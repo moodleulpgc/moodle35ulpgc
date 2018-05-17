@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/registry/db" VERSION="20130802" COMMENT="XMLDB file for Moodle mod/registry"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="registry" COMMENT="This table saves information about an instance of mod_registry in a course.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course registry activity belongs to"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the registry activity"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
+        <FIELD NAME="category" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="course category source"/>
+        <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Due date for activity registration"/>
+        <FIELD NAME="regmodule" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="module instances to registry"/>
+        <FIELD NAME="regsection" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="course section for instances"/>
+        <FIELD NAME="visibility" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="adminmod" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="tracker" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Tracker instance for this registry"/>
+        <FIELD NAME="issuename" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Word for issue"/>
+        <FIELD NAME="itemname" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Word for item"/>
+        <FIELD NAME="syncroles" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="registry_submissions" COMMENT="This table keeps information about course/user activity registrations ">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="registryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="registry instance"/>
+        <FIELD NAME="regcourse" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="course registryed"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="user sending registry"/>
+        <FIELD NAME="itemhash" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The hash stamp for course/user submission."/>
+        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="registry-associated tracker issue"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="The numerical grade for this submission. Can be determined by scales/advancedgradingforms etc but will always be converted back to a floating point number."/>
+        <FIELD NAME="grader" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timegraded" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="registryid" TYPE="foreign" FIELDS="registryid" REFTABLE="registry" REFFIELDS="id" COMMENT="The instance of mod_registry this submission belongs to."/>
+        <KEY NAME="regcourse" TYPE="foreign" FIELDS="regcourse" REFTABLE="course" REFFIELDS="id" COMMENT="The instance of course registered by this submission."/>
+        <KEY NAME="issueid" TYPE="foreign" FIELDS="issueid" REFTABLE="tracker_issue" REFFIELDS="id" COMMENT="The instance of tracker issue registered by this submission."/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" COMMENT="The instance of user submitting this activity registration."/>
+      </KEYS>
+      <INDEXES>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

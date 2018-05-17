@@ -1,0 +1,162 @@
+
+HTML, BODY {
+	height: 100%;
+}
+
+.lblChangeTitle, .lblEdit {
+	color: white;
+	font-size: xx-small;
+	cursor: pointer;
+	margin-left: 2px;
+	text-decoration: underline;
+}
+
+.lblEdit {
+	font-size: x-small;
+	background-color: #6495ED;
+	margin: 1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color:  #6495ED;
+}
+
+.cmapLabelTable {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	border-collapse: collapse;
+}
+
+.relationship .cmCornerTopLeft { height:4px; width:4px; background-image: url("tl.gif"); }
+.relationship .cmCornerTopRight { height:4px; width:4px; background-image: url("tr.gif");}
+.relationship .cmTopCenter { height:4px; background-image: url("top.gif");}
+.relationship .cmLeft {width:4px;background-image: url("left.gif");}
+.relationship .cmRight {width:4px;background-image: url("right.gif");}
+.relationship .cmCenter {padding:2px;}
+.relationship .cmCornerBottomLeft { height:4px; width:4px;background-image: url("bl.gif");}
+.relationship .cmCornerBottomRight { height:4px; width:4px;background-image: url("br.gif");}
+.relationship .cmBottomCenter { height:4px; background-image: url("bottom.gif");}
+
+.concept .cmCornerTopLeft { height:4px; width:4px; background-image: url("tl2.gif"); }
+.concept .cmCornerTopRight { height:4px; width:4px; background-image: url("tr2.gif");}
+.concept .cmTopCenter { height:4px; background-image: url("top2.gif");}
+.concept .cmLeft {width:4px;background-image: url("left2.gif");}
+.concept .cmRight {width:4px;background-image: url("right2.gif");}
+.concept .cmCenter {padding:2px;}
+.concept .cmCornerBottomLeft { height:4px; width:4px;background-image: url("bl2.gif");}
+.concept .cmCornerBottomRight { height:4px; width:4px;background-image: url("br2.gif");}
+.concept .cmBottomCenter { height:4px; background-image: url("bottom2.gif");}
+
+.concept, .relationship, .concept td, .relationship td, .concept table, .relationship table {
+	border: 0px;
+	border-style: none;
+	border-color: grey;
+	color: black;
+/*	background-color: #6495ED; */
+	font-weight: bold;
+	padding: 0px;
+	margin-bottom: 0px;
+}
+
+.concept {
+	background-color: #6495ED;
+}
+
+.relationship {
+	background-color: #FFFFFF;
+}
+
+.cmapedPanel, .titlePanel {
+	margin-bottom: 0px;
+}
+
+.cmapedPanel td, .gwt-DialogBox td {
+	padding: 0px;
+}
+
+.cmapTitle {
+	margin-left: 3px;
+	margin-top: 3px;
+	font-size: large;
+	font-weight: bold;
+}
+
+.titlePanel {
+	border-color: black;
+	border-width: 1px;
+	border-bottom-style: none;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	background-color: #6495ED;
+	width: 100%;
+	vertical-align: bottom;
+}
+.titlePanel .gwt-Button {
+	font-size: xx-small;
+	margin: 1px;
+}
+.btnAccept, .btnCancel, .btnDelete {
+	margin-left: 2px;
+	margin-top: 3px;
+}
+
+.txtNewValue {
+	border: 1px;
+	border-style: solid;
+	border-color: black;
+	width: 98%;	
+	margin-right: 2px;
+}
+
+.cmapPanel {
+	border: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+.srcRelationship-svg {
+	stroke: #666666;
+}
+
+.tgtRelationship-svg {
+	stroke: #666666;
+	fill: #666666;
+}
+
+.sendButton {
+  display: block;
+  font-size: 16pt;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+  margin: 15px 6px 6px;
+}
+
+.btnEditConcept {
+	background-color: #FFFF;
+	margin: 1px;
+	cursor: pointer;
+}
+
+.addConceptCursor {
+	cursor: url('addconcept.cur'), auto;
+}
+
+.addRelationshipCursor {
+	cursor: url('addrelationship.cur'), auto;
+}

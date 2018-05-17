@@ -1,0 +1,10 @@
+.path-mod-assign div.solutionsheet.greyedout,
+.path-mod-assign div.solutionsheet.greyedout a,
+.path-mod-assign div.solutionsheet.greyedout a.visited {
+    color: grey;
+}
+
+.path-mod-assign div.solutionshowhide {
+    padding-top: 0.5em;
+    padding-bottom: 1em;
+}

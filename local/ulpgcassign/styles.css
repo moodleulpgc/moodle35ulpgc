@@ -1,0 +1,72 @@
+/* assign additional classes
+-------------------------*/
+
+.path-mod-assign .extensiondate {
+    color: black;
+    background-color: #eee8aa;
+}
+
+.path-mod-assign .summarytable td {
+    border-collapse: collapse;
+    border: 1px solid #E0E0E0;
+}
+
+.path-mod-assign hr.separator {
+    border:  1px solid  #DDDDDD;
+    background-color: #DDDDDD;
+    color: #DDDDDD;
+    height: 1px;
+    margin-right:84%;
+    width: 16%
+}
+
+.path-mod-assign .gradingtablefiltermsg {
+    color : DarkRed;
+}
+
+.path-mod-assign div.oldsubmission {
+    background-color: #e5e4e2;
+}
+
+.path-mod-assign div.latesubmission {
+    color: black;
+    background-color: #eee8aa;
+}
+
+/* TODO  get these values from settings  in local_ulpgcassign settings or in theme
+ * 
+ * [[setting:coursesectionborderwidth]]
+ * 
+ */
+
+.path-mod-assign div.submissionstatussubmitted_graded {
+    color: black;
+    background-color: #dfffdf;   /* #cfefcf */
+}
+
+.path-mod-assign div.submissionstatussubmitted {
+    background-color: #efcfcf; /* #cfefcf */
+}
+
+.path-mod-assign div.submissiongraded {
+    background-color: #bfffbf; /* #cfefcf */
+}
+
+.path-mod-assign .submissionmodifiedlater {
+    color : maroon;
+}    
+
+.path-mod-assign .ffilemanager .filemanager {
+    width: 80%;
+}
+
+.path-mod-assign div.usersummary div.usersummarysection img.userpicture {
+    width: 100px;
+    height: 100px;
+    border-radius: 20%;
+}
+.path-mod-assign [data-region="user-info"] .img-rounded {
+    height: 60px;
+    width: 60px;
+    border-radius: 25%;
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/ulpgcgroups/db" VERSION="2016020100" COMMENT="XMLDB file for ULPGC ulpgcgroups Moodle plugin"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_ulpgcgroups" COMMENT="group specific data from ULPGC">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the Moodle component which added this group membership (e.g. 'auth_myplugin'), or blank if it was added manually. (Entries which are created by a Moodle component cannot be removed in the normal user interface.)"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this can be used to define the instance of the component that created the entry. Otherwise should be left as default (0)."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="groupid" TYPE="foreign" FIELDS="groupid" REFTABLE="groups" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

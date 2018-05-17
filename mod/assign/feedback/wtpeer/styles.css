@@ -1,0 +1,172 @@
+/************************************************/ 
+/*  assignfeedback_wtpeer styles             */
+/**********************************************/
+
+.assignfeedback_wtpeer_widget .toolbar ul {
+    display: none;
+}
+
+
+.path-mod-assign .wtpeer.commandslist li {
+    display: inline;
+    list-style-type: none;
+    padding-right: 20px;
+}
+
+
+.path-mod-assign .singleselect.wtpeeritemmenu {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    text-align: center;
+}
+
+#page-mod-assign-viewpluginpage .wtpeer.clearfix  {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.wtpeer.backbuttons  {
+    display: inline-block;
+    width: auto;
+}
+
+.wtpeer.backbuttons  div.singlebutton {
+    float: left;
+}
+
+.path-mod-assign .singleselect.wtpeeritemmenu select {
+    text-align: left;
+}
+
+#page-mod-assign-viewpluginpage #assignmarkersform  {
+    padding-top : 12px;
+    padding-bottom : 12px;
+}
+
+#page-mod-assign-viewpluginpage #assignmarkersform  table {
+    width: auto;
+    margin: 0 auto;
+}
+
+#page-mod-assign-viewpluginpage .assessmenttable ul.markernames,
+#page-mod-assign-grading ul.assessresults {
+    list-style-type: none;
+    margin: 0 0 2px 0px;
+    font-size: 0.85em;
+}
+
+#page-mod-assign-view .wtpeer.assessmentintro {
+   background: #fafafa;
+   border: 1px solid #DADADA;
+   -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+   box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+   margin: 1em auto;
+   padding: 10px;
+   width: 85%;
+}
+
+#page-mod-assign-view .wtpeer div.intro.commands {
+    float: right;
+    max-width: 30%;
+}
+
+#page-mod-assign-view .wtpeer div.intro.allocationinfo {
+    float: left;
+    max-width: 70%;
+}
+
+#page-mod-assign-view .wtpeer table.wtpeer_userallocations td, 
+table.wtpeer.showassessment td,
+table.wtpeer.showassessment th {
+    vertical-align: top;
+    border-bottom: 1px solid #ddd;  
+}
+
+#page-mod-assign-view .wtpeer table.wtpeer_userallocations td.cell, 
+table.wtpeer.showassessment td, 
+table.wtpeer.showassessment th {
+    padding: 2px 6px 2px 6px;
+}
+
+#page-mod-assign-view .wtpeer table.wtpeer_userallocations td.gradingdate {
+    font-size: 0.8em !important;
+}
+
+#page-mod-assign-viewpluginpage .wtpeer.showassessment td.lastcol {
+    width: 85%;
+}
+
+#page-mod-assign-viewpluginpage table.wtpeer.showassessment {
+    width: 100%;
+    margin-top: 1.0em;
+    margin-bottom: 1.0em;
+}
+
+
+#page-mod-assign-viewpluginpage.jsenabled .nonjs-control,
+#page-mod-assign-viewpluginpage.jsenabled .nonjs-control input {
+  display: none;
+}
+
+#page-mod-assign-viewpluginpage .js-control {
+  display: none;
+}
+
+#page-mod-assign-viewpluginpage .js-control input {
+  border: none;
+}
+
+#page-mod-assign-viewpluginpage.jsenabled .js-control {
+  display: inline-block;
+}
+
+#page-mod-assign-viewpluginpage  #region-main .btn.btn-small {
+    color: #333 !important;
+    padding: 2px 10px;
+
+}
+#page-mod-assign-viewpluginpage .btn-group .btn.dropdown-toggle {
+  background-color: #f5f5f5;
+}
+
+#page-mod-assign-viewpluginpage #region-main .dropdown-menu > li > a:hover,
+#page-mod-assign-viewpluginpage #region-main .dropdown-menu > li > a:focus,
+#page-mod-assign-viewpluginpage #region-main .dropdown-submenu:hover > a,
+#page-mod-assign-viewpluginpage #region-main .dropdown-submenu:focus > a {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: #0081c2;
+  background-image: -moz-linear-gradient(top, #0088cc, #0077b3);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0077b3));
+  background-image: -webkit-linear-gradient(top, #0088cc, #0077b3);
+  background-image: -o-linear-gradient(top, #0088cc, #0077b3);
+  background-image: linear-gradient(to bottom, #0088cc, #0077b3);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
+}
+
+
+#page-mod-assign-viewpluginpage .showassessment.download  {
+    float: right;
+    padding-top: 8px;
+}
+
+#page-mod-assign-viewpluginpage .assessmenttable ul.assessmentstatus {
+    list-style-type: none;
+    margin: 0 0 2px 0px;
+    word-wrap: normal;
+}
+
+#page-mod-assign-viewpluginpage .assessmenttable ul.assessmentstatus .success {
+    color: #006400;
+}
+
+#page-mod-assign-viewpluginpage .assessmenttable ul.assessmentstatus .error {
+    /* color: #800000; */
+}
+
+#page-mod-assign-viewpluginpage .assessmenttable .userlist .collapsibleregioncaption {
+    padding-left: 0px;
+}

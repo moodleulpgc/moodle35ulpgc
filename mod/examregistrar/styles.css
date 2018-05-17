@@ -1,0 +1,131 @@
+/**
+ * Exam registrar module styles
+ *
+ */
+
+.tabdisplay {margin-bottom: 0;}
+.examregmanagementtable {
+    clear:both;
+    width:100%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:left;
+}
+
+.examregprintexamtable {
+    clear:both;
+    width: 70%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:left;
+}
+
+.examcoursereview {
+    margin-top: 2.0em;
+}
+
+.examcourseviewtable {
+    clear:both;
+    width: 100%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:left;
+    border: 1px solid #DDD;
+}
+
+.examattemptreviewtable {
+    clear:both;
+    width: 90%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:left;
+    border: 1px solid #DDD;
+}
+
+.examcourseviewtable th.header,
+.examattemptreviewtable th.header {border: 1px solid #CCC;}
+.examcourseviewtable td,
+.examattemptreviewtable td {border: 1px solid #DDD; padding: 2px 4px;}
+
+td.colperiod,
+td.colexam {width:16%;}
+td.coldate {width:20%;}
+td.colcall {width:3%; text-align: center;}
+td.colbooked {width:15%; text-align: center;}
+td.colexamfile {}
+td.colroom {width:10%; text-align: center;}
+td.coltaken {width:5%;}
+
+td.colstatus {width:5%; text-align: center;}
+td.colgeneratinguser {width:20%;}
+td.colreview {width:10%;text-align: left;}
+td.colaction  {width:10%;}
+
+.examregmanagementform {
+    width:90%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:left;
+}
+
+.examregistrarmanagefilterform label,
+.examregallocationcontrolsleft label {
+    display: inline;
+}
+
+
+.managesessionheader {border-style: solid; border-width: 2px; border-color: #DDD; padding: 4px 10px; }
+.managesessionfooter {border-style: none; padding: 4px 10px; float:right; text-align:right; }
+.managesessioniteminfo {text-align:left; float:left;}
+.managesesionactionlink {text-align:right;}
+.examreviewsynchronize,
+.examreviewissuefilelink,
+.examreviewstatusicons {text-align:right; float:right; margin-top: 2px;}
+
+.examregprintbuttons {margin-left: 6.0em; margin-top: 1.0em; }
+
+.managesession.collapsibleregion {border-style: solid; border-width: 2px; border-color: #DDD; min-height:100px; margin-bottom: 1.0em;}
+.managesession .collapsibleregioninner {padding: 5px;}
+.managesession .collapsibleregioncaption {background-color: #DDD; font-weight:bold; padding-left: 2.0em; padding-top: 2px; padding-bottom: 2px;}
+.userlist .collapsibleregioncaption {background-color: white; font-weight:bold; padding-left: 0.5em; padding-top: 2px; padding-bottom: 2px;}
+.userlist.intable {text-align:left;}
+.userlist.intable ul {list-style-type:none;}
+.qcuserlist .collapsibleregioncaption {background-color: #FFE4E1; font-weight:bold; padding-left: 1.0em; padding-top: 2px; padding-bottom: 2px;} /* #FFB6C1*/
+
+.examregsessionrooms,
+.examregqualitycontrol,
+.examregroomallocatedseats,
+.examregsessionresponses {width:49%; float:left;}
+.examregsessionexams,
+.examregprintoperators,
+.examregunallocatedexams,
+.examregspecialexams {width:49%; float:right; }
+
+.examregallocationcontrols {width:90%; float:both; }
+.examregallocationcontrolsleft {width:55%; float:left; }
+.examregallocationcontrolsright {width:22%; float:right; }
+.examregallocation {float:both;}
+
+.allocatedroomheaderleft  {width:50%; float:left; }
+.allocatedroomheaderright  {width:40%; float:right; }
+
+.roomexamslist li  {list-style-type: disc; }
+.additionalexam li  {list-style-type: circle; margin-left: 2.0em}
+.busyalloc { color: red !important;}
+.freealloc { color: green;}
+
+.examregistrarfilterform {margin-top: 1.5em; margin-bottom: 1.5em;}
+.singleselect.filter {float:left;}
+.singleselect.center {margin-left:auto; margin-right:auto; text-align:center;}
+
+.allocatedroom,
+.allocatedexam {margin-top: 1.5em;}
+.allocatedroombody,
+.allocatedexambody {padding: 4px 4px 4px 1.5em; }
+.allocatedroombody ul,
+.allocatedexambody ul {padding-left: 2.0em; }
+
+#page-mod-examregistrar-view   .bookingform .fitemtitle  {width:40%; text-align:left;}
+#page-mod-examregistrar-view  .bookingform .felement  {width:50%; text-align:left;}
+
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/quiz/report/makeexam/db" VERSION="20130920" COMMENT="XMLDB file for Moodle mod/quiz/report/makeexam"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="quiz_makeexam_attempts" COMMENT="table to keep quiz attemps used as exams.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="currentattempt" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="questions" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Comma-separated list of question ids, with 0s for page breaks. The quiz layout. See also the quiz_question_instances table."/>
+        <FIELD NAME="attempt" TYPE="int" LENGTH="6" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Quiz name."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="From table examregistrar_exams"/>
+        <FIELD NAME="examfileid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="From table examregistrar_examfiles"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timesubmitted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="quizid" UNIQUE="false" FIELDS="quizid"/>
+        <INDEX NAME="examid" UNIQUE="false" FIELDS="examid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="quiz_makeexam_slots" COMMENT="Stores the original quiz slots for a saved quiz attempt.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references quiz.id."/>
+        <FIELD NAME="mkattempt" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references makeexam_attempt.id."/>
+        <FIELD NAME="inuse" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="slot" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Where this question comes in order in the list of questions in this quiz. Like question_attempts.slot."/>
+        <FIELD NAME="page" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The page number that this questions appears on. If the question in slot n appears on page p, then the question in slot n+1 must appear on page p or p+1. Well, except that when a quiz is being created, there may be empty pages, which would cause the page number to jump here."/>
+        <FIELD NAME="requireprevious" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Set to 1 when current question requires previous one to be answered first."/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references question.id."/>
+        <FIELD NAME="maxmark" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="7" COMMENT="How many marks this question contributes to quiz.sumgrades."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="quizid" TYPE="foreign" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id"/>
+        <KEY NAME="mkattempt" TYPE="foreign" FIELDS="mkattempt" REFTABLE="quiz_makeexam_attempts" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="quiz_makeexam_sections" COMMENT="Stores original sections of a quiz with section name (heading).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key references quiz.id."/>
+        <FIELD NAME="mkattempt" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key references makeexam_attempt.id."/>
+        <FIELD NAME="inuse" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="firstslot" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of the first slot in the section. The section runs from here to the start of the next section, or the end of the quiz."/>
+        <FIELD NAME="heading" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false" COMMENT="The text of the heading. May be an empty string/null. Multilang format."/>
+        <FIELD NAME="shufflequestions" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether the question order within this section should be shuffled for each attempt."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="quizid" TYPE="foreign" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id"/>
+        <KEY NAME="mkattempt" TYPE="foreign" FIELDS="mkattempt" REFTABLE="quiz_makeexam_attempts" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

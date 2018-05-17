@@ -1,0 +1,29 @@
+
+.block_supervision .footer {margin-top: 5px;}
+
+.supervisorstable {
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.supervisorstable td,
+.supervisorstable th {vertical-align: middle;text-align: left;padding: 4px;}
+
+.warning_block {
+    background-color: #FFC2C2; /*#F08080; /*#FA8072; pink; */
+    padding: 8px 4px 16px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+}
+.warning_none {
+    background-color: #98FB98; /*#62C462; /*##98FB98;  PaleGreen */
+    padding: 8px 4px 16px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+}

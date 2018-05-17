@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/assign/submission/exam/db" VERSION="20120423" COMMENT="XMLDB exam for Moodle mod/assign/submission/exam"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="assignsubmission_exam" COMMENT="Info about exam submissions for assignments">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="numexams" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The number of exams the student submitted."/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"  COMMENT="Reference to examregistrar_exams table if exists"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether the exam is especting, taken, delayed etc. "/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this submission info."/>
+        <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assign" REFFIELDS="id" COMMENT="The assignment instance this submission relates to"/>
+        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assign_submission" REFFIELDS="id" COMMENT="The submission this exam submission relates to."/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examid" UNIQUE="false" FIELDS="examid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

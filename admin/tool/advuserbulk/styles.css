@@ -1,0 +1,21 @@
+.path-admin-tool-advuserbulk .selectcourses td {
+    border: none;
+}
+
+.path-admin-tool-advuserbulk #buttonscell #addcontrols {
+    height: 13em;
+    margin-top: 3em;
+}
+
+.path-admin-tool-advuserbulk .selectcourses #existingcell,
+.path-admin-tool-advuserbulk .selectcourses #potentialcell {
+    width: 40%;
+}
+
+.path-admin-tool-advuserbulk #buttonscell {
+    text-align: center;
+}
+
+.path-admin-tool-advuserbulk .selectcourses select {
+    width: 100%;
+}

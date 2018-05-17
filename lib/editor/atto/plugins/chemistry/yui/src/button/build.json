@@ -1,0 +1,10 @@
+{
+  "name": "moodle-atto_chemistry-button",
+  "builds": {
+    "moodle-atto_chemistry-button": {
+      "jsfiles": [
+        "button.js"
+      ]
+    }
+  }
+}

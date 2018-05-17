@@ -1,0 +1,269 @@
+/*
+ This file is part of Moodle - http://moodle.org/
+
+ Moodle is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Moodle is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * masks module style sheet for 'frame*' pages embedded in main view
+ *
+ * @copyright  2016 Edunao SAS (contact@edunao.com)
+ * @author     Sadge (daniel@edunao.com)
+ * @package    mod_masks
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+/*-----------------------------------------
+  General frame layout
+*/
+
+html,
+body {
+    border: 0;
+    margin: 0;
+    /*overflow-y: hidden;*/
+    overflow : auto;
+    padding: 0;
+}
+
+form {
+    margin: 0;
+}
+
+#masks-frame {
+    text-align: center;
+}
+
+#masks-frame .frame-header,
+#masks-frame .frame-body,
+#masks-frame .frame-footer,
+#masks-frame .frame-section {
+    box-sizing: border-box;
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+#masks-frame .frame-title {
+    font-size: xx-large;
+    padding-bottom: 0.25em;
+    padding-top: 0.5em;
+}
+
+#masks-frame .frame-text {
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0 , 0.05);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    color: black;
+}
+
+#masks-frame .frame-text {
+    display: inline-block;
+    left: 0;
+    margin: 1em auto 1em auto;
+    margin-bottom: 20px;
+    max-width: 90%;
+    min-height: 20px;
+    padding: 19px;
+    position: relative;
+    right: 0;
+    text-align: left;
+}
+
+#masks-frame .frame-footer input,
+#masks-frame .frame-footer button {
+    margin: 1em;
+}
+
+/*-----------------------------------------
+  Question Editing layout
+*/
+
+#masks-frame.mask-edit-form .frame-body {
+    display: block;
+    left: 0;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 98%;
+    min-height: 10em;
+    padding: 0 5px;
+    right: 0;
+    top: 0;
+    width: 658;
+}
+
+#masks-frame.mask-edit-form .hint-section,
+#masks-frame.mask-edit-form .btn-hint-hide
+{
+    display: none;
+}
+
+#masks-frame.mask-edit-form.show-hint .btn-hint-hide
+{
+    display: inline;
+}
+
+#masks-frame.mask-edit-form.show-hint .btn-hint-show
+{
+    display: none;
+}
+
+#masks-frame.mask-edit-form.show-hint .hint-section {
+    bottom: 0;
+    display: block;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+}
+
+#masks-frame.mask-edit-form .hint-section .button-sub-section {
+    position: absolute;
+    right: 2px;
+    top: 0;
+}
+
+#masks-frame.mask-edit-form .hint-section .text-sub-section {
+    width: 100%;
+}
+
+#masks-frame.mask-edit-form.show-hint .question-section {
+    visibility: hidden;
+}
+
+#masks-frame.mask-edit-form .question-section {
+    display: block;
+    left: 0;
+    margin: auto;
+    max-width: 98%;
+    padding: 0 5px;
+    position: relative;
+    right: 0;
+    text-align: left;
+    top: 0;
+    width: 658;
+}
+
+#masks-frame.mask-edit-form textarea,
+#masks-frame.mask-edit-form input[type=text] {
+    width: 100%;
+}
+
+#masks-frame.mask-edit-form textarea {
+    resize: vertical;
+}
+
+#masks-frame .form-field.with-heading {
+    margin: 0.5em 0 0.5em 0;
+}
+
+#masks-frame .form-field {
+    position: relative;
+}
+
+#masks-frame .pre-noheading {
+    margin-top: -0.5em;
+}
+
+#masks-frame .post-noheading {
+    margin-bottom: 0.5em;
+}
+
+
+/*-----------------------------------------
+  Question / Answer layout (Student view)
+*/
+
+#masks-frame .answer {
+    display: inline-block;
+    left: 0;
+    margin: 1em auto 1em auto;
+    position: relative;
+    right: 0;
+    text-align: left;
+    max-width: 95%;
+}
+
+#masks-frame .answer input[type=text] {
+    max-width: 80%;
+    width: 400px;
+}
+
+#masks-frame .option {
+    cursor: pointer;
+    display: block;
+    margin: 0.125em 0 0.125em 0;
+    position: relative;
+}
+
+#masks-frame .option input {
+    cursor: pointer;
+}
+
+#masks-frame .option:hover {
+    text-decoration: underline;
+}
+
+
+/*-----------------------------------------
+  Upload frame
+*/
+
+#masks-frame.upload .upload-widget input {
+    border: solid lightgray 1px;
+    margin-bottom: 2em;
+    margin-top: 2em;
+    padding: 2px;
+}
+
+#masks-frame .upload-wait {
+    display: none;
+}
+
+#masks-frame .upload-input {
+    display: block;
+}
+
+
+#masks-frame.upload-running .upload-wait {
+    display: block;
+}
+
+#masks-frame.upload-running .upload-input {
+    display: none;
+}
+
+#masks-frame .uploading-img {
+    background-image: url("pix/loading.gif");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    height: 80px;
+    margin: 20px;
+    position: relative;
+    width: 80px;
+}
+
+#masks-frame.upload-error {
+    height : 100%;
+    overflow : auto;
+}

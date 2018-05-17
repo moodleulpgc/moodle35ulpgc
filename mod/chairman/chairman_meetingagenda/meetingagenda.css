@@ -1,0 +1,19 @@
+
+textarea[id^=id_topic_description_] {
+    width: 100%;
+}
+ #chairman_save_pdf {
+     margin: 10px;
+     padding: 5px;
+     float: right;
+     vertical-align:top;
+ }
+
+ .sortable_icon {
+     float: left;
+ }
+
+ .mform .ui-sortable{
+     list-style-image: none;
+     list-style-type: none;
+ }

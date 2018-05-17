@@ -1,0 +1,94 @@
+.que.easyofischer .answer {
+    padding: 0.3em;
+    width: auto;
+    display: inline;
+}
+.que.easyofischer .answer input {
+    width: 65%;
+}
+.que.easyofischer.applet {
+	width:520px;
+}
+.que.easyofischer.author {
+		float: right;
+		font-style: italic ;
+		font-size: 10px;
+}
+
+
+
+
+#page-question-type-easyofischer .mform .textareamonospace {
+    white-space: pre;
+    font-family: Andale Mono, Monaco, Courier New, DejaVu Sans Mono, monospace;
+}
+
+
+.que.easyofischer span.answerlabel {
+    vertical-align: top;
+}
+
+#div1 {width:95px;height:47px;padding:10px;border:1px solid #aaaaaa;}
+/* #divnew {width:220px;height:240px;padding:10px;border:1px solid #aaaaaa; background-image: url(type/easyofischer/pix/1chiral.png); float: left} */
+
+
+#divnewf1 {
+background-color:#ffffff;
+background-image: url([[pix:qtype_easyofischer|1chiral]]);
+width:220px;
+height:240px;
+padding:10px;
+border:1px solid #aaaaaa;
+float: left;
+}   
+
+
+
+#divnewf2 {
+background-color:#ffffff;
+background-image: url([[pix:qtype_easyofischer|2chiral]]);
+width:220px;
+height:300px;
+padding:10px;
+border:1px solid #aaaaaa;
+float: left;
+}   
+
+#divnewf3 {
+background-color:#ffffff;
+background-image: url([[pix:qtype_easyofischer|3chiral]]);
+width:220px;
+height:360px;
+padding:10px;
+border:1px solid #aaaaaa;
+float: left;
+}  
+
+
+
+#divnewf4 {
+background-color:#ffffff;
+background-image: url([[pix:qtype_easyofischer|4chiral]]);
+width:220px;
+height:420px;
+padding:10px;
+border:1px solid #aaaaaa;
+float: left;
+}  
+
+
+
+#pos0slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:95px; left:-1px;}
+#pos1slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-15px; left:79px;}
+#pos2slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:30px; left:160px;}
+#pos3slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:75px; left:80px;}
+
+div.flipable img[id^='oh']
+ {
+    transform: scale(-1, 1);
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -khtml-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+}

@@ -1,0 +1,139 @@
+/* ULPGC additional classes
+-------------------------*/
+
+.availabilityinfo {
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    padding: 4px 12px;
+    position: absolute;
+    top: 1.4em;
+    right: 24px;
+    z-index: -100;
+    max-width: 75%;
+    background-color: #EDEDFF;
+    opacity: 0;
+    border: 1px solid #003867;
+    /*
+    transition: opacity .25s ease-in-out;
+    -moz-transition: opacity .25s ease-in-out;
+    -webkit-transition: opacity .25s ease-in-out;
+    */
+}
+
+.section.sectiondraggable .activity .availabilityinfo {
+       max-width: 60%;
+}
+
+.contentwithoutlink:hover~.availabilityinfo,
+.activityinstance:hover~.availabilityinfo {
+    opacity: 1;
+    z-index: 100;
+}
+
+.sectionname:hover~.availabilityinfo {
+    opacity: 1;
+    z-index: 100;
+    top: -12px;
+    left: 15%;
+    position: relative;
+    max-width: 75%;
+}
+
+.section .activity .restriction {
+    position: absolute;
+    right: -15px;
+    top: 0px;
+}
+
+.activity .availabilityinfo:hover{
+    z-index: 100;
+    opacity: 1;
+}
+
+/* user profile list & like styles
+ ========================================================================= */
+
+.userprofile .profile_tree .node_category .contentnode {
+    list-style-type: initial;
+    margin-left: 0px;
+}
+
+
+
+/* mod_forum styles
+ ========================================================================= */
+
+#page-mod-forum-view .forumaddnew {
+    text-align: center;
+}
+
+.forumpost .header {
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+}
+
+
+.forumheaderlist  {
+    border: 1px solid;
+    border-collapse: collapse;
+}
+
+.path-mod-forum .forumheaderlist th {
+    padding: 5px;
+}
+
+.path-mod-forum .forumheaderlist td {
+    border-color: #DDD;
+    border-style: solid none solid none;
+}
+
+.forumheaderlist .header {
+    border: 1px solid;
+    border-collapse: collapse;
+    background: #dedede;
+}
+
+.forumheaderlist td.author {
+    border-style: solid solid solid none;
+}
+
+.forumheaderlist td.lastpost {
+    font-size: 0.75em;
+    word-wrap: normal;
+}
+
+.forumheaderlist tbody>tr:nth-child(odd)>td {
+    background-color: #F4F4F4;
+}
+.forumheaderlist tbody tr:hover>td {
+    background-color: #FAFADA;
+}
+
+/* mod_dialogue styles
+ ========================================================================= */
+
+.availability-dialogue ul button {
+    float: left;
+    margin-left: 1em;
+    margin-right: 1em;
+    min-width: 140px;
+    margin-top: 4px;
+}
+
+.availability-dialogue label {
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 1em;
+}
+
+body.path-mod-dialogue #region-main .dropdown-menu > li > a {
+    padding: 3px 10px;
+}
+
+body.path-mod-dialogue #region-main  .btn.btn-small.disabled {
+    background-color: #5CB85C;
+    color: #000;
+    font-weight: bold;
+}
+

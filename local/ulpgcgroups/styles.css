@@ -1,0 +1,92 @@
+/* groups additional classes
+-------------------------*/
+.ulpgc_dependency {
+    color: maroon;
+}
+
+[id^=page-group-] label {
+    display: inline; 
+}
+
+[id^=page-group-] img.iconhelp {
+    padding: 0px 5px;
+}
+
+#page-group-overview label {
+    display: block; 
+}
+
+#page-group-index .controlledmsg {
+    color: maroon;
+}
+
+#page-group-index .singleselect, 
+#page-group-members .singleselect,
+#page-group-overview .singleselect {
+    width: auto;
+}
+
+#page-group-overview .namingmenu .singleselect label,
+#page-group-overview .sourcemenu .singleselect label {
+    display: inline; 
+}
+#page-group-overview .namingmenu {
+    padding-top: 8px;
+}
+
+#page-group-index .groupingmenu, #page-group-index .namingmenu,
+#page-group-members .sourcemenu, #page-group-members .exclusivegroupingmenu, 
+#page-group-members .namingmenu {
+    float: both;
+    margin: auto;
+    text-align: right;
+    padding-bottom: 6px;
+}
+
+div .userselector  {
+    margin-top: 0;
+    overflow:auto;
+    overflow-x:scroll;
+}
+
+/* groups related pages styles
+ ========================================================================= */
+
+#groupeditform .groupmanagementtable.boxaligncenter {
+  -webkit-columns: 2 280px;
+     -moz-columns: 2 280px;
+          columns: 2 280px;
+  -webkit-column-gap: 2em;
+     -moz-column-gap: 2em;
+          column-gap: 2em;
+}
+
+#groupeditform .groups, #groupeditform .members {
+    display: inline-block;
+    width: 100% !important;
+    float: none !important;
+}
+
+#groupeditform select[multiple], #groupeditform select[size] {
+    height:auto;
+    min-height: 20.0em;
+}
+
+#groupeditform .groups select, #groupeditform .members select {
+    max-width: 100%;
+}
+
+#groupeditform .groups label, #groupeditform .members label {
+    min-height: 3.2em;
+    max-height: 3.2em;
+    display: block;
+    overflow: auto;
+}
+
+#groupeditform .groups p, #groupeditform .members p {
+    margin:  0 0 4px; 
+}
+
+#groupeditform input[type="submit"] {
+    margin: 0 0 4px 5px; 
+}

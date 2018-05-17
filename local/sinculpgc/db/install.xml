@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/sinculpgc/db" VERSION="2016020100" COMMENT="Archivo XMLDB para extensión de sincronización de la ULPGC"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_sinculpgc_user" COMMENT="user specific details for ULPGC" >
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="category" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="dedication" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="totaldedication" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="5"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>      
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_sinculpgc_units" COMMENT="Definiciones de Centros o Departamentos ULPGC" >
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="5" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="either centre, department or other word"/>    
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="director" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Director user id"/>
+        <FIELD NAME="secretary" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Secretary user id"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idnumber" UNIQUE="false" FIELDS="idnumber"/>
+        <INDEX NAME="type" UNIQUE="false" FIELDS="type"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/examregistrar/db" VERSION="20131225" COMMENT="XMLDB file for Moodle mod/examregistrar"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="examregistrar" COMMENT="This table saves information about an instance of mod_examregistrar in a course.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course examregistrar activity belongs to"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the examregistrar activity"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
+        <FIELD NAME="annuality" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="programme" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Usage and display mode for module instance"/>
+        <FIELD NAME="lagdays" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="programme" UNIQUE="false" FIELDS="programme"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_elements" COMMENT="The table keeps collections of valid customized values for other fields in related tables.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="codename" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="type" UNIQUE="false" FIELDS="type"/>
+        <INDEX NAME="sortorder" UNIQUE="false" FIELDS="sortorder"/>
+        <INDEX NAME="type-codename" UNIQUE="true" FIELDS="type, codename" COMMENT="Ensures uniqueness of shortname values for a given element type."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_periods" COMMENT="Exam periods or calls. Spanish &quot;convocatorias&quot;.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="annuality" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="degreetype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="term" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be a term from examregistrar_elements"/>
+        <FIELD NAME="scope" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be a period from examregistrar_elements"/>
+        <FIELD NAME="calls" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="degreetype" TYPE="foreign" FIELDS="degreetype" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="scope" TYPE="foreign" FIELDS="scope" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="term" TYPE="foreign" FIELDS="term" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timestart" UNIQUE="false" FIELDS="timestart"/>
+        <INDEX NAME="timeend" UNIQUE="false" FIELDS="timeend"/>
+        <INDEX NAME="annuality-degreetype-term-scope" UNIQUE="true" FIELDS="annuality, degreetype, term, scope" COMMENT="Ensures uniqueness of exam periods by type."/>
+      </INDEXES>
+
+    </TABLE>
+    <TABLE NAME="examregistrar_exams" COMMENT="Keeps information of individual exams and their dates.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="programme" TYPE="char" LENGTH="60" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="period" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="examtype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="examcall" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="examdate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="period" TYPE="foreign" FIELDS="period" REFTABLE="examregistrar_periods" REFFIELDS="id"/>
+        <KEY NAME="examtype" TYPE="foreign" FIELDS="examtype" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="examcall" TYPE="foreign" FIELDS="examcall" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="examdate" TYPE="foreign" FIELDS="examdate" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="programme" UNIQUE="false" FIELDS="programme"/>
+        <INDEX NAME="shortname" UNIQUE="false" FIELDS="shortname"/>
+        <INDEX NAME="programme-shortname-period-examtype-examcall" UNIQUE="true" FIELDS="programme, shortname, period, examtype, examcall" COMMENT="Ensures uniqueness of exams."/>
+        </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_examfiles" COMMENT="Keeps information of PDF files corresponding to eachg exam.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="attempt" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+        <INDEX NAME="examid-attempt" UNIQUE="true" FIELDS="examid, attempt" COMMENT="Ensures uniqueness of exam attempts."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_locations" COMMENT="Stores information about places, venues and rooms">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"  COMMENT="Must be one of examregistrar_elements location values"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="60" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="address" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="addressformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="seats" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="parent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="depth" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="type" TYPE="foreign" FIELDS="type" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="parent" TYPE="foreign" FIELDS="parent" REFTABLE="examregistrar_locations" REFFIELDS="id" COMMENT="note that to make this recursive FK working someday, the parent field must be declared NULL"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idnumber" UNIQUE="true" FIELDS="idnumber" COMMENT="To make possible to export and import unique locations and staffers locations"/>
+        <INDEX NAME="name-type-idnumber" UNIQUE="true" FIELDS="name, type, idnumber" COMMENT="To make possible backup without duplicates."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_staffers" COMMENT="Stores information about people in charge at each location">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="locationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="role" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="locationid" TYPE="foreign" FIELDS="locationid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+        <KEY NAME="role" TYPE="foreign" FIELDS="role" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_bookings" COMMENT="Stores information about students registering for a particular exam">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="seat" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="locationid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+        <KEY NAME="locationid" TYPE="foreign" FIELDS="locationid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="seat" UNIQUE="false" FIELDS="seat"/>
+        <INDEX NAME="examid-seat" UNIQUE="false" FIELDS="examid, seat"/>
+        <INDEX NAME="examid-userid" UNIQUE="true" FIELDS="examid, userid" COMMENT="Ensures uniqueness of exam booking place by user."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_seatings" COMMENT="Stores information about students registering for a particular exam">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="locationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeslot" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="seat" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+        <KEY NAME="timeslot" TYPE="foreign" FIELDS="timeslot" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="locationid" TYPE="foreign" FIELDS="locationid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="seat" UNIQUE="false" FIELDS="seat"/>
+        <INDEX NAME="examid-userid" UNIQUE="true" FIELDS="examid, userid" COMMENT="Ensures uniqueness of exam seating by user."/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>/Encoding.php</location>
+        <name>Encoding</name>
+        <version>2.0</version>
+        <license>Revised BSD</license>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>

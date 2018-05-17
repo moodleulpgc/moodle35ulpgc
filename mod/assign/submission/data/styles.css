@@ -1,0 +1,37 @@
+/************************************************/ 
+/*  assignsubmission_data styles             */
+/**********************************************/
+
+.assignsubmission_data.alert-error {
+    width: 85%;
+    padding: 12px;
+}
+
+#id_assignsummision_data .form-shortname, 
+.assignsubmissiondata .dataname .form-shortname {
+    font-size: 0.95em;
+    color: #999999 !important;
+}
+
+.path-mod-assign .assignsubmissiondata {
+    display: table;
+}
+
+.path-mod-assign .assignsubmissiondata .datafield {
+    display: table-row;
+    border-bottom: 2px solid #ddd;
+    margin-top: 12px;
+}
+.assignsubmissiondata .dataname, 
+.assignsubmissiondata .datacontent{
+    display: table-cell;
+}
+.assignsubmissiondata .dataname {
+    width: 20%;
+    font-weight: bold;
+}
+
+.assignsubmissiondata .datacontent{
+    max-width: 85%;
+    width: 80%;
+}

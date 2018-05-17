@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/unedtrivial/db" VERSION="20170701" COMMENT="XMLDB file for Moodle mod/unedtrivial"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="unedtrivial" COMMENT="Main info related to unedtrivial activity">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+            <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Course unedtrivial activity belongs to"/>
+            <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
+            <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="General introduction of the unedtrivial activity"/>
+            <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
+            <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
+            <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
+            <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="100" SEQUENCE="false" COMMENT="The maximum grade. Can be negative to indicate the use of a scale."/>
+            <FIELD NAME="enddate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Activity finalization date"/>
+            <FIELD NAME="questionsperday" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="3" COMMENT="Number of questions per day"/>
+            <FIELD NAME="retryerror" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="7" COMMENT="Unix time to retry a wrong question"/>
+            <FIELD NAME="retrysuccess" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="14" COMMENT="Unix time to retry a correct question"/>
+            <FIELD NAME="timestocomplete" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="2" COMMENT="Success times to close a question"/>
+            <FIELD NAME="scoreerror" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="10" COMMENT="Success times to close a question"/>
+            <FIELD NAME="scoresuccess" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="2" COMMENT="Success times to close a question"/>
+            <FIELD NAME="teachermails" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" DEFAULT="" COMMENT="Teacher email accounts"/>
+            <FIELD NAME="completionsubmit" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Completion condition"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        </INDEXES>
+    </TABLE>
+    <TABLE NAME="unedtrivial_mails" COMMENT="Mail addresses of students">
+        <FIELDS>
+	    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+            <FIELD NAME="idunedtrivial" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Activity unedtrivial"/>
+            <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Student who has answered"/>
+            <FIELD NAME="mail" TYPE="text" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Email"/>
+	</FIELDS>
+	<KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="idunedtrivial" TYPE="foreign" FIELDS="idunedtrivial" REFTABLE="unedtrivial" REFFIELDS="id"/>
+            <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="idunedtrivial" UNIQUE="false" FIELDS="idunedtrivial"/>
+        </INDEXES>
+    </TABLE>
+    <TABLE NAME="unedtrivial_questions" COMMENT="Activity questions">
+        <FIELDS>
+	    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+            <FIELD NAME="idunedtrivial" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Activity unedtrivial"/>
+            <FIELD NAME="qtype" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question type"/>
+            <FIELD NAME="question" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Question text"/>
+            <FIELD NAME="option1" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Answer 1"/>
+            <FIELD NAME="option2" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Answer 2"/>
+            <FIELD NAME="option3" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Answer 3"/>
+            <FIELD NAME="option4" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Answer 4"/>
+            <FIELD NAME="answer" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Correct answer"/>
+            <FIELD NAME="explanation" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="An explanation related to the answer"/>
+            <FIELD NAME="shuffle" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Shuffle answers?"/>
+	</FIELDS>
+	<KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="idunedtrivial" TYPE="foreign" FIELDS="idunedtrivial" REFTABLE="unedtrivial" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="idunedtrivial" UNIQUE="false" FIELDS="idunedtrivial"/>
+        </INDEXES>
+    </TABLE>
+    <TABLE NAME="unedtrivial_history" COMMENT="Questions sent to students">
+        <FIELDS>
+	    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+            <FIELD NAME="idunedtrivial" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Activity unedtrivial"/>
+            <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Student who has answered"/>
+            <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question answered"/>
+            <FIELD NAME="questionstate" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Answer state"/>
+            <FIELD NAME="questionscore" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Points earned"/>
+            <FIELD NAME="questiondate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Next time when question will be sent"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="idunedtrivial" TYPE="foreign" FIELDS="idunedtrivial" REFTABLE="unedtrivial" REFFIELDS="id"/>
+            <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+            <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="unedtrivial_questions" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="idunedtrivial" UNIQUE="false" FIELDS="idunedtrivial"/>
+        </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

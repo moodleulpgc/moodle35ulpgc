@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/o365/db" VERSION="20141030" COMMENT="XMLDB file for Moodle local/o365 plugin"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_o365_cronqueue" COMMENT="Queued events for the next cron run">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="operation" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the operation to be performed"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="the operation data"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="the time the operation was created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="operation" UNIQUE="false" FIELDS="operation"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_calidmap" COMMENT="Maps local event ids to o365 event ids">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle event id"/>
+        <FIELD NAME="outlookeventid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="outlook event id"/>
+        <FIELD NAME="origin" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="event origin, moodle or o365"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle user id linked to outlookeventid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="event" UNIQUE="false" FIELDS="eventid"/>
+        <INDEX NAME="oevent" UNIQUE="false" FIELDS="outlookeventid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_calsub" COMMENT="Tracks calendar subscriptions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="user id"/>
+        <FIELD NAME="caltype" TYPE="char" LENGTH="31" NOTNULL="true" SEQUENCE="false" COMMENT="the type of calendar - site,user,course,group"/>
+        <FIELD NAME="caltypeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="the id of the entity the calendar is for, i.e. courseid"/>
+        <FIELD NAME="o365calid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the ID of the o365 calendar to sync to"/>
+        <FIELD NAME="isprimary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Is the o365 calendar the default."/>
+        <FIELD NAME="syncbehav" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the sync behavior"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time subscription created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="usrcal" UNIQUE="true" FIELDS="user_id,caltype,caltypeid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_connections" COMMENT="Stores information on which accounts are connected.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="muserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle user id"/>
+        <FIELD NAME="aadupn" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="aad upn"/>
+        <FIELD NAME="uselogin" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether the connection uses login"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="muserid" UNIQUE="true" FIELDS="muserid"/>
+        <INDEX NAME="aadupn" UNIQUE="true" FIELDS="aadupn"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_token" COMMENT="Stores tokens.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="user id"/>
+        <FIELD NAME="scope" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="token scope"/>
+        <FIELD NAME="resource" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="token resource"/>
+        <FIELD NAME="token" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="token"/>
+        <FIELD NAME="expiry" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="token expiry"/>
+        <FIELD NAME="refreshtoken" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="refresh token"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="usrresscp" UNIQUE="false" FIELDS="user_id,resource"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_coursespsite" COMMENT="Stores information about sharepoint sites created for Moodle courses.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle course id"/>
+        <FIELD NAME="siteid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="sharepoint site id"/>
+        <FIELD NAME="siteurl" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="sharepoint site url"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time site created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time site modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="siteid" UNIQUE="false" FIELDS="siteid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_objects" COMMENT="Stores information about Office 365 objects.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the type of object this record represents"/>
+        <FIELD NAME="subtype" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the subtype of object this record represents"/>
+        <FIELD NAME="objectid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="o365 object id"/>
+        <FIELD NAME="moodleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="corresponding moodle id"/>
+        <FIELD NAME="o365name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="identifiable name in o365"/>
+        <FIELD NAME="tenant" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="O365 tenant empty is host"/>
+        <FIELD NAME="metadata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="additional metadata"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time record created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time record modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="moodleid" UNIQUE="false" FIELDS="moodleid"/>
+        <INDEX NAME="objectid" UNIQUE="false" FIELDS="objectid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_spgroupdata" COMMENT="Stores information about sharepoint groups created for Moodle course sites.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="coursespsiteid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="foreign key to local_o365_coursepsite table"/>
+        <FIELD NAME="groupid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="sharepoint group id"/>
+        <FIELD NAME="grouptitle" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="group title"/>
+        <FIELD NAME="permtype" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the type of permissions granted to the group"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time group created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time group modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="coursespsiteid" UNIQUE="false" FIELDS="coursespsiteid"/>
+        <INDEX NAME="groupid" UNIQUE="false" FIELDS="groupid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_spgroupassign" COMMENT="Stores what users are assigned to what sharepoint groups.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle user id"/>
+        <FIELD NAME="groupid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="sharepoint group id"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time record created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="groupid" UNIQUE="false" FIELDS="groupid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_appassign" COMMENT="Stores information on which accounts are assigned to the app.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="muserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle user id"/>
+        <FIELD NAME="assigned" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is assigned to application"/>
+        <FIELD NAME="photoid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="photo etag id"/>
+        <FIELD NAME="photoupdated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="last time photo was updated"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="muserid" UNIQUE="true" FIELDS="muserid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_matchqueue" COMMENT="Stores the queue of users waiting to be matched.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="musername" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="moodle username"/>
+        <FIELD NAME="o365username" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="o365 username"/>
+        <FIELD NAME="openidconnect" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="whether this was completed successfully"/>
+        <FIELD NAME="errormessage" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="if there was an error, stores the error message"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="musername" UNIQUE="false" FIELDS="musername"/>
+        <INDEX NAME="completed" UNIQUE="false" FIELDS="completed"/>
+        <INDEX NAME="o365username" UNIQUE="false" FIELDS="o365username"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_coursegroupdata" COMMENT="Stores information about groups created for Moodle groups and courses.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle Courseid" />
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0" COMMENT="Moodle course group id"/>
+        <FIELD NAME="displayname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle course description for o365 group title"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle course description for o365 group description"/>
+        <FIELD NAME="descriptionformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="picture" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Moodle file storage id for o365 group picture, only used for course."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time group created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time group modified"/>
+        <FIELD NAME="classnotebook" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="whether class notebook created or not"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseidgroupid" UNIQUE="false" FIELDS="courseid,groupid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_o365_calsettings" COMMENT="Tracks user level Outlook calendar sync settings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="user id"/>
+        <FIELD NAME="o365calid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the ID of the o365 calendar to sync to"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time subscription created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="usrcal" UNIQUE="true" FIELDS="user_id"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

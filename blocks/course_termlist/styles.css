@@ -1,0 +1,38 @@
+/* Course termlist Block
+-------------------------*/
+.block_course_termlist {
+    border-style: none !important;
+}
+
+
+.block_course_termlist h2.my-category {
+    margin: 0.4em 0.5em 0.4em !important;
+}
+
+.block_course_termlist .coursebox {
+    margin-right: -5px  !important;
+    padding-right: -5px  !important;
+    margin-bottom: 5px;
+    border-style: solid !important;
+}
+
+h3.my-term {
+    margin: 0em 1.0em 0.2em !important;
+    font-weight: normal !important;
+}
+
+.block_course_termlist .my-courses-list {
+    padding-left: 0.5em;
+    margin-left: 2.5em;
+    margin-top: 0;
+    font-size: 1.2em;
+}
+
+.block_course_termlist .my-course-name {
+    line-height: 2.0em ;
+}
+
+.block_course_termlist .dimmed {
+    color: #999 !important;
+    font-style: normal !important;
+}

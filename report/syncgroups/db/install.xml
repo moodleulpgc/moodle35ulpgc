@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="report/syncgroups/db" VERSION="20130402" COMMENT="XMLDB file for Moodle groups synchronize report"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="groups_syncgroups" COMMENT="stores course groups synchronization relationships">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="targetgroup"/>
+        <FIELD NAME="targetgroup" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="course" NEXT="parentgroups"/>
+        <FIELD NAME="parentgroups" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="targetgroup" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="parentgroups" NEXT="visible"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="timemodified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="course"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id" COMMENT="The course instance this group belongs to." PREVIOUS="primary" NEXT="targetgroup"/>
+        <KEY NAME="targetgroup" TYPE="foreign" FIELDS="targetgroup" REFTABLE="groups" REFFIELDS="id" COMMENT="The group instance of this group." PREVIOUS="course"/>
+      </KEYS>
+      <INDEXES>
+      </INDEXES>
+  </TABLE>
+  </TABLES>
+</XMLDB>

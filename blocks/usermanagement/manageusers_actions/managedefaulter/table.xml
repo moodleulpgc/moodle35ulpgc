@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB  VERSION="2008101800" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES> 	
+ 	<TABLE NAME="admin_moroso" COMMENT="Estudiantes morosos" >
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="id de moroso" NEXT="course"/>
+		<FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="context de curso" PREVIOUS="id" NEXT="userid"/>
+		<FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" ENUM="false" COMMENT="id de usuario"  PREVIOUS="course"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for admin_moroso"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+  
+</XMLDB>

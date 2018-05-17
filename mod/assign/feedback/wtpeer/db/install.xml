@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/assign/feedback/wtpeer/db" VERSION="20130926" COMMENT="XMLDB file for Moodle mod/assign/feedback/wtpeer"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="assignfeedback_wtpeer_grades" COMMENT="Stores separate grades to be wtpeer">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="grader" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="gradertype" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The type of the grade: auto, peer, tutor, grader."/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="The numerical grade for this assignment submission. Can be determined by scales/advancedgradingforms etc but will always be converted back to a floating point number."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time the assignment submission was first modified by a grader."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The most recent modification time for the assignment submission by a grader."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assign_submission" REFFIELDS="id" COMMENT="The submission this file submission relates to."/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="grader" UNIQUE="false" FIELDS="grader"/>
+        <INDEX NAME="user-submission-grader-type" UNIQUE="true" FIELDS="submission,userid,grader,gradertype" COMMENT="Ensure uniqueness of grader grading"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assignfeedback_wtpeer_allocs" COMMENT="stores grader allocation to submission/userid">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="grader" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="gradertype" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The type of the grade: auto, peer, tutor, grader."/>
+        <FIELD NAME="allocator" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The most recent modification time for the allocation submission by a grader."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assign_submission" REFFIELDS="id" COMMENT="The submission this file submission relates to."/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="grader" UNIQUE="false" FIELDS="grader"/>
+        <INDEX NAME="user-submission-grader-type" UNIQUE="true" FIELDS="submission,userid,grader,gradertype" COMMENT="Ensure uniqueness of marker allocations"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

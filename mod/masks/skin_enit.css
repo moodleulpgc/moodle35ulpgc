@@ -1,0 +1,592 @@
+/*
+ This file is part of Moodle - http://moodle.org/
+
+ Moodle is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Moodle is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * masks module style sheet for skinning
+ *
+ * @copyright  2016 Edunao SAS (contact@edunao.com)
+ * @author     Sadge (daniel@edunao.com)
+ * @package    mod_masks
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/*-----------------------------------------
+    Common style across main view and embedded frames
+*/
+
+@import 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,700';
+#masks, 
+#masks-frame
+{
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+}
+
+
+/*-----------------------------------------
+    Main view
+*/
+
+/*-----------------------------------------
+  Main header
+*/
+
+
+#masks .menu-bar-group.right-group,
+#masks .masks-header #student-menu-bar .menu-bar-group.right-group
+{
+    box-sizing: border-box;
+    padding-top: 13px;
+}
+
+/*-----------------------------------------
+  Add mask and save button
+*/
+.menu-bar-group {
+    min-height: 45px;
+}
+
+#masks #masks-menu-add-mask .menu-button {
+    vertical-align: baseline;
+}
+
+@media( max-width : 340px ) {
+    #masks .menu-bar-group .layout-save-group
+    {
+        height: auto;
+    }
+}
+
+
+/*-----------------------------------------
+  Drop down menu
+*/
+
+#masks #drop-down-add-mask.menu-popup {
+    margin-left: -14px;
+    margin-top: 9px;
+    top: auto;
+}
+
+#masks #drop-down-options.menu-popup {
+    margin-top: 14px;
+    top: auto;
+}
+
+#masks .masks-header #student-menu-bar #drop-down-options {
+    margin-top: 17px;
+    top: auto;
+}
+
+#masks #drop-down-page-select.menu-popup {
+    margin-top: 18px;
+    top: auto;
+}
+
+#masks .masks-header #student-menu-bar #drop-down-page-select {
+    margin-top: 21px;
+    top: auto;
+}
+
+#masks #drop-down-add-mask,
+#masks #drop-down-options,
+#masks #drop-down-page-select
+{
+    border: none;
+    padding-right: 0;
+}
+
+#masks #drop-down-add-mask .menu-entry,
+#masks #drop-down-options .menu-entry
+{
+    box-sizing: border-box;
+    height: 43px;
+    padding-bottom: 0;
+    padding-top: 6px;
+}
+
+#masks #drop-down-add-mask .menu-entry:first-child,
+#masks #drop-down-page-select .menu-entry:first-child,
+#masks #drop-down-options .menu-entry:first-child
+{
+    border-top: 3px #34c795 solid;
+}
+
+#masks #drop-down-add-mask .menu-entry:not(:first-child),
+#masks #drop-down-options .menu-entry:not(:first-child)
+{
+    border-top: 1px #616e98 solid;
+}
+
+#masks .menu-entry:hover,
+#masks #drop-down-add-mask .menu-entry:hover span,
+#masks #drop-down-options .menu-entry:hover ,
+#masks #drop-down-page-select .menu-entry:hover,
+#masks .menu-entry:hover .nav-page-name
+{
+    text-decoration: none;
+}
+
+#masks #drop-down-page-select .menu-entry {
+    height: 20px;
+}
+
+
+/*-----------------------------------------
+  Menu bar - student result
+*/
+
+#masks .menu-bar-group.left-group .grade-container {
+    margin-top: -3px;
+}
+
+#masks .menu-bar-group .circle-value {
+    background-color: #48516e;
+    border-radius: 50px;
+    display: inline-block;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    width: 45px;
+}
+
+#masks .menu-bar-group .circle-value.correct-answers-circle {
+    border: 3px #34c795 solid;
+}
+
+#masks .menu-bar-group .circle-label {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 600;
+    margin-left: 10px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+#masks .menu-bar-group .questions-remaining-circle.circle-value {
+    font-size: 22px;
+}
+
+/*-----------------------------------------
+  Mask context menu
+*/
+
+#masks .context-menu-pane > div {
+    background-color: #393f53;
+    border: none;
+    border-top: 1px #616e98 solid;
+    margin: 0;
+}
+
+#masks .context-menu-pane > div:not(.context-menu-row):hover {
+    background-color: #505a7c;
+}
+
+
+/*-----------------------------------------
+  Deleted mask
+*/
+
+#masks .mask-root.mask-deleted .mask-back {
+    background-color: #eb4e4e;
+    opacity: 0.93;
+}
+
+#masks .mask-root.mask-deleted .mask-main {
+    background-image: url('pix/mask_deleted.png');
+    opacity: 1;
+}
+
+#masks .mask-root.mask-deleted .masks-handle.m.c {
+    background-image: none;
+}
+
+
+/*-----------------------------------------
+  Frame contents
+*/
+
+#masks-frame {
+    background-color: #505a7c;
+    border-radius: 5px;
+    color: #fff;
+    position: relative;
+}
+
+#masks-frame .frame-header {
+    background-color: #393f53;
+}
+
+#masks-frame .frame-title {
+    background-position: 2% center;
+    background-repeat: no-repeat;
+}
+
+#masks-frame .cancel-button {
+    background-color: #eb4e4e;
+    background-image: url('pix/close.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0;
+    height: 27px;
+    margin: 0;
+    position: fixed;
+    right: 5px;
+    top: 5px;
+    transition: all 0.3s ease;
+    width: 27px;
+}
+
+#masks-frame .frame-footer {
+    position: inherit;
+}
+
+#masks-frame .frame-footer .cancel-button:hover {
+    background-color: #c93b3b;
+}
+
+#masks-frame #frame-form {
+    margin: auto;
+    width: 90%;
+}
+
+#masks-frame .option:hover {
+    text-decoration: none;
+}
+
+
+/*-----------------------------------------
+  Frame help button
+*/
+#masks-frame button.hide-toggle {
+    background-color: transparent;
+    background-image: url("pix/help_blue.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: none;
+    height: 25px;
+    position: fixed;
+    right: calc(5px + 27px + 10px);
+    top: 7px;
+    width: 25px;
+}
+
+#masks-frame button.hide-toggle.show-help {
+    background-image: url("pix/help.svg");
+}
+
+#masks-frame button.hide-toggle span {
+    display: none !important; /* csslint allow: important */
+}
+
+
+/*-----------------------------------------
+  Frame edit title
+*/
+
+#masks-frame.mask-edit-question .frame-title {
+    background-image: url("pix/family-question.png");
+}
+
+#masks-frame.mask-edit-note .frame-title {
+    background-image: url("pix/family-note.png");
+}
+
+@media( max-width: 420px ) {
+    #masks-frame.mask-edit-question .frame-title,
+    #masks-frame.mask-edit-note .frame-title {
+        background-image: none;
+    }
+}
+
+/*-----------------------------------------
+  Student Question Frames
+*/
+
+#masks-frame.question .frame-header {
+    background-color: #8d99c6;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    box-sizing: border-box;
+    padding: 15px 0;
+}
+
+#masks-frame.question .question-icon {
+    background: url(pix/mask_simple.png) no-repeat center center;
+    height: 80px;
+    width: 100%;
+}
+
+#masks-frame.question .question-text-look {
+    color: #fff;
+    font-size: 24px;
+    line-height: 30px;
+    margin: 0 3%;
+    text-align: center;
+    width: 94%;
+}
+
+#masks-frame.question .hint-section {
+    background-color: #393f53;
+    border-top: 1px #7383bf solid;
+    min-height: 60px;
+    width: 100%;
+}
+
+#masks-frame.question .hint-look {
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 22px;
+    padding: 20px 32px;
+    text-align: justify;
+    width: 100%;
+}
+
+
+/*-----------------------------------------
+  Student Answer Feedback Frames
+*/
+
+#masks-frame.pass-answer,
+#masks-frame.final-answer {
+    background-color: #7485c2;
+    color: #fff;
+}
+
+#masks-frame.good-answer,
+#masks-frame.perfect-answer {
+    background-color: #34c795;
+    color: #fff;
+}
+
+#masks-frame.incorrect-answer {
+    background-color: #eb4e4e;
+    color: #fff;
+}
+
+#masks-frame.answer .frame-header,
+#masks-frame.answer .frame-body .frame-text.frame-text-look {
+    background-color: inherit;
+    color: inherit;
+}
+
+#masks-frame.answer .frame-header {
+    text-transform: uppercase;
+}
+
+#masks-frame.answer .frame-body .frame-text.frame-text-look {
+    border: 0;
+    box-shadow: none;
+}
+
+#masks-frame.answer .frame-body {
+    margin-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+#masks-frame.answer .frame-text {
+    display: block;
+    font-size: 24px;
+    font-weight: 400;
+    margin: 0 auto 1em auto;
+    text-align: center;
+}
+
+#masks-frame.answer .frame-footer {
+    border-top-style: solid;
+    border-top-width: 1px;
+    margin-top: 20px;
+    padding: 20px 32px;
+}
+
+#masks-frame.correct-answer .frame-footer {
+    background-color: #1a634a;
+    border-color: rgb(115, 191, 131);
+}
+
+#masks-frame.incorrect-answer .frame-footer {
+    background-color: #752727;
+    border-color: rgb(191, 131, 115);
+}
+
+#masks-frame.answer .frame-footer-text {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 22px;
+    text-align: justify;
+}
+
+
+/*-----------------------------------------
+  Frame permanent note design
+*/
+
+#masks-frame.info.permanent {
+    background-color: #353b43;
+}
+
+#masks-frame.info.permanent .frame-header {
+    background-color: #353b43;
+}
+
+#masks-frame.info.permanent .frame-title {
+    background-image: url("pix/mask_note.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    font-size: 0;
+    min-height: 50px;
+    padding-top: 40px;
+}
+
+#masks-frame.info .frame-body {
+    margin: auto;
+    padding-bottom: 20px;
+    text-align: center;
+    width: 95%;
+}
+
+#masks-frame.info .frame-body .frame-text.frame-text-look {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #fff;
+    display: block;
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+}
+
+#masks-frame.info.permanent .frame-body .frame-text.frame-text-look {
+    font-weight: 600;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+
+/*-----------------------------------------
+   Frame upload
+*/
+
+#masks-frame.upload .frame-title {
+    background-image: url('pix/upload.png');
+}
+
+#masks-frame.upload .frame-body .frame-section.instructions .frame-text.frame-text-look,
+#masks-frame.upload-running .frame-body .frame-section .frame-text.frame-text-look
+{
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: #fff;
+    width: 85%;
+}
+
+#masks-frame.upload .upload-widget input {
+    border: none;
+}
+
+
+/*-----------------------------------------
+  Frame submit and confirm save button: green style
+*/
+
+#masks-frame .frame-footer .confirmsavebutton:hover,
+#masks-frame .frame-footer button[type="submit"]:hover,
+#masks-frame .frame-footer input[type="submit"]:hover
+{
+    background-color: #34c795;
+}
+
+
+/*-----------------------------------------
+  Frame red button
+*/
+
+#masks-frame .frame-footer .danger-button:hover
+{
+    background-color: #eb4e4e;
+}
+
+/*-----------------------------------------
+   Add and confirm/validate button
+*/
+
+#masks-frame .standard-button,
+#masks .standard-button
+{
+    background-color: transparent;
+    border-radius: 50px;
+    box-shadow: none;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    height: 44px !important; /* csslint allow: important */
+    padding: 11px 40px;
+    transition: all 0.3s ease;
+}
+
+
+#masks-frame .standard-button img,
+#masks .standard-button img
+{
+    display: none;
+}
+
+#masks-frame .standard-button.normal-button,
+#masks .standard-button.normal-button
+{
+    border: 2px #34c795 solid;
+}
+
+#masks-frame .standard-button.normal-button:hover,
+#masks .standard-button.normal-button:hover
+{
+    background-color: #34c795;
+}
+
+#masks .standard-button.danger-button,
+#masks-frame .standard-button.danger-button
+{
+    border: 2px #eb4e4e solid;
+}
+
+#masks .standard-button.danger-button:hover,
+#masks-frame .standard-button.danger-button:hover
+{
+    background-color: #eb4e4e;
+}
+
+#masks .standard-button.close-button,
+#masks-frame .standard-button.close-button
+{
+    border: 2px #fff solid;
+}
+
+#masks .standard-button.close-button:hover,
+#masks-frame .standard-button.close-button:hover
+{
+    background-color: inherit;
+}
+
+

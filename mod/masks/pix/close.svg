@@ -1,0 +1,20 @@
+<svg id="croix" xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #eb4e4e;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-width: 2px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="13.5" cy="13.5" r="13.5"/>
+  <path id="Forme_2_copie" data-name="Forme 2 copie" class="cls-2" d="M1476.07,289.275l-6.82,7.037" transform="translate(-1459 -279)"/>
+  <path id="Forme_2_copie_2" data-name="Forme 2 copie 2" class="cls-2" d="M1469.52,289.275l6.82,7.037" transform="translate(-1459 -279)"/>
+</svg>

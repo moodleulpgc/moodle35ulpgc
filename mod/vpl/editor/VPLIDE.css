@@ -1,0 +1,292 @@
+.vpl_ide_root {
+    direction: ltr;
+    text-align: left;
+    width: 100%;
+}
+
+.vpl_body_fullscreen {
+    overflow: hidden;
+}
+
+.vpl_ide_root_fullscreen {
+    background-color: white;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 90;
+}
+
+.vpl_ide_dialog {
+    z-index: 999;
+}
+
+#vpl_menu .ui-button-text-only .ui-button-text {
+    padding: 0.4em;
+}
+
+.vpl_ide_menu {
+    font-size: 110%;
+    min-width: 340px;
+    padding: 0.2em;
+}
+
+.vpl_ide_tr {
+    border: 0;
+    margin: 0;
+    min-width: 330px;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+#vpl_filelist {
+    display: none;
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
+#vpl_filelist_header {
+    padding-left: 0.5em;
+}
+
+#vpl_filelist_content {
+    overflow: auto;
+    padding-left: 0.5em;
+    white-space: pre;
+}
+
+.vpl_ide_dirindent {
+    display: inline-block;
+    width: 1.5em;
+}
+
+.vpl_ide_tabs {
+    position: absolute;
+    top: 0;
+}
+
+#vpl_tabs_scroll {
+    overflow: auto;
+}
+
+.vpl_ide_tabs li {
+    line-height: 1ex;
+}
+
+.vpl_ide_charicon {
+    color: gray;
+}
+
+.vpl_ide_closeicon {
+    color: white;
+    text-shadow:
+        1px 0 1px gray,
+        0 1px 1px gray,
+        0 -1px 1px gray,
+        -1px 0 1px gray;
+}
+div.vpl_ide_dialog_content {
+    height: 250px;
+    overflow: scroll;
+    width: 350px;
+}
+
+.vpl_ide_closeicon:hover {
+    color: gray;
+    cursor: pointer;
+    text-shadow: none;
+}
+.ui-widget {
+    font-size: 12px;
+}
+.ui-tabs .ui-tabs-panel {
+    padding: 0;
+}
+/*Resolve problem with essential theme*/
+.vpl_ide_file * {
+    font-family:
+        'Monaco',
+        'Menlo',
+        'Ubuntu Mono',
+        'Consolas',
+        'source-code-pro',
+        monospace;
+}
+
+.vpl_ide_file {
+    font-family:
+        'Monaco',
+        'Menlo',
+        'Ubuntu Mono',
+        'Consolas',
+        'source-code-pro',
+        monospace;
+    margin: 2px;
+    padding: 0;
+    z-index: 0;
+}
+
+.vpl_ide_binary {
+    font-size: 300%;
+    line-height: 200%;
+    margin: auto;
+    text-align: center;
+    z-index: 0;
+}
+
+.vpl_ide_img {
+    overflow: auto;
+}
+
+img.vpl_ide_file {
+    display: block;
+    height: auto;
+    padding: 2px;
+    width: auto;
+    z-index: 0;
+}
+
+.vpl_ide_results {
+    height: 100%;
+    min-width: 100px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.vpl_ide_results a {
+    border-bottom: solid 1px;
+    padding: 1px 2px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.vpl_ide_results pre {
+    line-height: 100%;
+    white-space: pre;
+    word-break: normal;
+    word-wrap: normal;
+}
+
+.vpl_ide_progressbar {
+    min-width: 100px;
+    position: relative;
+}
+
+.vpl_ide_progressbaricon {
+    display: block;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: 2em;
+}
+
+.vpl_ide_progressbarlabel {
+    border: 0;
+    display: block;
+    font-weight: bold;
+    margin: 0;
+    padding: 0 1em 0 1em;
+    text-align: center;
+    width: 100%;
+}
+
+.vpl_icon_repeat {
+    left: -0.7em;
+    position: absolute;
+}
+
+.vpl_ide {
+    font-size: 80%;
+}
+.vpl_ide .ui-dialog-titlebar {
+    padding: 0.15em;
+}
+.ace_gutter-tooltip {
+    white-space: pre-wrap;
+}
+
+.vpl_ide_accordion_c_compilation,
+.vpl_ide_accordion_c_execution {
+    font-family:
+        'Monaco',
+        'Menlo',
+        'Ubuntu Mono',
+        'Consolas',
+        'source-code-pro',
+        monospace;
+    max-width: 120em;
+    white-space: pre;
+}
+
+.vpl_vnc {
+    position: fixed;
+    width: auto;
+    z-index: 1000;
+}
+
+.vpl_vnc .ui-dialog-content {
+    padding: 0;
+}
+.vpl_noVNC_canvas {
+    cursor: none;
+    height: 600px;
+    width: 800px;
+}
+
+.vpl_vnc .ui-button-text-only .ui-button-text {
+    padding: 0.15em;
+}
+
+.vpl_terminal {
+    background-color: black;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    z-index: 1000;
+}
+.vpl_clipboard {
+    display: none;
+    z-index: 1010;
+}
+.vpl_clipboard_label1.ui-button-text,
+.vpl_clipboard_label1.ui-button-text {
+    padding: 0.15em;
+}
+.vpl_clipboard .vpl_clipboard_entry1,
+.vpl_clipboard .vpl_clipboard_entry2 {
+    height: 50px;
+    width: 200px;
+}
+
+/*Resolve problem with essential theme*/
+pre.vpl_terminal * {
+    border: 0;
+    font: 1em/1.2 monospace;
+    margin: 0;
+    padding: 0;
+}
+
+pre.vpl_terminal {
+    display: inline-block;
+    font: 1em/1.2 monospace;
+    font-size: 12px;
+    padding: 2px;
+}
+.vpl_buttonleft_orange {
+    background-color: orange;
+    color: white;
+    font-weight: bold;
+}
+.vpl_buttonleft_red {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+}
+.vpl_buttonleft_black {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+}

@@ -1,0 +1,51 @@
+<!--
+/**
+**************************************************************************
+**                                Chairman                              **
+**************************************************************************
+* @package mod                                                          **
+* @subpackage chairman                                                  **
+* @name Chairman                                                        **
+* @copyright oohoo.biz                                                  **
+* @link http://oohoo.biz                                                **
+* @author Raymond Wainman                                               **
+* @author Patrick Thibaudeau                                            **
+* @author Dustin Durand                                                 **
+* @license                                                              **
+http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later                **
+**************************************************************************
+**************************************************************************/
+-->
+
+<style type="text/css">
+
+.motion_accordian {
+    padding-bottom: 3px;
+}
+
+.userselector select {
+    width: 400px;
+}
+
+
+table#attend_table{
+margin-left: 0%;
+margin-top: 0;
+margin-bottom: 0;
+}
+
+#participants_header .felement {
+
+margin-left:0;
+}
+
+.mform .moodle_users_selector {
+    width: 100%;
+}
+
+.mform .guest_members {
+    width: 100%;
+}
+
+
+</style>

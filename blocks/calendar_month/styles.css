@@ -1,0 +1,26 @@
+
+/* ecastro ULPGC */
+
+.calendar_filters.ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    text-align: center;
+}
+
+.calendar_filters ul li { display: inline; }
+
+.calendar_filters ul li a {
+    padding: .1em 0.1em;
+}
+
+.block_calendar_month .content h3.eventskey {
+    margin-bottom: 0px;
+    padding: 3px 0px;
+    text-transform: none;
+}
+
+.block_calendar_month .day.today a{
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}

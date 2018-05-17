@@ -1,0 +1,24 @@
+/**
+ * Make Exam quiz report styles
+ *
+ */
+
+.makeexamreviewtable {width: 85%; margin-left: 4.0em; margin-right: auto; }
+
+.makeexamreviewtable th.header {border: 1px solid #CCC;}
+.makeexamreviewtable td {border: 1px solid #DDD; padding: 2px 4px;}
+
+.error a.link {color:red; }
+td.colattempt,
+td.colquestions,
+td.colstatus {width:5%; text-align: center;}
+td.colgeneratinguser {width:25%;}
+td.coelattempts td {width:35%;}
+td.colstatereview {width:5%;text-align: center;}
+td.colqaction {width:5%;}
+
+.makeexambuttonform {width:50%; float:right; margin: 1.0em 2.0em 0px }
+.makeexambutton {text-align:right;}
+
+#page-mod-quiz-report .mform .felement.fsubmit {text-align:right;}
+

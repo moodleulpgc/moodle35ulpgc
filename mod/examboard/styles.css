@@ -1,0 +1,77 @@
+
+.path-mod-examboard .label {
+    font-size: 1.0em;
+    font-weight: bold;
+}
+
+.path-mod-examboard .iteminfo .label {
+    float: left; 
+}
+
+
+
+.path-mod-examboard .pagebuttons {
+    text-align:center;
+}
+
+.path-mod-examboard .iteminfo .boardactivebutton, 
+.path-mod-examboard .pagebuttons .continuebutton,
+.path-mod-examboard .pagebuttons .actionselect label,
+.path-mod-examboard .singleboardtable .cell .continuebutton {
+    display: inline-block;
+}
+
+.path-mod-examboard .singleboardtable i.fa {
+    font-size: 1.5em;
+}
+
+.path-mod-examboard .label-info{
+    padding: 8px;
+}
+
+
+.nameslist {
+    display: table-cell;
+}
+
+.examinee {
+    margin-bottom: 6px;
+}
+
+.examineename {
+    margin-top: 4px;
+    margin-bottom: 6px;
+    float: left;
+}
+
+.examinee .collapsibleregion.tutors.collapsed {
+    min-height: 2.2em;
+}
+
+.examinee .tutors .collapsibleregioncaption {
+    text-decoration: none;
+}
+
+.tutors {
+    /* display: table; */
+}
+
+.tutor {
+    display: table-row;
+}
+
+.tutorname, .tutortitle {
+    display: table-cell;
+}
+
+.tutortitle {
+    width: 20%;
+}
+
+#mod_examboard_view_board_table .btn {
+    padding: 3px 12px;
+}
+
+.path-mod-examboard .csverror {
+    text-align: left;
+}

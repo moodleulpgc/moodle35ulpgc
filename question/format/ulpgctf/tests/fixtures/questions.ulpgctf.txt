@@ -1,0 +1,26 @@
+The Moodle project was started by:
+A) Petr Skoda
+B) Martin Dougiamas
+C) Eloy Lafuente
+D) Tim Hunt
+NAME: name of the question (optional)
+PG: page of manual (optional)
+ANSWER: B
+
+// a comment
+
+Moodle's abilities include handling user input that includes <html class="cool"> & images:
+A) True
+B) False
+NAME: name of the question (optional)
+PG: page of manual (optional)
+ANSWER: A
+
+ULPGC is an University rooted in
+A) Gran Canaria, Canary Islands
+B) Tenerife, "la otra isla"
+C) San Borondon's Island: an imaginary (|@#~½¬{[]}\) island; with some color.
+
+NAME: name of the question (optional)
+PG: page of manual (optional)
+ANSWER: A

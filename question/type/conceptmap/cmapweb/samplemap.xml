@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<cmapweb>
+	<conceptmap title="What is CmapWeb?">
+		<concept id="1" label="CmapWeb" posx="211" posy="31" />
+		<concept id="2" label="Concept Map Web editor" posx="391"
+			posy="121" />
+		<concept id="3" label="Concept Maps" posx="31" posy="121" />
+		<concept id="4" label="Most browsers" posx="211" posy="151" />
+		<concept id="5" label="Cognitive visualizations" posx="31"
+			posy="271" />
+		<concept id="6" label="Graphic representations" posx="31"
+			posy="391" />
+		<concept id="7" label="Knowledge" posx="301" posy="391" />
+		<concept id="8" label="Labels" posx="31" posy="481" />
+		<concept id="9" label="Relationships" posx="151" posy="481" />
+		<concept id="10" label="Web page" posx="391" posy="211" />
+		<concept id="11" label="Students" posx="391" posy="301" />
+		<relationship id="1" source="1" target="2" linkingWord="short of"
+			posx="331" posy="61" />
+		<relationship id="2" source="1" target="3" linkingWord="allows to create"
+			posx="61" posy="61" />
+		<relationship id="3" source="1" target="4" linkingWord="works on"
+			posx="211" posy="91" />
+		<relationship id="4" source="3" target="5" linkingWord="are"
+			posx="61" posy="181" />
+		<relationship id="5" source="5" target="6" linkingWord="are"
+			posx="91" posy="331" />
+		<relationship id="6" source="5" target="7" linkingWord="represent"
+			posx="211" posy="331" />
+		<relationship id="7" source="6" target="8" linkingWord="comprise"
+			posx="91" posy="436" />
+		<relationship id="8" source="6" target="9" linkingWord="comprise"
+			posx="91" posy="436" />
+		<relationship id="9" source="2" target="10"
+			linkingWord="can be integrated in" posx="391" posy="166" />
+		<relationship id="10" source="4" target="10"
+			linkingWord="used to navigate" posx="211" posy="211" />
+		<relationship id="11" source="10" target="11"
+			linkingWord="visited by" posx="391" posy="256" />
+		<relationship id="12" source="11" target="7" linkingWord="have"
+			posx="346" posy="346" />
+	</conceptmap>
+</cmapweb>

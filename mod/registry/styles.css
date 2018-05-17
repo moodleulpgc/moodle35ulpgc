@@ -1,0 +1,100 @@
+
+.itemname{
+    width: 70%;
+    float:left;
+    padding:2px;
+}
+
+.downloadsidebar{
+    width: 25%;
+    float:right;
+    background-color:yellow;
+    padding:4px 8px;
+    border: 1px solid;
+}
+
+.contentpdflink{
+    font-weight:bold;
+    /* background-color:yellow;
+    padding:4px 15px;
+    border: 1px solid;
+    */
+}
+
+.itemcontent{
+    clear:both;
+}
+
+#page-mod-registry-view td.select, td.status {
+    text-align:center;
+}
+
+#page-mod-registry-view td.select {
+    background-color:white;
+}
+
+
+
+#page-mod-registry-view td.cell, .submissions {
+    border: 1px solid #E0E0E0;
+    vertical-align:middle;
+    padding: 0.5em;
+}
+
+#course_registry_submissions .status_resolved{
+    background-color: #2EAA20;
+    color: white;
+    font-weight: bold;
+}
+
+#course_registry_submissions .status_posted{
+    background-color: #E4E4E4;
+    color: black;
+    font-weight: bold;
+}
+
+#course_registry_submissions .status_open{
+    background-color: #F5E2E2;
+    color: black;
+    font-weight: bold;
+}
+
+#course_registry_submissions .status_resolving{
+    background-color: #FCDD03;
+    color: black;
+    font-weight: bold;
+}
+
+#course_registry_submissions .status_waiting{
+    background-color: #FF6000;
+    color: black;
+    font-weight: normal;
+}
+
+.status_abandonned{
+    background-color: #454747;
+    color: white;
+    font-weight: bold;
+}
+
+#course_registry_submissions .status_transfered{
+    background-color: #FA0000;
+    color: white;
+    font-weight: bold;
+}
+
+#course_registry_submissions .status_testing{
+    background-color: #B8F079;
+    color: black;
+    font-weight: normal;
+}
+
+#course_registry_submissions .status_published{
+    background-color: #58BCF1;
+    color: black;
+    font-weight: normal;
+}
+
+.subtablelink {
+    text-align:center;
+}

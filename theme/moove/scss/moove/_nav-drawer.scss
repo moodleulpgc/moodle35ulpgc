@@ -1,0 +1,183 @@
+#nav-drawer {
+    padding: 5px;
+    overflow: visible;
+    background-color: $navbar-bg;
+    top: 70px;
+    padding-bottom: 20px;
+
+    .list-group {
+        .list-group-item {
+            padding: 0;
+            background-color: inherit;
+            border-radius: $card-border-radius;
+            border: 0;
+
+            a {
+                color: #fff;
+                padding: .75rem 0.75rem;
+                border: none;
+                color: #fff;
+                text-decoration: none;
+                width: 100%;
+                display: inherit;
+                border-radius: $card-border-radius;
+
+                &:hover {
+                    background-color: $navbar-bg-hover;
+                    color: #fff;
+                }
+
+                &:before {
+                    font-family: 'simple-line-icons';
+                    speak: none;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-variant: normal;
+                    text-transform: none;
+                    line-height: 1;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                    content: "\e089";
+                    font-size: 19px;
+                }
+
+                .m-l-0::before {
+                    font-size: 19px;
+                }
+            }
+
+            &[data-key="coursehome"] a:before {
+                content: "\e06a";
+            }
+
+            &[data-key="mycourses"] a:before {
+                content: "\e019";
+            }
+
+            &[data-key="participants"] a:before,
+            &[data-key="studentreport"] a:before {
+                content: "\e001";
+            }
+
+            &[data-key="badgesview"] a:before {
+                content: "\e028";
+            }
+
+            // Competences
+            &[data-key="competencies"] a:before {
+                content: "\e09b";
+            }
+
+            &[data-key="grades"] a:before {
+                content: "\e04c";
+            }
+
+            &[data-key="myhome"] a:before {
+                content: "\e007";
+            }
+
+            &[data-key="home"] a:before {
+                content: "\e069";
+            }
+
+            &[data-key="calendar"] a:before {
+                content: "\e075";
+            }
+
+            // Private files
+            &[data-key="privatefiles"] a:before,
+            &[data-key="7"] a:before {
+                content: "\e040";
+            }
+
+            &[data-key="sitesettings"] a:before {
+                content: "\e09a";
+            }
+        }
+    }
+
+    .list-group + .list-group {
+        border-top: 3px solid $navbar-separator;
+    }
+}
+
+#nav-drawer.closed {
+    width: 70px;
+    left: 0;
+
+    .list-group {
+        .list-group-item {
+            text-align: left;
+            padding: 0 .6rem;
+
+            > ul {
+                display: none;
+                padding: 10px;
+            }
+
+            .m-l-1 {
+                margin-left: 4px !important;
+            }
+
+            a .text {
+                display: none;
+            }
+
+            &:hover {
+                width: 260px;
+                background-color: $navbar-bg-hover;
+
+                &[data-key="mycourses"] {
+                    border-bottom-right-radius: 0;
+                }
+
+                a .text {
+                    display: inline-block;
+                }
+
+                .text {
+                    margin-left: 4px;
+                }
+
+                > ul {
+                    display: block;
+                    height: auto;
+                    overflow: auto;
+                    background-color: $navbar-bg;
+                    position: absolute;
+                    left: 60px;
+                    top: 45px;
+                    width: 200px;
+                    z-index: 1001;
+                    padding-top: 10px;
+                    border-bottom-left-radius: $card-border-radius;
+                    border-bottom-right-radius: $card-border-radius;
+
+                    li {
+                        padding: .5rem .2rem;
+                        width: 100%;
+
+                        a {
+                            width: 100%;
+                            padding: 0;
+                            font-size: 12px;
+
+                            &:before {
+                                font-size: 12px;
+                                content: "\e606";
+                            }
+
+                            .text {
+                                display: inline;
+                            }
+                        }
+                    }
+                }
+            }
+
+            ul li.list-group-item:hover {
+                border-bottom-right-radius: $card-border-radius;
+            }
+        }
+    }
+}

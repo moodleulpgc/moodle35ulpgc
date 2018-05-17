@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="report/autogroups/db" VERSION="20130402" COMMENT="XMLDB file for Moodle groups autopopulate report"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="groups_autogroups" COMMENT="stores course groups synchronization relationships">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="targetgroup"/>
+        <FIELD NAME="targetgroup" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="course" NEXT="searchterm"/>
+        <FIELD NAME="searchterm" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="targetgroup" NEXT="searchfield"/>
+        <FIELD NAME="searchfield" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="idnumber" SEQUENCE="false" PREVIOUS="targetgroup" NEXT="sourceroles"/>
+        <FIELD NAME="sourceroles" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="searchfield" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="sourceroles" NEXT="visible"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="timemodified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="course"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id" COMMENT="The course instance this group belongs to." PREVIOUS="primary" NEXT="targetgroup"/>
+        <KEY NAME="targetgroup" TYPE="foreign" FIELDS="targetgroup" REFTABLE="groups" REFFIELDS="id" COMMENT="The group instance of this group." PREVIOUS="course" />
+      </KEYS>
+      <INDEXES>
+      </INDEXES>
+  </TABLE>
+  </TABLES>
+</XMLDB>

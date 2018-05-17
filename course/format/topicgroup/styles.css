@@ -1,0 +1,14 @@
+.course-content ul.topicgroup {margin:0;}
+.course-content ul.topicgroup li.section {list-style: none;margin:0 0 5px 0;padding:0;}
+.course-content ul.topicgroup li.section .content {margin:0 40px;}
+.course-content ul.topicgroup li.section .left {float:left;}
+.course-content ul.topicgroup li.section .right {float:right;}
+.course-content ul.topicgroup li.section .left,
+.course-content ul.topicgroup li.section .right {width:40px;text-align:center;padding: 6px 0;}
+.course-content ul.topicgroup li.section .right img.icon { padding: 0 0 4px 0;}
+.course-content ul.topicgroup li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
+.groupinglabelright {float: right; text-align:right;}
+
+.course-content ul.topicgroup li.section .right.side {
+    display: block !important;
+}

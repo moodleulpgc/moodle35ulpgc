@@ -1,0 +1,53 @@
+Release 2.7.007
+---------------
+FIXED: PostgreSQL compatiblity issues
+FIXED: Spurious error message on successfull document upload when debigging output is enabled
+FIXED: Login verification strictness (which previoulsy used a weaker test than the standard require_login() )
+FIXED: Several minor rendering glitches
+FIXED: Browser crash issue (from an infinite loop in the event system) on Moodle 3.2 after clicking the page space on some systems
+CHANGED: Default values in moodle configuration parameters, as applied at module install time
+CHANGED: Some superficial formatting rules to better match Moodle style checkers
+ADDED: Per-instance configuration of avilable mask types and question fields
+ADDED: Solution for moving masks from page to page after one uploads a document update with more or less pages than the original
+
+Release 2.7.006
+---------------
+HOUSEKEEPING: Minor code formatting changes
+
+Release 2.7.005
+---------------
+FIXED: Issues reported in moodle submission
+FIXED: Vulnerability relating to teacher form editing
+FIXED: postgresql compatibility issue
+
+Release 2.7.004
+---------------
+FIXED: An issue that broke installation. The moodle code checkers complain if there are missing save points in the upgrade process - but installation fails if the savepoints are added during installation
+FIXED: Module completion problem
+FIXED: Module name was displayed as MASKS but official name is MASK
+FIXED: texts missing from FR translations
+FIXED: Frame size problem on Firefox
+FIXED: Jquery 3.0 compatibility (use in Moodle 3.2)
+FIXED: z-index of module page
+ADDED: new error pop-up before upload if pdf2svg command line is incorrect
+FIXED: wrong update of student progression in page header
+
+Release 2.7.003
+---------------
+FIXED: Incompatibility with Postgresql
+FIXED: False error message displayed after uploading the PDF
+FIXED: Navigation menu broken display on Moodle 3.2
+FIXED: Collision between footer and upload popup with Theme Essential
+FIXED: Teacher questions states reset in editing mode
+FIXED: coding style in js, php and css files
+ADDED: Possibility of shift masks of pages to the right or left page
+
+Release 2.7.002
+---------------
+FIXED: Incorrect font used
+FIXED: incorrect text for the 'incorrect answers' label in multiple choice question editting form
+FIXED: Popup title text too long in french for 'new multiple choice question'
+
+Release 2.7.001
+---------------
+Initial release, tested on Moodle branches 2.7 and above

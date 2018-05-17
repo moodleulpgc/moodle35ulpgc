@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/examregistrar/db" VERSION="20131225" COMMENT="XMLDB file for Moodle mod/examregistrar"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="examregistrar" COMMENT="This table saves information about an instance of mod_examregistrar in a course.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course examregistrar activity belongs to"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the examregistrar activity"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
+        <FIELD NAME="primaryreg" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Either empty or an idnumber for other instance"/>
+        <FIELD NAME="primaryidnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="annuality" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="One of elements annuality item "/>
+        <FIELD NAME="programme" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="May be a course_category idnumber "/>
+        <FIELD NAME="workmode" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Usage and display mode for module instance"/>
+        <FIELD NAME="lagdays" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Hold or waiver days"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="programme" UNIQUE="false" FIELDS="programme"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_elements" COMMENT="The table keeps collections of valid customized values for other fields in related tables.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="One of annualityitem, perioditem, periodtypeitem, sessionitem, scopeitem, locationitem, locationtypeitem, roleitem"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The userid that added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examregid" TYPE="foreign" FIELDS="examregid" REFTABLE="examregistrar" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examregid-type" UNIQUE="false" FIELDS="examregid, type"/>
+        <INDEX NAME="examregid-type-idnumber" UNIQUE="true" FIELDS="examregid,type,idnumber" COMMENT="Ensures uniqueness of idnumber values for a given element type."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_periods" COMMENT="Exam periods or calls. Spanish &quot;convocatorias&quot;.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="annuality" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be an annualityitem from examregistrar_elements"/>
+        <FIELD NAME="periodtype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be a periodtypeitem from examregistrar_elements"/>
+        <FIELD NAME="term" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"  COMMENT="Must be a termitem from examregistrar_elements"/>
+        <FIELD NAME="calls" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The userid that added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examregid" TYPE="foreign" FIELDS="examregid" REFTABLE="examregistrar" REFFIELDS="id"/>
+        <KEY NAME="annuality" TYPE="foreign" FIELDS="annuality" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="periodtype" TYPE="foreign" FIELDS="periodtype" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timestart" UNIQUE="false" FIELDS="timestart"/>
+        <INDEX NAME="timeend" UNIQUE="false" FIELDS="timeend"/>
+        <INDEX NAME="examregid-term-annuality" UNIQUE="true" FIELDS="examregid,term,annuality" COMMENT="Ensures uniqueness of exam periods by type."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_examsessions" COMMENT="Stores information an exam day">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="period" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="examdate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeslot" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The userid that added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examregid" TYPE="foreign" FIELDS="examregid" REFTABLE="examregistrar" REFFIELDS="id"/>
+        <KEY NAME="period" TYPE="foreign" FIELDS="period" REFTABLE="examregistrar_periods" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examdate" UNIQUE="false" FIELDS="examdate"/>
+        <INDEX NAME="timeslot" UNIQUE="false" FIELDS="timeslot"/>
+        <INDEX NAME="id-examregid-period" UNIQUE="true" FIELDS="id,examregid,period"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_exams" COMMENT="Keeps information of individual exams and their dates.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="annuality" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be an annualityitem from examregistrar_elements"/>
+        <FIELD NAME="programme" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="period" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="examscope" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be an scopeitem from examregistrar_elements"/>
+        <FIELD NAME="callnum" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="examsession" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the component which added this exam (e.g. 'examregistrar_cron'), or blank if it was added manually."/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examregid" TYPE="foreign" FIELDS="examregid" REFTABLE="examregistrar" REFFIELDS="id"/>
+        <KEY NAME="period" TYPE="foreign" FIELDS="period" REFTABLE="examregistrar_periods" REFFIELDS="id"/>
+        <KEY NAME="annuality" TYPE="foreign" FIELDS="annuality" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="examscope" TYPE="foreign" FIELDS="examscope" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="examsession" TYPE="foreign" FIELDS="examsession" REFTABLE="examregistrar_examsessions" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="programme" UNIQUE="false" FIELDS="programme"/>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="examregid-annuality-courseid-period-examscope-callnum" UNIQUE="true" FIELDS="examregid,annuality,courseid,period,examscope,callnum" COMMENT="Ensures uniqueness of exams."/>
+        </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_examfiles" COMMENT="Keeps information of PDF files corresponding to eachg exam.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="attempt" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the component which added this exam (e.g. 'examregistrar_cron'), or blank if it was added manually."/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+        <INDEX NAME="examid-attempt" UNIQUE="true" FIELDS="examid, attempt" COMMENT="Ensures uniqueness of exam attempts."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_locations" COMMENT="Stores information about places, venues and rooms">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="idnumber" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="locationtype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Must be an locationtypeitem from examregistrar_elements"/>
+        <FIELD NAME="address" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="addressformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="seats" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="parent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="depth" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the component which added this exam (e.g. 'examregistrar_cron'), or blank if it was added manually."/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examregid" TYPE="foreign" FIELDS="examregid" REFTABLE="examregistrar" REFFIELDS="id"/>
+        <KEY NAME="locationtype" TYPE="foreign" FIELDS="locationtype" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+        <KEY NAME="parent" TYPE="foreign" FIELDS="parent" REFTABLE="examregistrar_locations" REFFIELDS="id" COMMENT="note that to make this recursive FK working someday, the parent field must be declared NULL"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="id-examregid-locationtype" UNIQUE="true" FIELDS="id,examregid,locationtype" COMMENT="Ensures uniqueness of locations names/idnumbers by types."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_staffers" COMMENT="Stores information about people in charge at each location">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examsession" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="locationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="role" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Must be a roleitem from examregistrar_elements"/>
+        <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the component which added this exam (e.g. 'examregistrar_cron'), or blank if it was added manually."/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="locationid" TYPE="foreign" FIELDS="locationid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+        <KEY NAME="examsession" TYPE="foreign" FIELDS="examsession" REFTABLE="examregistrar_sessions" REFFIELDS="id"/>
+        <KEY NAME="role" TYPE="foreign" FIELDS="role" REFTABLE="examregistrar_elements" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="examsession-locationid-userid-role" UNIQUE="true" FIELDS="examsession,locationid,userid,role"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_bookings" COMMENT="Stores information about students registering for a particular exam">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="booked" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="bookedsite" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+        <KEY NAME="bookedsite" TYPE="foreign" FIELDS="bookedsite" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="booked" UNIQUE="false" FIELDS="booked"/>
+        <INDEX NAME="examid-userid" UNIQUE="true" FIELDS="examid, userid" COMMENT="Ensures uniqueness of exam booking place by user."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_session_rooms" COMMENT="Stores information about places used in a session">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examsession" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="available" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examsession" TYPE="foreign" FIELDS="examsession" REFTABLE="examregistrar_sessions" REFFIELDS="id"/>
+        <KEY NAME="roomid" TYPE="foreign" FIELDS="roomid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examsession-roomid" UNIQUE="true" FIELDS="examsession,roomid" COMMENT="Ensures uniqueness of rooms used by session."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_seating_rules" COMMENT="Stores information about rules for seating students registering for a particular exam">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examsession" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="bookedsite" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examsession" TYPE="foreign" FIELDS="examsession" REFTABLE="examregistrar_sessions" REFFIELDS="id"/>
+        <KEY NAME="bookedsite" TYPE="foreign" FIELDS="bookedsite" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+        <KEY NAME="roomid" TYPE="foreign" FIELDS="roomid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examsession-bookedsite" UNIQUE="false" FIELDS="examsession,bookedsite"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_session_seats" COMMENT="Stores information about students registering for a particular session">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examsession" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="bookedsite" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="additional" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="seat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the component which added this exam (e.g. 'examregistrar_cron'), or blank if it was added manually."/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examsession" TYPE="foreign" FIELDS="examsession" REFTABLE="examregistrar_sessions" REFFIELDS="id"/>
+        <KEY NAME="bookedsite" TYPE="foreign" FIELDS="bookedsite" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+        <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
+        <KEY NAME="roomid" TYPE="foreign" FIELDS="roomid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="additional" UNIQUE="false" FIELDS="additional"/>
+        <INDEX NAME="examid-userid" UNIQUE="true" FIELDS="examid, userid" COMMENT="Ensures uniqueness of exam seating by user."/>
+        <INDEX NAME="examsession-userid-additional" UNIQUE="true" FIELDS="examsession, userid, additional" COMMENT="Ensures uniqueness of room exam seating by user by restricting additionals."/>
+        <INDEX NAME="examsession-bookedsite-examid-userid" UNIQUE="false" FIELDS="examsession, bookedsite, examid, userid"/>
+        <INDEX NAME="examsession-bookedsite-examid-roomid" UNIQUE="false" FIELDS="examsession, bookedsite, examid, roomid"/>
+        <INDEX NAME="examsession-bookedsite-roomid-userid" UNIQUE="false" FIELDS="examsession, bookedsite, roomid, userid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_printing" COMMENT="Stores information about printing options and fields.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="page" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="element" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="contentformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="examregid" TYPE="foreign" FIELDS="examregid" REFTABLE="examregistrar" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examregid-page-element" UNIQUE="true" FIELDS="examregid,page,element" COMMENT="Ensures uniqueness of pages and elements."/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

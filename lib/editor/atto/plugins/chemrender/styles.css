@@ -1,0 +1,38 @@
+/**
+ * File styles.css
+ * Contains base styles for dialog windows.
+ *
+ * @package    atto_chemrender
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.atto_chemrender_preview_chemdoodle_iframe {
+    border: 0px;
+}
+.moodle-dialogue-base .moodle-dialogue .atto_chemrender_entry_container,
+.moodle-dialogue-base .moodle-dialogue .atto_chemrender_preview_container {
+    float:left;
+    padding-bottom: 20px;
+}
+.moodle-dialogue-base .moodle-dialogue .atto_chemrender_preview_container {
+    padding-left: 20px;
+    margin-left: 20px;
+    border-left: #D2D2D2 1px;
+    border-left-style: solid;
+    border-left-width: 2px;
+}
+.moodle-dialogue-base .moodle-dialogue .atto_chemrender_jmol_option_console_commands {
+    width:90%;
+    margin-left: 1em;
+}
+
+.atto_chemrender_jmol_options input[type=checkbox] {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.atto_chemrender_jmol_option_console_commands_helplink {
+    background-color:transparent;
+    margin-left: 0.5em;
+}

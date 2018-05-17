@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/assigndata/db" VERSION="20160303" COMMENT="XMLDB file for Moodle local/assigndata"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_assigndata_fields" COMMENT="every field available">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="required" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Required fields must have a value when inserted by a user"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="param1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param5" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param6" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param7" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param8" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param9" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="param10" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assign" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="type-assignment" UNIQUE="false" FIELDS="type, assignment" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_assigndata_submission" COMMENT="Info about data submissions for assignments">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="attemptnumber" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The attempt number that this submission relates to"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="content1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="content2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="content3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="content4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this submission info."/>
+        <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assign" REFFIELDS="id" COMMENT="The assignment instance this submission relates to"/>
+        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="local_assigndata_fields" REFFIELDS="id" COMMENT="The ID of the corresponding row in local_assigndata_fields "/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" COMMENT="The userid for the submission relating to this data."/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/assign/feedback/historic/db" VERSION="20120423" COMMENT="XMLDB file for Moodle mod/assign/feedback/historic"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="assignfeedback_historic" COMMENT="Historic data as assignment plugin">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="useridnumber" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The user ID number"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this feedback"/>
+        <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assign" REFFIELDS="id" COMMENT="The assignment instance this historic relates to."/>
+        <KEY NAME="grade" TYPE="foreign" FIELDS="grade" REFTABLE="assign_grades" REFFIELDS="id" COMMENT="The grade (user) this historic relates to."/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="useridnumber" UNIQUE="false" FIELDS="useridnumber"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="assignfeedback_historic_type" COMMENT="Historic data as assignment plugin">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="grade type codename"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this feedback"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="assignfeedback_historic_data" COMMENT="Historic data as assignment plugin">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="annuality" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="annuality of historic data"/>
+        <FIELD NAME="courseidnumber" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The course ID number"/>
+        <FIELD NAME="useridnumber" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="The user ID number"/>
+        <FIELD NAME="datatype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="type of data stored as historic"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="-1" SEQUENCE="false" DECIMALS="5" COMMENT="The numerical grade for historic data. Can be determined by scales/advancedgradingforms etc but will always be converted back to a floating point number."/>
+        <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="additional text comment for data stored as historic"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this feedback"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="useridnumber" UNIQUE="false" FIELDS="useridnumber"/>
+        <INDEX NAME="courseidnumber" UNIQUE="false" FIELDS="courseidnumber"/>
+        <INDEX NAME="annuality-useridnumber-courseidnumber-datatype" UNIQUE="true" FIELDS="annuality,useridnumber,courseidnumber,datatype"/>
+      </INDEXES>
+    </TABLE>
+</TABLES>
+</XMLDB>

@@ -1,0 +1,50 @@
+span.un_report span.rank1 {
+    color: white;
+    padding: 2px;
+}
+
+span.un_report span.rankBlue {
+    background-color: #4193ff;
+}
+
+span.un_report span.rankGreen {
+    background-color: #84be32;
+}
+
+span.un_report span.rankYellow {
+    background-color: #fbd41c;
+}
+
+span.un_report span.rankOrange {
+    background-color: #f79d62;
+}
+
+span.un_report span.rankRed {
+    background-color: #f76262;
+}
+
+span.un_report a {
+    text-decoration: none;
+}
+
+span.un_report img,
+div.un_report img {
+    margin-right: 5px;
+    position: relative;
+    vertical-align: middle;
+}
+
+div.un_report .un_progress {
+    width: 30px;
+}
+
+div.un_report img.un_progress {
+    margin-left: 5px;
+    margin-right: 5px;
+    vertical-align: middle;
+    width: 25px;
+}
+
+div.un_report div:first-child {
+    display: none;
+}

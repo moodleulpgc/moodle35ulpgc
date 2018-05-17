@@ -1,0 +1,214 @@
+<?php
+
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Prints the general exam periods management interface of an instance of examregistrar
+ *
+ * @package    mod_examregistrar
+ * @copyright  2013 Enrique Castro @ ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/// this file cannot be used alone, int must be included in a page-displaying script
+
+defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->libdir.'/tablelib.php');
+
+
+require_capability('mod/examregistrar:manageperiods',$context);
+
+$periodtype  = optional_param('etype', '0', PARAM_ALPHANUMEXT);
+
+$baseurl = new moodle_url('/mod/examregistrar/manage.php', array('id'=>$cm->id,'edit'=>$edit));
+
+
+///////////////////////////////////////////////////////////////////////////////
+/// process forms actions
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+add_to_log($course->id, 'examregistrar', 'manage edit locations', "manage.php?id={$cm->id}&edit=locations", $examregistrar->name, $cm->id);
+
+
+echo $OUTPUT->heading(get_string('editlocations', 'examregistrar'));
+
+$sel_annuality  = optional_param('sannuality', 0, PARAM_INT);
+$sel_degreetype  = optional_param('sdegreetype', 0, PARAM_INT);
+//$sel_term  = optional_param('sterm', 0, PARAM_INT);
+$sel_period  = optional_param('speriodtype', 0, PARAM_INT);
+
+echo $OUTPUT->container_start('examregistrarperiodsform clearfix ');
+    echo '<form class="examregistrarperiodsform" action="'.$CFG->wwwroot.'/mod/examregistrar/manage.php" method="post">'."\n";
+    echo '<input type="hidden" name="edit" value="'.$edit.'" />'."\n";
+    echo '<input type="hidden" name="id" value="'.$cm->id.'" />'."\n";
+
+    $annualitymenu = array(0 => get_string('any'));
+    $sql = "SELECT DISTINCT(annuality) AS id, annuality FROM {examregistrar_periods} WHERE examregid = ? ORDER BY annuality ASC ";
+    //$anns = $DB->get_records_menu('examregistrar_periods', array('examregid'=>$examregistrar->examregidused), ' annuality ASC ', 'annuality AS id, annuality');
+    if($anns = $DB->get_records_sql_menu($sql, array($examregistrar->examregidused))) {
+        $annualitymenu += $anns;
+    }
+    echo html_writer::label(get_string('annuality', 'examregistrar').': ', 'sannuality');
+    echo html_writer::select($annualitymenu, "sannuality", $sel_annuality);
+    echo ' &nbsp; ';
+    //$degreetypemenu = array(0 => get_string('any'));
+    $degreetypemenu = examregistrar_elements_getvaluesmenu($examregistrar->examregidused, 'degreetype');
+    echo html_writer::label(get_string('degreetype', 'examregistrar').': ', 'sdegreetype');
+    echo html_writer::select($degreetypemenu, "sdegreetype", $sel_degreetype);
+    echo ' &nbsp; ';
+    /*
+    //$termmenu = array(0 => get_string('any'));
+    $termmenu = examregistrar_elements_getvaluesmenu($examregistrar->examregidused, 'term');
+    echo html_writer::label(get_string('term', 'examregistrar').': ', 'sterm');
+    echo html_writer::select($termmenu, "sterm", $sel_term);
+    echo ' &nbsp; ';
+    */
+    //$periodmenu = array(0 => get_string('any'));
+    $periodtypemenu = examregistrar_elements_getvaluesmenu($examregistrar->examregidused, 'periodtype');
+    echo html_writer::label(get_string('period', 'examregistrar').': ', 'speriod');
+    echo html_writer::select($periodtypemenu, "speriodtype", $sel_period);
+    echo ' &nbsp; ';
+
+    echo '<input type="submit" value="'.get_string('filter', 'examregistrar').'" />'."\n";
+    echo '</form>'."\n";
+
+/*
+    $label = get_string('clearfilter', 'examregistrar');
+    //single_button($url, $label, $method='post', array $options=null)
+    //echo $OUTPUT->single_button($baseurl, $label, 'get');
+    $select = new single_button($baseurl, $label, 'get');
+    echo $OUTPUT->render($select);
+*/
+
+echo $OUTPUT->container_end();
+
+$editurl = new moodle_url($baseurl, array('item'=>-1));
+echo $OUTPUT->heading(html_writer::link($editurl, get_string('addperiod', 'examregistrar')));
+
+$table = new flexible_table('examregistrar-manage-editlocations'.$examregistrar->id);
+
+$tablecolumns = array('name', 'idnumber', 'locationtype', 'seats', 'parent', 'address', 'sortorder', 'action');
+$tableheaders = array(get_string('itemname', 'examregistrar'),
+                        get_string('idnumber', 'examregistrar'),
+                        get_string('locationtype', 'examregistrar'),
+                        get_string('seats', 'examregistrar'),
+                        get_string('parent', 'examregistrar'),
+                        get_string('address', 'examregistrar'),
+                        get_string('sortorder', 'examregistrar'),
+                        get_string('action'),
+                        );
+$table->define_columns($tablecolumns);
+$table->define_headers($tableheaders);
+$table->define_baseurl($baseurl->out());
+
+$table->sortable(true, 'name', SORT_ASC);
+$table->no_sorting('action');
+
+    $table->set_attribute('id', 'examregistrar_periods'.$examregistrar->id);
+    $table->set_attribute('cellspacing', '0');
+    $table->set_attribute('class', 'generaltable generalbox periodsstable');
+
+    $table->setup();
+
+    $select = "SELECT p.*,
+                    elt.name AS ltname, elt.idnumber AS ltidnumber,
+                    l.name AS parentname, l.idnumber AS parentidnumber ";
+    $count = "SELECT COUNT('x') ";
+    $sql = "FROM {examregistrar_locations} p
+                JOIN {examregistrar_elements} elt ON p.examregid =  elt.examregid AND elt.type = 'locationtype' AND p.locationtype = elt.id
+                JOIN {examregistrar_locations} l ON p.examregid =  l.examregid AND AND p.parent = l.id
+            WHERE p.examregid = :examregid ";
+    $params = array('examregid'=>$examregistrar->examregidused);
+
+    $where = '';
+    if($sel_locationtype) {
+        $where .= ' AND p.locationtype = :locationtype ';
+        $params['locationtype'] = $sel_locationtype;
+    }
+    if($sel_period) {
+        $where .= ' AND p.parent = :parent ';
+        $params['parent'] = $sel_parent;
+    }
+
+    $totalcount = $DB->count_records_sql($count.$sql, $params);
+
+    $table->initialbars(false);
+    $table->pagesize($perpage, $totalcount);
+
+    if ($table->get_sql_sort()) {
+        $sort = ' ORDER BY '.$table->get_sql_sort();
+    } else {
+        $sort = '';
+    }
+
+    $stredit   = get_string('edit');
+    $strdelete = get_string('delete');
+
+    print_object($select.$sql.$where.$sort);
+
+
+    $elements = $DB->get_records_sql($select.$sql.$where.$sort, $params);
+    if($elements) {
+        foreach($elements as $element) {
+            $data = array();
+            $start = '';
+            $end = '';
+            $data[] = $element->name;
+            $data[] = $element->idnumber;
+            $data[] = $element->ltname.' ('.$element->ltidnumber.') ';
+            $data[] = $element->seats;
+            $data[] = $element->parentname.' ('.$element->parentidnumber.') ';
+            $data[] = format_text($element->address, $element->addressformat);
+            $data[] = $element->sortorder;
+
+            $visible = -$element->id;
+            $visicon = 'show';
+            $strvisible = get_string('hide');
+            if(!$element->visible) {
+                foreach($data as $key => $value) {
+                    $data[$key] = html_writer::span($value, 'hidden');
+                }
+                $visible = $element->id;
+                $visicon = 'hide';
+                $strvisible = get_string('show');
+            }
+            $action = '';
+            $buttons = array();
+            if($canmanageperiods) {
+                $url = new moodle_url($baseurl, array('show'=>$visible));
+                $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/'.$visicon), 'alt'=>$strvisible, 'class'=>'iconsmall')), array('title'=>$strvisible));
+                $url = new moodle_url($baseurl, array('item'=>$element->id));
+                $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+                $url = new moodle_url($baseurl, array('del'=>$element->id));
+                $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+                //$buttons[] = html_writer::link(new moodle_url($returnurl, array('delete'=>$user->id, 'sesskey'=>sesskey())), html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+                $action = implode('&nbsp;&nbsp;', $buttons);
+            }
+
+            $data[] = $action;
+            $table->add_data($data);
+        }
+        $table->print_html();
+    } else {
+        echo $OUTPUT->heading(get_string('nothingtodisplay'));
+    }
+
+
+
+

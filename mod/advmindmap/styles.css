@@ -1,0 +1,19 @@
+table.advmindmap_help_table {
+    border: 1px solid black;
+    width: 95%;
+}
+
+table.advmindmap_help_table th, table.advmindmap_help_table td {
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    padding: 5px;
+    vertical-align: top;
+}
+
+div#flashcontent {
+    margin: 0 auto;
+    padding: 0px;
+    text-align: center;
+    border: 1px black solid;
+    width:820px;
+}

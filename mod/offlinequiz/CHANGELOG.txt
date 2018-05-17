@@ -1,0 +1,68 @@
+CHANGELOG
+=========
+3.4.2 (2018-04-10)
+------------------
+* changed the way how LaTeX-Question sheets work. It should now support almost every question that is written in the moodle editor
+* export of results now has the column "letter"
+* fixed an error for the calender-plugin where the report-appointment was displayed for all the days
+
+3.4.1 (2018-01-17)
+------------------
+* fixed an error, where under certain condition the field id_digits was missing.
+
+3.4.0 (2017-11-16)
+-------------------
+* latex-document supports double-$ as begin-tag for formulas in new line
+* latex-document supports underline, bold and italic texts
+* new option for alignment of latex-questions in pdf-files
+
+3.3.2 (2017-11-06)
+-------------------
+* additional index for tables page_corners and scanned_page
+
+3.3.0 (2017-08-03)
+------------------
+* Moodle 3.3 compatible version
+* Official support of boost Theme
+* Offlinequizzes are now searchable through the moodle search
+* Multiple little bugfixes 
+
+3.2.0 (2017-02-01)
+------------------
+
+* Moodle 3.2 compatible version
+
+3.1 (2016-07-23)
+----------------
+
+* First release for Moodle 3.1
+
+
+3.0 (2016-05-18)
+----------------
+
+* First release for Moodle 3.0
+
+
+2.9 (2015-11-20)
+----------------
+
+* First release for Moodle 2.9
+
+
+2.8 (2015-06-09)
+----------------
+
+* First release for Moodle 2.8
+
+
+2.7 (2014-09-23)
+----------------
+
+* First release for Moodle 2.7
+
+
+2.6 (2014-03-31)
+----------------
+
+* First release for Moodle 2.6

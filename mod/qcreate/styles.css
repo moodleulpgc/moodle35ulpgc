@@ -1,0 +1,12 @@
+#page-mod-qcreate-view ul#requiredqlist li {
+    font-weight: bold;
+}
+
+#page-mod-qcreate-view ul#requiredqlist ul li {
+    font-weight: normal;
+}
+
+#page-mod-qcreate-edit table#mod-qcreate-grades {
+    border-spacing: 0;
+    width: 100%;
+}

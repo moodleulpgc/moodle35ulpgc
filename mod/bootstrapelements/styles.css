@@ -1,0 +1,31 @@
+@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css");
+
+.mod-bootstrapelements-toggle {
+    min-width: 200px;
+}
+
+.mod-bootstrapelements-toggle .panel-heading a {
+    max-width: 100%;
+    white-space: normal;
+    display: inline;
+}
+
+.panel-heading .accordion-toggle:after {
+    font-family: 'FontAwesome';
+    content: "\f062";
+    margin-left: 5px;
+    color: grey;
+    float: right;
+}
+
+.panel-heading .accordion-toggle:hover {
+    text-decoration: none;
+}
+
+.panel-heading .accordion-toggle.collapsed:after {
+    content: "\f063";
+}
+
+.bootstrapelements .fa {
+    margin-right: 5px;
+}

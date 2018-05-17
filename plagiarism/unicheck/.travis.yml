@@ -1,0 +1,59 @@
+language: php
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.npm
+
+addons:
+  postgresql: "9.6"
+  packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
+
+php:
+ - 7.0
+ - 7.1
+
+env:
+  matrix:
+    - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE
+
+matrix:
+  include:  # Moodle 3.3 minimum PHP 5.6.5
+    - php: 5.6
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE
+    - php: 5.6
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - pecl install rar
+  - nvm install 8.9
+  - nvm use 8.9
+  - cd ../..
+  - composer selfupdate
+  - if [ -n "$GITHUB_APITOKEN" ]; then composer global config github-oauth.github.com $GITHUB_APITOKEN; fi
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+
+install:
+  - moodle-plugin-ci install
+
+script:
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci savepoints
+  - moodle-plugin-ci mustache
+  - moodle-plugin-ci grunt
+  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci behat

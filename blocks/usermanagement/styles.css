@@ -1,0 +1,119 @@
+
+.block_usermanagement .link {
+  border-top:1px solid;
+  border-top-color:#DDDDDD;
+  padding-bottom:5px;
+  font-size:0.82em;
+}
+
+.block_usermanagement .description {
+  color:#555555;
+  font-size:0.78em;
+  padding-left:10px;
+  padding-bottom:8px;
+}
+
+.block_usermanagement .title {
+  font-size:1.0em;
+}
+
+.block_usermanagement .image {
+}
+
+table.userstable .cell, .cell {
+  font-size: 0.85em !important;
+  eborder-color: #ff0000;
+  padding: 2px 2px 2px 2px;
+  border-collapse: collapse;
+
+}
+
+table.userstable tr {
+     background-color: #efefef;
+
+}
+
+table.userstable td   {
+     vertical-align: middle;
+}
+table.userstable tr.r1,
+                                 table.generaltable tr.r1   {
+     background-color: #FFFFFF;
+}
+
+table.userstable tr.selected   {
+     color: green;
+     font-weight: bolder;
+     background-color: #eedddd;
+     border-color: #ff0000;
+}
+
+
+table.userstable tr.selected   {
+     color: green;
+     font-weight: bolder;
+     background-color: #eedddd;
+     border-color: #ff0000;
+}
+
+
+
+
+table.userstable tr.selected.r1 {
+     color: green;
+     font-weight: bolder;
+     background-color: #ffeeee;
+     border-color: #ff0000;
+}
+
+
+
+table.userstable th.header {
+  font-size: 0.9em !important;
+  padding: 2px 2px 2px 2px;
+  background-color: #dfdfdf;
+}
+
+table.userstable .cell a.dimmed {
+  color: #aaaaaa !important;
+}
+#blocks-usermanagement-manageusers .header {
+  padding: 2px 2px 2px 2px;
+}
+
+.usermanagement_error {
+    color: #ff0000 !important;
+}
+
+
+/* Links w/ tooltip */
+a.tooltip {
+    position:relative;
+}
+
+a.tooltip span {
+    display: none;
+}
+
+a.tooltip:hover span {
+   /*display just on :hover state*/
+   display: block;
+   /*this positions it relative to the link*/
+   position: absolute;
+   top: 1.2em;
+   left: -2em;
+   /*you can adjust anything under here*/
+   width: 15em;
+   padding: 2px;
+   text-decoration: none !important;
+   border: 1px solid #666666;
+   background-color: #F5F5F5;
+}
+
+/* Column header tooltip */
+.header a.tooltip:hover span {
+    top: -2em;
+    left: -1em;
+    width: 12em;
+}
+

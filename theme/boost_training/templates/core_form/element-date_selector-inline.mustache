@@ -1,0 +1,15 @@
+{{!
+    @template none
+
+    Example context (json): {}
+}}
+{{< core_form/element-template-inline }}
+{{$element}}
+<span class="fdate_selector">
+    {{#element.elements}}
+        {{{separator}}}
+        {{{html}}}
+    {{/element.elements}}
+</span>
+{{/element}}
+{{/ core_form/element-template-inline }}

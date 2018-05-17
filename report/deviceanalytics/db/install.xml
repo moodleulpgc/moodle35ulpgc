@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="report/deviceanalytics/db" VERSION="20160321" COMMENT="XMLDB file for Moodle report/deviceanalytics"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="report_deviceanalytics" COMMENT="Default comment for report_deviceanalytics">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="starttime" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="time that the tracking starts"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="is the device analytics running"/>
+        <FIELD NAME="anonymous" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the user data will be stored anonymously"/>
+        <FIELD NAME="adminlog" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="if the admins will include inside the data"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="report_deviceanalytics_data" COMMENT="data for the table">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="userhash" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userrole" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="objectdate" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="activemoodlelang" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicetype" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="devicesystem" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicebrowser" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicebrowserversion" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicedisplaysizex" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicedisplaysizey" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicewindowsizex" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicewindowsizey" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="devicepointingmethod" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="httpuserag" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="httpssl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="httpacclang" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

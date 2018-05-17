@@ -1,0 +1,127 @@
+/* quiz additional classes
+-------------------------*/
+/* mod_quiz styles
+ ========================================================================= */
+#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
+    margin: 0.2em 3px 0px;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity.slot:hover {
+    background-color: #FAFADA;
+}
+
+
+#page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
+    left: 5.7em;
+}
+#page-mod-quiz-edit #categoryquestions .questionname,
+#page-mod-quiz-edit ul.slots li.activity div.activityinstance .questionname {
+    margin-left: 3px;
+}
+
+#page-mod-quiz-edit .statusdisplay {
+    background-color: #FFC !important;
+}
+
+#page-mod-quiz-edit .section-heading .instancesectioncontainer {
+    display: inline;
+}
+#page-mod-quiz-edit .section-heading .instancesectioncontainer h3 {
+    display: inline;
+    color: #999;
+}
+
+#page-mod-quiz-edit .section-heading .editing_section,
+#page-mod-quiz-edit .section-heading .editing_delete,
+#page-mod-quiz-edit .section-heading .instanceshufflequestions {
+    margin-left: 10px;
+}
+
+
+#page-mod-quiz-edit .section-heading .sectioninstance {
+    position: relative;
+}
+
+#page-mod-quiz-edit .section-heading form {
+    display: inline;
+    position: relative;
+    top: 3px;
+    left: -7px;
+}
+#page-mod-quiz-edit .section-heading form input {
+    font-size: 1.0em;
+    width: 50%;
+
+}
+
+#page-mod-quiz-edit span.editinstructions {
+    right: 0;
+    top: 0;
+}
+
+#page-mod-quiz-edit.dir-rtl span.editinstructions {
+    left: 0;
+    right: auto;
+}
+
+#page-mod-quiz-edit ul.section li.pagenumber:first-child .add-menu-outer ul.menu li:first-child,
+#page-mod-quiz-edit .last-add-menu .add-menu-outer ul.menu li:first-child {
+    display: none;
+}
+
+
+#page-mod-quiz-edit .section-heading {
+    font-size: 1.3em;
+}
+
+#page-mod-quiz-edit .section-heading .instancesectioncontainer,
+#page-mod-quiz-edit .section-heading .instancesectioncontainer h3 {
+    display: inline;
+}
+
+
+#page-mod-quiz-edit .moodle-actionmenu.show[data-enhanced] .menu a.cm-edit-action {
+    display: block;
+    padding: 2px 1em 2px 28px;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity  a.cm-edit-action.addasection  img.iconsmall,
+#page-mod-quiz-edit ul.slots li.section li.activity  a.cm-edit-action.addquestion  img.iconsmall {
+    display: inline;
+}
+
+#page-mod-quiz-edit a.cm-edit-action.questionbank  img.iconsmall,
+#page-mod-quiz-edit a.cm-edit-action.addarandomquestion  img.iconsmall {
+    display: none;
+}
+
+#page-mod-quiz-report .mform .felement.fsubmit {text-align:center;}
+
+/* questionbank styles
+ ========================================================================= */
+#categoryquestions .creatorname, #categoryquestions .modifiername   {
+    font-size: 0.7em;
+    line-height: 1.1em;
+    padding: 2px;
+}
+#categoryquestions .header.creatorname, #categoryquestions .header.modifiername   {
+    width: 16%;
+    font-size: .9em;
+}
+
+#categoryquestions td.questionname {
+    border: 0px;
+    vertical-align: middle;
+}
+
+
+
+/* question types styles
+ ========================================================================= */
+
+/* calculated questions */
+#id_mandatoryhdr .ftoggler,
+#id_synchronizehdr .ftoggler,
+#id_possiblehdr .ftoggler {
+    font-size: inherit;
+}

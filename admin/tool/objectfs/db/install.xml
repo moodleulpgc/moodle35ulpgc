@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="admin/tool/objectfs/db" VERSION="20161207" COMMENT="XMLDB file for Moodle tool/objectfs plugin"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="tool_objectfs_objects" COMMENT="Object data for objectfs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeduplicated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="location" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="contenthash" TYPE="unique" FIELDS="contenthash"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="tool_objectfs_reports" COMMENT="Object report data for objectfs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reporttype" TYPE="char" LENGTH="15" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="datakey" TYPE="char" LENGTH="15" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objectcount" TYPE="int" LENGTH="15" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objectsum" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,191 @@
+<?php
+
+include($CFG->dirroot.'/auth/casulpgc/languages.php');
+
+// set to defaults if undefined (CAS)
+if (!isset ($config->hostname)) {
+    $config->hostname = '';
+}
+if (!isset ($config->port)) {
+    $config->port = '';
+}
+if (!isset ($config->casversion)) {
+    $config->casversion = CAS_VERSION_2_0;
+}
+if (!isset ($config->baseuri)) {
+    $config->baseuri = '';
+}
+if (!isset ($config->language)) {
+    $config->language = '';
+}
+if (!isset ($config->proxycas)) {
+    $config->proxycas = '';
+}
+if (!isset ($config->logoutcas)) {
+    $config->logoutcas = '';
+}
+if (!isset ($config->certificate_check)) {
+    $config->certificate_check = '';
+}
+if (!isset ($config->certificate_path)) {
+    $config->certificate_path = '';
+}
+if (!isset($config->logout_return_url)) {
+    $config->logout_return_url = '';
+}
+
+if (!isset($config->removeuser)) {
+    $config->removeuser = AUTH_REMOVEUSER_KEEP;
+}
+
+$yesno = array( get_string('no'), get_string('yes') );
+
+?>
+<table cellspacing="0" cellpadding="5" border="0">
+<tr>
+    <td colspan="2">
+        <h4><?php print_string('auth_casulpgc_server_settings', 'auth_casulpgc') ?></h4>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right"><label for="hostname"><?php print_string('auth_casulpgc_hostname_key', 'auth_casulpgc') ?>: </label></td>
+    <td>
+        <input name="hostname" id="hostname" type="text" size="30" value="<?php echo $config->hostname ?>" />
+        <?php if (isset($err['hostname'])) { echo $OUTPUT->error_text($err['hostname']); } ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_hostname', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right">
+        <label for="baseuri"><?php print_string('auth_casulpgc_baseuri_key', 'auth_casulpgc') ?>: </label>
+    </td>
+    <td>
+        <input name="baseuri" id="baseuri" type="text" size="30" value="<?php echo $config->baseuri ?>" />
+        <?php if (isset($err['baseuri'])) { echo $OUTPUT->error_text($err['baseuri']); } ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_baseuri', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right">
+        <label for="port"><?php print_string('auth_casulpgc_port_key', 'auth_casulpgc') ?>: </label>
+    </td>
+    <td>
+        <input name="port" id="port" type="text" size="30" value="<?php echo $config->port ?>" />
+        <?php if (isset($err['port'])) { echo $OUTPUT->error_text($err['port']); } ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_port', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right">
+        <?php echo html_writer::label(get_string('auth_casulpgc_casversion', 'auth_casulpgc'), 'menucasversion'); ?>:
+    </td>
+    <td>
+        <?php
+             $casversions = array();
+             $casversions[CAS_VERSION_1_0] = 'CAS 1.0';
+             $casversions[CAS_VERSION_2_0] = 'CAS 2.0';
+             echo html_writer::select($casversions, 'casversion', $config->casversion, false);
+             if (isset($err['casversion'])) { echo $OUTPUT->error_text($err['casversion']); }
+        ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_version', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right"><?php echo html_writer::label(get_string('auth_casulpgc_language_key', 'auth_casulpgc'), 'menulanguage'); ?>:</td>
+    <td>
+        <?php echo html_writer::select($CASLANGUAGES, 'language', $config->language, false); ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_language', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right">
+        <?php echo html_writer::label(get_string('auth_casulpgc_proxycas_key', 'auth_casulpgc'), 'menuproxycas'); ?>:
+    </td>
+    <td>
+        <?php echo html_writer::select($yesno, 'proxycas', $config->proxycas, false); ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_proxycas', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right"><?php echo html_writer::label(get_string('auth_casulpgc_logoutcas_key', 'auth_casulpgc'), 'menulogoutcas'); ?>:</td>
+    <td>
+        <?php echo html_writer::select($yesno, 'logoutcas', $config->logoutcas, false); ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_logoutcas', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top"  class="required">
+    <td align="right"><?php echo html_writer::label(get_string('auth_casulpgc_certificate_check_key', 'auth_casulpgc'), 'menucertificate_check'); ?>:</td>
+    <td>
+        <?php echo html_writer::select($yesno, 'certificate_check', $config->certificate_check, false); ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_certificate_check', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right"><label for="certificate_path"><?php print_string('auth_casulpgc_certificate_path_key', 'auth_casulpgc') ?>: </label></td>
+    <td>
+        <input name="certificate_path" id="certificate_path" type="text" size="30" value="<?php echo $config->certificate_path ?>" />
+        <?php if (isset($err['certificate_path'])) echo $OUTPUT->error_text($err['certificate_path']); ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_certificate_path', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr valign="top" class="required">
+    <td align="right"><?php print_string('auth_casulpgc_logout_return_url_key', 'auth_casulpgc') ?>:</td>
+    <td>
+       <input name="logout_return_url" type="text" size="30" value="<?php echo $config->logout_return_url ?>" />
+       <?php if (isset($err['logout_return_url'])) { echo $OUTPUT->error_text($err['logout_return_url']); } ?>
+    </td>
+    <td>
+        <?php print_string('auth_casulpgc_logout_return_url', 'auth_casulpgc') ?>
+    </td>
+</tr>
+<tr>
+    <td colspan="2">
+        <h4><?php print_string('auth_sync_script', 'auth') ?></h4>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right">
+        <label for="menuremoveuser"><?php print_string('auth_remove_user_key', 'auth') ?></label>
+    </td>
+    <td>
+        <?php
+             $deleteopt = array();
+             $deleteopt[AUTH_REMOVEUSER_KEEP] = get_string('auth_remove_keep', 'auth');
+             $deleteopt[AUTH_REMOVEUSER_SUSPEND] = get_string('auth_remove_suspend', 'auth');
+             $deleteopt[AUTH_REMOVEUSER_FULLDELETE] = get_string('auth_remove_delete', 'auth');
+             echo html_writer::select($deleteopt, 'removeuser', $config->removeuser, false);
+        ?>
+    </td>
+    <td>
+        <?php print_string('auth_remove_user', 'auth') ?>
+    </td>
+</tr>
+<?php
+$help  = get_string('auth_ldapextrafields', 'auth_ldap');
+$help .= get_string('auth_updatelocal_expl', 'auth');
+$help .= get_string('auth_fieldlock_expl', 'auth');
+$help .= get_string('auth_updateremote_expl', 'auth');
+$help .= '<hr />';
+$help .= get_string('auth_updateremote_ldap', 'auth');
+
+print_auth_lock_options($this->authtype, $user_fields, $help, true, true, $this->get_custom_user_profile_fields());
+?>
+</table>

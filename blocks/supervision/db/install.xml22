@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/supervision/db" VERSION="2012081700" COMMENT="XMLDB file for Moodle supervision block"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="supervision_permissions" COMMENT="stores faculty/degree/department supervision permisions for supervisor users" NEXT="supervision_warnings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" ENUM="false" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="scope"/>
+        <FIELD NAME="scope" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" PREVIOUS="userid" NEXT="instance"/>
+        <FIELD NAME="instance" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="scope" NEXT="review"/>
+        <FIELD NAME="review" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="instance" NEXT="warnings"/>
+        <FIELD NAME="warnings" TYPE="char" LENGTH="254" NOTNULL="false" SEQUENCE="false" PREVIOUS="review" NEXT="assigner"/>
+        <FIELD NAME="assigner" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="warnings" NEXT="adduser"/>
+        <FIELD NAME="adduser" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="assigner" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="adduser"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="user" UNIQUE="false" FIELDS="userid" NEXT="scope" />
+        <INDEX NAME="scope" UNIQUE="false" FIELDS="scope" PREVIOUS="user" />
+      </INDEXES>
+    </TABLE>
+
+
+    <TABLE NAME="supervision_warnings" COMMENT="stores pending duties warnings for supervised and supervision users" PREVIOUS="supervision_permissions" NEXT="supervision_holidays" >
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" ENUM="false" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="module"/>
+        <FIELD NAME="module" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="cmid"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="module" NEXT="warningtype"/>
+        <FIELD NAME="warningtype" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="instanceid"/>
+        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="warningtype" NEXT="itemid"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="instanceid" NEXT="url"/>
+        <FIELD NAME="url" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="itemid" NEXT="info"/>
+        <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="url" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="info" NEXT="studentid"/>
+        <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="studentid" NEXT="timefixed" />
+        <FIELD NAME="timefixed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timecreated" NEXT="timemailed" />
+        <FIELD NAME="timemailed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timefixed" NEXT="comment" />
+        <FIELD NAME="comment" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="timemailed" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="courseid" NEXT="user"/>
+        <INDEX NAME="user" UNIQUE="false" FIELDS="userid" PREVIOUS="course" NEXT="student"/>
+        <INDEX NAME="student" UNIQUE="false" FIELDS="studentid" PREVIOUS="user" NEXT="time"/>
+        <INDEX NAME="time" UNIQUE="false" FIELDS="timecreated" PREVIOUS="student" NEXT="fixed" />
+        <INDEX NAME="fixed" UNIQUE="false" FIELDS="timefixed" PREVIOUS="time" NEXT="type" />
+        <INDEX NAME="type" UNIQUE="false" FIELDS="warningtype" PREVIOUS="fixed" NEXT="mod"/>
+        <INDEX NAME="mod" UNIQUE="false" FIELDS="module" PREVIOUS="type" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="supervision_holidays" COMMENT="to accumulate stats for pending activity" PREVIOUS="supervision_warnings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" ENUM="false" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="id"  NEXT="datestart"/>
+        <FIELD NAME="datestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="name" NEXT="timeduration" />
+        <FIELD NAME="timeduration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="datestart" NEXT="scope"/>
+        <FIELD NAME="scope" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="timeduration"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="date" UNIQUE="false" FIELDS="datestart" NEXT="duration" />
+        <INDEX NAME="duration" UNIQUE="false" FIELDS="timeduration" PREVIOUS="date" />
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -1,0 +1,37 @@
+<html>
+<style type="text/css">
+#div1 {width:95px;height:47px;padding:10px;border:1px solid #aaaaaa;}
+#pos0slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:95px; left:-1px;}
+#pos1slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-15px; left:79px;}
+#pos2slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:30px; left:160px;}
+#pos3slot {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:75px; left:80px;}
+div.flipable img[id^='oh']
+ {
+    transform: scale(-1, 1);
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -khtml-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+}
+</style>
+
+<input type="hidden" id="apos0slot" value=''>
+<input type="hidden" id="apos1slot" value=''>
+<input type="hidden" id="apos2slot" value=''>
+<input type="hidden" id="apos3slot" value=''>
+
+<div style="overflow: hidden; padding: 10px; ">
+<!-- fischer template -->
+<div id="divnewf1">
+
+<div class="dropablediv flipable" id="pos0slot" ></div>
+<div class="dropablediv" id="pos1slot" ></div>
+<div class="dropablediv" id="pos2slot" ></div>
+<div class="dropablediv" id="pos3slot" ></div>
+
+
+</div>
+
+
+<!---Note these divs are purposely let open -->

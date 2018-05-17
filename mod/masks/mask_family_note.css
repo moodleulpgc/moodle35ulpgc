@@ -1,0 +1,97 @@
+/*
+ This file is part of Moodle - http://moodle.org/
+
+ Moodle is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Moodle is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * Note family - Mask styles
+ *
+ * @copyright  2016 Edunao SAS (contact@edunao.com)
+ * @author     Sadge (daniel@edunao.com)
+ * @package    mod_masks
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+/*-----------------------------------------
+  note family - Mask styles
+*/
+
+#masks .mask-root.mask-family-note .mask-back {
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 2px;
+    box-sizing: border-box;
+}
+
+#masks .mask-root.mask-family-note .mask-main {
+    background-image: url('pix/mask_note.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: 0;
+    bottom: 0;
+    height: 48px;
+    left: 0;
+    margin: auto;
+    max-height: 75%;
+    max-width: 75%;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 48px;
+}
+
+
+/*-----------------------------------------
+  Rounded masks
+*/
+
+#masks .mask-root.mask-family-note.mask-style-note-4 .mask-back,
+#masks .mask-root.mask-family-note.mask-style-note-5 .mask-back,
+#masks .mask-root.mask-family-note.mask-style-note-6 .mask-back,
+#masks .mask-root.mask-family-note.mask-style-note-7 .mask-back {
+    border-radius: 100%;
+}
+
+
+/*-----------------------------------------
+  Mask colours
+*/
+
+#masks .mask-root.mask-style-note-4 .mask-back,
+#masks .mask-root.mask-style-note-0 .mask-back {
+    background-color: yellow;
+    border-color: darkgrey;
+}
+
+#masks .mask-root.mask-style-note-5 .mask-back,
+#masks .mask-root.mask-style-note-1 .mask-back {
+    background-color: lightpink;
+    border-color: darkgrey;
+}
+
+#masks .mask-root.mask-style-note-6 .mask-back,
+#masks .mask-root.mask-style-note-2 .mask-back {
+    background-color: lightgreen;
+    border-color: darkgrey;
+}
+
+#masks .mask-root.mask-style-note-7 .mask-back,
+#masks .mask-root.mask-style-note-3 .mask-back {
+    background-color: lightcyan;
+    border-color: darkgrey;
+}
+
