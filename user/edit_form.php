@@ -77,7 +77,7 @@ class user_edit_form extends moodleform {
         useredit_shared_definition($mform, $editoroptions, $filemanageroptions, $user);
 
         // Extra settigs.
-        if (!empty($CFG->disableuserimages) || $usernotfullysetup) {
+        if (!empty($CFG->disableuserimages) || $usernotfullysetup && $mform->elementExists('imagefile')) { // ecastro ULPGC
             $mform->removeElement('deletepicture');
             $mform->removeElement('imagefile');
             $mform->removeElement('imagealt');
@@ -98,6 +98,7 @@ class user_edit_form extends moodleform {
 
             // This is expected to exist when the form is submitted.
             $imagefile = $mform->createElement('hidden', 'imagefile');
+            $mform->setType('imagefile', PARAM_INT); // ecastro ULPGC
             $mform->insertElementBefore($imagefile, 'userpicturewarning');
         }
 
@@ -125,12 +126,13 @@ class user_edit_form extends moodleform {
 
         if ($user = $DB->get_record('user', array('id' => $userid))) {
 
-            // Remove description.
-            if (empty($user->description) && !empty($CFG->profilesforenrolledusersonly) && !$DB->record_exists('role_assignments', array('userid' => $userid))) {
-                $mform->removeElement('description_editor');
-            }
+        // Remove description.
+        if (empty($user->description) && !empty($CFG->profilesforenrolledusersonly) && !$DB->record_exists('role_assignments', array('userid' => $userid))) {
+            $mform->removeElement('description_editor');
+        }
 
             // Print picture.
+            if($mform->elementExists('imagealt')) { // ecastro ULPGC
             $context = context_user::instance($user->id, MUST_EXIST);
             $fs = get_file_storage();
             $hasuploadedpicture = ($fs->file_exists($context->id, 'user', 'icon', 0, '/', 'f2.png') || $fs->file_exists($context->id, 'user', 'icon', 0, '/', 'f2.jpg'));
@@ -144,6 +146,8 @@ class user_edit_form extends moodleform {
 
             if ($mform->elementExists('deletepicture') && !$hasuploadedpicture) {
                 $mform->removeElement('deletepicture');
+
+            }
             }
 
             // Disable fields that are locked by auth plugins.

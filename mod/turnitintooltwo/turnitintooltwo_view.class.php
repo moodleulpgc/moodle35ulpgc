@@ -146,8 +146,7 @@ class turnitintooltwo_view {
         $module = $DB->get_record('config_plugins', array('plugin' => 'mod_turnitintool'));
         if ( $module ) {
             $tabs[] = new tabobject('v1migration', $CFG->wwwroot.'/mod/turnitintooltwo/settings_extras.php?cmd=v1migration',
-                        get_string('v1migrationtitle', 'turnitintooltwo').' - '.get_string('v1migrationearlyaccess', 'turnitintooltwo'), 
-                        get_string('v1migrationtitle', 'turnitintooltwo'), false);    
+                        get_string('v1migrationtitle', 'turnitintooltwo'), get_string('v1migrationtitle', 'turnitintooltwo'), false);    
         }
 
         $selected = ($cmd == 'activitylog') ? 'apilog' : $cmd;
@@ -1387,7 +1386,7 @@ class turnitintooltwo_view {
 
                 // Has the student accepted the EULA?
                 $eulaaccepted = $submissionuser->useragreementaccepted;
-                if ($submissionuser->useragreementaccepted == 0 && !$_SESSION["unit_test"]) {
+                if ($submissionuser->useragreementaccepted == 0 && !empty($_SESSION["unit_test"])) {
                     $eulaaccepted = $submissionuser->get_accepted_user_agreement();
                 }
             }

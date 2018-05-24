@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Custom code to be run on installing the plugin.
  */
-function xmldb_mod_examboard_install() {
+function xmldb_examboard_install() {
     global $CFG;
 
     // ensure there is a diretory for PDF header images

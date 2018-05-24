@@ -4,7 +4,7 @@ Feature: Export good questions of a qcreate activity
   In order to re-use questions created by my students in a Question creation activity
   I need to export them
 
-  @javascript
+  @javascript @_file_upload
   Scenario: Teacher export good questions
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |

@@ -1,85 +1,85 @@
-.issuelist{
+.path-mod-tracker .issuelist{
     width: 100%;
 }
 
-.timelabel{
-    color: #808080;
-    font-size : 0.9em;
+.path-mod-tracker .timelabel{
     text-align: left;
     vertical-align: bottom;
+    font-size : 0.9em;
+    color: #808080;
     width: 15%;
 }
 
-.formerror{
+.path-mod-tracker .formerror{
     background-color: #F8E4E4;
     border: red 1px solid;
 }
 
-.errorbox{
+.path-mod-tracker .errorbox{
     border: 1px solid red;
     color: red;
     padding: 1px;
 }
 
-.green{
+.path-mod-tracker .green{
     color: green;
     font-weight: bold;
 }
 
-.red{
+.path-mod-tracker .red{
     color: red;
     font-weight: bold;
 }
 
-.status-resolved{
+.status_resolved{
     background-color: #2EAA20;
     color: white;
     font-weight: bold;
 }
 
-.status-posted{
+.status_posted{
     background-color: #D90000;
     color: white;
     font-weight: bold;
 }
 
-.status-open{
+.status_open{
     background-color: #FF8000;
     color: black;
     font-weight: bold;
 }
 
-.status-resolving{
+.status_resolving{
     background-color: #FCDD03;
     color: black;
     font-weight: bold;
 }
 
-.status-waiting{
+.status_waiting{
     background-color: #BAAB45;
     color: black;
     font-weight: bold;
 }
 
-.status-abandonned{
+.status_abandonned{
     background-color: #454747;
     color: white;
     font-weight: bold;
 }
 
-.status-transfered{
+.status_transfered{
     background-color: #E4E4E4;
     color: black;
     font-weight: normal;
 }
 
-.status-testing{
+.status_testing{
     background-color: #B8F079;
     color: black;
     font-weight: normal;
 }
 
-.status-published{
+.status_published{
     background-color: #58BCF1;
     color: black;
     font-weight: normal;
@@ -87,109 +87,109 @@
 
 .comments{
     background-color: #E0E0E0;
-    border: 1px solid #ACACAC;
     padding: 2px;
+    border: 1px solid #ACACAC;
 }
 
-.comment{
+.path-mod-tracker .comment{
     border: 1px solid #FFFFFF;
 }
 
-.visiblediv{
+.path-mod-tracker .visiblediv{
+    visibility: visible;
     display: block;
-    visibility: visible; 
 }
 
-.hiddendiv{
+.path-mod-tracker .hiddendiv{
+    visibility: hidden;
     display: none;
-    visibility: hidden; 
 }
 
-.list-priority{
-    font-size: 0.9em;
+.path-mod-tracker .list_priority{
     text-align: center;
     vertical-align: bottom;
+    font-size: 0.9em;
 }
 
-.list-issuenumber{
-    font-size: 0.9em;
+.path-mod-tracker .list_issuenumber{
     text-align: left;
     vertical-align: bottom;
+    font-size: 0.9em;
 }
 
-.list-summary{
-    font-size: 0.9em;
-    padding: 2px;
+.path-mod-tracker .list_summary{
     text-align: left ;
     vertical-align: bottom;
+    font-size: 0.9em;
     width: 40%;
+    padding: 2px;
 }
 
-.list-reportedby{
-    color: #4D4D4D;
-    font-size: 0.9em ;
+.path-mod-tracker .list_reportedby{
     text-align: left;
     vertical-align: bottom;
+    font-size: 0.9em ;
+    color: #4D4D4D;
     width:10%;
 }
 
-.list-assignedto{
-    color: #4D4D4D;
-    font-size: 0.9em;
+.path-mod-tracker .list_assignedto{
     text-align: left;
     vertical-align: bottom;
+    font-size: 0.9em;
+    color: #4D4D4D;
     width: 10%;
 }
 
-.list-watches{
+.path-mod-tracker .list_watches{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-status{
+.path-mod-tracker .list_status{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-transfered{
+.path-mod-tracker .list_transfered{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-testing{
+.path-mod-tracker .list_testing{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-action{
+.path-mod-tracker .list_action{
     text-align: center;
-    min-width:120px;
     vertical-align: bottom;
     width: 5%;
 }
 
 .tracker-image-attachment{
-    max-width:570px;
+     max-width:570px;
 }
 
-.flexible .r0{
-    background-color:#F0F0F0;
+.path-mod-tracker .flexible .r0{
+   background-color:#F0F0F0;
 }
 
-.flexible .r1{
-    background-color:#F8F8F8;
+.path-mod-tracker .flexible .r1{
+   background-color:#F8F8F8;
 }
 
-.nullclass{
-    color:#D0D0D0;
+
+.path-mod-tracker .nullclass{
+	color:#D0D0D0;
 }
 
-.redtext{
-    color:#800000;
+.path-mod-tracker .redtext{
+	color:#800000;
 }
 
 .tracker-printtable{
@@ -210,6 +210,17 @@
 .tracker-printtable.summary{
     border:1px #808080 solid
 }
+
+.tracker-issue table th, 
+.tracker-issue table tr, 
+.tracker-issue table td {border:1px solid #DDD; border-collapse:collapse;}
+
+.tracker-issue .visiblediv td h2 {
+    font-size: 1.3em;
+    font-weight: bold;
+    line-height: 1.5em;
+}
+
 
 .tracker-issue-editor {
     width:100%;
@@ -233,8 +244,8 @@
 }
 
 .tracker-issue-value{
-    border-bottom:1px solid #f0f0f0;
     padding:4px 4px 4px 15px;
+    border-bottom:1px solid #f0f0f0;
 }
 
 .tracker-issue-description{
@@ -248,11 +259,17 @@
 }
 
 #tracker-acknowledge{
-    border:1px #c0c0c0 solid;
-    font-size:1.2em;
     margin:50px;
+    border:1px #c0c0c0 solid;
     padding:30px;
+    font-size:1.2em;
 }
+
+.issueseen {color: #006400;}
+.issueunseen {color: #8B0000;}
+.rightedbutton {text-align: right; float:right;}
+.trackeruserpicture {text-align: left; float:left;}
+.commentattachments {text-align: right; float:right;}
 
 .tracker-issue-value {
     padding: 3px 3px 3px 15px;
@@ -262,38 +279,10 @@
     padding: 3px 15px 3px 3px;
 }
 
-.tracker-status-thin {
-    min-width:4px;
-    height:100%;
+.tracker-issue-value {
+    padding: 3px 3px 3px 15px;
 }
 
-.tracker-status {
-    height: 102%;
-    text-align:center;
-    width: 105%;
-}
-
-.tracker-filepicker {
-    border:1px solid #000;
-    height:160px;
-    width:600px;
-}
-
-.tracker-shadow {
-    -moz-opacity:0.5;
-    opacity:0.5;
-}
-
-.tracker-report-assignee {
-    font-weight:bolder;
-    font-size:1.3em;
-}
-
-#tracker-preferences-form div.fitemtitle {
-    width:600px;
-}
-
-.tracker-captcha {
-    margin-left: 285px;
-    margin-bottom: 10px;
+.tracker-issue-param {
+    padding: 3px 15px 3px 3px;
 }

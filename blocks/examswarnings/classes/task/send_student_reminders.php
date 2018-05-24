@@ -75,7 +75,7 @@ class send_student_reminders extends \core\task\scheduled_task {
                     WHERE e.examregid = :examregid AND e.examsession = :session AND e.visible = 1
                     GROUP BY b.examid, b.userid, b.booked
                     ORDER BY b.userid ";
-            if($users = $DB->get_records_sql_menu($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
+            if($users = $DB->get_records_sql($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
                 mtrace("    ... doing reserved exam reminders.");
                 
                 $sent = array();

@@ -8,12 +8,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 $tasks = array(
             array(
                 'classname' => 'mod_scheduler\task\send_reminders',
-                'minute' => 'R',
+                'minute' => '*/5',
                 'hour' => '*',
                 'day' => '*',
                 'dayofweek' => '*',

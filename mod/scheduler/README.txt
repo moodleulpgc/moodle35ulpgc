@@ -1,4 +1,4 @@
-Appointment Scheduler for Moodle
+Appointment Scheduler for Moodle 2.x
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ Teacher in turn can record the outcome of the meeting - and optionally a grade -
 within the scheduler.
 
 For further information, please see:
-    http://docs.moodle.org/33/en/Scheduler_module
+    http://docs.moodle.org/29/en/Scheduler_module
 
 (Note that the information there may refer to a previous version of the module.)
 
@@ -35,7 +35,7 @@ mod/scheduler/README.txt
 For further installation instructions please see:
     http://docs.moodle.org/en/Installing_contributed_modules_or_plugins
 
-This module is intended for Moodle 3.3 and above.
+This module is intended for Moodle 2.9 and above.
 
 
 === Authors ===
@@ -57,69 +57,6 @@ With further contributions taken from:
 
 
 === Release notes ===
-
---- Version 3.3 ---
-
-Intended for Moodle 3.3 and later.
-
-New features / improvements:
-
-Optionally, before making an appointment, students now see a booking screen 
-in which they need to enter text, upload a file, and/or solve a captcha.
-
-Filter strings (e.g., multilang syntax) are now processed in course shortname,
-course fullname, and location fields.
-
-Export files can now include custom profile fields of students.
-
-Feature changes:
-
-For booking in groups, students now need to select explicitly which group
-they are booking for, or whether they want to make an individual booking.
-Individual bookings can be disabled via a global configuration setting.
-
-For viewing student's email addresses, the capability 
-moodle/site:viewuseridentity is now required.
-
-When allowing an "unlimited" number of appointments, students will no longer
-be included in reminder e-mails if they have booked at least one slot. 
-
-Refactoring / API changes:
-
-The function scheduler_get_user_fields() in customlib.php has changed 
-signature. If you have customized it in an earlier version, you will want 
-to edit your code.
-
---- Version 3.1 ---
-
-Intended for Moodle 3.1 and later.
-
-New features / improvements:
-
-An additional "confidential note" field is supplied for appointments;
-the contents can be read by teachers only.
-
-Slot notes and appointment notes can now contain attachments.
-
-Students can now be allowed to see existing bookings of other students.
-See https://docs.moodle.org/31/en/Scheduler_Module_capabilities#Student_side
-
-Feature changes:
-
-Sending of invitations and reminders is no longer handled via a "mailto" link
-but rather via a webform, using Moodle's messaging system.
-
-The conflict detection feature (when creating new slots) has been reworked slightly.
-See https://docs.moodle.org/31/en/Scheduler:_Conflicts
-
-Refactoring / API changes:
-
-All email-related features now use the Messaging API.
-
-Appointment reminders and deletion of past unused slots are now handled via
-the Scheduled Tasks API.
-
-The new Search API is supported for the activity description only.
 
 --- Version 2.9 ---
 
@@ -201,8 +138,8 @@ No major functional changes over 1.9; bug fixes and API migration only. Requires
 
 === Technical notes ===
 
-The code of this module is rather old, some of it still predates even Moodle 1.9.
-It has now largely, but not completely, been adapted to the new APIs.
+The code of this module is rather old, much of it predates even Moodle 1.9.
+It has now largely, but not compltely, been adapted to the new APIs. 
 The following aspects have been migrated, that is, malfunction in this respect 
 should be considered a bug:
 
@@ -211,7 +148,6 @@ should be considered a bug:
 * New rich text editor and file API 
 * Localization / language packs
 * Logging / event system
-* Scheduler tasks API
-* Messaging API
 
-The module does not use any deprecated API as of Moodle 3.3.
+The module does not use any deprecated API as of Moodle 2.9.
+

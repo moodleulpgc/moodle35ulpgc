@@ -29,6 +29,7 @@ global $PAGE;
 // MODIFICATION END.
 
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
+user_preference_allow_ajax_update('sidepre-open', PARAM_ALPHA);
 require_once($CFG->libdir . '/behat/lib.php');
 // MODIFICATION Start: Require own locallib.php.
 require_once($CFG->dirroot . '/theme/boost_campus/locallib.php');
@@ -36,16 +37,27 @@ require_once($CFG->dirroot . '/theme/boost_campus/locallib.php');
 
 if (isloggedin()) {
     $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+    // ecastro ULPGC from moove
+    $draweropenright = (get_user_preferences('sidepre-open', 'true') == 'true');
 } else {
     $navdraweropen = false;
+    // ecastro ULPGC from moove 
+    $draweropenright = false;
 }
 $extraclasses = [];
 if ($navdraweropen) {
     $extraclasses[] = 'drawer-open-left';
 }
-$bodyattributes = $OUTPUT->body_attributes($extraclasses);
+
 $blockshtml = $OUTPUT->blocks('side-pre');
 $hasblocks = strpos($blockshtml, 'data-block=') !== false;
+
+// ecastro ULPGC from moove
+if ($draweropenright && $hasblocks) {
+    $extraclasses[] = 'drawer-open-right';
+}
+
+$bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $regionmainsettingsmenu = $OUTPUT->region_main_settings_menu();
 // MODIFICATION START: Setting 'catchshortcuts'.
 // Initialize array.
@@ -64,8 +76,16 @@ if (get_config('theme_boost_campus', 'catchctrlarrowdown') == true) {
 }
 // MODIFICATION END.
 
-// MODIFICATION START: Setting 'nawdrawerfullwidth'.
-$navdrawerfullwidth = get_config('theme_boost_campus', 'nawdrawerfullwidth');
+// MODIFICATION START: Setting 'darknavbar'.
+if (get_config('theme_boost_campus', 'darknavbar') == 'yes') {
+    $darknavbar = true;
+} else {
+    $darknavbar = false;
+}
+// MODIFICATION END.
+
+// MODIFICATION START: Setting 'navdrawerfullwidth'.
+$navdrawerfullwidth = get_config('theme_boost_campus', 'navdrawerfullwidth');
 // MODIFICATION END.
 
 $templatecontext = [
@@ -77,12 +97,14 @@ $templatecontext = [
     'navdraweropen' => $navdraweropen,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
+    // ecastro ULPGC moove
+    'draweropenright' => $draweropenright,
     // MODIFICATION START: Add Boost Campus realated values to the template context.
     'catchshortcuts' => json_encode($catchshortcuts),
-    'nawdrawerfullwidth' => $navdrawerfullwidth
+    'navdrawerfullwidth' => $navdrawerfullwidth,
+    'darknavbar' => $darknavbar
     // MODIFICATION END.
 ];
-
 
 // MODIDFICATION START.
 // Use the returned value from theme_boost_campus_get_modified_flatnav_defaulthomepageontop as the template context.

@@ -279,8 +279,8 @@ if(is_subclass_of($mform, 'moodleform')) {
             core_php_time_limit::raise();
             raise_memory_limit(MEMORY_EXTRA);
 
-            $iid = csv_import_reader::get_new_iid('mod_examboard_import_examninations');
-            $cir = new csv_import_reader($iid, 'mod_examboard_import_examninations');
+            $iid = csv_import_reader::get_new_iid('mod_examboard_import_examinations');
+            $cir = new csv_import_reader($iid, 'mod_examboard_import_examinations');
 
             $filecontent = $mform->get_file_content('recordsfile');
             $readcount = $cir->load_csv_content($filecontent, $fromform->encoding, $fromform->separator);

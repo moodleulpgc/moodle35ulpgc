@@ -4,12 +4,13 @@
  * This page prints a particular instance of scheduler and handles
  * top level interactions
  *
- * @package    mod_scheduler
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot.'/mod/scheduler/lib.php');
 require_once($CFG->dirroot.'/mod/scheduler/locallib.php');
 require_once($CFG->dirroot.'/mod/scheduler/renderable.php');
@@ -30,11 +31,14 @@ if ($id) {
 }
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
-$defaultsubpage = groups_get_activity_groupmode($cm) ? 'myappointments' : 'allappointments';
+require_login($course->id, false, $cm);
+$context = context_module::instance($cm->id);
+// TODO require_capability('mod/scheduler:view', $context);
+
+//$defaultsubpage = groups_get_activity_groupmode($cm) ? 'myappointments' : 'allappointments';
+$defaultsubpage = has_capability('mod/scheduler:canscheduletootherteachers', $context) ? 'allappointments' : 'myappointments';
 $subpage = optional_param('subpage', $defaultsubpage, PARAM_ALPHA);
 
-require_login($course->id, true, $cm);
-$context = context_module::instance($cm->id);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_url('/mod/scheduler/view.php', array('id' => $cm->id));
@@ -43,17 +47,32 @@ $output = $PAGE->get_renderer('mod_scheduler');
 
 // Print the page header.
 
+$strschedulers = get_string('modulenameplural', 'scheduler');
+$strscheduler  = get_string('modulename', 'scheduler');
+$strtime = get_string('time');
+$strdate = get_string('date', 'scheduler');
+$strstart = get_string('start', 'scheduler');
+$strend = get_string('end', 'scheduler');
+$strname = get_string('name');
+$strseen = get_string('seen', 'scheduler');
+$strnote = get_string('comments', 'scheduler');
+$strgrade = get_string('grade', 'scheduler');
+$straction = get_string('action', 'scheduler');
+$strduration = get_string('duration', 'scheduler');
+$stremail = get_string('email');
+
 $title = $course->shortname . ': ' . format_string($scheduler->name);
 $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
+// Mark viewed by user (if required)
+$completion = new completion_info($course); // ecastro ULPGC
+$completion->set_module_viewed($cm);
 
-// Route to screen.
+// route to screen
 
-$isteacher = has_capability('mod/scheduler:manage', $context);
-$isstudent = has_capability('mod/scheduler:viewslots', $context);
-if ($isteacher) {
-    // Teacher side.
+// teacher side
+if (has_capability('mod/scheduler:manage', $context)) {
     if ($action == 'viewstatistics') {
         include($CFG->dirroot.'/mod/scheduler/viewstatistics.php');
     } else if ($action == 'viewstudent') {
@@ -66,12 +85,12 @@ if ($isteacher) {
         include($CFG->dirroot.'/mod/scheduler/teacherview.php');
     }
 
-} else if ($isstudent) {
-    // Student side.
+    // student side
+} else if (has_capability('mod/scheduler:appoint', $context)) {
     include($CFG->dirroot.'/mod/scheduler/studentview.php');
 
+    // for guests
 } else {
-    // For guests.
     echo $OUTPUT->header();
     echo $OUTPUT->box(get_string('guestscantdoanything', 'scheduler'), 'generalbox');
     echo $OUTPUT->footer($course);

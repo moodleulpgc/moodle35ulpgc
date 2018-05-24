@@ -752,7 +752,11 @@ class mod_qcreate_lib_testcase extends mod_qcreate_base_testcase {
         // Create a question as student0.
         $this->setUser($this->students[0]);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $standardq = $questiongenerator->create_question('shortanswer', null,
+        $q1 = $questiongenerator->create_question('shortanswer', null,
+                array('category' => $qcreate->get_question_category()->id));
+
+        // Create another question as student0.
+        $q2 = $questiongenerator->create_question('shortanswer', null,
                 array('category' => $qcreate->get_question_category()->id));
 
         $submittedgrade = 80;
@@ -762,11 +766,21 @@ class mod_qcreate_lib_testcase extends mod_qcreate_base_testcase {
         // The qcreate_process_local_grade needs cmidnumber set.
         $instance->cmidnumber = $cm->id;
 
-        qcreate_process_local_grade($instance, $standardq, false, false, $submittedgrade, $submitcomment);
-        // Check now for finished and unfinished attempts.
+        // Grade first question.
+        qcreate_process_local_grade($instance, $q1, false, false, $submittedgrade, $submitcomment);
+        // Check now for updates.
         $updates = qcreate_check_updates_since($cm, $onehourago);
         $this->assertTrue($updates->questions->updated);
+        $this->assertCount(2, $updates->questions->itemids);
+        $this->assertEquals([$q1->id, $q2->id], $updates->questions->itemids, '', 0, 10, true);
         $this->assertTrue($updates->grades->updated);
+        $this->assertCount(1, $updates->grades->itemids);
+
+        // Other student should see no update.
+        $this->setUser($this->students[1]);
+        $updates = qcreate_check_updates_since($cm, $onehourago);
+        $this->assertFalse($updates->questions->updated);
+        $this->assertFalse($updates->grades->updated);
 
     }
 }

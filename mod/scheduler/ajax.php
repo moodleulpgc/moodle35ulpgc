@@ -3,14 +3,15 @@
 /**
  * Process ajax requests
  *
- * @package    mod_scheduler
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('AJAX_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(__DIR__.'/../../config.php');
 require_once('locallib.php');
 
 $id = required_param('id', PARAM_INT);

@@ -2090,7 +2090,6 @@ function examboard_process_csv_record($record, $columns, $fieldnames, $examboard
                     if(isset($values[2])) {
                         $value += $values[2];
                     }
-                    $value = strtotime(" $value", $t) - $t;
                 } elseif($key == 'group') {
                     $value = $DB->get_field('groups', 'id', array('courseid'=>$examboard->course, 'name' => trim($value)));
                 } elseif($key == 'deputy') {
@@ -2107,7 +2106,10 @@ function examboard_process_csv_record($record, $columns, $fieldnames, $examboard
                     } elseif(core_text::strtolower($value) == core_text::strtolower($examboard->secretary)) {
                         $data->sortorder = 1;
                     } elseif(strpos(core_text::strtolower($value), core_text::strtolower($examboard->vocal)) !== false) {
-                        $order = (int)trim(str_replace(core_text::strtolower($examboard->vocal), '', core_text::strtolower($value)));    
+                        // takes care of cases vocal1, Vocal2 etc
+                        $order = (int)trim(str_replace(core_text::strtolower($examboard->vocal), '', core_text::strtolower($value)));
+                        // just in case "vocal" without numeral
+                        $order = max(1, $order); 
                         $data->sortorder = min(2, ($order + 1));
                     } else {
                         $value = '';
@@ -2128,6 +2130,33 @@ function examboard_process_csv_record($record, $columns, $fieldnames, $examboard
 }
 
 
+function examboard_insert_update_tabledata($table, $data) {
+    global $DB;
+    if(isset($data->id)) {
+        // we are updating
+        $DB->update_record($table, $data);
+    } else {
+        // we are inserting
+        $data->id = $DB->insert_record($table, $data);
+    }
+    
+    return $data->id;
+}
+
+function examboard_insert_update_data(&$data, $record, $now, $update, $table, $fields) {
+    if(isset($data->id) && !$update) {
+        return $data->id;
+    }
+
+    $data->timemodified = $now;
+    foreach($fields as $field) {
+        if(isset($record->{$field})) {
+            $data->{$field} = $record->{$field};
+        }
+    }
+    
+    return examboard_insert_update_tabledata($table, $data);
+}
 
 function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fromform) {
     global $CFG, $DB;
@@ -2151,7 +2180,6 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
     while ($record = $csvreader->next()) {
         // Fill data_content with the values imported from the CSV file:
         // convert raw data to an object with cleaned & formatted data
-       
         $record = examboard_process_csv_record($record, $columns, $fieldnames, $examboard);
 
         if(!$record->idnumber || !$record->sessionname) {
@@ -2159,101 +2187,61 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
             continue;
         }
         
-        //check if this board idnumber already exists
+        //check if this board idnumber already exists, and add/update add needed
         $params = array('idnumber' => $record->idnumber, 'examboardid' => $examboard->id);
         //if exists & update //if nor exists insert
-        if($board = $DB->get_record('examboard_board', $params)) {
-            if($fromform->ignoremodified) {
-                foreach(array('title', 'name', 'groupid') as $field) {
-                    if($record->{$field}) {
-                        $board->{$field} = $record->{$field};
-                    }
-                }
-                $board->timemodified = $now;
-                $DB->update_record('examboard_board', $board);
-            }
-        } else {
+        $board = $DB->get_record('examboard_board', $params);
+        if(!$board) {
             $board = new stdClass();
             $board->examboardid = $examboard->id;
             $board->idnumber = $record->idnumber;
-            foreach(array('title', 'name', 'groupid') as $field) {
-                if(isset($record->{$field})) {
-                    $board->{$field} = $record->{$field};
-                }
-            }
-            $board->timemodified = $now;
-            $board->id = $DB->insert_record('examboard_board', $board);
-        }        
+        }
+        $board->id = examboard_insert_update_data($board, $record, $now, $fromform->ignoremodified, 
+                                                    'examboard_board', array('title', 'name', 'groupid'));
         
-        //check if this examination already exists
+        //check if this examination already exists, , and add/update add needed
         $params = array('boardid' => $board->id, 'sessionname' => $record->sessionname, 'examboardid' => $examboard->id);
-        if($exam = $DB->get_record('examboard_exam', $params)) {
-            if($fromform->ignoremodified) {
-                foreach(array('venue', 'examdate', 'duration') as $field) {
-                    if($record->{$field}) {
-                        $exam->{$field} = $record->{$field};
-                    }
-                }
-                $exam->timemodified = $now;
-                $DB->update_record('examboard_board', $exam);
-            }
-        } else {
+        $exam = $DB->get_record('examboard_exam', $params);
+        if(!$exam) {
             $exam = new stdClass();
             $exam->examboardid = $examboard->id;
             $exam->boardid = $board->id;
-            $exam->sessionname = $record->sessionname;
-            $exam->timemodified = $now;
-            foreach(array('venue', 'examdate', 'duration') as $field) {
-                if($record->{$field}) {
-                    $exam->{$field} = $record->{$field};
-                }
-            }            
-            $exam->id = $DB->insert_record('examboard_board', $exam);
         }
+        $exam->id = examboard_insert_update_data($exam, $record, $now, $fromform->ignoremodified, 
+                                                    'examboard_exam', array('sessionname', 'venue', 'examdate', 'duration'));
         
         if($record->member) {
             //the user is known 
             // is already assigned to this exam?
-            $params = array('examid' => $exam->id, 'userid' => $record->member);
+            $params = array('boardid' => $board->id, 'userid' => $record->member);
             if($member = $DB->get_record('examboard_member', $params)) {
                 if($fromform->ignoremodified) {
                     if($member->sortorder != $record->sortorder) {
                         //delete any user in this position
-                        $DB->delete_records('examboard_member', array('examid' => $exam->id, 'sortorder' => $record->sortorder));
+                        $DB->delete_records('examboard_member', array('boardid' => $board->id, 'sortorder' => $record->sortorder));
                         // TODO  // TODO  // TODO  // TODO  
                         //what happend with other tables ?? confirmation , notification??
                     }
-                    $member->sortorder = $record->sortorder;
-                    if($record->deputy) {
-                        $member->deputy = $record->deputy; 
-                    }
-                    $member->timemodified = $now;
-                    $DB->update_record('examboard_member', $member);
                 }
             } else {
                 $member = new stdClass();
                 $member->boardid = $board->id;
                 $member->userid = $record->member;
-                $member->sortorder = $record->sortorder;
-                if($record->deputy) {
-                    $member->deputy = $record->deputy; 
-                }
                 $member->timecreated = $now;
-                $member->timemodified = $now;
-                $member->id = $DB->insert_record('examboard_member', $member);
             }
+            $member->id = examboard_insert_update_data($member, $record, $now, $fromform->ignoremodified, 
+                                                            'examboard_member', array('sortorder', 'deputy'));
         }
 
         if($record->examinee) {
             //the user is known 
             // is already assigned to this exam?
             $params = array('examid' => $exam->id, 'userid' => $record->examinee);
-            if($user = $DB->get_record('examboard_member', $params)) {
+            $fields = array();
+            if($user = $DB->get_record('examboard_examinee', $params)) {
                 if($fromform->ignoremodified) {
                     if($record->userlabel && ($record->userlabel != $user->userlabel)) {
-                        $user->userlabel = $record->userlabel;
-                        $user->timemodified = $now;
-                        $DB->update_record('examboard_examinee', $user);
+                        $fields[] = 'userlabel';
                     }
                 }
             } else {
@@ -2265,13 +2253,13 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
                 $user->examid = $exam->id;
                 $user->userid = $record->examinee;
                 $user->sortorder = $sortorder;
-                if($record->userlabel) {
-                    $user->userlabel = $record->userlabel; 
+                if(isset($record->userlabel)) {
+                    $fields[] = 'userlabel';
                 }
                 $user->timecreated = $now;
-                $user->timemodified = $now;
-                $user->id = $DB->insert_record('examboard_examinee', $user);
             }
+            $user->id = examboard_insert_update_data($user, $record, $now, $fromform->ignoremodified, 
+                                                            'examboard_examinee', $fields);
         }
 
         if($record->tutor && $record->examinee ) {        
@@ -2330,48 +2318,9 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
     $csvreader->cleanup(true);
 
     // message n imported
-
-
     return get_string('importedrecords', 'examboard', $recordsadded);
 }
 
-/*
-
-    $mandatory = array('idnumber'       => get_string('boardidnumber', 'examboard'),
-                        'sessionname'   => get_string('examsession', 'examboard'), );
-    
-    $optional = array('title'       => get_string('boardtitle', 'examboard'),
-                        'name'      => get_string('boardname', 'examboard'),
-                        'group'     => get_string('accessgroup', 'examboard'),
-                        'venue'     => get_string('examvenue', 'examboard'),
-                        'examdate'  => get_string('examdate', 'examboard'),
-                        'duration'  => get_string('examduration', 'examboard'),
-                        'member'    => get_string('member', 'examboard'),
-                        'role'      => get_string('memberrole', 'examboard'),
-                        'deputy'    => get_string('deputy', 'examboard'),
-                        'examinee'  => $examboard->examinee,
-                        'userlabel' => get_string('userlabel', 'examboard'),
-                        'tutor'     => $examboard->tutor,
-                        'othertutors' => get_string('othertutors', 'examboard'),
-                        );
-
-    if($export) {
-        unset($optional['deputy']);
-        $export = array('boardactive'   => get_string('boardactive', 'examboard'),
-                        'examactive'    => get_string('examactive', 'examboard'),
-                        'membersortorder'=> get_string('order', 'examboard'),
-                        'exemption'     => get_string('exemption', 'examboard'),
-                        'confirmation'  => get_string('boardstatus', 'examboard'),
-                        'notifications' => get_string('boardnotify', 'examboard'),
-                        'examineesortorder' => get_string('order', 'examboard'),
-                        'grades'        => get_string('grades'),
-                        'excluded'      => get_string('excluded', 'examboard'),
-                        'approved'      => get_string('approved', 'examboard'),
-                       );
-        $optional += $export;
-    }
-
-*/
 
 function examboard_export_exam_row(&$row) {
    global $CFG, $DB, $SESSION, $PAGE;
@@ -2381,15 +2330,6 @@ function examboard_export_exam_row(&$row) {
     $lastexam = $SESSION->mod_examboard_export_examid;
     $rolestr = $SESSION->mod_examboard_export_rolestr;
     list($skipped, $examineefields, $memberfields) = $SESSION->mod_examboard_export_fieldtypes;
-
-    /*
-    $skipped = array('idnumber', 'sessionname', 'title', 'name', 'venue', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
-    $examineefields = array('examinee', 'userlabel', 'tutor', 'othertutors', 'examineesortorder', 'grades', 'excluded', 'approved');
-    $memberfields = array('member', 'role', 'deputy', 'exemption', 'confirmed', 'notifications');  
-    */
-    
-    //print_object($columns);
-    //print_object($row);
     
     $names = get_all_user_name_fields();
     $user = core_user::get_support_user(); 

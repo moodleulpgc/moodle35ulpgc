@@ -1,172 +1,136 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package     mod_tracker
- * @category    mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- */
-defined('MOODLE_INTERNAL') || die();
+require_once $CFG->libdir.'/formslib.php';
 
-require_once($CFG->libdir.'/formslib.php');
+class TrackerIssueForm extends moodleform{
 
-class TrackerIssueForm extends moodleform {
+	var $elements;
+	var $editoroptions;
+	var $context;
 
-    /**
-     * List of dynamic forms elements
-     */
-    protected $elements;
+	/**
+	* Dynamically defines the form using elements setup in tracker instance
+	*
+	*
+	*/
+	function definition(){
+		global $DB, $COURSE, $USER;
 
-    /**
-     * Options for editors
-     */
-    public $editoroptions;
+		$tracker = $this->_customdata['tracker'];
+		$trackerid  = $tracker->id;
 
-    /**
-     * context for file handling
-     */
-    protected $context;
+		$this->context = context_module::instance($this->_customdata['cmid']);
+		$maxfiles = 0;                // TODO: add some setting
+		$maxbytes = 0;  //$COURSE->maxbytes; // TODO: add some setting
+		$this->editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'context' => $this->context);
 
-    /**
-     * Dynamically defines the form using elements setup in tracker instance
-     */
-    public function definition() {
-        global $DB, $COURSE;
+		$mform = $this->_form;
 
-        $tracker = $this->_customdata['tracker'];
+        $mform->addElement('header', 'reportanissue', tracker_getstring('reportanissue','tracker'));
 
-        $this->context = context_module::instance($this->_customdata['cmid']);
-        $maxfiles = 99;                // TODO: add some setting.
-        $maxbytes = $COURSE->maxbytes; // TODO: add some setting.
-        $this->editoroptions = array('trusttext' => true,
-                                     'subdirs' => false,
-                                     'maxfiles' => $maxfiles,
-                                     'maxbytes' => $maxbytes,
-                                     'context' => $this->context);
+        $assignedto = $tracker->defaultassignee ? $tracker->defaultassignee : '';
+        $reportedby = '';
+        $fields = get_all_user_name_fields(true, 'u');
+        if ($canworkon = tracker_can_workon($tracker, $this->context)) {
+                    $users = get_users_by_capability($this->context, array('mod/tracker:report', 'mod/tracker:seeissues'), 'u.id, u.idnumber, '.$fields, 'lastname ASC, firstname ASC, idnumber ASC');
+                    $names = array(''=>tracker_getstring('choose'));
+                    if(!$users) {
+                        $users[$USER->id] = $USER;
+                    }
+                    foreach($users as $user) {
+                        $names[$user->id] = fullname($user, false, 'lastname');
+                    }
+                    $assignedto = $USER->id;
 
-        $mform = $this->_form;
+        } else {
+            $names[$USER->id] = fullname($USER, false, 'lastname');
+            $reportedby = $USER->id;
+        }
+        
+        $mform->addElement('select', 'reportedby', tracker_getstring('reportedby', 'tracker'), $names);
+        $mform->setDefault('reportedby', $reportedby);
+        $mform->addRule('reportedby', null, 'required', null, 'client');
 
-        $mform->addElement('hidden', 'id'); // Course module id.
+        if((($tracker->supportmode == 'usersupport') || 
+                ($tracker->supportmode == 'boardreview') ||
+                    ($tracker->supportmode == 'tutoring')) && !$tracker->defaultassignee && tracker_can_edit($tracker, $this->context)) { 
+            $users = get_users_by_capability($this->context, 'mod/tracker:resolve', 'u.id, u.idnumber, '.$fields, 'lastname ASC, firstname ASC, idnumber ASC');
+            $names = array(''=>tracker_getstring('choose'));
+            foreach($users as $user) {
+                $names[$user->id] = fullname($user, false, 'lastname');
+            }
+            $mform->addElement('select', 'assignedto', tracker_getstring('assignedto', 'tracker'), $names);
+            $mform->setDefault('assignedto', $assignedto);
+        } else {
+            $mform->addElement('hidden', 'assignedto', $assignedto);
+            $mform->setType('assignedto', PARAM_INT);
+        }        
+        
+        if ($canworkon) {
+            $keys = array(POSTED => tracker_getstring('posted', 'tracker'),
+                            OPEN => tracker_getstring('open', 'tracker'),
+                            RESOLVING => tracker_getstring('resolving', 'tracker'),
+                            WAITING => tracker_getstring('waiting', 'tracker'),
+                            TESTING => tracker_getstring('testing', 'tracker'),
+                            RESOLVED => tracker_getstring('resolved', 'tracker'),
+                            ABANDONNED => tracker_getstring('abandonned', 'tracker'),
+                            TRANSFERED => tracker_getstring('transfered', 'tracker'),
+                            VALIDATED => tracker_getstring('validated', 'tracker'),
+                            PUBLISHED => tracker_getstring('published', 'tracker'));
+            $mform->addElement('select', 'status', tracker_getstring('status', 'tracker'), $keys);
+            $mform->setDefault('status',  WAITING);
+
+            $mform->addElement('checkbox', 'sendemail', tracker_getstring('sendemail', 'tracker'));
+            $mform->setDefault('sendemail', 0);
+        }
+
+		$mform->addElement('text', 'summary', tracker_getstring('summary', 'tracker'), array('size' => 80));
+		$mform->setType('summary', PARAM_TEXT);
+	  	$mform->addRule('summary', null, 'required', null, 'client');
+
+		$mform->addElement('editor', 'description_editor', tracker_getstring('description', 'tracker'), $this->editoroptions);
+
+		tracker_loadelementsused($tracker, $this->elements);
+
+		if (!empty($this->elements)){
+			foreach($this->elements as $element){
+                if ($element->active && !$element->private) {
+				    $element->add_form_element($mform);
+                }
+			}
+		}
+
+        if ($canworkon) {
+            $mform->addElement('static', '', '', '<br />');
+            $mform->addElement('editor', 'resolution_editor', tracker_getstring('resolution', 'tracker'), $this->editoroptions);
+        }
+
+        $mform->addElement('hidden', 'id', $this->_customdata['cmid']);
         $mform->setType('id', PARAM_INT);
-
-        $mform->addElement('hidden', 'issueid'); // Issue id.
-        $mform->setType('issueid', PARAM_INT);
-
-        $mform->addElement('hidden', 'trackerid', $tracker->id);
+        $mform->addElement('hidden', 'trackerid', $trackerid);
         $mform->setType('trackerid', PARAM_INT);
 
-        $mform->addElement('header', 'header0', get_string('description'));
+		$this->add_action_buttons();
+	}
 
-        $mform->addElement('text', 'summary', get_string('summary', 'tracker'), array('size' => 80));
-        $mform->setType('summary', PARAM_TEXT);
-        $mform->addRule('summary', null, 'required', null, 'client');
+	function validation($data, $files = null){
 
-        $mform->addElement('editor', 'description_editor', get_string('description'), $this->editoroptions);
+	}
 
-        tracker_loadelementsused($tracker, $this->elements);
+	function set_data($defaults){
+		global $COURSE;
 
-        if (!empty($this->elements)) {
-            foreach ($this->elements as $element) {
-                if ((get_class($element) == 'captchaelement') && ($this->_customdata['mode'] == 'update')) {
-                    // Avoid captcha when updating issue data.
-                    continue;
-                }
-                if (($element->active == true) && ($element->private == false)) {
-                    $element->add_form_element($mform);
-                }
-            }
-        }
+		$defaults->description_editor['text'] = $defaults->description;
+		$defaults->description_editor['format'] = $defaults->descriptionformat;
+    	$defaults = file_prepare_standard_editor($defaults, 'description', $this->editoroptions, $this->context, 'mod_tracker', 'issuedescription', $defaults->issueid);
 
-        if ($this->_customdata['mode'] == 'update') {
+		// something to prepare for each element ?
+		if (!empty($this->elements)){
+			foreach($this->elements as $element){
+				$element->set_data($defaults);
+			}
+		}
 
-            $mform->addelement('header', 'processinghdr', get_string('processing', 'tracker'), '');
-
-            // Assignee.
-            $context = context_module::instance($this->_customdata['cmid']);
-            $resolvers = tracker_getresolvers($context);
-            $resolversmenu[0] = '---- '. get_string('unassigned', 'tracker').' -----';
-            if ($resolvers) {
-                foreach ($resolvers as $resolver) {
-                    $resolversmenu[$resolver->id] = fullname($resolver);
-                }
-                $mform->addElement('select', 'assignedto', get_string('assignedto', 'tracker'), $resolversmenu);
-            } else {
-                $mform->addElement('static', 'resolversshadow', get_string('assignedto', 'tracker'), get_string('noresolvers', 'tracker'));
-                $mform->addElement('hidden', 'assignedto');
-                $mform->setType('assignedto', PARAM_INT);
-            }
-
-            // Status.
-            $statuskeys = tracker_get_statuskeys($tracker);
-            $mform->addElement('select', 'status', get_string('status', 'tracker'), $statuskeys);
-
-            // Dependencies.
-            $dependencies = tracker_getpotentialdependancies($tracker->id, $this->_customdata['issueid']);
-            if (!empty($dependencies)) {
-                foreach ($dependencies as $dependency) {
-                    $summary = shorten_text(format_string($dependency->summary));
-                    $dependenciesmenu[$dependency->id] = "{$tracker->ticketprefix}{$dependency->id} - ".$summary;
-                }
-                $select = &$mform->addElement('select', 'dependencies', get_string('dependson', 'tracker'), $dependenciesmenu);
-                $select->setMultiple(true);
-            } else {
-                $mform->addElement('static', 'dependenciesshadow', get_string('dependson', 'tracker'), get_string('nopotentialdeps', 'tracker'));
-            }
-
-            $mform->addelement('header', 'resolutionhdr', get_string('resolution', 'tracker'), '');
-            $mform->addElement('editor', 'resolution_editor', get_string('resolution', 'tracker'), $this->editoroptions);
-
-        }
-
-        $this->add_action_buttons();
-    }
-
-    public function set_data($defaults) {
-
-        $defaults->description_editor['text'] = @$defaults->description;
-        $defaults->description_editor['format'] = @$defaults->descriptionformat;
-        $defaults = file_prepare_standard_editor($defaults, 'description', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issuedescription', @$defaults->issueid);
-
-        // Something to prepare for each element ?
-        if (!empty($this->elements)) {
-            foreach ($this->elements as $element) {
-                $element->set_data($defaults, @$this->_customdata['issueid']);
-            }
-        }
-
-        $defaults->resolution_editor['text'] = @$defaults->resolution;
-        $defaults->resolution_editor['format'] = @$defaults->resolutionformat;
-        $defaults = file_prepare_standard_editor($defaults, 'resolution', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issueresolution', @$defaults->issueid);
-
-        parent::set_data($defaults);
-    }
-
-    public function validate($data, $files = array()) {
-
-        $errors = array();
-
-        // Something to prepare for each element ?
-        if (!empty($this->elements)) {
-            foreach ($this->elements as $element) {
-                $errors = array_merge($errors, $element->validate($data, $files));
-            }
-        }
-
-        return $errors;
-    }
+		parent::set_data($defaults);
+	}
 }

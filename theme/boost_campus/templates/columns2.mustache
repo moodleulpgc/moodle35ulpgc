@@ -50,21 +50,12 @@
 }}
 {{! MODIFICATION:
     * Remove section for footer blocks with own mustache template
-    * Add theme_boost_campus/nav-drawer template instead of theme_boost/nav-drawer template
     * Require own javascript module for back to top button functionality
     * If setting "showsettingsincourse" is enabled, then render course context menu from theme_boost_campus/settings_link_page template
       and use the equivalent own javascript "incoursesettings".
-    * Use additional JavaScript functionality if the setting nawdrawerfullwidth is enabled. We write this here, so we do not
-      have to override the drawer.js file for this small addition.
+    * Call to own navbar mustache template instead of boost/navbar.
 }}
-{{{ output.doctype }}}
-<html {{{ output.htmlattributes }}}>
-<head>
-    <title>{{{ output.page_title }}}</title>
-    <link rel="shortcut icon" href="{{{ output.favicon }}}" />
-    {{{ output.standard_head_html }}}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
+{{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
 
@@ -72,44 +63,56 @@
 
     {{{ output.standard_top_of_body_html }}}
 
-    {{>theme_boost/header}}
+    {{>theme_boost_campus/navbar}}
 
     <div id="page" class="container-fluid">
         {{{ output.full_header }}}
 
         <div id="page-content" class="row">
-            <div id="region-main-box" class="col-xs-12">
+            <div id="region-main-box" class="col-12">
                 {{#node}}
                     {{> theme_boost_campus/settings_link_page }}
                 {{/node}}
                 {{#hasregionmainsettingsmenu}}
-                <div id="region-main-settings-menu" class="hidden-print {{#hasblocks}}has-blocks{{/hasblocks}}">
+                <div id="region-main-settings-menu" class="d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
                     <div> {{{ output.region_main_settings_menu }}} </div>
                 </div>
                 {{/hasregionmainsettingsmenu}}
-                <section id="region-main" {{#hasblocks}}class="has-blocks"{{/hasblocks}}>
-                    <div class="card card-block">
-                    {{#hasregionmainsettingsmenu}}
-                        <div class="region_main_settings_menu_proxy"></div>
-                    {{/hasregionmainsettingsmenu}}
-                    {{{ output.course_content_header }}}
-                        {{#activitynode}}
-                            {{> theme_boost_campus/activity_settings_incourse }}
-                        {{/activitynode}}
-                    {{{ output.main_content }}}
-                    {{{ output.activity_navigation }}}
-                    {{{ output.course_content_footer }}}
+                <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}}>
+                    <div class="card">
+                        <div class="card-body">
+                            {{#hasregionmainsettingsmenu}}
+                                <div class="region_main_settings_menu_proxy"></div>
+                            {{/hasregionmainsettingsmenu}}
+                            {{{ output.course_content_header }}}
+                            {{#activitynode}}
+                                {{> theme_boost_campus/activity_settings_incourse }}
+                            {{/activitynode}}
+                            {{{ output.main_content }}}
+                            {{{ output.activity_navigation }}}
+                            {{{ output.course_content_footer }}}
+                        </div>
                     </div>
                 </section>
                 {{#hasblocks}}
-                <section data-region="blocks-column" class="hidden-print">
-                    {{{ sidepreblocks }}}
-                </section>
+                    <i id="sidepreopen-control"
+                        aria-expanded="{{#draweropenright}}true{{/draweropenright}}{{^draweropenright}}false{{/draweropenright}}"
+                        aria-controls="sidepre-blocks"
+                        data-action="toggle-drawer"
+                        data-side="right"
+                        data-preference="sidepre-open"
+                        title="{{#str}} showhideblocks, theme_moove {{/str}}">
+                    </i>
+
+                    <section id="sidepre-blocks" data-region="blocks-column" class="d-print-none">
+                        {{{ sidepreblocks }}}
+                    </section>
+
                 {{/hasblocks}}
             </div>
         </div>
     </div>
-    {{> theme_boost_campus/nav-drawer }}
+    {{> theme_boost/nav-drawer }}
 </div>
 
 </body>
@@ -130,30 +133,4 @@ require(['theme_boost_campus/catchshortcuts'], function(mod) {
     mod.init();
     });
 {{/incoursesettings}}
-// This is needed because sections are just anchor calls and won't reload the page.
-// So the nav drawer won't close then.
-{{#nawdrawerfullwidth}}
-    require(['jquery'], function($) {
-        // If a course section menu item is clicked.
-            $('.list-group-item[href*="#section"]').click(function() {
-            // Only process if we are on small screens
-            if ($(document).width() < 768) {
-                // Then close the nav drawer and set all corresponding values correctly.
-                // This code is taken from drawer.js as we cannot call the function closeAll() here.
-                var body = $('body');
-                var trigger = body.find("[data-action='toggle-drawer']");
-                var side = trigger.attr('data-side');
-                var drawerid = trigger.attr('aria-controls');
-                var drawer = $(document.getElementById(drawerid));
-                var preference = trigger.attr('data-preference');
-
-                trigger.attr('aria-expanded', 'false');
-                body.removeClass('drawer-open-' + side);
-                drawer.attr('aria-hidden', 'true');
-                drawer.addClass('closed');
-                M.util.set_user_preference(preference, 'false');
-            }
-        });
-    });
-{{/nawdrawerfullwidth}}
 {{/js}}

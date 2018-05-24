@@ -1,0 +1,195 @@
+<?php
+
+/**
+* @package mod-tracker
+* @category mod
+* @author Clifford Tham, Valery Fremaux > 1.8
+* @date 02/12/2007
+* @version moodle 2.x
+*
+* Prints prints user's profile and stats
+*/
+    if (!defined('MOODLE_INTERNAL')) {
+        die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
+    }
+
+    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+?>
+
+<center>
+
+<!-- Print Bug Form -->
+<form name="byidform" action="view.php" method="get" class="mform">
+<input type="hidden" name="what" value="searchforissues" />
+<input type="hidden" name="screen" value="browse" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+<fieldset>
+	<legend class="ftoggler"><?php echo tracker_getstring('searchbyid', 'tracker') ?></legend>
+<table border="0" cellpadding="5">
+    <tr>
+        <td align="right" width="150"><b><?php echo tracker_getstring('issuenumber', 'tracker') ?>:</b></td>
+        <td width="200" align="left">
+            <input type="text" name="issuenumber" value="" size="5" />
+        </td>
+        <td width="200">&nbsp;</td>
+        <td width="200">
+            <input type="submit" name="search" value="<?php echo tracker_getstring('search', 'tracker') ?>" />
+        </td>
+    </tr>
+</table>
+</fieldset>
+</form>
+
+<?php
+    $OUTPUT->box_end();
+    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+?>
+<form name="searchform" action="view.php" method="post" class="mform">
+<input type="hidden" name="what" value="searchforissues" />
+<input type="hidden" name="screen" value="<?php echo ($tracker->supportmode == 'bugtracker') ? 'browse' : 'mytickets' ; ?>" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+<script type="text/javascript" language="javascript">
+var datereporteditems = ['day','month','year'];
+</script>
+
+<fieldset>
+	<legend class="ftoggler"><?php echo tracker_getstring('searchcriteria', 'tracker') ?></legend>
+<table border="0" cellpadding="5" width="800">
+    <tr>
+        <td align="right" width="130" valign="top"><b><?php echo tracker_getstring('reportedby', 'tracker') ?>:</b><br /></td>
+        <td width="180" valign="top" align="left">
+<?php
+    $reporters = tracker_getreporters($tracker->id);
+    $format = '';
+    if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview')) {
+        $format = 'lastname';
+    }
+
+    $reportersmenu = array();
+    if ($reporters){
+        foreach($reporters as $reporter){
+            $reportersmenu[$reporter->id] = fullname($reporter, false, $format);
+        }
+        //natcasesort($reportersmenu); // ecastro ULPGC
+        echo html_writer::select($reportersmenu, 'reportedby', '', array('' => tracker_getstring('any', 'tracker')));
+    } else {
+        echo tracker_getstring('noreporters', 'tracker');
+    }
+?>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td align="right" width="130" valign="top"><div><b><?php echo tracker_getstring('datereported', 'tracker') ?>:</b>
+            <br /></div>
+            <div><b><?php echo tracker_getstring('dateinterval', 'tracker') ?>:</b></div></td>
+        <td width="180" valign="top" align="left">
+            <div>
+            <input type="checkbox" name="checkdate" value="1" onclick="return lockoptions('searchform', 'checkdate', datereporteditems)" />
+            <?php
+            echo html_writer::select_time('days', 'days');
+            echo html_writer::select_time('months', 'month');
+            echo html_writer::select_time('years', 'year');
+            ?>
+            <br /></div>
+            <div><input type="text" name="dateinterval" value="1" size="2" />&nbsp; <b><?php echo tracker_getstring('days', 'tracker') ?></b></div>
+        </td>
+        <td>&nbsp;</td>
+        <td></td>
+        <td></td>
+    </tr>
+
+
+    <tr>
+        <td align="right" width="130" valign="top"><b><?php echo tracker_getstring('status', 'tracker') ?>:</b></td>
+        <td width="180" valign="top" align="left"><?php
+            $STATUSKEYS = array(
+                            POSTED => tracker_getstring('posted', 'tracker'),
+                            OPEN => tracker_getstring('open', 'tracker'),
+                            RESOLVING => tracker_getstring('resolving', 'tracker'),
+                            WAITING => tracker_getstring('waiting', 'tracker'),
+                            TESTING => tracker_getstring('testing', 'tracker'),
+                            RESOLVED => tracker_getstring('resolved', 'tracker'),
+                            ABANDONNED => tracker_getstring('abandonned', 'tracker'),
+                            TRANSFERED => tracker_getstring('transfered', 'tracker'),
+                            VALIDATED => tracker_getstring('validated', 'tracker'),
+                            PUBLISHED => tracker_getstring('published', 'tracker'),
+                            -1 => tracker_getstring('allopen', 'tracker'),
+                            -2 => tracker_getstring('allclosed', 'tracker'),
+                            );
+
+            echo html_writer::select($STATUSKEYS, 'status', '');
+        ?></td>
+
+        <td align="right" width="200"><b></b></td>
+        <td width="240" valign="top" align="left">
+
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+        <td align="right" width="130" valign="top"><b><?php echo tracker_getstring('assignedto', 'tracker') ?>:</b><br /></td>
+        <td width="180" valign="top" align="left">
+<?php
+    $assignees = tracker_getassignees($tracker->id);
+
+    $assigneesmenu = array(0 => get_string('unassigned', 'tracker'));
+    if ($assignees){
+        foreach($assignees as $assignee){
+            $assigneesmenu[$assignee->id] = fullname($assignee);
+        }
+        echo html_writer::select($assigneesmenu, 'assignedto', '', array('' => tracker_getstring('any', 'tracker')));
+    } else {
+        echo tracker_getstring('noassignees', 'tracker');
+    }
+?>
+        </td>
+        <td align="right" width="200"></td>
+        <td width="280" valign="top" align="left">
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td align="right" valign="top"><b><?php echo tracker_getstring('summary', 'tracker') ?>:</b><br /></td>
+        <td colspan="3" align="left" valign="top">
+            <input type="text" name="summary" size="70" value="" maxlength="100" />
+        </td>
+    </tr>
+    <tr>
+        <td align="right" valign="top">
+            <b><?php echo tracker_getstring('description') ?>:</b>
+        </td>
+        <td align="left" colspan="3">
+             <input name="description" type="text" value="" size="70" maxlength="100">
+        </td>
+    </tr>
+
+    <!--Print Bug Category Dropdowns-->
+    <tr>
+        <td>
+            <?php tracker_printelements($tracker, null, 'search'); ?>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="center" colspan="4">
+            <input type="submit" name="search" value="<?php echo tracker_getstring('search', 'tracker') ?>" />
+            <input type="button" name="savequery_btn" value="<?php echo tracker_getstring('savequery', 'tracker') ?>" onclick="document.forms['searchform'].view.value = 'profile';document.forms['searchform'].screen.value = 'myqueries';document.forms['searchform'].what.value = 'savequery';document.forms['searchform'].submit();" />
+        </td>
+    </tr>
+</table>
+</fieldset>
+</form>
+<?php
+$OUTPUT->box_end();
+$nohtmleditorneeded = true;
+?>
+</center>
+<script type="text/javascript">
+lockoptions('searchform','checkdate', datereporteditems);
+</script>

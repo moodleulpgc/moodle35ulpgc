@@ -1,20 +1,19 @@
 <?php
 
 /**
- * Define all the restore steps that will be used by the restore_scheduler_activity_task
- *
- * @package    mod_scheduler
- * @copyright  2016 Henning Bostelmann and others (see README.txt)
+ * @package    mod
+ * @subpackage scheduler
+ * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Define all the restore steps that will be used by the restore_scheduler_activity_task
+ */
 
 /**
  * Structure step to restore one scheduler activity
- *
- * @copyright  2016 Henning Bostelmann and others (see README.txt)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_scheduler_activity_structure_step extends restore_activity_structure_step {
 
@@ -30,12 +29,11 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
             $slot = new restore_path_element('scheduler_slot', '/activity/scheduler/slots/slot');
             $paths[] = $slot;
 
-            $appointment = new restore_path_element('scheduler_appointment',
-                                                    '/activity/scheduler/slots/slot/appointments/appointment');
+            $appointment = new restore_path_element('scheduler_appointment', '/activity/scheduler/slots/slot/appointments/appointment');
             $paths[] = $appointment;
         }
 
-        // Return the paths wrapped into standard activity structure.
+        // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
 
@@ -48,21 +46,21 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
 
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        if ($data->scale < 0) { // Scale found, get mapping.
+        if ($data->scale < 0) { // scale found, get mapping
             $data->scale = -($this->get_mappingid('scale', abs($data->scale)));
         }
 
-        if (is_null($data->gradingstrategy)) { // Catch inconsistent data created by pre-1.9 DB schema.
+        if (is_null($data->gradingstrategy)) { // catch inconsistent data created by pre-1.9 DB schema
             $data->gradingstrategy = 0;
         }
 
-        if ($data->bookingrouping > 0) {
-            $data->bookingrouping = $this->get_mappingid('grouping', $data->bookingrouping);
+        if (isset($data->bookingrouping) && $data->bookingrouping > 0) {
+            //$data->bookingrouping = $this->get_mappingid('grouping', $data->bookingrouping); // removed by ecastro ULPGC
         }
 
-        // Insert the scheduler record.
+        // insert the scheduler record
         $newitemid = $DB->insert_record('scheduler', $data);
-        // Immediately after inserting "activity" record, call this.
+        // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
 
@@ -82,6 +80,7 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
 
         $newitemid = $DB->insert_record('scheduler_slots', $data);
         $this->set_mapping('scheduler_slot', $oldid, $newitemid, true);
+        // Apply only once we have files in the slot
     }
 
     protected function process_scheduler_appointment($data) {
@@ -96,18 +95,17 @@ class restore_scheduler_activity_structure_step extends restore_activity_structu
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         $data->studentid = $this->get_mappingid('user', $data->studentid);
+        if (isset($data->groupid) && $data->groupid) {
+            $data->groupid = $this->get_mappingid('group', $data->groupid);
+        }
 
         $newitemid = $DB->insert_record('scheduler_appointment', $data);
-        $this->set_mapping('scheduler_appointment', $oldid, $newitemid, true);
+        // $this->set_mapping('scheduler_appointments', $oldid, $newitemid, true);
+        // Apply only once we have files in the appointment
     }
 
     protected function after_execute() {
-        // Add scheduler related files.
+        // Add scheduler related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_scheduler', 'intro', null);
-        $this->add_related_files('mod_scheduler', 'bookinginstructions', null);
-        $this->add_related_files('mod_scheduler', 'slotnote', 'scheduler_slot');
-        $this->add_related_files('mod_scheduler', 'appointmentnote', 'scheduler_appointment');
-        $this->add_related_files('mod_scheduler', 'teachernote', 'scheduler_appointment');
-        $this->add_related_files('mod_scheduler', 'studentfiles', 'scheduler_appointment');
     }
 }

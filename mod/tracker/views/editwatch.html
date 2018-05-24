@@ -13,7 +13,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-echo $OUTPUT->heading(get_string('editwatch', 'tracker'));
+echo $OUTPUT->heading(tracker_getstring('editwatch', 'tracker'));
 $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 $open = ($form->events & EVENT_OPEN) ? 'checked="checked"' : '' ;
 $resolving = ($form->events & EVENT_RESOLVING) ? 'checked="checked"' : '' ;

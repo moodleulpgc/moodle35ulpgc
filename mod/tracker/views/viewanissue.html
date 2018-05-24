@@ -1,0 +1,372 @@
+<?php
+
+/**
+ * @package mod-tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ *
+ * HTML form
+ * Print Bug Description
+ */
+
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
+}
+
+$issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+
+if (!$issue){
+    new moodle_url('/mod/tracker/view.php',  array('id' => $cm->id, 'view' => 'view'));
+    if ($tracker->supportmode == 'bugtrack'){
+        $url->param('screen', 'browse');
+        redirect($url);
+    } else {
+        $url->param('screen', 'mytickets');
+        redirect($url);
+    }
+}
+
+$issue->reporter = $DB->get_record('user', array('id' => $issue->reportedby));
+$issue->owner = $DB->get_record('user', array('id' => $issue->assignedto));
+
+tracker_loadelementsused($tracker, $elementsused);
+// ULPGC ecastro
+$autoresponses = array();
+if(is_array($elementsused)) {
+    foreach($elementsused as $key => $elementinuse) {
+        $option = $elementinuse->get_autoresponse($issueid);
+        if(is_array($option) && $option) {
+            $autoresponses += $option;
+        } elseif($option) {
+            $autoresponses[] = $option;
+        }
+    }
+}
+$numautoresp = count($autoresponses);
+
+$url = new moodle_url('/mod/tracker/view.php',  array('id' => $cm->id, 'screen' => 'user', 'user' => $issue->reportedby));
+$otherissueslink = '';
+if($canviewall) {
+    $otherissueslink = $OUTPUT->single_button($url, tracker_getstring('userissues', 'tracker'),'', array('class'=>'noclass') );
+}
+
+
+// set initial view mode for additional pannels
+$commentscount = $DB->count_records('tracker_issuecomment', array('issueid' => $issue->id));
+$initialviewmode = (($action == 'doaddcomment') || ($commentscount > 0) || ($numautoresp >0) ) ? 'visiblediv' : 'hiddendiv' ;
+$initialviewmodeforccs = ($action == 'register' || $action == 'unregister') ? 'visiblediv' : 'hiddendiv' ;
+
+
+// check for lower dependancies
+
+$childtree = tracker_printchilds($tracker, $issue->id, true, 20);
+$parenttree = tracker_printparents($tracker, $issue->id, true, -20);
+$ccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
+$cced = array();
+$history = $DB->get_records_select('tracker_issueownership', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id), 'timeassigned DESC');
+$statehistory = $DB->get_records_select('tracker_state_change', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id),'timechange ASC');
+$showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? "<a id=\"toggledependancieslink\" href=\"javascript:toggledependancies()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+$showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialviewmodeforccs == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+$showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialviewmodeforccs == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+
+// fixing embeded files URLS
+
+$issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker', 'issuedescription', $issue->id);
+$issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker', 'issueresolution', $issue->id);
+
+if($USER->id == $issue->reportedby) {
+    $now = time();
+    if($issue->userlastseen < $issue->resolvermodified) {
+        $DB->set_field('tracker_issue', 'userlastseen', $now, array('id'=>$issue->id));
+    }
+}
+
+// get STATUSKEYS labels
+
+$STATUSKEYS = tracker_get_statuskeys($tracker);
+
+// Start printing.
+
+echo $OUTPUT->box_start('generalbox', 'bugreport');
+?>
+
+<!-- Print Bug Form -->
+
+<table cellpadding="5" class="tracker-issue">
+<script type="text/javascript">
+    var showhistory = "<?php echo tracker_getstring('showhistory', 'tracker') ?>";
+    var hidehistory = "<?php echo tracker_getstring('hidehistory', 'tracker') ?>";
+
+    var showccs = "<?php echo tracker_getstring('showccs', 'tracker') ?>";
+    var hideccs = "<?php echo tracker_getstring('hideccs', 'tracker') ?>";
+
+    var showdependancies = "<?php echo tracker_getstring('showdependancies', 'tracker') ?>";
+    var hidedependancies = "<?php echo tracker_getstring('hidedependancies', 'tracker') ?>";
+
+    var showcomments = "<?php echo tracker_getstring('showcomments', 'tracker') ?>";
+    var hidecomments = "<?php echo tracker_getstring('hidecomments', 'tracker') ?>";
+</script>
+<?php
+
+if (tracker_can_workon($tracker, $context, $issue)) {
+    // If I can resolve and I have seen, the bug is open
+    if ($issue->status < OPEN) {
+        $oldstatus = $issue->status;
+        $issue->status = OPEN;
+        $DB->set_field('tracker_issue', 'status', OPEN, array('id' => $issueid));
+        // log state change
+        $stc = new StdClass;
+        $stc->userid = $USER->id;
+        $stc->issueid = $issue->id;
+        $stc->trackerid = $tracker->id;
+        $stc->timechange = time();
+        $stc->statusfrom = $oldstatus;
+        $stc->statusto = $issue->status;
+        $DB->insert_record('tracker_state_change', $stc);
+    }
+}
+
+if (tracker_can_edit($tracker, $context, $issue)) {
+    echo $renderer->edit_link($issue, $cm);
+}
+
+//echo $renderer->core_issue($issue, $tracker);
+?>
+
+    <?php if(!(($tracker->supportmode == 'usersupport') 
+                || ($tracker->supportmode == 'boardreview') 
+                    || ($tracker->supportmode == 'tutoring'))) { ?>
+    <tr valign="top">
+        <td colspan="4" align="left" class="tracker-issue-summary">
+            <?php echo format_string($issue->summary); ?>
+        </td>
+    </tr>
+    <?php } ?>
+    <tr>
+        <td align="right" width="60" class="tracker-issue-param">
+            <b><?php echo tracker_getstring('issuenumber', 'tracker') ?>:</b><br />
+        </td>
+        <td width="200">
+            <?php echo $tracker->ticketprefix.$issueid;
+                    echo html_writer::div($showdependancieslink, ' rightedbutton  ');
+            ?>
+        </td>
+        <td align="right" width="60" class="tracker-issue-param" ><b><?php echo tracker_getstring('status', 'tracker') ?>:</b></td>
+        <td width="130" class="<?php echo 'status_'.$STATUSCODES[$issue->status] ?>"><b><?php echo $STATUSKEYS[$issue->status];
+                if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview')) {
+                    $canreport = has_capability('mod/tracker:report', $context);
+                    $canresolve = tracker_can_edit($tracker, $context, $issue);
+                    if(($issue->reportedby == $USER->id) && (!$canresolve) && ($issue->status == TESTING) && $canreport && ($issue->userlastseen > $issue->resolvermodified) ) {
+                        $url = new moodle_url('/mod/tracker/view.php',  array('id' => $cm->id, 'screen' => 'viewanissue', 'issueid' => $issue->id, 'what' => 'usercloseissue' ));
+                        //echo '<div style="float:right; width:100%; text-align: right; " >';
+                        echo $OUTPUT->single_button($url, tracker_getstring('closeissue', 'tracker'), 'post', array('class'=>' rightedbutton '));
+                        //echo '</div>';
+                    }
+                }
+        ?></b></td>
+    </tr>
+    <tr>
+        <td align="right" width="50" class="tracker-issue-param"><b><?php echo tracker_getstring('reportedby', 'tracker') ?>:</b></td>
+        <td width="200">
+            <?php $name = html_writer::div($OUTPUT->user_picture($issue->reporter), ' trackeruserpicture ' ) ;
+                    $userurl = new moodle_url('/user/view.php', array('id'=>$issue->reportedby, 'course'=>$tracker->course));
+                    $name .= html_writer::link($userurl,fullname($issue->reporter));
+                    $name .= '<br />'.tracker_getstring('idnumber').': '.$issue->reporter->idnumber;
+                    echo $name;
+                    echo html_writer::div($otherissueslink, ' rightedbutton ');
+            ?>
+        </td>
+        <td align="right" width="50" class="tracker-issue-param" >
+            <b><?php echo tracker_getstring('datereported', 'tracker') ?>:</b>
+        </td>
+        <td width="130">
+            <?php echo userdate($issue->datereported); ?>
+        </td>
+    </tr>
+    <tr>
+        <td align="right" width="50" class="tracker-issue-param"><b><?php echo tracker_getstring('assignedto', 'tracker') ?>:</b></td>
+        <td width="200">
+            <?php
+            if (!$issue->owner){
+                echo tracker_getstring('unassigned', 'tracker');
+            } else {
+                echo $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+                echo '&nbsp;'.fullname($issue->owner);
+            }
+            ?>
+        </td>
+    <?php if(($tracker->supportmode != 'usersupport') && ($tracker->supportmode != 'boardreview') && ($tracker->supportmode != 'tutoring')) { ?>
+        <td align="right" width="50" class="tracker-issue-param"><b><?php echo tracker_getstring('cced', 'tracker') ?>:</b></td>
+        <td width="130">
+            <?php echo (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs) ?>
+        </td>
+    <?php } else { ?>
+        <td align="right" width="50" class="tracker-issue-param"><b><?php echo tracker_getstring('userlastseen', 'tracker') ?>:</b></td>
+        <td width="130">
+            <?php $class = ($issue->userlastseen < $issue->resolvermodified) ? ' issueunseen ' : ' issueseen';
+                    if($issue->userlastseen) {
+                        echo html_writer::span(userdate($issue->userlastseen), $class);
+                    }
+            ?>
+        </td>
+    <?php } ?>
+    </tr>
+    <?php if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview')|| ($tracker->supportmode == 'tutoring')) { ?>
+    <tr>
+        <td align="right" width="50" class="tracker-issue-param"><b><?php echo tracker_getstring('summary', 'tracker') ?>:</b></td>
+        <td colspan="3"  align="left">
+            <?php echo format_text($issue->summary); ?>
+        </td>
+    </tr>
+    <?php } ?>
+
+    <!--Print Bug Attributes-->
+
+<?php
+
+if (is_array($elementsused)) {
+    echo $renderer->issue_attributes($issue, $elementsused);
+} ?>
+
+    <tr valign="top">
+        <td align="right" height="50" class="tracker-issue-param"><b><?php echo tracker_getstring('description') ?>:</b></td>
+        <td align="left" colspan="3" width="600">
+            <?php echo format_text($issue->description); ?>
+        </td>
+    </tr>
+
+
+
+<?php if (!empty($issue->resolution)) {
+?>
+    <tr valign="top">
+        <td align="right" height="50" class="tracker-issue-param"><b><?php echo tracker_getstring('resolution', 'tracker') ?>:</b></td>
+        <td align="left" colspan="3">
+            <?php echo $renderer->resolution($issue); ?>
+        </td>
+    </tr>
+<?php
+
+}
+$showcommentslink = '';
+$addcommentlink = '';
+if ($tracker->enablecomments) {
+
+    $cancomment = has_capability('mod/tracker:comment', $context);
+    $addcommentlink = '';
+    if ($cancomment) {
+        $addcommentlink = "<a href=\"addcomment.php?id={$cm->id}&amp;issueid={$issueid}\">".tracker_getstring('addacomment', 'tracker').'</a>';
+    }
+    $showcommentslink = '';
+    // TODO subtitute by a shop call
+    $canviewcomments = (($tracker->supportmode != 'boardreview') || ($cancomment));
+    if($canviewcomments) {
+        if ($commentscount) {
+            $showcommentslink = "<a id=\"togglecommentlink\" href=\"javascript:togglecomments()\">".tracker_getstring('hidecomments', 'tracker').'</a>&nbsp;-&nbsp;';
+        } else {
+            $showcommentslink = '<i>'.tracker_getstring('nocomments','tracker').'</i>&nbsp;-&nbsp;';
+        }
+    }
+}
+
+$transferlink = '';
+if ($tracker->parent && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
+    $transferlink = " - <a href=\"view.php?id={$cm->id}&amp;view=view&amp;what=cascade&amp;issueid={$issueid}\">".tracker_getstring('cascade','tracker')."</a>";
+}
+
+$distribute = '';
+if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
+    $distribute = $renderer->distribution_form($tracker, $issue, $cm);
+}
+
+?>
+    <tr valign="top">
+        <td align="left" colspan="2">
+            <?php echo tracker_getstring('cced', 'tracker').': '; echo (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);  ?>
+        </td>
+        <td align="right" colspan="2">
+            <?php echo $showcommentslink.$addcommentlink.$transferlink.$distribute; ?>
+        </td>
+    </tr>
+
+<?php if((($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview')) && $numautoresp ) { ?>
+    <tr>
+        <td colspan="4">
+            <div id="issuecomments" class="<?php echo $initialviewmode ?> comments">
+            <table width="100%">
+                <?php tracker_printautoresponses($issue, $autoresponses); ?>
+            </table>
+            </div>
+        </td>
+    </tr>
+<?php } ?>
+
+<?php
+if ($tracker->enablecomments && $canviewcomments) {
+    if (!empty($commentscount)) {
+?>
+    <tr>
+        <td colspan="4">
+            <div id="issuecomments" class="<?php echo $initialviewmode ?> comments">
+            <table width="100%">
+                <?php echo $renderer->comments($issue->id, $context->id); ?>
+            </table>
+            </div>
+        </td>
+    </tr>
+<?php
+    }
+}
+?>
+<!-- -- end oc comments section -->
+
+    <tr valign="top">
+        <td align="right" colspan="4">
+            <?php $showcommentslink = str_replace('togglecommentlink', 'togglecommentlink2',  $showcommentslink);
+            echo $showhistorylink.$showccslink.$showdependancieslink.$showcommentslink.$addcommentlink.$transferlink.$distribute; ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="4" align="center" width="100%">
+            <table id="issuedependancytrees" class="<?php echo $initialviewmodeforccs //$initialviewmode ?>">
+                <tr>
+                    <td>&nbsp;</td>
+                    <td align="left" style="white-space : nowrap">
+                    <?php
+                        echo $parenttree;
+                        echo $tracker->ticketprefix.$issue->id.' - '.format_string($issue->summary).'<br/>';
+                        echo $childtree;
+                    ?>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+<?php
+if ($showccslink) {
+    echo $renderer->ccs($ccs, $issue, $cm, $cced, $initialviewmodeforccs);
+}
+if (has_capability('mod/tracker:managewatches', $context)) {
+    echo $renderer->watches_form($issue, $cm, $cced);
+}
+if ($showhistorylink) {
+    echo $renderer->history($history, $statehistory, $initialviewmode);
+}
+?>
+</table>
+<?php
+echo $OUTPUT->box_end();
+$nohtmleditorneeded = true;
+
+if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview')) {
+    if(($issue->status == TESTING) && ($issue->reportedby == $USER->id) && !empty($issue->resolution) && !tracker_can_workon($tracker, $context, $issue)) {
+        // it is my own issue, I've seen,  and already answered, turn to resolved
+        $DB->set_field('tracker_issue', 'status', RESOLVED, array('id' => $issueid));
+    }
+}
+
+?>
+</center>

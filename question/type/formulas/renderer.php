@@ -121,17 +121,15 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
 
         $feedback = $this->part_combined_feedback($qa, $partoptions, $part, $sub->fraction);
         $feedback .= $this->part_general_feedback($qa, $partoptions, $part);
-        // We don't display the right answer if one of the part's coordinates is a MC or select question.
-        // Because for that coordinate our result is not the right answer, but the index of the right answer,
-        // And it would be very dfficult to calculate the right answer.
-        // TODO: find a solution in that case. A popup (calculated in the part renderer) would work,
-        // but would no be very accessible.
-        if ($partoptions->rightanswer && !$part->part_has_multichoice_coordinate()) {
+        // If one of the part's coordinates is a MC or select question, the correct answer
+        // stored in the database is not the right answer, but the index of the right answer,
+        // so in that case, we need to calculate the right answer.
+        if ($partoptions->rightanswer) {
             $feedback .= $this->part_correct_response($part->partindex, $qa);
         }
         $output .= html_writer::nonempty_tag('div', $feedback,
                 array('class' => 'formulaspartoutcome'));
-        return html_writer::tag('span', $output , array('class' => 'formulaspart'));
+        return html_writer::tag('div', $output , array('class' => 'formulaspart'));
     }
 
     // Return class and image for the part feedback.
@@ -146,8 +144,6 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
 
         list( $sub->anscorr, $sub->unitcorr) = $question->grade_responses_individually($part, $response, $checkunit);
         $sub->fraction = $sub->anscorr * ($sub->unitcorr ? 1 : (1 - $part->unitpenalty));
-
-
 
         // Get the class and image for the feedback.
         if ($options->correctness) {
@@ -177,20 +173,13 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
 
         $subqreplaced = $question->formulas_format_text($localvars, $part->subqtext,
                 $part->subqtextformat, $qa, 'qtype_formulas', 'answersubqtext', $part->id, false);
-
         $types = array(0 => 'number', 10 => 'numeric', 100 => 'numerical_formula', 1000 => 'algebraic_formula');
         $gradingtype = ($part->answertype != 10 && $part->answertype != 100 && $part->answertype != 1000) ? 0 : $part->answertype;
         $gtype = $types[$gradingtype];
 
-        // Get the set of defined placeholders and their options, also missing placeholders are appended at the end.
-        $pattern = '\{(_[0-9u][0-9]*)(:[^{}:]+)?(:[^{}:]+)?\}';
-        preg_match_all('/'.$pattern.'/', $subqreplaced, $matches);
-        $boxes = array();
-        foreach ($matches[1] as $j => $match) {
-            if (!array_key_exists($match, $boxes)) {  // If there is duplication, it will be skipped.
-                $boxes[$match] = (object)array('pattern' => $matches[0][$j], 'options' => $matches[2][$j], 'stype' => $matches[3][$j]);
-            }
-        }
+        // Get the set of defined placeholders and their options.
+        $boxes = $part->part_answer_boxes($subqreplaced);
+        // Append missing placholders at the end of part.
         foreach (range(0, $part->numbox) as $j => $notused) {
             $placeholder = ($j == $part->numbox) ? "_u" : "_$j";
             if (!array_key_exists($placeholder, $boxes)) {
@@ -250,7 +239,7 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
             }
 
             $stexts = null;
-            if (strlen($boxes[$placeholder]->options) != 0) { // MC or check box.
+            if (strlen($boxes[$placeholder]->options) != 0) { // Then it's a multichoice answer..
                 try {
                     $stexts = $question->qv->evaluate_general_expression($vars, substr($boxes[$placeholder]->options, 1));
                 } catch (Exception $e) {
@@ -271,7 +260,7 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
                         }
                         $select = html_writer::select($choices, $inputname,
                                 $currentanswer, array('' => ''), $inputattributes);
-                        $output = html_writer::start_tag('span', array('class' => 'formulaspart'));
+                        $output = html_writer::start_tag('span', array('class' => 'formulas_menu'));
                         $output .= html_writer::tag('label', get_string('answer'),
                                 array('class' => 'subq accesshide', 'for' => $inputattributes['id']));
                         $output .= $select;
@@ -412,21 +401,13 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
     public function part_correct_response($i, question_attempt $qa) {
         $question = $qa->get_question();
 
-        $tmp = $question->get_correct_responses_individually($question->parts[$i]);
-        if ($question->parts[$i]->part_has_combined_unit_field()) {
-            $correctanswer = implode(' ', $tmp);
-        } else {
-            if (!$question->parts[$i]->part_has_separate_unit_field()) {
-                unset($tmp["${i}_" . (count($tmp) - 1)]);
-            }
-            $correctanswer = implode(', ', $tmp);
-        }
+        $correctanswer = $question->correct_response_formatted($question->parts[$i]);
         return html_writer::nonempty_tag('div', get_string('correctansweris', 'qtype_formulas', $correctanswer),
                     array('class' => 'formulaspartcorrectanswer'));
     }
 
     /**
-     * Gereate a brief statement of how many sub-parts of this question the
+     * Generate a brief statement of how many sub-parts of this question the
      * student got right.
      * @param question_attempt $qa the question attempt to display.
      * @return string HTML fragment.
@@ -499,8 +480,7 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
         if ($part->feedback == '') {
             return '';
         }
-        
-        
+
         $feedback = '';
         $gradingdetails = '';
         $question = $qa->get_question();
@@ -523,7 +503,7 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
         }
         return '';
     }
-    
+
     /**
      * @param int $i the part index.
      * @param question_attempt $qa the question attempt to display.

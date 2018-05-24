@@ -2,8 +2,10 @@
 
 /**
  * Export settings form
+ * (using Moodle formslib)
  *
- * @package    mod_scheduler
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2015 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -13,28 +15,10 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/mod/scheduler/exportlib.php');
 
-/**
- * Export settings form
- * (using Moodle formslib)
- *
- * @package    mod_scheduler
- * @copyright  2015 Henning Bostelmann and others (see README.txt)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class scheduler_export_form extends moodleform {
 
-    /**
-     * @var scheduler_instance the scheduler to be exported
-     */
     protected $scheduler;
 
-    /**
-     * Create a new export settings form.
-     *
-     * @param string $action
-     * @param scheduler_instance $scheduler the scheduler to export
-     * @param object $customdata
-     */
     public function __construct($action, scheduler_instance $scheduler, $customdata=null) {
         $this->scheduler = $scheduler;
         parent::__construct($action, $customdata);
@@ -48,14 +32,10 @@ class scheduler_export_form extends moodleform {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $radios = array();
-        $radios[] = $mform->createElement('radio', 'content', '',
-                                          get_string('onelineperslot', 'scheduler'), 'onelineperslot');
-        $radios[] = $mform->createElement('radio', 'content', '',
-                                          get_string('onelineperappointment', 'scheduler'),  'onelineperappointment');
-        $radios[] = $mform->createElement('radio', 'content', '',
-                                          get_string('appointmentsgrouped', 'scheduler'), 'appointmentsgrouped');
-        $mform->addGroup($radios, 'contentgroup',
-                                          get_string('contentformat', 'scheduler'), null, false);
+        $radios[] = $mform->createElement('radio', 'content', '', get_string('onelineperslot', 'scheduler'), 'onelineperslot');
+        $radios[] = $mform->createElement('radio', 'content', '', get_string('onelineperappointment', 'scheduler'),  'onelineperappointment');
+        $radios[] = $mform->createElement('radio', 'content', '', get_string('appointmentsgrouped', 'scheduler'), 'appointmentsgrouped');
+        $mform->addGroup($radios, 'contentgroup', get_string('contentformat', 'scheduler'), null, false);
         $mform->setDefault('content', 'onelineperappointment');
         $mform->addHelpButton('contentgroup', 'contentformat', 'scheduler');
 
@@ -116,7 +96,7 @@ class scheduler_export_form extends moodleform {
         $mform->addElement('select', 'pdforientation', get_string('pdforientation', 'scheduler'),  $selopt);
         $mform->disabledIf('pdforientation', 'outputformat', 'neq', 'pdf');
 
-        $buttonarray = array();
+        $buttonarray=array();
         $buttonarray[] = $mform->createElement('submit', 'preview', get_string('preview', 'scheduler'));
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('createexport', 'scheduler'));
         $buttonarray[] = $mform->createElement('cancel');
@@ -125,13 +105,7 @@ class scheduler_export_form extends moodleform {
 
     }
 
-    /**
-     * Add a group of export fields to the form.
-     *
-     * @param string $groupid id of the group in the list of fields
-     * @param string $labelid language string id for the group label
-     */
-    private function add_exportfield_group($groupid, $labelid) {
+    public function add_exportfield_group($groupid, $labelid) {
 
         $mform = $this->_form;
         $fields = scheduler_get_export_fields();

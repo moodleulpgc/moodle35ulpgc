@@ -1058,7 +1058,7 @@ function qcreate_get_qestions_number($userid, $qcreate) {
  * @param $createnew boolean optional Defaults to false. If set to true a new grade object will be created in the database
  * @return object The grade
  */
-function qcreate_get_local_grade($qcreate, $qid, $createnew=false) {
+function qcreate_get_local_grade($qcreate, $qid, $createnew = false) {
     global $DB;
 
     $grade = $DB->get_record_sql(
@@ -1576,10 +1576,10 @@ function qcreate_check_updates_since(cm_info $cm, $from, $filter = array()) {
     $params['time2'] = $from;
     if (has_capability('mod/qcreate:grade', $qcreateobj->get_context())) {
         // Teacher should see questions from all users.
-        $whereuser = 'q.createdby = :userid AND (q.timemodified > :time1 OR q.timecreated > :time2) AND ';
+        $whereuser = '(q.timemodified > :time1 OR q.timecreated > :time2) AND ';
     } else {
-        $params['userid'] = $USER->id;
         $whereuser = 'q.createdby = :userid AND (q.timemodified > :time1 OR q.timecreated > :time2) AND ';
+        $params['userid'] = $USER->id;
     }
     $params['contextid'] = $qcreateobj->get_context()->id;
 
@@ -1604,7 +1604,7 @@ function qcreate_check_updates_since(cm_info $cm, $from, $filter = array()) {
             g.teacher AS usermodified, q.qtype AS qtype
             FROM {user} u, {question_categories} qc, {question} q
             LEFT JOIN {qcreate_grades} g ON g.questionid = q.id
-            WHERE u.id = :userid AND u.id = q.createdby AND qc.id = q. category AND qc.contextid= :contextid
+            WHERE u.id = :userid AND u.id = q.createdby AND qc.id = q.category AND qc.contextid= :contextid
             AND timemarked > :time1
             ORDER BY rawgrade DESC";
     $grades = $DB->get_records_sql($sql, $params);

@@ -166,6 +166,80 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         $dbman->rename_field($table, $formatfield, 'introformat', false);
     }
 
+	// Moodle 2.x
+    if ($oldversion < 2012080901) {
+
+    /// Add field format on table tracker_element
+        $table = new xmldb_table('tracker_element');
+        $field = new xmldb_field('required', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+    /// Conditionally launch add field  format
+        if (!$dbman->field_exists($table,$field)) {
+            $dbman->add_field($table, $field);
+        }
+
+    /// Add field format on table tracker_elementitem
+        $table = new xmldb_table('tracker_elementitem');
+        $field = new xmldb_field('autoresponse', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+
+    /// Conditionally launch add field  format
+        if (!$dbman->field_exists($table,$field)) {
+            $dbman->add_field($table, $field);
+        }
+
+
+    /// Add field format on table tracker_issue
+        $table = new xmldb_table('tracker_issue');
+        $field = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+    /// Conditionally launch add field  format
+        if (!$dbman->field_exists($table,$field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+    /// Conditionally launch add field  format
+        if (!$dbman->field_exists($table,$field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('userlastseen', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+    /// Conditionally launch add field  format
+        if (!$dbman->field_exists($table,$field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('tracker', XMLDB_INDEX_NOTUNIQUE, array('trackerid'));
+        // Conditionally launch add index rolecontext
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('reportedby', XMLDB_INDEX_NOTUNIQUE, array('reportedby'));
+        // Conditionally launch add index rolecontext
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+    /// tracker savepoint reached
+        upgrade_mod_savepoint(true, 2012080901, 'tracker');
+    }
+
+
+    // re-configure ULPGC customizations
+    $ulpgc = get_config('local_ulpgccore');
+    if ($result && $ulpgc && $oldversion < 2013080305) {
+
+    /// Rename fields on table tracker_issue
+        $table = new xmldb_table('tracker_issue');
+
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        if ($dbman->field_exists($table, $field)){
+            $dbman->rename_field($table, $field, 'resolvermodified', false);
+        }
+    }
     if ($result && $oldversion < 2013092200) {
 
         // Define field subtrackers to be added to tracker.
@@ -220,6 +294,31 @@ function xmldb_tracker_upgrade($oldversion = 0) {
 
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2014010100, 'tracker');
+    }
+
+    if ($result && $oldversion < 2014101701) {
+        // Define table tracker_translation to be created.
+        $table = new xmldb_table('tracker_translation');
+
+        // Adding fields to table tracker_translation.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('trackerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('issueword', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('assignedtoword', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('summaryword', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('descriptionword', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('statuswords', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+
+        // Adding keys to table forum_digests.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('trackerid', XMLDB_KEY_FOREIGN, array('trackerid'), 'tracker', array('id'));
+
+        // Conditionally launch create table for forum_digests.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2014101701, 'tracker');
     }
 
     if ($result && $oldversion < 2015072300) {
@@ -298,6 +397,47 @@ function xmldb_tracker_upgrade($oldversion = 0) {
 
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015080600, 'tracker');
+    }
+    
+    if ($result && $oldversion < 2015091301) {
+        // Define table tracker_translation to be created.
+        $table = new xmldb_table('tracker_translation');
+
+        // Adding fields to table tracker_translation.
+        $field = new xmldb_field('forcedlang', XMLDB_TYPE_CHAR, 30, null, XMLDB_NOTNULL, null, 'en', 'statuswords');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    
+        $langs = array('actv', 'admin', 'exam', 'tfg', 'tutor'); 
+        foreach($langs as $lang) {
+            $dir = '/lang/es_'.$lang;
+            $filename = 'tracker.php';
+            $source = $CFG->dirroot.'/mod/tracker'.$dir.'/'.$filename;
+            $langconfig = $source = $CFG->dirroot.'/mod/tracker'.$dir.'/langconfig.php';
+           
+            
+            $dir = $CFG->dataroot.$dir;
+            make_writable_directory($dir);
+            if(file_exists($source)) {
+                copy($source, $dir.'/'.$filename);
+                if(file_exists($langconfig)) {
+                    copy($langconfig, $dir.'/langconfig.php');
+                }
+                $dir .= '_local';
+                make_writable_directory($dir);
+                copy($source, $dir.'/'.$filename);
+            }
+        }
+    
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015091301, 'tracker');
+    
+    }
+
+    if ($result && $oldversion < 2015111100) {
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015111100, 'tracker');
     }
 
     return $result;

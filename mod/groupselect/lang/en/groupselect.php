@@ -94,6 +94,7 @@ $string['ok'] = 'OK';
 $string['password'] = 'Requires password';
 $string['pluginadministration'] = 'Module administration';
 $string['pluginname'] = 'Group self-selection';
+$string['privacy:metadata'] = 'The plugin Group self-selection does not store any personal data.';
 $string['removeallsupervisors'] = 'Remove group supervisors';
 $string['saving'] = 'Saving...';
 $string['select'] = 'Become member of {$a}';

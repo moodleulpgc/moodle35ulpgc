@@ -15,30 +15,57 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     mod_tracker
- * @category    mod
- * @author      Clifford Tham, Valery Fremaux > 1.8
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
  */
 require('../../config.php');
-require_once($CFG->dirroot.'/mod/tracker/lib.php');
-require_once($CFG->dirroot.'/mod/tracker/locallib.php');
+require_once($CFG->dirroot."/mod/tracker/lib.php");
+require_once($CFG->dirroot."/mod/tracker/locallib.php");
+require_once $CFG->dirroot.'/mod/tracker/forms/editelement_form.php';
 
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
-$t  = optional_param('t', 0, PARAM_INT);  // Tracker ID.
-$type = required_param('type', PARAM_TEXT);  // Element class name.
-$elementid = optional_param('elementid', 0, PARAM_INT);  // Element instance id.
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
+$t  = optional_param('t', 0, PARAM_INT);  // tracker ID
+$type = required_param('type', PARAM_TEXT);  // Element class name
+$elementid = optional_param('elementid', 0, PARAM_INT);  // Element instance id
 
-list($cm, $tracker, $course) = tracker_get_context($id, $t);
+if ($id) {
+    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
+        print_error('errorcoursemodid', 'tracker');
+    }
+
+    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+        print_error('errorcoursemisconfigured', 'tracker');
+    }
+
+    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
+        print_error('errormoduleincorrect', 'tracker');
+    }
+} else {
+
+    if (! $tracker = $DB->get_record('tracker', array('id' => $t))) {
+        print_error('errormoduleincorrect', 'tracker');
+    }
+
+    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
+        print_error('errorcoursemisconfigured', 'tracker');
+    }
+    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
+        print_error('errorcoursemodid', 'tracker');
+    }
+}
 
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
-// Security.
+
+// Security. 
 
 $context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 
-// Setting page.
+// setting page
 $url = new moodle_url('/mod/tracker/editelement.php', array('id' => $id));
 $PAGE->set_url($url);
 $PAGE->set_context($context);
@@ -58,17 +85,13 @@ if ($form->is_cancelled()) {
     $params = array('id' => $id, 'view' => $view, 'screen' => $screen);
     redirect(new moodle_url('/mod/tracker/view.php', $params));
 }
-
 if ($data = $form->get_data()) {
+
     $element = new StdClass;
     $element->name = $data->name;
     $element->description = $data->description;
     $element->type = $data->type;
     $element->course = (@$data->shared) ? 0 : $COURSE->id;
-    $element->paramint1 = 0 + @$data->paramint1;
-    $element->paramint2 = 0 + @$data->paramint2;
-    $element->paramchar1 = @$data->paramchar1;
-    $element->paramchar2 = @$data->paramchar2;
     if (!$data->elementid) {
         $element->id = $DB->insert_record('tracker_element', $element);
     } else {
@@ -77,10 +100,9 @@ if ($data = $form->get_data()) {
     }
 
     $elementobj = trackerelement::find_instance_by_id($tracker, $element->id);
-    if (!$data->elementid && $elementobj->has_options()) {
-        // Bounces to the option editor.
+    if (!$data->elementid && $elementobj->hasoptions()) {  // Bounces to the option editor
 
-        // Prepare use case bounce to further code (later in controller).
+        // prepare use case bounce to further code (later in controller).
         $params = array('id' => $id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
         redirect($url);
@@ -96,6 +118,7 @@ if ($elementid) {
     $data = $DB->get_record('tracker_element', array('id' => $elementid));
     $data->elementid = $data->id;
     $data->id = $id;
+    $data->shared = ($data->course == 0); 
 } else {
     $data = new StdClass();
     $data->id = $id;

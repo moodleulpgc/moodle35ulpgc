@@ -93,9 +93,7 @@ body.loginbackgroundimage {
 /* Make page navbar dark if setting "darknavabr" is set to yes. */
 @if variable-exists(darknavbar) {
     @if $darknavbar == 'yes' {
-        header.navbar {
-            background-color: $gray-dark;
-
+        .navbar {
             .navbar-nav .nav-link .icon,
             .navbar-nav .nav-link,
             .usertext,
@@ -180,7 +178,6 @@ body.loginbackgroundimage {
         }
     }
 
-
     /* Menu item: my courses. */
     .list-group-item[data-key="mycourses"] {
         margin-top: 15px;
@@ -195,20 +192,11 @@ body.loginbackgroundimage {
     .list-group-item[href*="#section-"]:not([href*="#section-0"]) {
         border-top: none;
     }
-
-    /* If setting 'navdrawericons' is disabled, do not show any icons by hiding the whole media-left span. */
-    @if variable-exists(navdrawericons) {
-        @if $navdrawericons == 'no' {
-            .list-group-item .media-left {
-                display: none;
-            }
-        }
-    }
 }
 
 /* If the setting navdrawerfullwidth is enabled, we want the nav drawer menu to be displayed full size on small screens. */
-@if variable-exists(nawdrawerfullwidth) {
-    @if $nawdrawerfullwidth == 'yes' {
+@if variable-exists(navdrawerfullwidth) {
+    @if $navdrawerfullwidth == 'yes' {
         @include media-breakpoint-down(sm) {
             #nav-drawer {
                 width: 100%;
@@ -225,6 +213,14 @@ body.loginbackgroundimage {
   Course header
   -------------------------------------*/
 
+/* Remove margin from the pageheadingbuttons in the course header. */
+#page-header {
+    .breadcrumb,
+    .singlebutton form {
+        margin: 0;
+    }
+}
+
 /*
  * If set in showswitchedroleincourse, the switched role information will be displayed
  * in the course header instead of next to the user name.
@@ -238,10 +234,7 @@ body.loginbackgroundimage {
 /* If showsettingsincourse is enabled, we have to style the cog icon a bit different. */
 @if variable-exists(showsettingsincourse) {
     @if $showsettingsincourse == 'yes' {
-        #page-navbar {
-            .breadcrumb-button {
-                margin-top: 0;
-            }
+        #page-header {
             /* If the setting is enabled we do not need the triangle icon, because there is no menu
              * popping up next to the cog icon. */
             .context-header-settings-menu .dropdown-toggle::after {
@@ -268,7 +261,10 @@ body.loginbackgroundimage {
             position: inherit;
             left: inherit;
             font-weight: $headings-font-weight;
-            font-size: $font-size-h3;
+            font-size: $h3-font-size;
+            width: initial;
+            height: initial;
+            clip-path: none;
         }
     }
 }
@@ -499,66 +495,66 @@ blockquote::before {
     @if $blockicon == 'yes' {
         /* If setting blockicon is checked, add a default Font Awesome icon
          * before the block title. */
-        .block .card-block .card-title::before {
+        .block .card-title::before {
             font-family: FontAwesome;
             content: '\f009';
             font-size: 1.3rem;
             padding-right: 7px;
         }
         /* Provide different, suitable Font Awesome icons for different Moodle blocks. */
-        .block_recent_activity .card-block .card-title::before {
+        .block_recent_activity .card-title::before {
             content: '\f017';
         }
-        .block_calendar_month .card-block .card-title::before,
-        .block_calendar_upcoming .card-block .card-title::before {
+        .block_calendar_month .card-title::before,
+        .block_calendar_upcoming .card-title::before {
             content: '\f133';
         }
-        .block_people .card-block .card-title::before {
+        .block_people .card-title::before {
             content: '\f0c0';
         }
-        .block_quickmail .card-block .card-title::before {
+        .block_quickmail .card-title::before {
             content: '\f003';
         }
-        .block_activity_module .card-block .card-title::before {
+        .block_activity_module .card-title::before {
             content: '\f12e';
         }
-        .block_news_items .card-block .card-title::before {
+        .block_news_items .card-title::before {
             content: '\f0a1';
         }
-        .block_progress .card-block .card-title::before {
+        .block_progress .card-title::before {
             content: '\f0ae';
         }
-        .block_private_files .card-block .card-title::before {
+        .block_private_files .card-title::before {
             content: '\f114';
         }
-        .block_comments .card-block .card-title::before {
+        .block_comments .card-title::before {
             content: '\f075';
         }
-        .block_completion_status .card-block .card-title::before {
+        .block_completion_status .card-title::before {
             content: '\f0e4';
         }
-        .block_search_forums .card-block .card-title::before {
+        .block_search_forums .card-title::before {
             content: '\f0e6';
         }
-        .block_admin_bookmarks .card-block .card-title::before {
+        .block_admin_bookmarks .card-title::before {
             content: '\f097';
         }
-        .block_adminblock .card-block .card-title::before {
+        .block_adminblock .card-title::before {
             content: '\f0fe';
         }
-        .block_attendance .card-block .card-title::before {
+        .block_attendance .card-title::before {
             content: '\f046';
         }
-        .block_sharing_cart .card-block .card-title::before {
+        .block_sharing_cart .card-title::before {
             content: '\f07a';
         }
-        .block_glossary_random .card-block .card-title::before {
+        .block_glossary_random .card-title::before {
             content: '\f14b';
         }
-        .block_selfcompletion .card-block .card-title::before {
+        .block_selfcompletion .card-title::before {
             content: '\f14a';
         }
-        .block_badges .card-block .card-title::before {
+        .block_badges .card-title::before {
             content: '\f0a3';
         }
     }
@@ -612,6 +608,12 @@ blockquote::before {
         }
         /* Remove the underline decoration from footer blocks context menu items.*/
         .dropdown-item.menu-action {
+            text-decoration: none;
+        }
+        /* Set the text decoration for the block controls to none to prevent an underscore from being displayed
+         * for a white space.
+         */
+        .block-controls a {
             text-decoration: none;
         }
     }
@@ -735,8 +737,6 @@ a[href^="mailto"]::before {
  * Image area.
  */
 .imagearea {
-    text-align: center;
-    background-color: $gray-dark;
     border-top: 1px solid #fff;
 
     img {
@@ -756,9 +756,7 @@ a[href^="mailto"]::before {
  */
 .footnote {
     min-height: 40px;
-    color: #fff;
     border-top: 1px solid #fff;
-    background-color: $gray-dark;
 }
 
 
@@ -789,16 +787,23 @@ a[href^="mailto"]::before {
 #boost-campus-activity-settings {
     /* Initially do not display the settings. Visibility will be changed on click with incoursesettings.js. */
     display: none;
-    border: none;
-    padding-bottom: 0.1rem;
+    padding: 1rem;
+    padding-top: 0;
     margin-bottom: 3rem;
+    margin-top: 1rem;
+    border: none;
+
+    .nav-tabs {
+        border: none;
+        .active {
+            background-color: darken($body-bg, 5%);
+            border-color: darken($body-bg, 5%);
+        }
+    }
     /* Improve color of tab content so it looks more like a real tab. */
     .tab-content .card {
-        background-color: #f4f4f4;
-        border-left: 1px solid #ddd;
-        border-right: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 2rem;
+        background-color: darken($body-bg, 5%);
+        border: none;
     }
 }
 
@@ -830,7 +835,7 @@ a[href^="mailto"]::before {
 .course-hidden-infobox,
 .switched-role-infobox,
 .course-guestaccess-infobox {
-    min-height: 5rem;
+    min-height: 4rem;
 }
 
 
@@ -886,29 +891,15 @@ a[href^="mailto"]::before {
         display: none;
     }
 
-    /* If setting 'navdrawericons' is enabled, revert the indent to the collapsed custom child nodes which was
+    /* Revert the indent to the collapsed custom child nodes which was
        added by local_boostnavigation. Unfortunately, this has to be done for each custom node block individually because the child
        node does not know (with a CSS-selectable attribute) if its parent node is collapsed or node. */
-    @if variable-exists(navdrawericons) {
-        @if $navdrawericons == 'yes' {
-            .list-group-item[data-key^="localboostnavigationcustomcourseusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomcourseusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomcourseusers"] > div,
-            .list-group-item[data-key^="localboostnavigationcustomcourseadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomcourseadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomcourseadmins"] > div,
-            .list-group-item[data-key^="localboostnavigationcustomrootusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomrootusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomrootusers"] > div,
-            .list-group-item[data-key^="localboostnavigationcustomcrootadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomrootadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomrooradmins"] > div,
-            .list-group-item[data-key^="localboostnavigationcustombottomusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomusers"] > div,
-            .list-group-item[data-key^="localboostnavigationcustombottomadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomadmins"] > div {
-                margin-left: inherit !important;
-            }
-        }
-    }
-
-    /* If setting 'navdrawericons' is enabled, revert the indent to the activity nodes which was added by local_boostnavigation. */
-    /* TODO: Remove when MDL-61298 is integrated to Moodle core. */
-    @if variable-exists(navdrawericons) {
-        @if $navdrawericons == 'yes' {
-            .list-group-item[data-key^="localboostnavigationactivity"] > div {
-                margin-left: inherit !important;
-            }
-        }
+    .list-group-item[data-key^="localboostnavigationcustomcourseusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomcourseusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomcourseusers"] > div,
+    .list-group-item[data-key^="localboostnavigationcustomcourseadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomcourseadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomcourseadmins"] > div,
+    .list-group-item[data-key^="localboostnavigationcustomrootusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomrootusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomrootusers"] > div,
+    .list-group-item[data-key^="localboostnavigationcustomcrootadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustomrootadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustomrooradmins"] > div,
+    .list-group-item[data-key^="localboostnavigationcustombottomusers"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomusers"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomusers"] > div,
+    .list-group-item[data-key^="localboostnavigationcustombottomadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomadmins"] > div {
+        margin-left: inherit !important;
     }
 }

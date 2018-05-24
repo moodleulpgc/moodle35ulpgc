@@ -81,7 +81,8 @@ class examboard_addexam_form extends moodleform {
             $mform->setType('groupid', PARAM_INT);
         }
 
-        $mform->addElement('advcheckbox', 'boardactive', get_string('boardactive', 'examboard'), ' fff');
+        $activestr = get_string('visibility_explain', 'examboard');
+        $mform->addElement('advcheckbox', 'boardactive', get_string('boardactive', 'examboard'), $activestr);
         $mform->setDefault('boardactive', 1);
         $mform->disabledIf('boardactive', 'boardid', 'neq', 0);
         
@@ -104,7 +105,7 @@ class examboard_addexam_form extends moodleform {
         $mform->setDefault('duration', HOURSECS);
         $mform->addHelpButton('duration', 'examduration', 'examboard');
         
-        $mform->addElement('advcheckbox', 'examactive', get_string('examactive', 'examboard'), ' ffrrr f');
+        $mform->addElement('advcheckbox', 'examactive', get_string('examactive', 'examboard'), $activestr);
         $mform->setDefault('examactive', 1);
         
         if($action == 'addexam') {

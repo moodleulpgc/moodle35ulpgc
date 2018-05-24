@@ -1,13 +1,4 @@
 <?php
-
-/**
- * Strings for component 'mod_scheduler', language 'en'
- *
- * @package    mod_scheduler
- * @copyright  2017 Henning Bostelmann and others (see README.txt)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 $string['pluginname'] = 'Scheduler';
 $string['pluginadministration'] = 'Scheduler administration';
 $string['modulename'] = 'Scheduler';
@@ -63,47 +54,51 @@ $string['actions'] = 'Actions';
 $string['addappointment'] = 'Add another student';
 $string['addcommands'] = 'Add slots';
 $string['addondays'] = 'Add appointments on';
+$string['addscheduled'] = 'Add scheduled student';
 $string['addsession'] = 'Add repeated slots';
 $string['addsingleslot'] = 'Add single slot';
 $string['addslot'] = 'You can add additional appointment slots at any time.';
 $string['addstudenttogroup'] = 'Add this student to appointment group';
 $string['allappointments'] = 'All appointments';
 $string['allononepage'] = 'All slots on one page';
-$string['allowgroup'] = 'Exclusive slot - click to change';
+$string['allowgroup'] = 'Exclusive slot';
+$string['allslotsincloseddays'] = 'All slots were in closed days';
 $string['allteachersgrading'] = 'Teachers can grade all appointments';
 $string['allteachersgrading_desc'] = 'When enabled, teachers can grade appointments they are not assigned to.';
 $string['alreadyappointed'] = 'Cannot make the appointment. The slot is already fully booked.';
-$string['appointfor'] = 'Make appointment for';
+$string['appointedslots'] = 'Appointed slots'; // ecastro ULPGC
 $string['appointforgroup'] = 'Make appointments for: {$a}';
 $string['appointingstudent'] = 'Appointment for slot';
 $string['appointingstudentinnew'] = 'Appointment for new slot';
 $string['appointment'] = 'Appointment';
 $string['appointmentno'] = 'Appointment {$a}';
-$string['appointmentnote'] = 'Notes for appointment (visible to student)';
+$string['appointmentnote'] = 'Note on appointment'; // ecastro ULPGC
+$string['appointmentnote_help'] = 'A note written when booking an slot, with information for teacher or students about the meeting (purpose, excuses etc.)'; // ecastro ULPGC
+$string['appointmentnotes'] = 'Notes for appointment';
 $string['appointments'] = 'Appointments';
 $string['appointmentsgrouped'] = 'Appointments grouped by slot';
 $string['appointsolo'] = 'just me';
 $string['appointsomeone'] = 'Add new appointment';
 $string['appointmentsummary'] = 'Appointment on {$a->startdate} from {$a->starttime} to {$a->endtime} with {$a->teacher}';
+$string['asmemberof'] = 'as member of {$a}'; // ecastro ULPGC
 $string['attendable'] = 'Attendable';
 $string['attendablelbl'] = 'Total candidates for scheduling';
 $string['attended'] = 'Attended';
+$string['attendednondeletable'] = 'Some slots have not been deleted because the meeting was attended ({$a}).';
 $string['attendedlbl'] = 'Amount of attended students';
 $string['attendedslots'] = 'Attended slots';
 $string['availableslots'] = 'Available slots';
 $string['availableslotsall'] = 'All slots';
 $string['availableslotsnotowned'] = 'Not owned';
 $string['availableslotsowned'] = 'Owned';
-$string['bookingformoptions'] = 'Booking form and student-supplied data';
-$string['bookinginstructions'] = 'Booking instructions';
-$string['bookinginstructions_help'] = 'This text will be displayed to students before they make a booking. It can, for example, instruct students how to fill out the optional message field or which files to upload.';
 $string['bookslot'] = 'Book slot';
-$string['bookaslot'] = 'Book a slot';
-$string['bookingdetails'] = 'Booking details';
 $string['bookwithteacher'] = 'Teacher';
 $string['break'] = 'Break between slots';
 $string['breaknotnegative'] = 'Length of the break must not be negative';
 $string['cancelbooking'] = 'Cancel booking';
+$string['cancelledbystudent'] = '{$a} : Appointment cancelled or moved by a student';
+$string['cancelledbyteacher'] = '{$a} : Appointment cancelled by the teacher';
+$string['cancelonly'] = 'On cancellation only'; // ecastro ULPGC
 $string['canbooksingleappointment'] = 'You can book one appointment in this scheduler.';
 $string['canbook1appointment'] = 'You can book one more appointment in this scheduler.';
 $string['canbooknappointments'] = 'You can book {$a} more appointments in this scheduler.';
@@ -111,9 +106,10 @@ $string['canbooknofurtherappointments'] = 'You cannot book further appointments 
 $string['canbookunlimitedappointments'] = 'You can book any number of appointments in this scheduler.';
 $string['chooseexisting'] = 'Choose existing';
 $string['choosingslotstart'] = 'Choosing the start time';
-$string['comments'] = 'Comments';
-$string['conflictlocal'] = '{$a->datetime} ({$a->duration} minutes) in this scheduler';
-$string['conflictremote'] = '{$a->datetime} ({$a->duration} minutes) in course {$a->courseshortname}, scheduler {$a->schedulername}';
+$string['comments'] = 'General comments for meeting';
+$string['comments_help'] = 'These comments can be edited only by the teacher and are associated with the slot. 
+All students appointed in this slot will see this text, common for all them, 
+contrary to appointment notes, that are personal and specific for each separate student. '; // ecastro ULPGC
 $string['contentformat'] = 'Format';
 $string['contentformat_help'] = '<p>There are three basic choices for the export format,
      differing in how slots with several appointments are handled.
@@ -137,15 +133,11 @@ $string['contentformat_help'] = '<p>There are three basic choices for the export
     </dl>
     You can explore the effect of these options using the "Preview" button.</p>';
 $string['complete'] = 'Booked';
-$string['confirmbooking'] = "Confirm booking";
-$string['confirmdelete-all'] = 'This will delete <b>all</b> slots in this scheduler. Deletion cannot be undone. Continue anyway?';
-$string['confirmdelete-mine'] = 'This will delete all your slots in this scheduler. Deletion cannot be undone. Continue anyway?';
-$string['confirmdelete-myunused'] = 'This will delete all your unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
-$string['confirmdelete-selected'] = 'This will delete the selected slots. Deletion cannot be undone. Continue anyway?';
-$string['confirmdelete-one'] = 'Delete slot?';
-$string['confirmdelete-unused'] = 'This will delete all unused slots in this scheduler. Deletion cannot be undone. Continue anyway?';
-$string['conflictingslots'] = 'The slot on {$a} cannot be created due to conflicting slots:';
-$string['copytomyself'] = 'Send a copy to myself';
+$string['composeemail'] = 'Compose email:';
+$string['confirmdelete'] = 'Deletion is definitive. Continue anyway?';
+$string['confirmrevoke'] = 'You have asked to revoke the meeting. Continue?';
+$string['confirmcancelbooking'] = 'Yo have asked to cancel the booking. Continue?';
+$string['conflictingslots'] = 'Conflicting';
 $string['course'] = 'Course';
 $string['createexport'] = 'Create export file';
 $string['csvformat'] = 'CSV';
@@ -160,24 +152,26 @@ $string['defaultslotduration_help'] = 'The default length (in minutes) for appoi
 $string['deleteallslots'] = 'Delete all slots';
 $string['deleteallunusedslots'] = 'Delete unused slots';
 $string['deletecommands'] = 'Delete slots';
+$string['deletedslots'] = 'Deleted {$a} conflicting slots'; // ecastro ULPGC
 $string['deletemyslots'] = 'Delete all my slots';
 $string['deleteselection'] = 'Delete selected slots';
 $string['deletetheseslots'] = 'Delete these slots';
 $string['deleteunusedslots'] = 'Delete my unused slots';
-$string['deleteonsave'] = 'Delete this appointment (when saving the form)';
 $string['deletedconflictingslots'] = 'For the slot on {$a}, conflicting slots have been deleted:';
 $string['department'] = 'From where?';
 $string['disengage'] = 'Drop my appointments';
-$string['displayfrom'] = 'Display slot to students from';
+$string['displayfrom'] = 'Display appointment to students from';
 $string['distributetoslot'] = 'Distribute to the whole group';
 $string['divide'] = 'Divide into slots?';
+$string['dontforgetsaveadvice'] = 'You have changed the list of appointed people. Don\'t forget saving this form to commit the changes definitively.';
 $string['duration'] = 'Duration';
 $string['durationrange'] = 'Slot duration must be between {$a->min} and {$a->max} minutes.';
-$string['editbooking'] = 'Edit booking';
+$string['editappointnote'] = 'Add/Edit appointment note'; // ecastro ULPGC
 $string['emailreminder'] = 'Email a reminder';
 $string['emailreminderondate'] = 'Email a reminder on';
 $string['end'] = 'End';
 $string['enddate'] = 'Repeat time slots until';
+$string['endtime'] = 'End time';
 $string['excelformat'] = 'Excel';
 $string['exclusive'] = 'Exclusive';
 $string['exclusivity'] = 'Exclusivity';
@@ -200,10 +194,7 @@ $string['field-studentusername'] = 'Student user name';
 $string['field-studentidnumber'] = 'Student id number';
 $string['field-attended'] = 'Attended';
 $string['field-slotnotes'] = 'Slot notes';
-$string['field-appointmentnote'] = 'Appointment note (to student)';
-$string['field-teachernote'] = 'Confidential note (teacher only)';
-$string['field-studentnote'] = 'Message by student';
-$string['field-filecount'] = 'Number of uploaded files';
+$string['field-appointmentnotes'] = 'Appointment notes';
 $string['field-grade'] = 'Grade';
 $string['fileformat'] = 'File format';
 $string['fileformat_help'] = 'The following file formats are available:
@@ -218,7 +209,10 @@ $string['fileformat_help'] = 'The following file formats are available:
      </ul>';
 $string['finalgrade'] = 'Final grade';
 $string['firstslotavailable'] = 'The first slot will be open on: {$a}';
-$string['forbidgroup'] = 'Group slot - click to change';
+$string['forbidgroup'] = 'Group slot';
+$string['forceno'] = 'Groups and single users'; // ecastro ULPG
+$string['forceonlysingle'] = 'Single users only'; // ecastro ULPG
+$string['forceonlygroups'] = 'As Groups only'; // ecastro ULPG
 $string['forcewhenoverlap'] = 'Force when overlap';
 $string['forcourses'] = 'Choose students in courses';
 $string['friday'] = 'Friday';
@@ -229,6 +223,7 @@ $string['gradingstrategy'] = 'Grading strategy';
 $string['gradingstrategy_help'] = 'In a scheduler where students can have several appointments, select how grades are aggregated.
     The gradebook can show either <ul><li>the mean grade or</li><li>the maximum grade</li></ul> that the student has achieved.';
 $string['group'] = 'group ';
+$string['groupaction'] = '{$a} - click to change'; // ecastro ULPGC
 $string['groupbreakdown'] = 'By group size';
 $string['groupbookings'] = 'Booking in groups';
 $string['groupbookings_help'] = 'Allow students to book a slot for all members of their group.
@@ -242,22 +237,23 @@ $string['groupsession'] = 'Group session';
 $string['groupsize'] = 'Group size';
 $string['guardtime'] = 'Guard time';
 $string['guestscantdoanything'] = 'Guests can\'t do anything here.';
+$string['hasnotesgrades'] = 'Notes/grades on student'; // ecastro ULPGC
 $string['htmlformat'] = 'HTML';
 $string['howtoaddstudents'] = 'For adding students to a global scoped scheduler, use the role setting for the module.<br/>You may also use module role definitions to define the attenders of your students.';
 $string['ignoreconflicts'] = 'Ignore scheduling conflicts';
 $string['ignoreconflicts_help'] = 'If this box is ticked, then the slot will be moved to the requested date and time, even if other slots exist at the same time. This may lead to overlapping appointments for some teachers or students, and should therefore be used with care.';
-$string['ignoreconflicts_link'] = 'mod/scheduler/conflict';
 $string['includeemptyslots'] = 'Include empty slots';
 $string['includeslotsfor'] = 'Include slots for';
 $string['incourse'] = ' in course ';
-$string['mixindivgroup'] = 'Mix individual and group bookings';
-$string['mixindivgroup_desc'] = 'Where group scheduling is enabled, allow individual bookings as well.';
 $string['introduction'] = 'Introduction';
+$string['invitation'] = 'Invitation';
+$string['invitationtext'] = 'Please choose a time-slot for an appointment at ';
 $string['isnonexclusive'] = 'Non-exclusive';
 $string['landscape'] = 'Landscape';
 $string['lengthbreakdown'] = 'By slot duration';
 $string['limited'] = 'Limited ({$a} left)';
 $string['location'] = 'Location';
+$string['markall'] = 'Edit grades/notes for all students'; // ecastro ULPGC
 $string['markseen'] = 'After you have had an appointment with a student please mark them as "Seen" by clicking the checkbox near to their user picture above.';
 $string['markasseennow'] = 'Mark as seen now';
 $string['maxgrade'] = 'Take the highest grade';
@@ -268,10 +264,6 @@ $string['maxstudentlistsize_desc'] = 'The maximum length of the list of students
 $string['meangrade'] = 'Take the mean grade';
 $string['meetingwith'] = 'Meeting with your';
 $string['meetingwithplural'] = 'Meeting with your';
-$string['message'] = 'Message';
-$string['messagesent'] = 'Message sent to {$a} recipients';
-$string['messagesubject'] = 'Subject';
-$string['messagebody'] = 'Message body';
 $string['minutes'] = 'minutes';
 $string['minutesperslot'] = 'minutes per slot';
 $string['missingstudents'] = '{$a} students still need to make an appointment';
@@ -282,6 +274,8 @@ $string['modeappointments'] = 'appointment(s)';
 $string['modeoneonly'] = 'in this scheduler';
 $string['modeoneatatime'] = 'at a time';
 $string['monday'] = 'Monday';
+$string['move'] = 'Change';
+$string['moveslot'] = 'Move slot';
 $string['multiple'] = '(multiple)';
 $string['myappointments'] = 'My appointments';
 $string['myself'] = 'Myself';
@@ -289,7 +283,7 @@ $string['name'] = 'Scheduler name';
 $string['needteachers'] = 'Slots cannot be added as this course has no teachers';
 $string['negativerange'] = 'Range is negative. This can\'t be.';
 $string['never'] = 'Never';
-$string['nfiles'] = '{$a} files';
+$string['newappointment'] = '{$a} : New appointment';
 $string['noappointments'] = 'No appointments';
 $string['noexistingstudents'] = 'No students available for scheduling';
 $string['nogroups'] = 'No group available for scheduling.';
@@ -304,9 +298,10 @@ $string['note'] = 'Grade';
 $string['noteacherforslot'] = 'No teacher for the slots';
 $string['noteachershere'] = 'No teacher available';
 $string['notenoughplaces'] = 'Sorry, there are not enough free appointments in this slot.';
-$string['notesrequired'] = 'You must enter text into this field before booking the slot.';
 $string['notifications'] = 'Notifications';
 $string['notseen'] = 'Not seen';
+$string['notselected'] = 'You have not yet made a choice';
+$string['notusedslots'] = 'Unused slots'; // ecastro ULPGC
 $string['now'] = 'Now';
 $string['occurrences'] = 'Occurrences';
 $string['odsformat'] = 'ODS';
@@ -314,12 +309,10 @@ $string['on'] = 'on';
 $string['onelineperappointment'] = 'One line per appointment';
 $string['onelineperslot'] = 'One line per slot';
 $string['oneslotadded'] = '1 slot added';
-$string['oneslotdeleted'] = '1 slot deleted';
 $string['onthemorningofappointment'] = 'On the morning of the appointment';
 $string['options'] = 'Options';
+$string['orscheduleinnew'] = 'Or create e new one'; // ecastro ULPGC
 $string['otherstudents'] = 'Other participants';
-$string['outlineappointments'] = '{$a->attended} appointments attended, {$a->upcoming} upcoming. ';
-$string['outlinegrade'] = 'Grade: {$a}.';
 $string['overall'] = 'Overall';
 $string['overlappings'] = 'Some other slots are overlapping';
 $string['pageperteacher'] = 'One page for each {$a}';
@@ -335,7 +328,10 @@ $string['purgeunusedslots'] = 'Purge unused slots in the past';
 $string['recipients'] = 'Recipients';
 $string['registeredlbl'] = 'Student appointed';
 $string['reminder'] = 'Reminder';
-$string['requireupload'] = 'File upload required';
+$string['remindertext'] = 'This is just a reminder that you have not yet set up your appointment. Please choose a time-slot as soon as possible at ';
+$string['remindtitle'] = '{$a}: Appointment reminder';
+$string['remindwhere'] = 'Location of the appointment: ';
+$string['remindwithwhom'] = 'Scheduled appointment with ';
 $string['resetslots'] = 'Delete scheduler slots';
 $string['resetappointments'] = 'Delete appointments and grades';
 $string['return'] = 'Back to course';
@@ -343,6 +339,7 @@ $string['revoke'] = 'Revoke the appointment';
 $string['saturday'] = 'Saturday';
 $string['save'] = 'Save';
 $string['savechoice'] = 'Save my choice';
+$string['savecomment'] = 'Save the comment';
 $string['saveseen'] = 'Save seen';
 $string['schedule'] = 'Schedule';
 $string['scheduleappointment'] = 'Schedule appointment for {$a}';
@@ -355,6 +352,7 @@ $string['schedulestudents'] = 'Schedule by student';
 $string['scopemenu'] = 'Show slots in: {$a}';
 $string['scopemenuself'] = 'Show my slots in: {$a}';
 $string['seen'] = 'Seen';
+$string['seenall'] = 'Mark all students as attended'; // ecastro ULPGC
 $string['selectedtoomany'] = 'You have selected too many slots. You can select no more than {$a}.';
 $string['sendmessage'] = 'Send message';
 $string['sendinvitation'] = 'Send invitation';
@@ -364,35 +362,42 @@ $string['sepcolon'] = 'Colon';
 $string['sepcomma'] = 'Comma';
 $string['sepsemicolon'] = 'Semicolon';
 $string['septab'] = 'Tab';
+$string['sharedfrom'] = 'Shared from {$a}'; // ecastro ULPGC
+$string['sharedslot'] = 'Shared slot'; // ecastro ULPGC
+$string['sharedslot_help'] = 'If marked as shared, then these slots will be available for display and booking at other Scheduler instances.'; // ecastro ULPGC
+$string['sharedslotsenabled'] = 'Enable Shared slots'; // ecastro ULPGC
+$string['sharedslotsenabled_desc'] = 'Allows sharing of slots created in and scheduler instance. 
+"Sharing" means that slots created in am instance will be displayed in other instances (if configured to accept them). 
+Once a student books a slot that slot ceaces to be shared and becomes a regular slot in the instance where the student booked. '; // ecastro ULPGC
+$string['sharedto'] = 'Shared to other Schedulers'; // ecastro ULPGC
 $string['showemailplain'] = 'Show e-mail addresses in plain text';
 $string['showemailplain_desc'] = 'In the teacher\'s view of the scheduler, show the e-mail addresses of students needing an appointment in plain text, in addition to mailto: links.';
 $string['showparticipants'] = 'Show participants';
 $string['slot_is_just_in_use'] = 'Sorry, the appointment has just been chosen by another student! Please try again.';
 $string['slotdatetime'] = '{$a->shortdatetime} for {$a->duration} minutes';
-$string['slotdatetimelong'] = '{$a->date}, {$a->starttime} &ndash; {$a->endtime}';
-$string['slotdatetimelabel'] = 'Date and time';
 $string['slotdescription'] = '{$a->status} on {$a->startdate} from {$a->starttime} to {$a->endtime} at {$a->location} with {$a->facilitator}.';
 $string['slot'] = 'Slot';
+$string['slotnotes'] = 'General comment'; // ecastro ULPGC
 $string['slots'] = 'Slots';
 $string['slotsadded'] = '{$a} slots have been added';
 $string['slotsdeleted'] = '{$a} slots have been deleted';
-$string['slottype'] = 'Slot type';
+$string['slottype'] = 'Slot type'; // ecastro ULPGC
 $string['slotupdated'] = '1 slot updated';
-$string['slotwarning'] = '<strong>Warning:</strong> Moving this slot to the selected time conflicts with the slot(s) listed below. Tick "Ignore scheduling conflicts" if you want to move the slot nevertheless.';
+$string['slotwarning'] = '<strong>Warning: </strong>Moving this slot to the selected time conflicts with the slot(s) listed below. Tick "Ignore scheduling conflicts" if you want to move the slot nevertheless.';
 $string['staffbreakdown'] = 'By {$a}';
+$string['staffmember'] = 'Member of Staff';
 $string['staffrolename'] = 'Role name of the teacher';
 $string['start'] = 'Start';
 $string['startpast'] = 'You can\'t start an empty appointment slot in the past';
+$string['starttime'] = 'Start time';
 $string['statistics'] = 'Statistics';
 $string['student'] = 'Student';
 $string['studentbreakdown'] = 'By student';
-$string['studentcomments'] = 'Student\'s message';
+$string['studentcomments'] = 'Student\'s notes';
 $string['studentdetails'] = 'Student details';
-$string['studentfiles'] = 'Uploaded files';
 $string['studentmultiselect'] = 'Each student can be selected only once in this slot';
-$string['studentnote'] = 'Message by student';
+$string['studentnotes'] = 'Your notes about the appointment ';
 $string['students'] = 'Students';
-$string['studentprovided'] = 'Student provided: {$a}';
 $string['sunday'] = 'Sunday';
 $string['tab-thisappointment'] = 'This appointment';
 $string['tab-otherappointments'] = 'All appointments of this student';
@@ -404,40 +409,19 @@ $string['thisscheduler'] = 'this scheduler';
 $string['thiscourse'] = 'this course';
 $string['thissite'] = 'the entire site';
 $string['thursday'] = 'Thursday';
-$string['timefrom'] = 'From:';
-$string['timerange'] = 'Time range';
-$string['timeto'] = 'To:';
 $string['totalgrade'] = 'Total grade';
 $string['tuesday'] = 'Tuesday';
 $string['unattended'] = 'Unattended';
 $string['unlimited'] = 'Unlimited';
 $string['unregisteredlbl'] = 'Unappointed students';
 $string['upcomingslots'] = 'Upcoming slots';
+$string['updateappointnote'] = 'Update';
 $string['updategrades'] = 'Update grades';
 $string['updatesingleslot'] = '';
-$string['uploadrequired'] = 'You must upload files here before booking the slot.';
-$string['uploadstudentfiles'] = 'Upload files';
-$string['uploadmaxfiles'] = 'Maximum number of uploaded files';
-$string['uploadmaxfiles_help'] = 'The maximum number of files that a student can upload in the booking form. File upload is optional unless the "File upload required" box is ticked. If set to 0, students will not see a file upload box.';
-$string['uploadmaxsize'] = 'Maximum file size';
-$string['uploadmaxsize_help'] = 'Maximum file size for student uploads. This limit applies per file.';
-$string['uploadmaxfilesglobal'] = 'Maximum number of uploaded files';
-$string['uploadmaxfilesglobal_desc'] = 'The maximum number of files that a student can upload in a booking form. This can be reduced further at the level of individual schedulers.';
-$string['usebookingform'] = 'Use booking form';
-$string['usebookingform_help'] = 'If enabled, student see a separate booking screen before they can book a slot. The booking screen may require them to enter data, upload files, or solve a captcha; see options below.';
-$string['usebookingform_link'] = 'mod/scheduler/bookingform';
-$string['usecaptcha'] = 'Use CAPTCHA for new bookings';
-$string['usecaptcha_help'] = 'If enabled, students will need to solve a CAPTCHA security question before making a new booking.
-Use this setting if you suspect that students use automated programs to snap up available slots.
-<p>No captcha will be displayed if the student edits an existing booking.</p>';
-$string['usenotes'] = 'Use notes for appointments';
-$string['usenotesnone'] = 'none';
-$string['usenotesstudent'] = 'Appointment note, visible to teacher and student';
-$string['usenotesteacher'] = 'Confidential note, visible to teachers only';
-$string['usenotesboth'] = 'Both types of notes';
-$string['usestudentnotes'] = 'Let students enter a message';
-$string['usestudentnotes_help'] = 'If enabled, the booking screen will contain a text box in which students can enter a message. Use the "booking instructions" above to instruct students what information they should supply.';
-$string['viewbooking'] = 'See details';
+$string['updatingappointment'] = 'Updating an appointment';
+$string['usesharedslots'] = 'Use shared slots'; // ecastro ULPGC
+$string['usesharedslots_help'] = 'If enabled, then the shared slots created in other Scheduler instances will be available here and students coud book on them here. <br />
+Conversely, slots created here could be marked as shared, to be available in other Scheduler instances as well.';
 $string['wednesday'] = 'Wednesday';
 $string['welcomebackstudent'] = 'You can book additional slots by clicking on the corresponding "Book slot" button below.';
 $string['welcomenewstudent'] = 'The table below shows all available slots for an appointment. Make your choice by clicking on the corresponding "Book slot" button. If you need to make a change later you can revisit this page.';
@@ -453,26 +437,26 @@ $string['xdaysbefore'] = '{$a} days before slot';
 $string['xweeksbefore'] = '{$a} weeks before slot';
 $string['yesallgroups'] = 'Yes, for all groups';
 $string['yesingrouping'] = 'Yes, in grouping {$a}';
-$string['yesoptional'] = 'Yes, optional for student';
-$string['yesrequired'] = 'Yes, student must enter a message';
 $string['yourappointmentnote'] = 'Comments for your eyes';
 $string['yourslotnotes'] = 'Comments on the meeting';
-$string['yourstudentnote'] = 'Your message';
 $string['yourtotalgrade'] = 'Your total grade in this activity is <strong>{$a}</strong>.';
 
 
 /* ***********  Help strings from here on ************ */
 
-$string['forcewhenoverlap_help'] = '
+$string['forcewhenoverlap_help']='
 <h3>Forcing slot creation when slots overlap</h3>
 <p>This setting determines how new slots will be handled if they overlap with other, already existing slots.</p>
 <p>If enabled, the overlapping existing slot will be deleted and the new slot created.</p>
 <p>If disabled, the overlapping existing slot will be kept and a new slot will <em>not</em> be created.</p>
 ';
-$string['forcewhenoverlap_link'] = 'mod/scheduler/conflict';
+
+$string['addscheduled_help']='
+<h3>Adding an appointment on slot setup</h3>
+<p>Using this link, you will add a user to the appointment list defined by this slot information. It may be a simple and fast way to setup a collective appointment. </p>';
 
 $string['appointmentmode'] = 'Setting the appointment mode';
-$string['appointmentmode_help'] = '<p>You may choose here some variants in the way appointments can be taken. </p>
+$string['appointmentmode_help']='<p>You may choose here some variants in the way appointments can be taken. </p>
 <p><ul>
 <li><strong>"<emph>n</emph> appointments in this scheduler":</strong> The student can only book a fixed number of appointments in this activity. Even if the teacher marks them as "seen", they will not be allowed to book further meetings. The only way to reset ability of a student to book is to delete the old "seen" records.</li>
 <li><strong>"<emph>n</emph> appointments at a time":</strong> The student can book a fixed number of appointments. Once the meeting is over and the teacher has marked the student as "seen", the student can book further appointments. However the student is limited to <emph>n</emph> "open" (unseen) slots at any given time.
@@ -482,22 +466,22 @@ $string['appointmentmode_help'] = '<p>You may choose here some variants in the w
 
 $string['appointagroup_help'] = 'Choose whether you want to make the appointment only for yourself, or for an entire group.';
 
-$string['bookwithteacher_help'] = 'Choose a teacher for the appointment.';
+$string['bookwithteacher_help']='Choose a teacher for the appointment.';
 
-$string['choosingslotstart_help'] = 'Change (or choose) the appointment start time. If this appointment collides with some other slots, you\'ll be asked
+$string['choosingslotstart_help']='Change (or choose) the appointment start time. If this appointment collides with some other slots, you\'ll be asked
 if this slot replaces all conflicting appointments. Note that the new slot parameters will override all previous
 settings.';
 
-$string['exclusivity_help'] = '<p>You can set a limit on the number of students that can apply for a given slot. </p>
+$string['exclusivity_help']='<p>You can set a limit on the number of students that can apply for a given slot. </p>
 <p>Setting a limit of 1 (default) will mean that the slot is exclusive to a single student.</p>
 <p>Setting a limit of, e.g., 3  will mean that up to three students can book into the slot.</p>
 <p>If disabled, any number of students can book the slot; it will never be considered "full".</p>';
 
-$string['location_help'] = 'Specify the scheduled location of the meeting.';
+$string['location_help']='Specify the scheduled location of the meeting.';
 
-$string['notifications_help'] = 'When this option is enabled, teachers and students will receive notifications when appointments are applied for or cancelled.';
+$string['notifications_help']='When this option is enabled, teachers and students will receive notifications when appointments are applied for or cancelled.';
 
-$string['staffrolename_help'] = '
+$string['staffrolename_help']='
 The label for the role who attends students. This is not necessarily a "teacher".';
 
 $string['guardtime_help'] = 'A guard time prevents students from changing their booking shortly before the appointment.
@@ -543,7 +527,6 @@ with the student <strong><a href="{$a->attendee_url}">{$a->attendee}</a></strong
 <p><strong><span class="error">has been cancelled or moved</span></strong>.</p>';
 
 $string['email_reminder_subject'] = '{$a->course_short}: Appointment reminder';
-
 $string['email_reminder_plain'] = 'You have an upcoming appointment
 on {$a->date} from {$a->time} to {$a->endtime}
 with {$a->attendant}.
@@ -555,6 +538,20 @@ from <strong>{$a->time}</strong> to <strong>{$a->endtime}</strong><br/>
 with <strong><a href="{$a->attendant_url}">{$a->attendant}</a></strong>.</p>
 
 <p>Location: <strong>{$a->location}</strong></p>';
+
+$string['email_teacherreminder_subject'] = '{$a->course_short}: Appointment reminder';
+$string['email_teacherreminder_plain'] = 'You have an upcoming appointment
+on {$a->date} from {$a->time} to {$a->endtime}
+with {$a->attendee}.
+
+Location: {$a->location}';
+
+$string['email_teacherreminder_html'] = '<p>You have an upcoming appointment on <strong>{$a->date}</strong>
+from <strong>{$a->time}</strong> to <strong>{$a->endtime}</strong><br/>
+with <strong><a href="{$a->attendee_url}">{$a->attendee}</a></strong>.</p>
+
+<p>Location: <strong>{$a->location}</strong></p>';
+
 
 $string['email_teachercancelled_subject'] = '{$a->course_short}: Appointment cancelled by the teacher';
 
@@ -576,8 +573,7 @@ with the {$a->staffrole} <strong><a href="{$a->attendant_url}">{$a->attendant}</
 
 <p><strong><span class="error">has been cancelled</span></strong>. Please apply for a new slot.</p>';
 
-$string['email_invite_subject'] = 'Invitation: {$a->module}';
-$string['email_invite_html'] = '<p>Please choose a time slot for an appointment at:</p> <p>{$a->scheduler_url}</p>';
-
-$string['email_invitereminder_subject'] = 'Reminder: {$a->module}';
-$string['email_invitereminder_html'] = '<p>This is just a reminder that you have not yet set up your appointment. Please choose a time slot as soon as possible at:</p><p>{$a->scheduler_url}</p>';
+$string['completionappointmentsgroup'] = 'Require appoinments';
+$string['completionappointments'] = 'Has booked appointments, at least: ';
+$string['completionattendedgroup'] = 'Require attended';
+$string['completionattended'] = 'Has attended appointments, at least: ';

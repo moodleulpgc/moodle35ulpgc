@@ -476,8 +476,16 @@ $string['import_help'] = 'Permite importar datos de Tribunales de Examen desde u
 Los datos a importar pueden incluir los nombres es identificación del examen y el tribunal, 
 así como sus miembros, estudiantes examinados y, en su caso, tutores de los mismos. 
 
-El archivo importado debe contar con una primera file con título que datos se importan en esa columna.
+El archivo importado debe contar con una primera file con título que datos se importan en esa columna. 
+Los nombres de las columnas deben coincidir con los indicados en esta página más abajo.
+
+Las fechas y tiempos deben introducirse en un formato estándar ISO 8601 o RFC entendible por "strtotime". 
+Por ejemplo 01-02-2018 10:00 
+
+Las duraciones deben indicarse en horas, opcionalmenet con minutos y segundos, por ejemplo 2:30:05.
+
 ';
+$string['importedrecords'] = 'Procesados {$a} registros para importación o actualización.';
 $string['export'] = 'Exportar';
 $string['export_help'] = 'Permite exportar todos o algunso delos datos sobre Exámenes por Tribunal almacenados en este módulo. 
 
@@ -584,3 +592,11 @@ Puede consultar los detalles en el Campus virtual, en la actividad {$a->link}.
 ';
 $string['remindercontrolsubject'] = '[{$a->shortname}]: Resumen de recordatorios de Tribunal en {$a->modname}';
 $string['remindercontrolbody'] = 'Se han enviado {$a->count} recordatorios de participación en Tribunales para {$a->usertype} en {$a->modname}';
+$string['bulkaddexam'] = 'Agregar lote de exámenes';
+$string['bulkaddnum'] = 'Nº de exámenes a añadir';
+$string['bulkaddnum_help'] = 'Esta herramienta agregará una serie de exámenes denominados igual y numerados correlativamente. 
+
+Se debe indicar el número total de exámenes de exámenes a añadir en el lote y el primer número de la serie.
+';
+$string['bulkaddstart'] = 'Empezar en';
+$string['submitbulkaddexam'] = 'Agregar lote';

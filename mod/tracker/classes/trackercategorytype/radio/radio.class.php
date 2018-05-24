@@ -14,37 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package tracker
  * @author Clifford Tham
  * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
  *
  * A class implementing a radio button (exclusive choice) element
  */
-defined('MOODLE_INTERNAL') || die();
-
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class radioelement extends trackerelement {
 
-    public function __construct(&$tracker, $id = null, $used = false) {
+    function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
-        $this->set_options_from_db();
+        $this->setoptionsfromdb();
     }
 
-    public function view($issueid = 0) {
+    function view($issueid = 0) {
         $str = '';
 
-        $this->get_value($issueid);
+        $this->getvalue($issueid);
 
-        if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $this->options)) {
-            $str = format_string($this->options[$this->value]->description);
+        $optbynames = array();
+        foreach ($this->options as $opt) {
+            $optbynames[$opt->name] = format_string($opt->description);
+        }
+
+        if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $optbynames)) {
+            $str = $optbynames[$this->value];
         }
         return $str;
     }
 
-    public function edit($issueid = 0) {
-        $this->get_value($issueid);
+    function edit($issueid = 0) {
+        $this->getvalue($issueid);
         if (isset($this->options)) {
 
             $optbynames = array();
@@ -54,28 +60,22 @@ class radioelement extends trackerelement {
 
             foreach ($optbynames as $name => $option) {
                 if ($this->value == $name) {
-                    $attrs = array('type' => 'radio', 'name' => 'element'.$this->name, 'value' => $name, 'checked' => 'checked');
-                    echo html_writer::empty_tag('input', $attrs);
+                    echo html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'element'.$this->name, 'value' => $name, 'checked' => 'checked'));
                 } else {
-                    $attrs = array('type' => 'radio', 'name' => 'element'.$this->name, 'value' => $name);
-                    echo html_writer::empty_tag('input', $attrs);
+                    echo html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'element'.$this->name, 'value' => $name));
                 }
                 echo format_string($option);
-                echo $this->options_sep();
+                echo html_writer::empty_tag('br');
             }
         }
     }
 
-    public function options_sep() {
-        return html_writer::empty_tag('br');
-    }
-
-    public function add_form_element(&$mform) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
-
-            $mform->addElement('static', 'element'.$this->name.'_set', format_string($this->description));
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $mform->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->id);
+                $mform->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->name);
                 $mform->setType('element'.$this->name, PARAM_TEXT);
             }
             if (!empty($this->mandatory)) {
@@ -84,17 +84,17 @@ class radioelement extends trackerelement {
         }
     }
 
-    public function set_data(&$defaults, $issueid = 0) {
+    function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
             if (!empty($this->options)) {
-                $elmvalues = $this->get_value($issueid);
+                $elmvalues = $this->getvalue($issueid);
                 $values = explode(',', $elmvalues);
                 if (!empty($values)) {
                     foreach ($values as $v) {
                         if (array_key_exists($v, $this->options)) {
                             // Check option still exists.
-                            $elementname = "element{$this->name}";
-                            $defaults->$elementname = $v;
+                            $elementname = "element{$this->name}{$option->id}";
+                            $defaults->$elementname = 1;
                         }
                     }
                 }
@@ -102,11 +102,10 @@ class radioelement extends trackerelement {
         }
     }
 
-    public function form_process(&$data) {
+    function formprocess(&$data) {
         global $DB;
 
-        $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
-        if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {
+        if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid))) {
             $attribute = new StdClass();
             $attribute->trackerid = $data->trackerid;
             $attribute->issueid = $data->issueid;
@@ -115,7 +114,7 @@ class radioelement extends trackerelement {
 
         $elmname = 'element'.$this->name;
         $data->$elmname = optional_param($elmname, '', PARAM_TEXT);
-        $attribute->elementitemid = $data->$elmname; // In this case we have elementitem id or idlist.
+        $attribute->elementitemid = $data->$elmname; // in this case we have elementitem id or idlist
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
@@ -128,7 +127,7 @@ class radioelement extends trackerelement {
         }
     }
 
-    public function type_has_options() {
+    function type_has_options() {
         return true;
     }
 }

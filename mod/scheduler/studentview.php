@@ -3,16 +3,20 @@
 /**
  * Student scheduler screen (where students choose appointments).
  *
- * @package    mod_scheduler
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$appointgroup = optional_param('appointgroup', -1, PARAM_INT);
+$appointgroup = optional_param('appointgroup', 0, PARAM_INT);
 
 \mod_scheduler\event\booking_form_viewed::create_from_scheduler($scheduler)->trigger();
+
+// Clean all late slots (for everybody).
+$scheduler->free_late_unused_slots();
 
 $PAGE->set_docs_path('mod/scheduler/studentview');
 
@@ -20,32 +24,23 @@ $urlparas = array(
         'id' => $scheduler->cmid,
         'sesskey' => sesskey()
 );
-if ($appointgroup >= 0) {
+if ($appointgroup) {
     $urlparas['appointgroup'] = $appointgroup;
 }
 $actionurl = new moodle_url('/mod/scheduler/view.php', $urlparas);
 
 
 // General permissions check.
-require_capability('mod/scheduler:viewslots', $context);
-$canbook = has_capability('mod/scheduler:appoint', $context);
-$canseefull = has_capability('mod/scheduler:viewfullslots', $context);
+require_capability('mod/scheduler:appoint', $context);
 
 if ($scheduler->is_group_scheduling_enabled()) {
-    $mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $scheduler->bookingrouping, 'g.id, g.name');
-    if ($appointgroup > 0 && !array_key_exists($appointgroup, $mygroupsforscheduling)) {
-        throw new moodle_exception('nopermissions');
+    $mygroupsforscheduling = groups_get_all_groups($scheduler->courseid, $USER->id, $cm->groupingid, 'g.id, g.name'); // ecastro ULPGC user coursemodule grouping
+    if ($appointgroup && !array_key_exists($appointgroup, $mygroupsforscheduling)) {
+        throw new moodle_exception('nogroups'); // ecastro ULPGC
     }
 }
 
-if ($scheduler->is_group_scheduling_enabled()) {
-    $canbook = $canbook && ($appointgroup >= 0);
-} else {
-    $appointgroup = 0;
-}
-
-
-include($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
+include_once($CFG->dirroot.'/mod/scheduler/studentview.controller.php');
 
 echo $output->header();
 
@@ -77,15 +72,22 @@ if ($showowngrades) {
 // Print group selection menu if given.
 if ($scheduler->is_group_scheduling_enabled()) {
     $groupchoice = array();
-    if ($scheduler->is_individual_scheduling_enabled()) {
-        $groupchoice[0] = get_string('myself', 'scheduler');
-    }
     foreach ($mygroupsforscheduling as $group) {
         $groupchoice[$group->id] = $group->name;
     }
+    
+    $nothing = array(0 => get_string('myself', 'scheduler'));
+    if($scheduler->bookingrouping == 1) { // ecastro ULPGC this is force only groups
+        $nothing = false;
+    }
     $select = $output->single_select($actionurl, 'appointgroup', $groupchoice, $appointgroup,
-                                     array(-1 => 'choosedots'), 'appointgroupform');
+                                     $nothing, 'appointgroupform'); // ecastro ULPGC
     echo html_writer::div(get_string('appointforgroup', 'scheduler', $select), 'dropdownmenu');
+    if(!$appointgroup && !$nothing) { // ecastro ULPGC, ensure appointgroup has a value, even if not set from parent (not used select)
+        reset($groupchoice);
+        $appointgroup = key($groupchoice);
+        $actionurl->param('appointgroup', $appointgroup);
+    }
 }
 
 // Get past (attended) slots.
@@ -100,15 +102,13 @@ if (count($pastslots) > 0) {
         if ($pastslot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsresults', $context)) {
             $others = new scheduler_student_list($scheduler, true);
             foreach ($pastslot->get_appointments() as $otherapp) {
-                $othermark = $scheduler->get_gradebook_info($otherapp->studentid);
-                $gradehidden = !is_null($othermark) && ($othermark->hidden <> 0);
+                $gradehidden = ($scheduler->get_gradebook_info($otherapp->studentid)->hidden <> 0);
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id, false, !$gradehidden);
             }
         } else {
             $others = null;
         }
-        $hasdetails = $scheduler->uses_studentdata();
-        $slottable->add_slot($pastslot, $appointment, $others, false, false, $hasdetails);
+        $slottable->add_slot($pastslot, $appointment, $others);
     }
 
     echo $output->heading(get_string('attendedslots', 'scheduler'), 3);
@@ -135,14 +135,11 @@ if (count($upcomingslots) > 0) {
         } else {
             $others = null;
         }
-
-        $cancancel = $slot->is_in_bookable_period();
-        $canedit = $cancancel && $scheduler->uses_studentdata();
-        $canview = !$cancancel && $scheduler->uses_studentdata();
-        if ($scheduler->is_group_scheduling_enabled()) {
-            $cancancel = $cancancel && ($appointgroup >= 0);
+        if($action == 'editappointnote') { // ecastro ULPGC
+            $slotid = optional_param('slotid', 0, PARAM_INT);
+            $slot->appointmentnoteedit = ($slot->id == $slotid) ? 1 : 0;
         }
-        $slottable->add_slot($slot, $appointment, $others, $cancancel, $canedit, $canview);
+        $slottable->add_slot($slot, $appointment, $others, $slot->is_in_bookable_period());
     }
 
     echo $output->heading(get_string('upcomingslots', 'scheduler'), 3);
@@ -150,9 +147,9 @@ if (count($upcomingslots) > 0) {
 }
 
 $bookablecnt = $scheduler->count_bookable_appointments($USER->id, false);
-$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, $canseefull));
+$bookableslots = array_values($scheduler->get_slots_available_to_student($USER->id, false));
 
-if (!$canseefull && $bookablecnt == 0) {
+if ($bookablecnt == 0) {
     echo html_writer::div(get_string('canbooknofurtherappointments', 'scheduler'), 'studentbookingmessage');
 
 } else if (count($bookableslots) == 0) {
@@ -162,7 +159,7 @@ if (!$canseefull && $bookablecnt == 0) {
     echo html_writer::div($noslots, 'studentbookingmessage');
 
 } else {
-    // The student can book (or see) further appointments, and slots are available.
+    // The student can book further appointments, and slots are available.
     // Show the booking form.
 
     $booker = new scheduler_slot_booker($scheduler, $USER->id, $actionurl, $bookablecnt);
@@ -177,9 +174,8 @@ if (!$canseefull && $bookablecnt == 0) {
 
     for ($idx = $start; $idx < $end; $idx++) {
         $slot = $bookableslots[$idx];
-        $canbookthisslot = $canbook && ($bookablecnt != 0);
 
-        if (has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
+        if ($slot->is_groupslot() && has_capability('mod/scheduler:seeotherstudentsbooking', $context)) {
             $others = new scheduler_student_list($scheduler, false);
             foreach ($slot->get_appointments() as $otherapp) {
                 $others->add_student($otherapp, $otherapp->studentid == $USER->id);
@@ -191,21 +187,20 @@ if (!$canseefull && $bookablecnt == 0) {
         }
 
         // Check what to print as group information...
-        $remaining = $slot->count_remaining_appointments();
         if ($slot->exclusivity == 0) {
             $groupinfo = get_string('yes');
-        } else if ($slot->exclusivity == 1 && $remaining == 1) {
+        } else if ($slot->exclusivity == 1) {
             $groupinfo = get_string('no');
         } else {
+            $remaining = $slot->count_remaining_appointments();
             if ($remaining > 0) {
                 $groupinfo = get_string('limited', 'scheduler', $remaining.'/'.$slot->exclusivity);
             } else { // Group info should not be visible to students.
                 $groupinfo = get_string('complete', 'scheduler');
-                $canbookthisslot = false;
             }
         }
 
-        $booker->add_slot($slot, $canbookthisslot, false, $groupinfo, $others);
+        $booker->add_slot($slot, true, false, $groupinfo, $others);
     }
 
 
@@ -213,9 +208,7 @@ if (!$canseefull && $bookablecnt == 0) {
     $bookingmsg1 = get_string($msgkey, 'scheduler');
 
     $a = $bookablecnt;
-    if ($bookablecnt == 0) {
-        $msgkey = 'canbooknofurtherappointments';
-    } else if ($bookablecnt == 1) {
+    if ($bookablecnt == 1) {
         $msgkey = ($scheduler->schedulermode == 'oneonly') ? 'canbooksingleappointment' : 'canbook1appointment';
     } else if ($bookablecnt > 1) {
         $msgkey = 'canbooknappointments';
@@ -225,10 +218,8 @@ if (!$canseefull && $bookablecnt == 0) {
     $bookingmsg2 = get_string($msgkey, 'scheduler', $a);
 
     echo $output->heading(get_string('availableslots', 'scheduler'), 3);
-    if ($canbook) {
-        echo html_writer::div($bookingmsg1, 'studentbookingmessage');
-        echo html_writer::div($bookingmsg2, 'studentbookingmessage');
-    }
+    echo html_writer::div($bookingmsg1, 'studentbookingmessage');
+    echo html_writer::div($bookingmsg2, 'studentbookingmessage');
     if ($total > $pagesize) {
         echo $output->paging_bar($total, $offset, $pagesize, $actionurl, 'offset');
     }

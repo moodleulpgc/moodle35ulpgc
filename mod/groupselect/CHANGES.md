@@ -1,5 +1,8 @@
 # Changes for mod_groupselect
 
+## Version 3.15 (2018051900)
+*   Implemented interface of the privacy api for GDPR (moodle 3.5)
+
 ## Version 3.14 (2018031606)
 *   New settings to allow participants to join or leave groups
 *   Added navigation to manage groups for teachers

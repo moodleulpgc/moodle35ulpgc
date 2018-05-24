@@ -35,6 +35,7 @@ class runtasks extends \core\task\scheduled_task
     }
 
     public function execute() {
+        global $DB; // ecastro ULPGC
         $config = get_config('queue_cron');
 
         $tasks = $DB->get_recordset('task_adhoc', null, 0, $config->maxtasks);

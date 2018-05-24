@@ -830,7 +830,9 @@ function mod_studentquiz_get_question_types() {
  * @param stdClass $context of the studentquiz activity
  * @return true or exception
  */
-function mod_studentquiz_add_question_capabilities($context) {
+function mod_studentquiz_ensure_question_capabilities($context) {
+    global $CFG;
+
     $archtyperoles = array('student', 'teacher');
     $roles = array();
     foreach ($archtyperoles as $archtyperole) {
@@ -842,8 +844,14 @@ function mod_studentquiz_add_question_capabilities($context) {
         'moodle/question:add',
         'moodle/question:usemine',
         'moodle/question:viewmine',
-        'moodle/question:editmine');
+        'moodle/question:editmine'
+    );
+    if ($CFG->version >= 2018051700) { // Moodle 3.5+
+        $capabilities[] = 'moodle/question:tagmine';
+    }
     foreach ($capabilities as $capability) {
+        // TODO: Enforcing capabilities shouldn't be required that hard, but we had issues in unit-tests
+        // see https://travis-ci.org/frankkoch/moodle-mod_studentquiz/builds/381355375
         foreach ($roles as $role) {
             assign_capability($capability, CAP_ALLOW, $role->id, $context->id, false);
         }
@@ -913,9 +921,8 @@ function mod_studentquiz_migrate_old_quiz_usage($courseorigid=null) {
 
             // For each course we need to find the studentquizzes.
             // "up" section: Only get the topmost category of that studentquiz, which isn't "top" if that one exists
-            $DB->set_debug(false);
             $studentquizzes = $DB->get_records_sql('
-                select s.id, s.name, cm.id as cmid, c.id as contextid, qc.id as categoryid
+                select s.id, s.name, cm.id as cmid, c.id as contextid, qc.id as categoryid, qc.name as categoryname, qc.parent
                 from {studentquiz} s
                 inner join {course_modules} cm on s.id = cm.instance
                 inner join {context} c on cm.id = c.instanceid
@@ -925,7 +932,7 @@ function mod_studentquiz_migrate_old_quiz_usage($courseorigid=null) {
                 where m.name = :modulename
                 and cm.course = :course
                 and (
-                    qc.name = :topname1
+                    up.name = :topname1
 	                or (
 	                    up.id is null
 	                    and qc.name <> :topname2

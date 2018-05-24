@@ -469,7 +469,14 @@ $string['import_help'] = 'Allows to import Examination data in a CSV file.
 Data to import may include Exam and Committee names, dates and users (teachers examines, students or even tutors.
 
 The imported file must contain a first row with titles defining data contained in that column.
+Column names must match exactly with those indicated below in this page.
+
+Dates must be specified in an ISO 8601 o RFC standar format parseable by "strtotime". 
+For instance  02/01/2018 10:00 is Feb 01.
+
+Duration must be specified in hours, optionally with minutes ansd seconds, e.g. 2:30:05.
 ';
+$string['importedrecords'] = 'Processed {$a} records for import/update.';
 $string['export'] = 'Export';
 $string['export_help'] = 'Allows to export all or some data about examinations stored in Examboard modeule.';
 $string['fixedfields'] = 'Mandatory items';
@@ -572,6 +579,12 @@ You may check the details in the activity {$a->link}.
 ';
 $string['remindercontrolsubject'] = '[{$a->shortname}]: Reminders summary for {$a->modname}';
 $string['remindercontrolbody'] = 'Have been issued {$a->count} reminders to {$a->usertype} in {$a->modname}';
+$string['bulkaddexam'] = 'Add Exam series';
+$string['bulkaddnum'] = 'Number exams to add';
+$string['bulkaddnum_help'] = 'This tool will add a series of numbered exams with correlative numbers. 
 
-
-
+Total number of exams to add and the number of the first added exam need to be indicated.
+';
+$string['bulkaddstart'] = 'Starting no';
+$string['submitbulkaddexam'] = 'Add series';
+$string['visibility_explain'] = 'Hidden items are inactive, visible only for managers.';

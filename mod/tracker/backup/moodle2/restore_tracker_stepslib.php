@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define all the restore steps that will be used by the restore_url_activity_task
- *
- * @package     mod
- * @subpackage  tracker
- * @copyright   2010 onwards Valery Fremaux (valery.freamux@club-internet.fr)
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod-tracker
+ * @copyright 2010 onwards Valery Fremaux (valery.freamux@club-internet.fr)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Define all the restore steps that will be used by the restore_url_activity_task
+ */
 
 /**
  * Structure step to restore one tracker activity
@@ -38,25 +39,27 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $paths[] = $tracker;
         $elements = new restore_path_element('tracker_element', '/activity/tracker/elements/element');
         $paths[] = $elements;
-        $path = '/activity/tracker/elements/element/elementitems/elementitem';
-        $elementitem = new restore_path_element('tracker_elementitem', $path);
+        $elementitem = new restore_path_element('tracker_elementitem', '/activity/tracker/elements/element/elementitems/elementitem');
         $paths[] = $elementitem;
         $usedelement = new restore_path_element('tracker_usedelement', '/activity/tracker/usedelements/usedelement');
         $paths[] = $usedelement;
+        $translation = new restore_path_element('tracker_translation', '/activity/tracker/translations/translation');
+        $paths[] = $translation;
 
-        if ($userinfo) {
-            $paths[] = new restore_path_element('tracker_issue', '/activity/tracker/issues/issue');
-            $paths[] = new restore_path_element('tracker_issueattribute', '/activity/tracker/issues/issue/attribs/attrib');
-            $paths[] = new restore_path_element('tracker_issuecc', '/activity/tracker/issues/issue/ccs/cc');
-            $paths[] = new restore_path_element('tracker_issuecomment', '/activity/tracker/issues/issue/comments/comment');
-            $paths[] = new restore_path_element('tracker_issueownership', '/activity/tracker/issues/issue/ownerships/ownership');
-            $paths[] = new restore_path_element('tracker_state_change', '/activity/tracker/issues/issue/statechanges/state');
-            $paths[] = new restore_path_element('tracker_issuedependancy', '/activity/tracker/dependancies/dependancy');
-            $paths[] = new restore_path_element('tracker_query', '/activity/tracker/queries/query');
-            $paths[] = new restore_path_element('tracker_preferences', '/activity/tracker/preferences/preference');
+
+        if ($userinfo){
+	        $paths[] = new restore_path_element('tracker_issue', '/activity/tracker/issues/issue');
+	        $paths[] = new restore_path_element('tracker_issueattribute', '/activity/tracker/issues/issue/attribs/attrib');
+	        $paths[] = new restore_path_element('tracker_issuecc', '/activity/tracker/issues/issue/ccs/cc');
+	        $paths[] = new restore_path_element('tracker_issuecomment', '/activity/tracker/issues/issue/comments/comment');
+	        $paths[] = new restore_path_element('tracker_issueownership', '/activity/tracker/issues/issue/ownerships/ownership');
+	        $paths[] = new restore_path_element('tracker_state_change', '/activity/tracker/issues/issue/statechanges/state');
+	        $paths[] = new restore_path_element('tracker_issuedependancy', '/activity/tracker/dependancies/dependancy');
+	        $paths[] = new restore_path_element('tracker_query', '/activity/tracker/queries/query');
+	        $paths[] = new restore_path_element('tracker_preferences', '/activity/tracker/preferences/preference');
         }
 
-        // Return the paths wrapped into standard activity structure.
+        // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
 
@@ -69,29 +72,29 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        // Insert the label record.
+        // insert the label record
         $newitemid = $DB->insert_record('tracker', $data);
-        // Immediately after inserting "activity" record, call this.
+        // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
 
     protected function after_execute() {
-        global $DB;
+    	global $DB;
 
-        // Remap element used to real values.
-        if ($used = $DB->get_records('tracker_elementused', array('trackerid' => $this->get_new_parentid('tracker')))) {
-            foreach ($used as $u) {
-                $u->elementid = $this->get_mappingid('tracker_element', $u->elementid);
-                $DB->update_record('tracker_elementused', $u);
-            }
-        }
+    	// remap element used to real values
+		if ($used = $DB->get_records('tracker_elementused', array('trackerid' => $this->get_new_parentid('tracker')))){
+			foreach($used as $u){
+		        $u->elementid = $this->get_mappingid('tracker_element', $u->elementid);
+		        $DB->update_record('tracker_elementused', $u);
+		     }
+		}
 
-        // Add tracker related files, no need to match by itemname (just internally handled context).
+        // Add tracker related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_tracker', 'intro', null);
     }
 
     protected function process_tracker_element($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -100,11 +103,11 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_element', $data);
-        $this->set_mapping('tracker_element', $oldid, $newitemid, false); // Has no related files.
+        $this->set_mapping('tracker_element', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_elementitem($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -113,11 +116,11 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_elementitem', $data);
-        $this->set_mapping('tracker_elementitem', $oldid, $newitemid, false); // Has no related files.
+        $this->set_mapping('tracker_elementitem', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_usedelement($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -125,22 +128,27 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->trackerid = $this->get_new_parentid('tracker');
         $data->canbemodifiedby = $this->get_mappingid('user', $data->canbemodifiedby);
 
-        /*
-         * If the used element addresses a local element backuped in the tracker
-         * remap the element and store it. Otherwise forget it.
-         */
-        $newlocalelementid = $this->get_mappingid('tracker_element', $data->elementid);
-        if ($newlocalelementid) {
-            $data->elementid = $newlocalelementid;
-
-            // The data is actually inserted into the database later in inform_new_usage_id.
-            $newitemid = $DB->insert_record('tracker_elementused', $data);
-            $this->set_mapping('tracker_elementused', $oldid, $newitemid, false); // Has no related files.
-        }
+        // The data is actually inserted into the database later in inform_new_usage_id.
+        $newitemid = $DB->insert_record('tracker_elementused', $data);
+        $this->set_mapping('tracker_elementused', $oldid, $newitemid, false); // Has no related files
     }
 
-    protected function process_tracker_issue($data) {
+    protected function process_tracker_translation($data) {
         global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->trackerid = $this->get_new_parentid('tracker');
+
+        // The data is actually inserted into the database later in inform_new_usage_id.
+        $newitemid = $DB->insert_record('tracker_translation', $data);
+        $this->set_mapping('tracker_translation', $oldid, $newitemid, false); // Has no related files
+    }
+
+
+    protected function process_tracker_issue($data) {
+    	global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -151,9 +159,11 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->assignedto = $this->get_mappingid('user', $data->assignedto);
         $data->bywhomid = $this->get_mappingid('user', $data->bywhomid);
 
+        // $data->timemodified = $this->apply_date_offset($data->timemodified);
+
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issue', $data);
-        $this->set_mapping('tracker_issue', $oldid, $newitemid, false); // Has no related files.
+        $this->set_mapping('tracker_issue', $oldid, $newitemid, false); // Has no related files
 
         $this->add_related_files('mod_tracker', 'issuecomment', 'tracker_issue', null, $oldid);
         $this->add_related_files('mod_tracker', 'issuedescription', 'tracker_issue', null, $oldid);
@@ -161,7 +171,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issueattribute($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -170,23 +180,19 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->issueid = $this->get_new_parentid('issue');
 
         $data->elementid = $this->get_mappingid('tracker_element', $data->elementid);
+        $data->elementitemid = $this->get_mappingid('tracker_elementitem', $data->elementitemid);
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        // Discard all attributes related to non local elements.
-        if ($data->elementid) {
-            $data->elementitemid = $this->get_mappingid('tracker_elementitem', $data->elementitemid);
-            $data->timemodified = $this->apply_date_offset($data->timemodified);
+        // The data is actually inserted into the database later in inform_new_usage_id.
+        $newitemid = $DB->insert_record('tracker_issueattribute', $data);
+        // needs no mapping as terminal record
+        $this->set_mapping('tracker_issueattribute', $oldid, $newitemid, false); // Has no related files
 
-            // The data is actually inserted into the database later in inform_new_usage_id.
-            $newitemid = $DB->insert_record('tracker_issueattribute', $data);
-            // Needs no mapping as terminal record.
-            $this->set_mapping('tracker_issueattribute', $oldid, $newitemid, false); // Has no related files.
-
-            $this->add_related_files('mod_tracker', 'issueattribute', 'tracker_issueattribute', null, $oldid);
-        }
+        $this->add_related_files('mod_tracker', 'issueattribute', 'tracker_issueattribute', null, $oldid);
     }
 
     protected function process_tracker_issuecc($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
@@ -198,10 +204,12 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issuecc', $data);
+        // needs no mapping as terminal record
+        // $this->set_mapping('tracker_issuecc', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_issuecomment($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
@@ -213,14 +221,14 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issuecomment', $data);
-        // Needs no mapping as terminal record.
-        $this->set_mapping('tracker_issuecomment', $oldid, $newitemid, false); // Has no related files.
+        // needs no mapping as terminal record
+        $this->set_mapping('tracker_issuecomment', $oldid, $newitemid, false); // Has no related files
 
         $this->add_related_files('mod_tracker', 'issuecomment', 'tracker_issuecomment', null, $oldid);
     }
 
     protected function process_tracker_issuedependancy($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
@@ -230,11 +238,12 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issuedependancy', $data);
-        // Needs no mapping as terminal record.
+        // needs no mapping as terminal record
+        // $this->set_mapping('tracker_issuedependancy', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_issueownership($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
@@ -245,11 +254,12 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issueownership', $data);
-        // Needs no mapping as terminal record.
+        // needs no mapping as terminal record
+        // $this->set_mapping('tracker_ownership', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_preferences($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
@@ -258,24 +268,32 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_preferences', $data);
-        // Needs no mapping as terminal record.
+        // needs no mapping as terminal record
+        // $this->set_mapping('tracker_preferences', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_query($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
         $data->trackerid = $this->get_new_parentid('tracker');
         $data->userid = $this->get_mappingid('user', $data->userid);
+        if(!isset($data->fieldnames)) { // ecastro ULPGC
+            $data->fieldnames = '';
+        }
+        if(!isset($data->fieldvalues)) {
+            $data->fieldvalues = '';
+        }
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_query', $data);
-        // Needs no mapping as terminal record.
+        // needs no mapping as terminal record
+        // $this->set_mapping('tracker_query', $oldid, $newitemid, false); // Has no related files
     }
 
     protected function process_tracker_state_change($data) {
-        global $DB;
+    	global $DB;
 
         $data = (object)$data;
 
@@ -285,7 +303,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_state_change', $data);
-        // Needs no mapping as terminal record.
+        // needs no mapping as terminal record
+        // $this->set_mapping('tracker_state_change', $oldid, $newitemid, false); // Has no related files
     }
 
 }

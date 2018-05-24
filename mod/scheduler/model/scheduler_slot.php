@@ -3,10 +3,12 @@
 /**
  * A class for representing a scheduler slot.
  *
- * @package    mod_scheduler
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2011 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -15,23 +17,15 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*/
 class scheduler_slot extends mvc_child_record_model {
 
-    /**
-     * @var mvc_child_list list of appointments in this slot
-     */
     protected $appointments;
 
     protected function get_table() {
         return 'scheduler_slots';
     }
 
-    /**
-     * Create a new slot in a specific scheduler
-     *
-     * @param scheduler_instance $scheduler
-     */
     public function __construct(scheduler_instance $scheduler) {
         parent::__construct();
         $this->data = new stdClass();
@@ -52,6 +46,16 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
+     * Create a scheduler slot from an already loaded record
+     */
+    /*  public static function load_from_record(stdClass $record, scheduler_instance $scheduler) {
+     $slot = new scheduler_slot($scheduler);
+    $slot->data = $record;
+    return $slot;
+    }
+
+    */
+    /**
      * Save any changes to the database
      */
     public function save() {
@@ -61,76 +65,13 @@ class scheduler_slot extends mvc_child_record_model {
         $this->update_calendar();
     }
 
-    /**
-     * Sets appointment-related data (grade, comments) for all student in this slot.
-     *
-     * @param scheduler_appointment $template appointment from which the data will be read
-     */
-    public function distribute_appointment_data(scheduler_appointment $template) {
-        $scheduler = $this->get_scheduler();
-        foreach ($this->appointments->get_children() as $appointment) {
-            if ($appointment->id != $template->id) {
-                if ($scheduler->uses_grades()) {
-                    $appointment->grade = $template->grade;
-                }
-                if ($scheduler->uses_appointmentnotes()) {
-                    $appointment->appointmentnote = $template->appointmentnote;
-                    $appointment->appointmentnoteformat = $template->appointmentnoteformat;
-                    $this->distribute_file_area('appointmentnote', $template->id, $appointment->id);
-                }
-                if ($scheduler->uses_teachernotes()) {
-                    $appointment->teachernote = $template->teachernote;
-                    $appointment->teachernoteformat = $template->teachernoteformat;
-                    $this->distribute_file_area('teachernote', $template->id, $appointment->id);
-                }
-                $appointment->save();
-            }
-        }
-    }
 
-    /**
-     * Distribute plugin files from a source to a target id within a file area
-     *
-     * @param unknown $area
-     * @param unknown $sourceid
-     * @param unknown $targetid
-     */
-    private function distribute_file_area($area, $sourceid, $targetid) {
-
-        if ($sourceid == $targetid) {
-            return;
-        }
-
-        $fs = get_file_storage();
-        $component = 'mod_scheduler';
-        $ctxid = $this->get_scheduler()->context->id;
-
-        // Delete old files in the target area.
-        $files = $fs->get_area_files($ctxid, $component, $area, $targetid);
-        foreach ($files as $f) {
-            $f->delete();
-        }
-
-        // Copy files from the source to the target.
-        $files = $fs->get_area_files($ctxid, $component, $area, $sourceid);
-        foreach ($files as $f) {
-            $fs->create_file_from_storedfile(array('itemid' => $targetid), $f);
-        }
-    }
-
-    /**
-     * Retrieve the scheduler associated with this appointment.
-     *
-     * @return scheduler_instance the scheduler
-     */
     public function get_scheduler() {
         return $this->get_parent();
     }
 
     /**
      * Return the teacher object
-     *
-     * @return stdClass
      */
     public function get_teacher() {
         global $DB;
@@ -141,21 +82,18 @@ class scheduler_slot extends mvc_child_record_model {
         }
     }
 
+
     /**
      * Return the end time of the slot
-     *
-     * @return int
      */
     public function get_endtime() {
-        return $this->data->starttime + $this->data->duration * MINSECS;
+        return $this->data->starttime + $this->data->duration*MINSECS;
     }
 
     /**
      * Is this slot bookable in its bookable period for students.
      * This checks for the availability time of the slot and for the "guard time" restriction,
      * but not for the number of actualy booked appointments.
-     *
-     * @return boolean
      */
     public function is_in_bookable_period() {
         $available = $this->hideuntil <= time();
@@ -165,19 +103,12 @@ class scheduler_slot extends mvc_child_record_model {
 
     /**
      * Is this a group slot (i.e., more than one student is permitted)
-     *
-     * @return boolean
      */
     public function is_groupslot() {
         return (boolean) !($this->data->exclusivity == 1);
     }
 
 
-    /**
-     * Count the number of appointments in this slot
-     *
-     * @return int
-     */
     public function get_appointment_count() {
         return $this->appointments->get_child_count();
     }
@@ -202,8 +133,6 @@ class scheduler_slot extends mvc_child_record_model {
 
     /**
      * Has the slot been attended?
-     *
-     * @return boolean
      */
     public function is_attended() {
         $isattended = false;
@@ -215,8 +144,6 @@ class scheduler_slot extends mvc_child_record_model {
 
     /**
      * Has the slot been booked by a specific student?
-     *
-     * @return boolean
      */
     public function is_booked_by_student($studentid) {
         $result = false;
@@ -226,16 +153,16 @@ class scheduler_slot extends mvc_child_record_model {
         return $result;
     }
 
-    /**
-     * Count the remaining free appointments in this slot
-     *
-     * @return int
-     */
     public function count_remaining_appointments() {
         if ($this->exclusivity == 0) {
             return -1;
         } else {
-            $rem = $this->exclusivity - $this->get_appointment_count();
+            $scheduler = $this->get_parent();
+            if($scheduler->bookingrouping == 1) { // ecastro ULPGC if only groups, count groups, noy single students
+                $rem = $this->exclusivity - $this->get_group_appointment_count();
+            } else {
+                $rem = $this->exclusivity - $this->get_appointment_count();
+            }
             if ($rem < 0) {
                 $rem = 0;
             }
@@ -244,9 +171,21 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
+     *  Get the number of different groups that haves group-appointment in this scheduler
+     */
+    public function get_group_appointment_count() { // ecastro ULPGC
+        $groups = array();
+        $appointments = $this->appointments->get_children();
+        foreach($appointments as $appointment) {
+            if($appointment->groupid) {
+                $groups[$appointment->groupid] = $appointment->groupid;
+            }
+        }
+        return count($groups);
+    }
+
+    /**
      *  Get an appointment by ID
-     *
-     *  @return scheduler_appointment
      */
     public function get_appointment($id) {
         return $this->appointments->get_child_by_id($id);
@@ -254,8 +193,6 @@ class scheduler_slot extends mvc_child_record_model {
 
     /**
      *  Get an array of all appointments
-     *
-     *  @return array
      */
     public function get_appointments($userfilter = null) {
         $apps = $this->appointments->get_children();
@@ -270,9 +207,27 @@ class scheduler_slot extends mvc_child_record_model {
     }
 
     /**
+     *  Get an array of group appointments
+     */
+    public function get_group_appointments() { // ecastro ULPGC
+        global $DB;
+        $groups = array();
+        $appointments = $this->appointments->get_children();
+        foreach($appointments as $appointment) {
+            if($appointment->groupid) {
+                $groups[$appointment->groupid] = $appointment->groupid;
+            }
+        }
+
+        if($groups) {
+            list($insql, $params) = $DB->get_in_or_equal(array_keys($groups));
+            $groups = $DB->get_records_select_menu('groups', "id $insql", $params,  ' name ASC', 'id, name' );
+        }
+        return $groups;
+    }
+
+    /**
      * Create a new appointment relating to this slot.
-     *
-     * @return scheduler_appointment
      */
     public function create_appointment() {
         return $this->appointments->create_child();
@@ -280,11 +235,10 @@ class scheduler_slot extends mvc_child_record_model {
 
     /**
      * Remove an appointment from this slot.
-     *
-     * @param scheduler_appointment $app
      */
     public function remove_appointment($app) {
         $this->appointments->remove_child($app);
+        $this->clear_calendar($app); // ecastro ULPGC
     }
 
     public function delete() {
@@ -301,42 +255,52 @@ class scheduler_slot extends mvc_child_record_model {
     * are bigger than 7 digits in length...
     */
 
-    /**
-     * Get the id string for teacher events in this slot
-     * @return string
-     */
     private function get_teacher_eventtype() {
         $slotid = $this->get_id();
         $courseid = $this->get_parent()->get_courseid();
         return "SSsup:{$slotid}:{$courseid}";
     }
 
-    /**
-     * Get the id string for student events in this slot
-     * @return string
-     */
+
     private function get_student_eventtype() {
         $slotid = $this->get_id();
         $courseid = $this->get_parent()->get_courseid();
         return "SSstu:{$slotid}:{$courseid}";
     }
 
-    /**
-     * Remove all calendar events related to this slot from the DB
-     *
-     * @uses $DB
-     */
-    private function clear_calendar() {
-        global $DB;
-        $DB->delete_records('event', array('eventtype' => $this->get_teacher_eventtype()));
-        $DB->delete_records('event', array('eventtype' => $this->get_student_eventtype()));
+    private function get_group_eventtype($groupid = 0) { // ecastro ULPGC
+        $slotid = $this->get_id();
+        $courseid = $this->get_parent()->get_courseid();
+        return "group:$groupid:{$slotid}:{$courseid}";
     }
 
-    /**
-     * Update calendar events related to this slot
-     *
-     * @uses $DB
-     */
+    private function clear_calendar($app = false) {
+        global $DB;
+        $slotid = $this->get_id();
+        $courseid = $this->get_parent()->get_courseid();
+        $instanceid = $this->get_parent_id();
+        $eventtype = "%:{$slotid}:{$courseid}";
+        $select = $DB->sql_like('eventtype', '?').' AND instance = ? AND modulename = ? ';
+        $params = array($eventtype, $instanceid, 'scheduler');
+        if($app) {
+            if($app->groupid) {
+                $select .= ' AND groupid = ? ';
+                $params[] = $app->groupid;
+            } else {
+                $user = ' userid = ? ';
+                $params[] = $app->studentid;
+                $apps = $this->get_appointment_count();
+                if($apps == 1) {
+                    $user .= " OR userid = ? ";
+                    $params[] =  $this->data->teacherid;
+                }
+                $select .= " AND ( $user ) ";
+            }
+        }
+
+        $DB->delete_records_select('event', $select, $params);
+    }
+
     private function update_calendar() {
 
         global $DB;
@@ -346,9 +310,15 @@ class scheduler_slot extends mvc_child_record_model {
         $myappointments = $this->appointments->get_children();
 
         $studentids = array();
+        $groupids = array(); // ecastro ULPGC
         foreach ($myappointments as $appointment) {
             if (!$appointment->is_attended()) {
-                $studentids[] = $appointment->studentid;
+                //$studentids[] = $appointment->studentid;
+                if($appointment->groupid) { // ecastro ULPGC
+                    $groupids[$appointment->groupid] = $appointment->groupid; // ecastro avoid duplicates
+                } else {
+                    $studentids[$appointment->studentid] = $appointment->studentid; // ecastro avoid duplicates
+                }
             }
         }
 
@@ -356,7 +326,13 @@ class scheduler_slot extends mvc_child_record_model {
         $students = $DB->get_records_list('user', 'id', $studentids);
         $studentnames = array();
         foreach ($students as $student) {
-            $studentnames[] = fullname($student);
+            $studentnames[$student->id] = fullname($student);
+        }
+
+        $groupnames = array();
+        $groups = $DB->get_records_list('groups', 'id', $groupids); // ecastro ULPGC to allow group events
+        foreach ($groups as $group) {
+            $groupnames[$group->id] = format_string($group->name);
         }
 
         $schedulername = $scheduler->get_name(true);
@@ -366,7 +342,7 @@ class scheduler_slot extends mvc_child_record_model {
         $courseid = $scheduler->get_courseid();
 
         $baseevent = new stdClass();
-        $baseevent->description = "$schedulername<br/><br/>$schedulerdescription";
+        $baseevent->description = "$schedulername<br/><br/>{$this->notes}<br/><br/>{$this->appointmentnote}   "; // ecastro ULPGC
         $baseevent->format = 1;
         $baseevent->modulename = 'scheduler';
         $baseevent->courseid = 0;
@@ -387,30 +363,28 @@ class scheduler_slot extends mvc_child_record_model {
 
         $teacherids = array();
         $teacherevent = clone($baseevent);
+        $teachereventname = get_string('meetingwith', 'scheduler'); // ecastro ULPGC
         if (count($studentids) > 0) {
             $teacherids[] = $teacher->id;
             if (count($studentids) > 1) {
-                $teachereventname = get_string('meetingwithplural', 'scheduler').' '.
-                                get_string('students', 'scheduler').', '.implode(', ', $studentnames);
+                $teachereventname = get_string('meetingwithplural', 'scheduler').' '.get_string('students', 'scheduler');
+                $teacherevent->description .= '<br/><br/>'.get_string('students', 'scheduler').', '.implode(', ', $studentnames);
             } else {
                 $teachereventname = get_string('meetingwith', 'scheduler').' '.
-                                get_string('student', 'scheduler').', '.$studentnames[0];
+                                get_string('student', 'scheduler').', '.reset($studentnames);
             }
             $teacherevent->name = shorten_text($teachereventname, 200);
         }
 
+        if($studentids) { 
         $this->update_calendar_events( $this->get_teacher_eventtype(), $teacherids, $teacherevent);
+        }
+
+        $this->update_calendar_events($this->get_group_eventtype(), array(), $teacherevent, $groupnames); // ecastro ULPGC
 
     }
 
-    /**
-     * Update a certain type of calendat events related to this slot.
-     *
-     * @param string $eventtype
-     * @param array $userids users to assign to the event
-     * @param stdClass $eventdata dertails of the event
-     */
-    private function update_calendar_events($eventtype, array $userids, stdClass $eventdata) {
+    private function update_calendar_events($eventtype, array $userids, $eventdata, $groupnames = array()) { // ecastro ULPGC allow group events
 
         global $CFG, $DB;
         require_once($CFG->dirroot.'/calendar/lib.php');
@@ -420,6 +394,7 @@ class scheduler_slot extends mvc_child_record_model {
         $existingevents = $DB->get_records('event', array('modulename' => 'scheduler', 'eventtype' => $eventtype));
         $handledevents = array();
         $handledusers = array();
+        $handledgroups = array(); // ecastro ULPGC
 
         // Update existing calendar events.
         foreach ($existingevents as $eventid => $existingdata) {
@@ -441,6 +416,47 @@ class scheduler_slot extends mvc_child_record_model {
             }
         }
 
+    // ecastro ULPGC
+        $groupevents = array();
+        foreach ($groupnames as $groupid => $groupname) { // ecastro ULPGC
+            $eventtype = $this->get_group_eventtype($groupid);
+            $groupevents = $groupevents + $DB->get_records('event', array('modulename' => 'scheduler', 'eventtype' => $eventtype));
+        }
+
+        $existingevents = $existingevents + $groupevents;
+        $scheduler = $this->get_parent();
+        $courseid = $scheduler->get_courseid();
+        // Update existing calendar GROUP events.
+        foreach ($groupevents as $eventid => $existingdata) {
+            if (in_array($existingdata->groupid, array_keys($groupnames))) {
+                $eventdata->groupid = $existingdata->groupid;
+                $eventdata->courseid = $courseid;
+                $calendarevent = calendar_event::load($existingdata);
+                $calendarevent->update($eventdata, false);
+                $handledevents[] = $eventid;
+                $handledgroups[] = $existingdata->groupid;
+            }
+        }
+
+        // Add new calendar GROUP events.
+        $context = context_course::instance($courseid);
+        $url = new moodle_url('/user/index.php', array('contextid'=>$context->id, 'group'=>0));
+        ///user/index.php?contextid=1400&roleid=0&id=5&perpage=20&accesssince=0&search=&group=209
+        foreach ($groupnames as $groupid => $groupname) { // ecastro ULPGC
+            if (!in_array($groupid, $handledgroups)) {
+                $thisevent = clone($eventdata);
+                $thisevent->name =  get_string('meetingwith', 'scheduler').' '.get_string('group').' '.$groupname;
+                $eventdata->eventtype = $this->get_group_eventtype($groupid);
+                $url->param('group', $groupid);
+                $thisevent->description .= '<br/><br/>'.html_writer::link($url, $groupname);
+                $thisevent->userid = 0;
+                $thisevent->groupid = $groupid;
+                $thisevent->courseid = $courseid;
+                calendar_event::create($thisevent, false);
+            }
+        }
+    // ecastro ULPGC
+
         // Remove old, obsolete calendar events.
         foreach ($existingevents as $eventid => $existingdata) {
             if (!in_array($eventid, $handledevents)) {
@@ -454,14 +470,9 @@ class scheduler_slot extends mvc_child_record_model {
 
 }
 
-/**
- * A factory class for scheduler slots.
- *
- * @copyright  2011 Henning Bostelmann and others (see README.txt)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class scheduler_slot_factory extends mvc_child_model_factory {
     public function create_child(mvc_record_model $parent) {
         return new scheduler_slot($parent);
     }
 }
+

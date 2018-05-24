@@ -4,6 +4,24 @@ moodle-theme_boost_campus
 Changes
 -------
 
+### Release v3.5-r1
+
+* 2018-05-23 - Improved footer blocks feature to only use the chosen columns as the region in the config.
+* 2018-05-17 - Fixed section0title setting.
+* 2018-05-17 - Added upgrade.php to handle all settings changes correctly.
+* 2018-05-15 - Changes to navdrawerfullwidth setting (corrections and removing code because MDL-61411 is integrated into core).
+* 2018-05-16 - Minor improvement to block controls for footer blocks.
+* 2018-05-16 - Fixed imagearea setting due to changes in Moodle core.
+* 2018-05-16 - Fixed CSS rules for block icons due to changes in the classes in Moodle core.
+* 2018-05-15 - Fixed setting for footnote due to changes in Moodle core.
+* 2018-05-15 - Fixed setting for dark navbar due to changes in Moodle core.
+* 2018-05-15 - Adjusted core renderer method full_header due to changes in Boost and added own version of header mustache.
+* 2018-05-14 - Adjusted improved mustache templates due to changes in the original templates.
+* 2018-05-14 - Removed setting to show icons in the navdrawer due to integration of MDL-61298 into the core.
+* 2018-05-14 - Made changes to nav drawer HTML structure undone due to integration of MDL-61343 into the core.
+* 2018-05-14 - Changed used SCSS variable name due to renaming of variables by Moodle.
+* 2018-05-14 - Check compatibility for Moodle 3.5, no functionality change.
+
 ### Release v3.4-r5
 
 * 2018-05-17 - Add missing PHPDoc to make codechecker happier.

@@ -57,6 +57,12 @@ function theme_boost_campus_get_main_scss_content($theme) {
     $pre = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/pre.scss');
     // Post CSS - this is loaded AFTER the main scss but before the extra scss from the setting.
     $post = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/post.scss');
+    
+    // Load ULPGC specific css 
+    // load moove _blocks
+    $blocks = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_blocks.scss');
+    $post .= "\n". $blocks;
+    
 
     // Combine them together.
     return $pre . "\n" . $scss . "\n" . $post;
@@ -99,8 +105,7 @@ function theme_boost_campus_get_pre_scss($theme) {
         'incoursesettingsswitchtorole' => ['incoursesettingsswitchtorole'],
         'hidefooteronloginpage' => ['hidefooteronloginpage'],
         'footerhideusertourslink' => ['footerhideusertourslink'],
-        'navdrawericons' => ['navdrawericons'],
-        'nawdrawerfullwidth' => ['nawdrawerfullwidth']
+        'navdrawerfullwidth' => ['navdrawerfullwidth']
         // MODIFICATION END.
     ];
 
@@ -176,16 +181,4 @@ function theme_boost_campus_reset_app_cache() {
     // To be safe and because there can only be one callback function added to a plugin setting,
     // we also delete the complete theme cache here.
     theme_reset_all_caches();
-}
-
-/**
- * Get icon mapping for font-awesome.
- */
-function theme_boost_campus_get_fontawesome_icon_map() {
-    return [
-        'core:i/course' => 'fa-graduation-cap',
-        'core:i/home' => 'fa-home',
-        'core:i/privatefiles' => 'fa-file-o',
-        'core:i/section' => 'fa-folder-o'
-    ];
 }

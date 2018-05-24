@@ -1,12 +1,13 @@
 <?php
-
 /**
  * Base class for appointment-based events.
  *
- * @package    mod_scheduler
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 
 namespace mod_scheduler\event;
 
@@ -15,23 +16,15 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_scheduler abstract base event class for appointment-based events.
  *
+ * @package    mod
+ * @subpackage scheduler
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class appointment_base extends \core\event\base {
 
-
-    /**
-     * @var \scheduler_appointment the appointment associated with this event
-     */
     protected $appointment;
 
-    /**
-     * Return the base data fields for an appointment
-     *
-     * @param \scheduler_appointment $appointment the appointment in question
-     * @return array
-     */
     protected static function base_data(\scheduler_appointment $appointment) {
         return array(
             'context' => $appointment->get_parent()->get_context(),
@@ -39,11 +32,6 @@ abstract class appointment_base extends \core\event\base {
         );
     }
 
-    /**
-     * Set data of the event from an appointment record.
-     *
-     * @param \scheduler_appointment $appointment
-     */
     protected function set_appointment(\scheduler_appointment $appointment) {
         $this->add_record_snapshot('scheduler_appointment', $appointment->data);
         $this->add_record_snapshot('scheduler_slots', $appointment->get_parent()->data);

@@ -29,12 +29,21 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And the following "activities" exist:
       | activity  | name           | intro | course | idnumber   | schedulermode |
       | scheduler | Test scheduler | n     | C1     | scheduler1 | oneonly       |
-    And I add the upcoming events block globally
+    And I log in as "manager1"
+    And I follow "Site home"
+    And I follow "Turn editing on"
+    And I add the "Upcoming events" block
+    And I click on "Actions" "link_or_button" in the "Upcoming events" "block"
+    And I follow "Configure Upcoming events block"
+    And I set the following fields to these values:
+       | Page contexts | Display throughout the entire site |
+    And I click on "Save changes" "button"
+    And I log out
 
   @javascript
   Scenario: The teacher adds slots, and students book them
     When I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I follow "Course 1"
     And I add 10 slots 5 days ahead in "Test scheduler" scheduler and I fill the form with:
       | Location | My office |
     Then I should see "10 slots have been added"
@@ -46,7 +55,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I log out
            
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I follow "Course 1"    
     And I follow "Test scheduler"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should see "10:00 AM" in the "slotbookertable" "table"
@@ -56,7 +65,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I log out
     
     When I log in as "student3"
-    And I am on "Course 1" course homepage    
+    And I follow "Course 1"    
     And I follow "Test scheduler"
     Then I should see "1:00 AM" in the "slotbookertable" "table"
     And I should not see "2:00 AM" in the "slotbookertable" "table"
@@ -67,7 +76,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I log out
     
     When I log in as "teacher1"
-    And I am on "Course 1" course homepage    
+    And I follow "Course 1"    
     And I follow "Test scheduler"
     Then I should see "1:00 AM" in the "slotmanager" "table"
     And I should see "Student 1" in the "2:00 AM" "table_row"
@@ -87,7 +96,7 @@ Feature: Office hours bookings with Scheduler, one booking per student
     And I log out
     
     When I log in as "student1"
-    And I am on "Course 1" course homepage    
+    And I follow "Course 1"    
     And I follow "Test scheduler"
     Then I should see "Attended slots"
     And "slotbookertable" "table" should not exist

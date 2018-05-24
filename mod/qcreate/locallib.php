@@ -862,31 +862,6 @@ class qcreate {
     }
 
     /**
-     * Load a count of local grades.
-     *
-     * @return int number of grades
-     */
-    public function count_grades() {
-        global $DB;
-
-        if (!$this->has_instance()) {
-            return 0;
-        }
-
-        $currentgroup = groups_get_activity_group($this->get_course_module(), true);
-        list($esql, $params) = get_enrolled_sql($this->get_context(), 'mod/qcreate:submit', $currentgroup, true);
-
-        $params['qcreateid'] = $this->get_instance()->id;
-
-        $sql = 'SELECT COUNT(g.userid)
-                   FROM {qcreate_grades} g
-                   JOIN(' . $esql . ') e ON e.id = g.userid
-                   WHERE g.qcreateid = :qcreateid';
-
-        return $DB->count_records_sql($sql, $params);
-    }
-
-    /**
      * Count the number of questions created by an user
      *
      * @ param int $userid id of the user, 0 means all users
@@ -1341,6 +1316,51 @@ class qcreate {
         return false;
     }
 
+    /**
+     * Get the local grades for an user.
+     * If isgrader is set to false, it will return local grades for
+     * all question created in this qcreate.
+     * If isgrader is set to true it will return local grades given
+     * by this grader.
+     *
+     * @param int $userid id of user.
+     * @return array $grades All grade records for this user.
+     */
+
+    public function get_all_local_grades($userid, $isgrader = false) {
+        global $DB;
+
+        $params = array('qcreateid' => $this->get_instance()->id, 'userid' => $userid);
+        $userwhere = $isgrader ? "qg.teacher = :userid" : "q.createdby = :userid";
+        $sql = "SELECT
+                    q.*,
+                    qg.id AS hasgrade,
+                    qg.grade AS bestgrade,
+                    qg.questionid AS questiongraded,
+                    qg.timemarked AS grademodified,
+                    qg.teacher AS grader,
+                    qg.gradecomment AS teachercomment
+                                          FROM {question} q
+                                          LEFT JOIN {user} u ON u.id = q.createdby
+                                          LEFT JOIN {question_categories} qc ON qc.id = q.category
+                                          LEFT JOIN {qcreate_grades} qg ON qg.questionid = q.id
+                 WHERE $userwhere AND qg.qcreateid = :qcreateid;";
+
+        // Fetch the questions created.
+        $grades = $DB->get_records_sql($sql, $params);
+
+        return $grades;
+    }
+
+    public function delete_user_local_grades($userid) {
+        global $DB;
+        $cat = $this->get_question_category()->id;
+        $questions = $DB->get_records('question', array('category' => $cat, 'createdby' => $userid), '', 'id');
+        if ($questions) {
+            list($qids, $params) = $DB->get_in_or_equal(array_keys($questions), SQL_PARAMS_NAMED);
+            $DB->delete_records_select('qcreate_grades', 'questionid ' . $qids, $params);
+        }
+    }
     /**
      * This will retrieve a grade object from the db.
      *
