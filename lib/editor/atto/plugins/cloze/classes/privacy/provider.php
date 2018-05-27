@@ -15,24 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the calculated question type.
+ * Privacy Subsystem implementation for atto_cloze.
  *
- * @package    qformat_glossary
- * @copyright  2016 Daniel Thies <dthies@ccal.edu>
+ * @package    atto_cloze
+ * @copyright  2018 Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace atto_cloze\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qformat_glossary';
-$plugin->version   = 2016072803;
-$plugin->release   = '1.0.1';
+/**
+ * Privacy Subsystem for atto_cloze implementing null_provider.
+ *
+ * @copyright   2018 Daniel Thies <dethies@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
 
-$plugin->requires  = 2013051400;
+    use \core_privacy\local\legacy_polyfill;
 
-$plugin->maturity  = MATURITY_STABLE;
-
-$plugin->dependencies = array(
-    'mod_glossary' => 2013110500,
-    'qformat_xml' => 2013110500,
-);
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function _get_reason() {
+        return 'privacy:metadata';
+    }
+}

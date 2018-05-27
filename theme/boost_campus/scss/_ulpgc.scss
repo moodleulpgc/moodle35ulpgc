@@ -1,0 +1,137 @@
+#bloque_dch_cabecera {
+    float: right;
+    margin-top: 9px;
+    margin-left: 9px;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera {
+    padding: 0;
+    margin: 0;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li {
+    float: right;
+    margin: 0;
+    width: auto;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li a.desconectar {
+    height: 31px !important;
+    margin-top: 0px !important;
+    padding: 2px !important;
+    width: auto !important;
+    background: #40628d;
+    border-radius: 2px;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li a {
+    font-family: "Helvetica Neue","Helvetica", "Arial";
+    display: block;
+    color: #ffffff;
+    font-size: 0.875em;
+    text-decoration: none;
+} 
+
+#bloque_dch_cabecera ul.enlaces_cabecera li a:hover {
+    color: #ff9a00;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li.boton_ulpgc {
+    padding: 0 5px 0 0 !important;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li a.miulpgc {
+    padding: 6px 12px;
+    height: auto;
+    border-radius: 2px;
+    background: rgba(64, 98, 141, 0.7);
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li a span.ico_miulpgc {
+    display: block;
+    float: left;
+    width: 12px;
+    height: 35px;
+    /* url('https://www.ulpgc.es/images/ulpgc_graficos_v14.svg') -160px -295px no-repeat;*/
+    background: url('https://www2.ulpgc.es/images_nwi/ulpgc_graficos_v14.svg') -154px -285px no-repeat;
+    padding-right: 20px;
+}
+
+#bloque_dch_cabecera ul.enlaces_cabecera li a span.ico_desconectar {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 30px;
+    /* background: url('https://www.ulpgc.es/images/ulpgc_graficos_v14.svg') -179px -451px no-repeat; */
+    background: url('https://www2.ulpgc.es/images_nwi/ulpgc_graficos_v14.svg') -190px -482px no-repeat;
+    background-size: 904px;
+}
+
+
+#correo_ulpgc {
+    padding-top: 8px;
+    padding-right: 8px;
+}
+
+#correo_ulpgc a:hover {
+    color: #ff9a00;
+}
+
+#correo_ulpgc a span.ico_correo {
+    float: left;
+    width: 21px;
+    height: 16px;
+    background: url('https://www2.ulpgc.es/images_nwi/ulpgc_graficos_v14.svg') -152px -140px no-repeat;
+    margin-top: 3px;
+}
+
+#correo_ulpgc a:hover span.ico_correo {
+	background:url('https://www2.ulpgc.es/images_nwi/ulpgc_graficos_v14.svg') -202px -140px no-repeat; 
+}
+
+.navbar .navbar-nav .nav-link .icon:hover,
+.navbar a.dropdown-toggle .usertext:hover, 
+.navbar .usermenu .dropdown a:hover {
+    color: #ff9a00 !important;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 500;
+}
+
+button[data-action=toggle-drawer] {    
+    padding: .375rem .75rem;
+    border : 0;
+    background-color: #40628d;
+    color: #ffffff;
+    border-radius: 4px;
+}
+
+button[data-action=toggle-drawer].btn-secondary:focus  {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.bg-dark {
+    background-color: rgb(0,46,103) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    padding-right: .2rem;
+    padding-left: .2rem;
+    content: "»"
+}
+
+.d-flex.flex-wrap {
+    background-color: #f2f2f2;
+}
+
+
+.nav .caret, .dropdown-toggle::after {
+    margin-left: 0px;
+}
+
+.userbutton .avatar img.userpicture {
+    margin-right: 0px;
+}

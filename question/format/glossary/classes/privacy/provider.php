@@ -15,14 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'qformat_glossary'
+ * Privacy Subsystem implementation for qformat_glossary.
  *
  * @package    qformat_glossary
- * @copyright  Daniel Thies <dthies@ccal.edu>
+ * @copyright  2018 Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Moodle glossary entries';
-$string['pluginname_help'] = 'This is a format for converting between questions and glossary entry export files';
-$string['pluginname_link'] = 'qformat/glossary';
-$string['privacy:metadata'] = 'The Glossary question import format plugin does not store any personal data.';
+namespace qformat_glossary\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Privacy Subsystem for qformat_glossary implementing null_provider.
+ *
+ * @copyright   2018 Daniel Thies <dethies@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    use \core_privacy\local\legacy_polyfill;
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function _get_reason() {
+        return 'privacy:metadata';
+    }
+}

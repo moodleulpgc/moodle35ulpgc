@@ -15,17 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local plugin "Navbar Plus" - Version file
+ * Privacy Subsystem implementation for atto_fullscreen.
  *
- * @package    local_navbarplus
- * @copyright  2017 Kathrin Osswald, Ulm University <kathrin.osswald@uni-ulm.de>
+ * @package    atto_fullscreen
+ * @copyright  2018 Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace atto_fullscreen\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_navbarplus';
-$plugin->version = 2018052400;
-$plugin->release = 'v3.5-r1';
-$plugin->requires = 2018051700;
-$plugin->maturity = MATURITY_STABLE;
+/**
+ * Privacy Subsystem for atto_fullscreen implementing null_provider.
+ *
+ * @copyright   2018 Daniel Thies <dethies@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    use \core_privacy\local\legacy_polyfill;
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function _get_reason() {
+        return 'privacy:metadata';
+    }
+}

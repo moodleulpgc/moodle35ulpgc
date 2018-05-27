@@ -61,8 +61,8 @@ function theme_boost_campus_get_main_scss_content($theme) {
     // Load ULPGC specific css 
     // load moove _blocks
     $blocks = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_blocks.scss');
-    $post .= "\n". $blocks;
-    
+    $ulpgc = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_ulpgc.scss');
+    $post .= "\n". $blocks."\n".$ulpgc ;
 
     // Combine them together.
     return $pre . "\n" . $scss . "\n" . $post;

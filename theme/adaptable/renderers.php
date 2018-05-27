@@ -1953,12 +1953,12 @@ EOT;
                 switch ($PAGE->theme->settings->enableheading) {
                     case 'fullname':
                         // Full Course Name.
-                        $retval .= '<div id="sitetitle">' . format_string($coursetitle) . '</div>';
+                        $retval .= '<div id="sitetitle"><h1>' . format_string($coursetitle) . '<h1></div>';
                         break;
 
                     case 'shortname':
                         // Short Course Name.
-                        $retval .= '<div id="sitetitle">' . format_string($coursetitle) . '</div>';
+                        $retval .= '<div id="sitetitle"><h1>' . format_string($coursetitle) . '</h1></div>';
                         break;
 
                     default:

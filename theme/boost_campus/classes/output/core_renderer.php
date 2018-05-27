@@ -121,7 +121,8 @@ class core_renderer extends \theme_boost\output\core_renderer {
         if (!empty($PAGE->theme->settings->favicon)) {
             return $PAGE->theme->setting_file_url('favicon', 'favicon');
         } else {
-            return $this->image_url('favicon', 'theme');
+            return 'https://www.ulpgc.es/sites/all/themes/ulpgc/favicon.ico'; // ecastro ULPGC
+            //return $this->image_url('favicon', 'theme');
         }
         // MODIFICATION END.
         /* ORIGINAL START.

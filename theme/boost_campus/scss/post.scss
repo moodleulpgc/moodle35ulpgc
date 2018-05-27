@@ -500,6 +500,7 @@ blockquote::before {
             content: '\f009';
             font-size: 1.3rem;
             padding-right: 7px;
+            color: #ff9a00;
         }
         /* Provide different, suitable Font Awesome icons for different Moodle blocks. */
         .block_recent_activity .card-title::before {

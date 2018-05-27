@@ -23,3 +23,4 @@
  */
 
 $string['pluginname'] = 'Cloze editor';
+$string['privacy:metadata'] = 'The Atto Cloze editor plugin does not store any personal data.';

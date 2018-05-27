@@ -1,0 +1,4 @@
+Release 1.0.1 26 May 2018
+Converts tags in questions and entries
+Reports no data storage to Privacy API 
+Removes warnings for PHP 7.2

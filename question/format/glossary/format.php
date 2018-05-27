@@ -124,7 +124,8 @@ class qformat_glossary extends qformat_xml {
                 $question->contextid, 'question', 'questiontext', $question->id);
 
             // Write the question tags.
-            if ((get_config('core', 'version') >= 2016120503) && ($tags = core_tag_tag::get_item_tags_array('core_question', 'question', $question->id))) {
+            if ((get_config('core', 'version') >= 2016120503) &&
+                    ($tags = core_tag_tag::get_item_tags_array('core_question', 'question', $question->id))) {
                 $expout .= glossary_start_tag("TAGS", 4);
                 foreach ($tags as $tag) {
                     $expout .= glossary_full_tag ("TAG", 5, false, $tag);
@@ -217,8 +218,8 @@ class qformat_glossary extends qformat_xml {
         $xml = xmlize($lines, 0);
 
         if ($xml) {
-            $xmlentries = $xml['GLOSSARY']['#']['INFO'][0]['#']['ENTRIES'][0]['#']['ENTRY'];
-            $sizeofxmlentries = count($xmlentries);
+            $xmlentries = @$xml['GLOSSARY']['#']['INFO'][0]['#']['ENTRIES'][0]['#']['ENTRY'];
+            $sizeofxmlentries = is_array($xmlentries) ? count($xmlentries) : 0;
 
             // Iterate through glossary entries.
             for ($i = 0; $i < $sizeofxmlentries; $i++) {
@@ -284,7 +285,7 @@ class qformat_glossary extends qformat_xml {
 
         // If there are aliases, add these as alternate answers.
         $xmlaliases = @$xmlentry['#']['ALIASES'][0]['#']['ALIAS']; // Ignore missing ALIASES.
-        $sizeofxmlaliases = count($xmlaliases);
+        $sizeofxmlaliases = is_array($xmlaliases) ? count($xmlaliases) : 0;
         for ($k = 0; $k < $sizeofxmlaliases; $k++) {
             $xmlalias = $xmlaliases[$k];
             $aliasname = trim(trusttext_strip($xmlalias['#']['NAME'][0]['#']));
