@@ -18,8 +18,8 @@
  * View all BigBlueButton instances in this course.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -87,7 +87,7 @@ if ($submit === 'end') {
     $moderator = bigbluebuttonbn_is_moderator($context, json_encode($participantlist), $USER->id);
     $administrator = is_siteadmin();
     if ($moderator || $administrator) {
-        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bigbluebuttonbn);
+        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_ENDED, $bigbluebuttonbn, $cm);
         echo get_string('index_ending', 'bigbluebuttonbn');
         $meetingid = $bigbluebuttonbn->meetingid.'-'.$course->id.'-'.$bigbluebuttonbn->id;
         if ($g != '0') {

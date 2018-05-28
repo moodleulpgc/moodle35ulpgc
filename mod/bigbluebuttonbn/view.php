@@ -18,8 +18,8 @@
  * View a BigBlueButton room.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -28,10 +28,10 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 $id = required_param('id', PARAM_INT);
-$bn = optional_param('bn', 0, PARAM_INT);
+$bn = optional_param('n', 0, PARAM_INT);
 $group = optional_param('group', 0, PARAM_INT);
 
-$viewinstance = bigbluebuttonbn_view_validator($id, $bn);
+$viewinstance = bigbluebuttonbn_views_validator($id, $bn);
 if (!$viewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
@@ -39,16 +39,19 @@ if (!$viewinstance) {
 $cm = $viewinstance['cm'];
 $course = $viewinstance['course'];
 $bigbluebuttonbn = $viewinstance['bigbluebuttonbn'];
-$context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 
-bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['view'], $bigbluebuttonbn);
+$context = context_module::instance($cm->id);
+
+bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_ACTIVITY_VIEWED, $bigbluebuttonbn, $cm);
 
 // Additional info related to the course.
 $bbbsession['course'] = $course;
 $bbbsession['coursename'] = $course->fullname;
 $bbbsession['cm'] = $cm;
+// Hot-fix: Only for v2017101004, to be removed in the next release if db upgrade is added.
+bigbluebuttonbn_verify_passwords($bigbluebuttonbn);
 $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
 bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
 
@@ -508,6 +511,24 @@ function bigbluebuttonbn_view_ended(&$bbbsession) {
                 $bbbsession['presentation']['name'], null, $attributes).'<br><br>';
     }
     return '';
+}
+
+// Hot-fix: Only for v2017101004, to be removed in the next release if db upgrade is added.
+/**
+ * Make sure the passwords have been setup.
+ *
+ * @param object $bigbluebuttonbn
+ *
+ * @return void
+ */
+function bigbluebuttonbn_verify_passwords(&$bigbluebuttonbn) {
+    global $DB;
+    if (empty($bigbluebuttonbn->moderatorpass) || empty($bigbluebuttonbn->viewerpass)) {
+        $bigbluebuttonbn->moderatorpass = bigbluebuttonbn_random_password(12);
+        $bigbluebuttonbn->viewerpass = bigbluebuttonbn_random_password(12, $bigbluebuttonbn->moderatorpass);
+        // Store passwords in the database.
+        $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
+    }
 }
 
 /**

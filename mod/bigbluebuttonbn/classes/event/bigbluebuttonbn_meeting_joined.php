@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn recording viewed event.
+ * The mod_bigbluebuttonbn meeting joined event.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -28,21 +28,21 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn recording viewed event (triggered when a recording is viewed).
+ * The mod_bigbluebuttonbn meeting joined event (triggered by bbb_view.php when the user joins the session).
  *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-class recording_viewed extends base
+class bigbluebuttonbn_meeting_joined extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '##userid' has viewed a recording with id ".
-            "'##other' from the course id '##courseid'.";
+        parent::init();
+        $this->description = "The user with id '##userid' has joined a bigbluebutton meeting for ".
+            "the bigbluebuttonbn activity with id '##objectid' for the course id ".
+            "'##contextinstanceid'.";
     }
 
     /**
@@ -51,7 +51,7 @@ class recording_viewed extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_recording_viewed', 'bigbluebuttonbn');
+        return 'BigBlueButtonBN meeting joined';
     }
 
     /**

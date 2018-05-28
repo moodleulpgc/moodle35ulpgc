@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn live session event.
+ * The mod_bigbluebuttonbn meeting ended event.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -28,22 +28,21 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn live_session (Experimental: for being triggered when external events are received).
+ * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_broker.php and index.php when the meeting is ended by the user).
  *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-class live_session_event extends base
+class bigbluebuttonbn_meeting_ended extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        parent::init('r', self::LEVEL_OTHER);
-        $this->description = "The user with id '##userid' triggered action ##other in a ".
-        "bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-        "'##objectid' for the course id '##courseid'.";
+        parent::init();
+        $this->description = "A bigbluebutton meeting for the bigbluebuttonbn activity with id ".
+            "'##objectid' for the course id '##contextinstanceid' has been forcibly ".
+            "ended by the user with id '##userid'.";
     }
 
     /**
@@ -52,7 +51,7 @@ class live_session_event extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_live_session', 'bigbluebuttonbn');
+        return 'BigBlueButtonBN meeting forcibly ended';
     }
 
     /**

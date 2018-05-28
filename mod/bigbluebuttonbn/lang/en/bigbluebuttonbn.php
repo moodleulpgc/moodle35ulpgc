@@ -18,8 +18,8 @@
  * Language File.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2018 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -29,25 +29,22 @@ $string['activityoverview'] = 'You have upcoming bigbluebuttonbn sessions';
 $string['bbbduetimeoverstartingtime'] = 'The due time for this activity must be greater than the starting time';
 $string['bbbdurationwarning'] = 'The maximum duration for this session is %duration% minutes.';
 $string['bbbrecordwarning'] = 'This session may be recorded.';
-$string['bigbluebuttonbn:join'] = 'Join a meeting';
-$string['bigbluebuttonbn:managerecordings'] = 'Manage recordings';
-$string['bigbluebuttonbn:addinstance'] = 'Add a new meeting';
+$string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activity';
+$string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
+$string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
-$string['indicator:cognitivedepth'] = 'BigBlueButtonBN cognitive';
-$string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a BigBlueButtonBN activity.';
-$string['indicator:socialbreadth'] = 'BigBlueButtonBN social';
-$string['indicator:socialbreadth_help'] = 'This indicator is based on the social breadth reached by the student in a BigBlueButtonBN activity.';
-$string['modulename'] = 'BigBlueButtonBN';
-$string['modulenameplural'] = 'BigBlueButtonBN';
-$string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
 
-Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.
-
-To view later recordings, add a RecordingsBN resource to this course.';
-$string['modulename_link'] = 'BigBlueButtonBN/view';
-$string['pluginadministration'] = 'BigBlueButton administration';
-$string['pluginname'] = 'BigBlueButtonBN';
-$string['search:activity'] = 'BigBlueButtonBN - activity information';
+$string['privacy:metadata:bigbluebuttonbn'] = 'Stores the configuration for the room or activity that defines the features and general behaviour of the BigBlueButton session.';
+$string['privacy:metadata:bigbluebuttonbn:participants'] = 'A list of rules that define the role users will in the live meeting. A user ID may be stored as permissions can be granted per role or user.';
+$string['privacy:metadata:bigbluebuttonbn_logs'] = 'Stores events triggered when using the plugin.';
+$string['privacy:metadata:bigbluebuttonbn_logs:userid'] = 'The user ID of the user who triggered the event.';
+$string['privacy:metadata:bigbluebuttonbn_logs:timecreated'] = 'The time at which the log was created.';
+$string['privacy:metadata:bigbluebuttonbn_logs:meetingid'] = 'The meeting ID the user had access to.';
+$string['privacy:metadata:bigbluebuttonbn_logs:log'] = 'The type of event triggered by the user.';
+$string['privacy:metadata:bigbluebuttonbn_logs:meta'] = 'May include extra information related to the meeting or the recording afected by the event.';
+$string['privacy:metadata:bigbluebutton'] = 'In order to create and join BigBlueButton sessions, user data needs to be exchanged with the server.';
+$string['privacy:metadata:bigbluebutton:userid'] = 'The userid of the user accessing the BigBlueButton server.';
+$string['privacy:metadata:bigbluebutton:fullname'] = 'The fullname of the user accessing the BigBlueButton server.';
 
 $string['config_general'] = 'General configuration';
 $string['config_general_description'] = 'These settings are <b>always</b> used';
@@ -223,9 +220,20 @@ $string['mod_form_field_recordings_deleted'] = 'Include recordings from deleted 
 $string['mod_form_field_recordings_imported'] = 'Show only imported links';
 $string['mod_form_field_recordings_preview'] = 'Show recording preview';
 
+$string['modulename'] = 'BigBlueButtonBN';
+$string['modulenameplural'] = 'BigBlueButtonBN';
+$string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
+
+Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.
+
+To view later recordings, add a RecordingsBN resource to this course.';
+$string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
 $string['ends_at'] = 'Ends';
+$string['pluginadministration'] = 'BigBlueButton administration';
+$string['pluginname'] = 'BigBlueButtonBN';
+$string['serverhost'] = 'Server Name';
 $string['view_error_no_group_student'] = 'You have not been enrolled in a group. Please contact your Teacher or the Administrator.';
 $string['view_error_no_group_teacher'] = 'There are no groups configured yet. Please set up groups or contact the Administrator.';
 $string['view_error_no_group'] = 'There are no groups configured yet. Please set up groups before trying to join the meeting.';
@@ -351,23 +359,19 @@ $string['view_recording_preview_help'] = 'Hover over an image to view it in full
 $string['view_recording_modal_button'] = 'Apply';
 $string['view_recording_modal_title'] = 'Set values for recording';
 
-$string['event_activity_created'] = 'Activity created';
-$string['event_activity_viewed'] = 'Activity viewed';
-$string['event_activity_deleted'] = 'Activity deleted';
-$string['event_activity_updated'] = 'Activity updated';
-$string['event_meeting_created'] = 'Meeting created';
-$string['event_meeting_ended'] = 'Meeting forcibly ended';
-$string['event_meeting_joined'] = 'Meeting joined';
-$string['event_meeting_left'] = 'Meeting left';
-$string['event_recording_viewed'] = 'Recording viewed';
-$string['event_recording_edited'] = 'Recording edited';
+$string['event_activity_created'] = 'BigBlueButtonBN activity created';
+$string['event_activity_deleted'] = 'BigBlueButtonBN activity deleted';
+$string['event_activity_modified'] = 'BigBlueButtonBN activity modified';
+$string['event_activity_viewed'] = 'BigBlueButtonBN activity viewed';
+$string['event_activity_viewed_all'] = 'BigBlueButtonBN activity management viewed';
+$string['event_meeting_created'] = 'BigBlueButtonBN meeting created';
+$string['event_meeting_ended'] = 'BigBlueButtonBN meeting forcibly ended';
+$string['event_meeting_joined'] = 'BigBlueButtonBN meeting joined';
+$string['event_meeting_left'] = 'BigBlueButtonBN meeting left';
 $string['event_recording_deleted'] = 'Recording deleted';
 $string['event_recording_imported'] = 'Recording imported';
 $string['event_recording_published'] = 'Recording published';
 $string['event_recording_unpublished'] = 'Recording unpublished';
-$string['event_recording_protected'] = 'Recording protected';
-$string['event_recording_unprotected'] = 'Recording unprotected';
-$string['event_live_session'] = 'Live session event';
 
 $string['instance_type_default'] = 'Room/Activity with recordings';
 $string['instance_type_room_only'] = 'Room/Activity only';
