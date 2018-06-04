@@ -393,6 +393,8 @@ $string['logofile_help'] = 'A logo or stamp file to include in the upper left co
 Must be an image file.
 
 ';
+$string['logowidth'] = 'Logo width';
+$string['logowidth_help'] = 'The desired width of the logo image in the header, in mm.';
 $string['messagesender'] = 'Formal closing';
 $string['messagesender_help'] = 'A closing line, after main text (and the automatically included link to the activity instance),
 and before the signature. Should include the title of the notifying manager. 

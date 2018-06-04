@@ -18,8 +18,8 @@
  * Config all BigBlueButtonBN instances in this course.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -32,8 +32,8 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 /**
  * Moodle class for mod_form.
  *
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
 
@@ -83,7 +83,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $participantlist);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
         // Add standard elements, common to all modules.
@@ -175,7 +175,13 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
             'maxlength="64" size="32"');
         $mform->setType('name', empty($CFG->formatstringstriptags) ? PARAM_CLEANHTML : PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
+        if ($cfg['version_major'] < '2015051100') {
+            // This is valid before v2.9.
+            $this->add_intro_editor(false, get_string('mod_form_field_intro', 'bigbluebuttonbn'));
+        } else {
+            // This is valid after v2.9.
+            $this->standard_intro_elements(get_string('mod_form_field_intro', 'bigbluebuttonbn'));
+        }
         $mform->setAdvanced('introeditor');
         $mform->setAdvanced('showdescription');
         if ($cfg['sendnotifications_enabled']) {
@@ -327,10 +333,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Function for showing the block for setting participant roles.
      *
      * @param object $mform
+     * @param array $cfg
      * @param string $participantlist
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $participantlist) {
+    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $cfg, $participantlist) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');

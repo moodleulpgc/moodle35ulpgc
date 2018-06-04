@@ -18,7 +18,7 @@
  * The mod_bigbluebuttonbn abstract base event.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
+ * @copyright 2017 - present, Blindside Networks Inc
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
@@ -30,9 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mod_bigbluebuttonbn abstract base event class. Most mod_bigbluebuttonbn events can extend this class.
  *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 abstract class base extends \core\event\base {
 
@@ -63,9 +62,9 @@ abstract class base extends \core\event\base {
     /**
      * Init method.
      */
-    protected function init($crud = 'r', $edulevel = self::LEVEL_PARTICIPATING) {
-        $this->data['crud'] = $crud;
-        $this->data['edulevel'] = $edulevel;
+    protected function init() {
+        $this->data['crud'] = 'r';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'bigbluebuttonbn';
     }
 

@@ -1083,7 +1083,7 @@ class renderer extends plugin_renderer_base {
 
         $output .= $this->flexible_table($viewer);
 
-        $output .= '<div class="clearer clearfix"></div>'.'aquí va la tabla' .'<div class="clearer clearfix"></div>';
+        $output .= '<div class="clearer clearfix"></div>';
 
         return $output;
     }

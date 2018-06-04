@@ -482,6 +482,43 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    
+    public static function get_responses_icon($status, $url = null) {
+
+        if($status == EXAM_RESPONSES_UNSENT) {
+            $icon = 'circle-o';
+            $statusclass = 'unsent';
+        } elseif($status == EXAM_RESPONSES_WAITING) {
+            $icon = 'info-circle';
+            $statusclass = 'waiting';
+        } elseif($status == EXAM_RESPONSES_REJECTED) {
+            $icon = 'exclamation-triangle';
+            $statusclass = 'rejected';
+        } elseif($status < EXAM_RESPONSES_WAITING) {
+            $icon = 'dot-circle-o';
+            $statusclass = 'sent';
+        } elseif($status > EXAM_RESPONSES_REJECTED) {
+            $icon = 'check-circle';
+            $statusclass = 'approved';
+        }
+        
+        $title = get_string('response_'.$statusclass, 'examregistrar');        
+                            
+        $icon = html_writer::tag('i', '', array('class' => "fa fa-$icon responseicon $statusclass",
+                                                'title' => $title,
+                                                'aria-label' => $title,
+                                                ));
+                                                
+        if($url) {
+            $icon = html_writer::link($url, $icon, array('aria-label' => get_string('responsesupload', 'examregistrar'),
+                                                            'title' => ' xxx'));
+        } else {
+            $icon = html_writer::span($icon, 'fa-pull-left');
+        }
+    
+        return $icon; 
+    }
+    
     public function listdisplay_allocatedexam(examregistrar_allocatedexam $exam, $basecourse, $baseurl, $venue='') {
         $output = '';
 
@@ -493,6 +530,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
 
         $config = get_config('examregistrar');
         $now = time();
+        $examdate = $exam->get_examdate();
 
         $examname = $exam->get_exam_name(false, true, true); //$exam->shortname.' - '.$exam->fullname ;
         $output .= $this->output->container($this->output->heading($examname, 2, ' roomheader '), ' allocatedroomheaderleft ');
@@ -513,8 +551,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
                     $item = '&nbsp; '.$this->output->action_icon($url, $icon);
                 }
             } else {
-                $date = $exam->get_examdate();
-                $printable = ($now >= strtotime(" -{$config->printdays} days ", $date)) && ( $now <= strtotime(" + 1 day ", $date));
+                $printable = ($now >= strtotime(" -{$config->printdays} days ", $examdate)) && ( $now <= strtotime(" + 1 day ", $examdate));
                 if($printable) {
                     $url = examregistrar_file_encode_url($context->id, $exam->examfile, 'exam', '', $basecourse->id);
                     $icon = new pix_icon('printgreen', get_string('printexam', 'examregistrar'), 'examregistrar', array('class' => 'iconlarge'));
@@ -542,43 +579,10 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
             $item = '&nbsp; '.$this->output->render($icon);
         }
 
-/*
-        if(!$message = $exam->set_valid_file()) {
-            if($exam->examfile) {
-                $context = context_course::instance($exam->courseid);
-                $url = examregistrar_file_encode_url($context->id, $exam->examfile, 'exam');
-                $icon = new pix_icon('t/print', get_string('printexam', 'examregistrar'), '', array('class' => 'iconlarge'));
-                //$icon = new pix_icon('f/pdf', $strexamfile, 'moodle', array('class'=>'iconsmall', 'title'=>$strexamfile));
-                $item = '&nbsp; '.$this->output->action_icon($url, $icon).'&nbsp; ('.count($exam->users).')';
-            } else {
-                $message = get_string('error_noneapproved', 'examregistrar');
-            }
-        }
-        if($message && !$url) {
-            $icon = new pix_icon('i/risk_xss', $message, '', array('class' => 'iconlarge'));
-            $item = '&nbsp; '.$this->output->render($icon);
-        }
-
-*/
-
-/*
-
-        $singleroom = false;
-        if($venue) {
-            $url = '';
-            if($singleroom = examregistrar_is_venue_single_room($venue)) {
-            } else {
-                $url = new moodle_url('/mod/examregistrar/download.php', $baseurl->params(array()) + array('down'=>'printexampdf', 'session'=>$exam->session, 'venue'=>$exam->venue, 'exam'=>$exam->get_id()));
-                $item = $this->output->single_button($url, get_string('downloadexampdf', 'examregistrar'), 'post', array('class'=>' singlelinebutton '));
-            }
-            $output .= $this->output->container($item, ' allocatedroomheaderright ');
-        }
-*/
-
         if($item && $exam->callnum < 0) {
             $item .= ' &nbsp; '.html_writer::span(get_string('specialexam', 'examregistrar'), ' error bold large ');
         }
-
+        
         $output .= $this->output->container($item, ' allocatedroomheaderright ');
 
         $output .= $this->output->container_end();
@@ -588,25 +592,70 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
         $output .= $this->output->container_start(' allocatedexambody ');
 
         if($exam->users) {
-
+            $singleroom = examregistrar_is_venue_single_room($venue);
+            //$singleroom = 0;
+            $examdate = 0;
+        
+            $output .= $this->output->container_start(' clearfix ');
+            $output .= $this->output->container_start(' allocatedexamregistered ');
             $output .= html_writer::tag('p', get_string('exambookedstudents', 'examregistrar', count($exam->users)));
-            if(!$singleroom = examregistrar_is_venue_single_room($venue)) {
+
+            $canresponse = $canreview = false;
+            if(!$message && $exam->examfile) {
+                $canresponse = has_capability('mod/examregistrar:uploadresponses',$context);
+                $canreview = has_capability('mod/examregistrar:reviewtaken',$context);
+            }
+            
+            $url = new moodle_url('/mod/examregistrar/view.php?', $baseurl->params(array()) + 
+                        array('period'=>$exam->period, 'session'=>$exam->session, 'venue'=>$exam->venue,  
+                        'examf'=>$exam->examfile, 'action'=>'exam_responses_upload'));
+            
+            if(!$singleroom) {
                 $roomvenue = '';
                 if($venue) {
                     $roomvenue = $venue;
                 }
                 if($rooms = $exam->get_room_allocations($roomvenue)) {
                     foreach($rooms as $rid => $room) {
-                        $rooms[$rid] = $room->name.' ('.$room->allocated.')';
+                        $status = $exam->get_responses_status($rid);
+                        $flag = '';
+                        if($exam->examfile && $canresponse && ($now > $examdate) 
+                                    && (!$exam->taken && ($status < EXAM_RESPONSES_COMPLETED) || $canreview)) {
+                            $url->param('room', $rid);
+                            $flag = $this->get_responses_icon($status, $url);
+                        } elseif($exam->examfile) {
+                            $flag = $this->get_responses_icon($status);
+                        }
+                        $rooms[$rid] = $room->name.' ('.$room->allocated.')'.$flag;
                     }
                 }
                 //$output .= html_writer::tag('p', get_string('exambookedstudents', 'examregistrar', count($exam->users)));
                 $output .= html_writer::alist($rooms);
             }
+            $output .= $this->output->container_end();
+            if($exam->examfile && ($now > $examdate)) {
+                $status = $exam->get_responses_status($venue);
+/*
+                $icon = html_writer::tag('i', null, array('class' => "fa fa-$icon responseicon $status"));
+                $flag = html_writer::span($icon, ' fa-pull-left ');
 
-            //$output .= print_collapsible_region(html_writer::alist($rooms), 'userlist', 'showhideuserlistexam_'.$exam->get_id(), get_string('allocatedrooms', 'examregistrar'),'userlistexam_'.$exam->get_id(), false, true);
+                $button = '';
+                */
+                if($canresponse && (!$exam->taken && ($status < EXAM_RESPONSES_COMPLETED) || $canreview)) {
+                    $url->param('room', $exam->venue);
+                    $flag = $this->get_responses_icon($status, $url);
+                } else {
+                    $flag = $this->get_responses_icon($status);
+                }
+                
+                $output .= $this->output->container($flag, ' fa-2x  allocatedexamresponses allocatedroomheaderright');
+            }
+            
+            $output .= $this->output->container_end();
+            
+            //$output .= $this->output->container_end();
 
-
+            $output .= $this->output->container_start(' allocatedexamstudentstable ');
             $table = new html_table();
             $table->attributes = array('style'=>'border:1px solid black;border-collapse:collapse;', 'class'=>'flexible examregprintexamtable' );
             $tableheaders = array(get_string('student', 'examregistrar'),
@@ -638,6 +687,8 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
         $output .= $this->output->container_end();
 
         $output .= $this->output->container_end();
+        $output .= $this->output->container_end();
+
         return $output;
     }
 

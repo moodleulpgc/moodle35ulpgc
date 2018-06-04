@@ -260,7 +260,7 @@ $string['uploadcsvlocations'] = 'Load CSV Locations';
 $string['uploadcsvstaffers'] = 'Load CSV Staffers';
 $string['uploadcsvsession_rooms'] = 'Load CSV session rooms';
 $string['uploadcsvassignseats'] = 'Load CSV room assignment';
-$string['uploadcsvfile'] = 'Upload CVS file';
+$string['uploadcsvfile'] = 'Upload CSV file';
 $string['uploadcsvfile_help'] = '
 Please, select a file containing CSV data suitable for importing. The first line must include the column name. Some columns are optional (may not exists in the file) while other are required.
 
@@ -307,7 +307,7 @@ $string['elementitem'] = 'Element';
 $string['csvuploadsuccess'] = 'Succesfully loaded {$a} data rows';
 $string['uploadtableexplain'] = 'This is a preview of the first records in the CSV file you are about to upload.
 Please, check if the system is interpreting correctly the file structure and data.';
-$string['uploadconfirm'] = 'Do you want to proceed with CVS uploading?';
+$string['uploadconfirm'] = 'Do you want to proceed with CSV uploading?';
 
 $string['annualityitem'] = 'Annuality';
 $string['annualityitem_help'] = '
@@ -861,7 +861,24 @@ $string['examfileresponses_help'] = 'Exam responses file
 File or files containing response sheets filled by students taking this exam
 
 ';
-$string['statereview'] = 'State review';
+$string['responsesupload'] = 'Upload exam responses files';
+$string['response_unsent'] = 'Not loaded responses yet';
+$string['response_sent'] = 'Responses loaded';
+$string['response_waiting'] = 'Responses loaded, waiting approval';
+$string['response_approved'] = 'Responses loaded and approved';
+$string['response_rejected'] = 'Responses rejected';
+$string['responsestatus'] = 'Status'; 
+$string['responsestatus_help'] = 'The possible status for response data or files uploaded. 
+
+ * Sent: Some data or files loaded but not approved yet.
+ * Waiting: Some data or files loaded but not completed and expecting to upload more dada or files.
+ * Completed: Data & files uploadad are regarded as completed for all users taking the exam.
+ * Validated: Data reviewed and approved. May bye set only by staff with appropiate capabilities.
+
+';
+
+
+$string['statereview'] = 'Status review';
 $string['status'] = 'State';
 $string['status_help'] = 'Exam status
 
@@ -886,6 +903,7 @@ $string['status_waiting'] = 'Waiting';
 $string['status_rejected'] = 'Rejected';
 $string['status_approved'] = 'Approved';
 $string['status_validated'] = 'Validated';
+$string['status_completed'] = 'Completed';
 $string['missingreview'] = '(Missing)';
 
 $string['confirm_delete'] = 'You have requested to delete the Exam attempt {$a->attempt} on state {$a->status} correspondig to: <br>
@@ -921,6 +939,8 @@ $string['allsessions'] = 'all sessions';
 $string['error_manyapproved'] = 'More than one exam file approved';
 $string['error_noneapproved'] = 'No exam file approved';
 $string['error_nonesent'] = 'No exam file sent';
+$string['error_nonzero'] = 'The value must be different form 0';
+$string['error_lessthan'] = 'The value must be less than or equal {$a}';
 $string['extensionanswers'] = 'Answers filename suffix';
 $string['configextensionanswers'] = 'The file name suffix for the file with right answers.
 Must include any conection character or puntuation, but exclude the real filename extension.';
@@ -930,7 +950,7 @@ Must include any conection character or puntuation, but exclude the real filenam
 $string['extensionresponses'] = 'Responses filename suffix';
 $string['configextensionresponses'] = 'The file name suffix for the responses file, that with response sheets filled by students that took the exam.
 Must include any conection character or puntuation, but exclude the real filename extension.';
-// fito@20140701 Added for avoid warnings
+
 $string['configpdfwithteachers'] = 'configpdfwithteachers';
 $string['pdfaddexamcopy'] = 'pdfaddexamcopy';
 $string['configpdfaddexamcopy'] = 'configpdfaddexamcopy';
@@ -972,3 +992,17 @@ $string['eventexamfilessynced'] = 'Examfiles reviewed synchronized from Tracker 
 $string['eventcapabilitiesupdated'] = 'MakeExam composing capabilities updated';
 $string['eventbookingsubmitted'] = 'Exam booking submitted';
 $string['eventbookingunbooked'] = 'Exam booking removed by new booking';
+
+$string['headeruserdata'] = 'General User Attendance data';
+$string['headerroomsdata'] = 'Attendance data by room';
+$string['headerresponsefiles'] = 'Response files';
+$string['loadattendance'] = 'Load user data';
+$string['loadattendance_explain'] = 'If checked then detailed data for each user will be set';
+$string['usershowing'] = 'Showing';
+$string['usershowing_help'] = 'The  number of students that have been accepted to the exam room';
+$string['usertaken'] = 'Taken';
+$string['usertaken_help'] = 'The number of exams collected, students that have taken the exam';
+$string['usercertified'] = 'Certified';
+$string['loadroomattendance'] = 'Room to load';
+$string['loadsitedata'] = 'Load site attendance';
+$string['loadsitedata_explain'] = 'If checked then load summary attendance data for site';

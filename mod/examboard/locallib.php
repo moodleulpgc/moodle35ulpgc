@@ -1775,7 +1775,7 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
                 
                 list($attachment, $attachpath) = examboard_generate_notification_pdf($examboard, $course, 
                                                         $messagehtmluser, $fromform->messagesender,
-                                                        $fromform->logofile, $fromform->signaturefile, 
+                                                        $fromform->logofile, $fromform->logowidth, $fromform->signaturefile, 
                                                         $fromform->tempdir.'/'. $filename);
                 if($attachment) {
                     $attachname = clean_filename($fromform->attachname.'.pdf');
@@ -1846,7 +1846,7 @@ function examboard_usertype_string($usertype) {
 }
 
 function  examboard_generate_notification_pdf($examboard, $course, 
-                                                $maintext, $sender, $logo, $signature, $filename) {
+                                                $maintext, $sender, $logo, $logowidth, $signature, $filename) {
     global $CFG, $DB, $USER;
     require_once($CFG->libdir.'/pdflib.php');
     
@@ -1883,19 +1883,24 @@ function  examboard_generate_notification_pdf($examboard, $course,
         $logoname = 'mod/examboard/pix/temp/'.basename($logo);
         $newlogo = K_PATH_IMAGES.$logoname;
         copy($logo, $newlogo);
+        if(!$logowidth) {
+            $logowidth = 20; 
+        }
+    } else {
+        $logowidth = 0;
     }
 
-    $pdf->SetHeaderData($logoname, 16, $titlename, $subject);
+    $pdf->SetHeaderData($logoname, $logowidth, $titlename, $subject);
 
     // set header and footer fonts
     $pdf->setHeaderFont(array('helvetica', '', 12));
     $pdf->setFooterFont(array('helvetica', '', 8));
     
-    // set margins
+    // set header margins
     $topmargin = 25;
-    $leftmargin = 25;
+    $leftmargin = 10;
     $rightmargin = 25;
-    $pdf->SetMargins($leftmargin, $topmargin, $rightmargin);
+    $pdf->SetMargins($leftmargin, $topmargin, $rightmargin, true);
     $pdf->SetHeaderMargin(5);
     $pdf->SetFooterMargin(10);
 
@@ -1910,6 +1915,12 @@ function  examboard_generate_notification_pdf($examboard, $course,
     
     // add content
     $pdf->AddPage('', '', true);
+    
+    // set margins
+    $topmargin = 25;
+    $leftmargin = 25;
+    $rightmargin = 25;
+    $pdf->SetMargins($leftmargin, $topmargin, $rightmargin, true);
     
     $pdf->Ln(10);
     $pdf->Ln(10);

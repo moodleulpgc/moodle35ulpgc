@@ -818,6 +818,13 @@ $string['examfileresponses_help'] = 'Archivo de Respuestas al examen
 Archivo o archivos conteniendo la hojas de respuesta rellenadas por los estudiantes que han realizado el examen.
 
 ';
+$string['responsesupload'] = 'Subir hojas de respuestas';
+$string['response_unsent'] = 'No se han cargado respuestas aún';
+$string['response_sent'] = 'Respuestas cargadas';
+$string['response_waiting'] = 'Respuestas cargadas, esperando aprobación';
+$string['response_approved'] = 'Respuestas cargadas y aprobadas';
+$string['response_rejected'] = 'Respuestas RECHAZADAS';
+
 $string['statereview'] = 'Revisión';
 $string['status'] = 'Estado';
 $string['status_help'] = 'Estado de revisión del Examen
@@ -842,6 +849,7 @@ $string['status_waiting'] = 'En espera';
 $string['status_rejected'] = 'Rechazado';
 $string['status_approved'] = 'Aprobado';
 $string['status_validated'] = 'Validado';
+$string['status_completed'] = 'Completado';
 $string['missingreview'] = '(No encontrado)';
 $string['confirm_delete'] = 'Ha solicitado borrar el Archivo de Examen {$a->attempt} en estado {$a->status} correspondiente a: <br>
 Asignatura: {$a->coursename} <br />
@@ -912,5 +920,18 @@ $string['generateextracallef'] = 'Generar PDFs extra';
 $string['resortbyshortname'] = 'Por nombre corto';
 $string['resortbyfullname'] = 'Por nombre completo';
 $string['resortbyidnumber'] = 'Por idnumber';
-
 $string['eventmanageviewed'] = 'Gestión del registro vista';
+
+$string['headeruserdata'] = 'Asistencia detallada por usuario';
+$string['headerroomsdata'] = 'Asistencia por Aula';
+$string['headerresponsefiles'] = 'Archivos de respuestas';
+$string['loadattendance'] = 'Cargar asistencia detallada';
+$string['loadattendance_explain'] = 'Si se activa se permitirá especificar los datos de asistencia detallada para cada usuario individual';
+$string['usershowing'] = 'Presentado';
+$string['usershowing_help'] = 'El número de estudiantes que han entrado al Aula';
+$string['usertaken'] = 'Recogido';
+$string['usertaken_help'] = 'El número de estudiante que han entregado su examen';
+$string['usercertified'] = 'Certificado';
+$string['loadroomattendance'] = 'Aula a cargar';
+$string['loadsitedata'] = 'Cargar asistencia por Sede';
+$string['loadsitedata_explain'] = 'Si se activa se cargarán los datos globales de asistencia en la Sede';

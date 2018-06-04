@@ -101,6 +101,36 @@ td.colaction  {width:10%;}
 .examregunallocatedexams,
 .examregspecialexams {width:49%; float:right; }
 
+.allocatedexamregistered i.fa.responseicon {
+    margin-left: 1.0em;
+}
+
+i.fa.responseicon.unsent,
+i.fa.responseicon.rejected {
+    color: red;
+}
+
+i.fa.responseicon.sent,
+i.fa.responseicon.approved {
+    color: green;
+}
+
+i.fa.responseicon.waiting {
+    color: #FF8C00;
+}
+
+
+
+
+
+i.fa.responseicon.unconfirmed {
+    color: #FF8C00;
+}
+
+i.fa.responseicon:hover {
+    font-weight: bold;
+}
+
 .examregallocationcontrols {width:90%; float:both; }
 .examregallocationcontrolsleft {width:55%; float:left; }
 .examregallocationcontrolsright {width:22%; float:right; }
@@ -108,6 +138,7 @@ td.colaction  {width:10%;}
 
 .allocatedroomheaderleft  {width:50%; float:left; }
 .allocatedroomheaderright  {width:40%; float:right; }
+.allocatedexamregistered  {float:left; }
 
 .roomexamslist li  {list-style-type: disc; }
 .additionalexam li  {list-style-type: circle; margin-left: 2.0em}
@@ -129,3 +160,13 @@ td.colaction  {width:10%;}
 #page-mod-examregistrar-view  .bookingform .felement  {width:50%; text-align:left;}
 
 
+#id_headeruserdata  .fitem.fitem_fgroup  div.fitemtitle {
+    width: 400px;
+}
+#id_headeruserdata  .fitem.fitem_fgroup  div.fitemtitle label {
+    font-weight: normal !important;
+}
+
+div.singlelinebutton {
+   float: right; 
+}

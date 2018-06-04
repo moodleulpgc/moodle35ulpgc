@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_bigbluebuttonbn meeting ended event.
+ * The mod_bigbluebuttonbn recording published event.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -28,22 +28,20 @@ namespace mod_bigbluebuttonbn\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_bigbluebuttonbn meeting ended event (triggered by bbb_broker.php and index.php when the meeting is ended by the user).
+ * The mod_bigbluebuttonbn recording published event (triggered when a recording is published).
  *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
-class meeting_ended extends base
+class bigbluebuttonbn_recording_published extends base
 {
     /**
      * Init method.
      */
     protected function init() {
-        parent::init('r', self::LEVEL_OTHER);
-        $this->description = "A bigbluebutton meeting for the bigbluebuttonbn activity with id ".
-            "'##objectid' for the course id '##courseid' has been forcibly ".
-            "ended by the user with id '##userid'.";
+        parent::init();
+        $this->description = "The user with id '##userid' has published a recording with id ".
+            "'##other' in the course id '##contextinstanceid'.";
     }
 
     /**
@@ -52,7 +50,7 @@ class meeting_ended extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('event_meeting_ended', 'bigbluebuttonbn');
+        return 'Recording published';
     }
 
     /**

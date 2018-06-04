@@ -18,8 +18,8 @@
  * Library calls for Moodle and BigBlueButton.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -51,6 +51,14 @@ if (!isset($CFG->bigbluebuttonbn)) {
 
 if (file_exists(dirname(__FILE__).'/config.php')) {
     require_once(dirname(__FILE__).'/config.php');
+    // Old BigBlueButtonBN cfg schema. For backward compatibility.
+    global $BIGBLUEBUTTONBN_CFG;
+    if (isset($BIGBLUEBUTTONBN_CFG)) {
+        foreach ((array) $BIGBLUEBUTTONBN_CFG as $key => $value) {
+            $cfgkey = str_replace("bigbluebuttonbn_", "", $key);
+            $CFG->bigbluebuttonbn[$cfgkey] = $value;
+        }
+    }
 }
 
 /*
@@ -86,7 +94,6 @@ const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
  * @uses FEATURE_MOD_INTRO
  * @uses FEATURE_BACKUP_MOODLE2
  * @uses FEATURE_COMPLETION_TRACKS_VIEWS
- * @uses FEATURE_COMPLETION_HAS_RULES
  * @uses FEATURE_GRADE_HAS_GRADE
  * @uses FEATURE_GRADE_OUTCOMES
  * @uses FEATURE_SHOW_DESCRIPTION
@@ -121,24 +128,24 @@ function bigbluebuttonbn_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $bigbluebuttonbn  An object from the form in mod_form.php
+ * @param object $data  An object from the form in mod_form.php
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
-function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
+function bigbluebuttonbn_add_instance($data) {
     global $DB;
     // Excecute preprocess.
-    bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
+    bigbluebuttonbn_process_pre_save($data);
     // Pre-set initial values.
-    $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
+    $data->presentation = bigbluebuttonbn_get_media_file($data);
     // Insert a record.
-    $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
+    $data->id = $DB->insert_record('bigbluebuttonbn', $data);
     // Encode meetingid.
-    $meetingid = bigbluebuttonbn_encode_meetingid($bigbluebuttonbn->id);
+    $meetingid = bigbluebuttonbn_encode_meetingid($data->id);
     // Set the meetingid column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $bigbluebuttonbn->id));
+    $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
     // Complete the process.
-    bigbluebuttonbn_process_post_save($bigbluebuttonbn);
-    return $bigbluebuttonbn->id;
+    bigbluebuttonbn_process_post_save($data);
+    return $data->id;
 }
 
 /**
@@ -146,20 +153,20 @@ function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $bigbluebuttonbn  An object from the form in mod_form.php
+ * @param object $data  An object from the form in mod_form.php
  * @return bool Success/Fail
  */
-function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
+function bigbluebuttonbn_update_instance($data) {
     global $DB;
     // Excecute preprocess.
-    bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
+    bigbluebuttonbn_process_pre_save($data);
     // Pre-set initial values.
-    $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
-    $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
+    $data->id = $data->instance;
+    $data->presentation = bigbluebuttonbn_get_media_file($data);
     // Update a record.
-    $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
+    $DB->update_record('bigbluebuttonbn', $data);
     // Complete the process.
-    bigbluebuttonbn_process_post_save($bigbluebuttonbn);
+    bigbluebuttonbn_process_post_save($data);
     return true;
 }
 
@@ -462,7 +469,6 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
     bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
-    bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn);
 }
 
 /**
@@ -497,22 +503,17 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     }
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
-    $event->type        = CALENDAR_EVENT_TYPE_ACTION;
-    $event->name        = $bigbluebuttonbn->name;
-    $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
-    $event->courseid    = $bigbluebuttonbn->course;
-    $event->groupid     = 0;
-    $event->userid      = 0;
-    $event->modulename  = 'bigbluebuttonbn';
-    $event->instance    = $bigbluebuttonbn->id;
-    $event->eventtype   = \mod_bigbluebuttonbn\event\events::$events['meeting_create'];
-    $event->timestart   = $bigbluebuttonbn->openingtime;
-    $event->timesort    = $bigbluebuttonbn->openingtime;
-    $event->timeduration = 0;
+    $event->name = $bigbluebuttonbn->name;
+    $event->courseid = $bigbluebuttonbn->course;
+    $event->groupid = 0;
+    $event->userid = 0;
+    $event->modulename = 'bigbluebuttonbn';
+    $event->instance = $bigbluebuttonbn->id;
+    $event->timestart = $bigbluebuttonbn->openingtime;
+    $event->durationtime = 0;
     if ($bigbluebuttonbn->closingtime) {
-        $event->timeduration = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
+        $event->durationtime = $bigbluebuttonbn->closingtime - $bigbluebuttonbn->openingtime;
     }
-    $event->durationtime = $event->timeduration;
     $event->id = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
     if ($event->id) {
@@ -523,15 +524,6 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     calendar_event::create($event);
 }
 
-function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
-    if (!empty($bigbluebuttonbn->completionexpected)) {
-        \core_completion\api::update_completion_date_event(
-            $bigbluebuttonbn->coursemodule,
-            'bigbluebuttonbn',
-            $bigbluebuttonbn->id, $bigbluebuttonbn->completionexpected
-          );
-    }
-}
 /**
  * Get a full path to the file attached as a preuploaded presentation
  * or if there is none, set the presentation field will be set to blank.
@@ -541,12 +533,14 @@ function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
  * @return string
  */
 function bigbluebuttonbn_get_media_file(&$bigbluebuttonbn) {
-    $draftitemid = isset($bigbluebuttonbn->presentation) ? $bigbluebuttonbn->presentation : null;
+    if (!isset($bigbluebuttonbn->presentation) || $bigbluebuttonbn->presentation == '') {
+        return '';
+    }
     $context = context_module::instance($bigbluebuttonbn->coursemodule);
     // Set the filestorage object.
     $fs = get_file_storage();
     // Save the file if it exists that is currently in the draft area.
-    file_save_draft_area_files($draftitemid, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
+    file_save_draft_area_files($bigbluebuttonbn->presentation, $context->id, 'mod_bigbluebuttonbn', 'presentation', 0);
     // Get the file if it exists.
     $files = $fs->get_area_files($context->id, 'mod_bigbluebuttonbn', 'presentation', 0,
         'itemid, filepath, filename', false);

@@ -18,8 +18,8 @@
  * Class for the structure used for backup BigBlueButtonBN.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
@@ -29,9 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Define all the backup steps that will be used by the backup_bigbluebuttonbn_activity_task.
  *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2010-2017 Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
  */
 class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step
 {
@@ -41,6 +40,9 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
      * @return object
      */
     protected function define_structure() {
+
+        // To know if we are including userinfo.
+        $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
@@ -62,7 +64,11 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
 
         // Define sources.
         $bigbluebuttonbn->set_source_table('bigbluebuttonbn', array('id' => backup::VAR_ACTIVITYID));
-        $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
+
+        // This source definition only happen if we are including user info.
+        if ($userinfo) {
+            $log->set_source_table('bigbluebuttonbn_logs', array('bigbluebuttonbnid' => backup::VAR_PARENTID));
+        }
 
         // Define id annotations.
         $log->annotate_ids('user', 'userid');
