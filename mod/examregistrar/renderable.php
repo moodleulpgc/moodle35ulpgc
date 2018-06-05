@@ -108,7 +108,13 @@ class examregistrar_exam implements renderable {
     public $examsession = '';
     /** @var int $examfile the row ID for an entry in examfiles table   */
     public $examfile;
+    /** @var int $taken if this exam has been declared taken, in examfiles table   */
+    public $taken;
+    /** @var int $printmode if this exam has to be printed single/double page, in examfiles table   */
+    public $printmode;
 
+    
+    
     /** @var bool $visible   */
     public $visible = true;
 
@@ -176,6 +182,11 @@ class examregistrar_exam implements renderable {
             $message = get_string('error_nonesent', 'examregistrar');
         }
 
+        if($this->examfile && $examfile) {
+            $this->taken = $examfile->taken;
+            $this->printmode  = $examfile->printmode;
+        }
+        
         return $message;
     }
 
@@ -243,8 +254,11 @@ class examregistrar_exam implements renderable {
     }
 
     public function get_print_mode() {
-        global $DB;
-        return $DB->get_field('examregistrar_examfiles', 'printmode', array('id'=>$this->examfile, 'examid'=>$this->examid));
+        if(!$this->examfile && !$this->printmode) {
+            $this->get_valid_file();
+        }
+        
+        return $this->printmode;
     }
 }
 
@@ -461,7 +475,7 @@ class examregistrar_allocatedexam extends examregistrar_exam implements renderab
             $params['venue'] = $venue;
         }
         $fields = get_all_user_name_fields(true, 'u');
-        $sql = "SELECT  b.id AS bid, ss.*,  u.id, u.username, u.idnumber, $fields
+        $sql = "SELECT  b.id AS bid, ss.*, ss.id AS sid, b.userid, b.bookedsite, u.id, u.username, u.idnumber, $fields
                 FROM {examregistrar_bookings} b
                 JOIN {examregistrar_exams} e ON b.examid = e.id AND  e.examsession = :session
                 JOIN {user} u ON b.userid = u.id
@@ -527,7 +541,7 @@ class examregistrar_allocatedexam extends examregistrar_exam implements renderab
         return $venues;
     }
 
-    public function get_room_allocations($venue=-1) {
+    public function get_room_allocations($venue = -1, $room = 0) {
         global $DB;
 
         if($venue < 0) {
@@ -540,6 +554,12 @@ class examregistrar_allocatedexam extends examregistrar_exam implements renderab
             $where = ' AND ss.bookedsite = :venue ';
             $params['venue'] = $venue;
         }
+        if($room) {
+            $where = ' AND ss.roomid = :room ';
+            $params['room'] = $room;
+        }
+        
+        
         $sql = "SELECT  ss.roomid, el.name AS name, ss. examid, COUNT(ss.userid) AS allocated
                 FROM {examregistrar_session_seats} ss
                 JOIN {examregistrar_locations} l ON l.id = ss.roomid
@@ -551,6 +571,35 @@ class examregistrar_allocatedexam extends examregistrar_exam implements renderab
 
         $rooms = $DB->get_records_sql($sql, $params);
         return $rooms;
+    }
+    
+    public function get_responses_status($room = 0) {
+        global $DB;
+        
+        if($room == 0) {
+            $rooms = $this->get_room_allocations(0);
+        } else {
+            $rooms[$room] = $this->get_room_allocations(-1, $room);
+        }
+    
+        $max = 0;
+        $min = 999;
+    
+        foreach($rooms as $rid => $allocation) {
+            $response = $DB->get_record('examregistrar_responses', array('examsession'  => $this->session,
+                                                                                'bookedsite'  => $this->venue,
+                                                                                'roomid'      => $rid,
+                                                                                'examid'      => $this->get_id(),
+                                                                                'examfile'    => $this->examfile,
+                                                                                ));
+            $status = isset($response->status) ? $response->status : 0; 
+            $max = max($max, $status);
+            $min = min($min, $status);
+        }
+        
+        $status = ($max ==  $min) ? $max : EXAM_RESPONSES_WAITING;
+
+        return $status;
     }
 }
 

@@ -154,7 +154,7 @@ if($action == 'response_files' && $examfid) {
     if (!$mform->is_cancelled()) {
         if ($formdata = $mform->get_data()) {
             $formdata = file_postupdate_standard_filemanager($formdata, 'files', $options, $ccontext, 'mod_examregistrar', $data->area, $examfid);
-                print_object($formdata);
+                //print_object($formdata);
             if(isset($formdata->files) && $formdata->files) {
                 $DB->set_field('examregistrar_examfiles', 'taken', 1, array('id'=>$examfid));
             }

@@ -130,6 +130,10 @@
     top: 26px;
     z-index: 1000;
     border-radius: [[setting:navbardropdownborderradius]];
+
+}
+
+.navbar .nav .dropdown-menu, .headermenu .dropdown-menu  {
     max-height: 0;
 
     -webkit-transition: all [[setting:navbardropdowntransitiontime]];
@@ -140,10 +144,9 @@
 
     overflow: hidden;
     opacity: 0;
-
 }
 
-.dropdown:hover .dropdown-menu {
+.navbar .dropdown:hover .dropdown-menu, .headermenu .dropdown:hover .dropdown-menu {
     max-height: 800px;
     opacity: 1;
 }
@@ -151,7 +154,6 @@
 .navbar .nav .dropdown-menu {
     margin-top: 14px!important;
 }
-
 
 .nav .dropdown-menu .icon-time{
     margin-left: 4px;

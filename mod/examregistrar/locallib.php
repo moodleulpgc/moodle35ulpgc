@@ -1194,6 +1194,7 @@ function examregistrar_is_venue_single_room($venue, $returnids=true) {
             $room = reset($rooms);
         }
     }
+    
     return $room;
 }
 
@@ -2242,7 +2243,7 @@ function examregistrar_get_examallocations_byexam(array $filters, $courseids = a
         $params['session'] = $filters['session'];
     }
     if(isset($filters['bookedsite']) && $filters['bookedsite']) {
-        $where .= ' AND ss.bookedsite = :bookedsite ';
+        $where .= ' AND b.bookedsite = :bookedsite ';
         $params['bookedsite'] = $filters['bookedsite'];
     }
 
@@ -2262,7 +2263,7 @@ function examregistrar_get_examallocations_byexam(array $filters, $courseids = a
         $where .= ' AND e.id = :exam ';
         $params['exam'] = $filters['exam'];
     }
-
+/*
     $sql = "SELECT e.*, c.shortname, c.fullname, c.idnumber
                 FROM {examregistrar_exams} e
                 JOIN {course} c ON c.id = e.courseid
@@ -2271,10 +2272,21 @@ function examregistrar_get_examallocations_byexam(array $filters, $courseids = a
                 GROUP BY e.id
                 ORDER BY c.shortname ASC, c.fullname ASC ";
 
+*/
+                
+    $sql = "SELECT e.*, c.shortname, c.fullname, c.idnumber
+                FROM {examregistrar_exams} e
+                JOIN {course} c ON c.id = e.courseid
+                LEFT JOIN {examregistrar_bookings} b ON e.id = b.examid AND b.booked = 1
+                LEFT JOIN {examregistrar_session_seats} ss ON e.id = ss.examid AND  ss.examsession = e.examsession AND b.bookedsite = ss.bookedsite
+                WHERE 1 $where
+                GROUP BY e.id
+                ORDER BY c.shortname ASC, c.fullname ASC ";
+                
     $examallocations = array();
 
     if($allocations = $DB->get_records_sql($sql, $params)) {
-
+    
         foreach($allocations as $allocation) {
             if($courseids && !in_array($allocation->courseid, $courseids)) {
                 continue;
@@ -3607,36 +3619,199 @@ function examregistrar_generateexams_fromcourses($examregistrar, $options) {
 
 
 
-    // check exam file origin for special questions usage
-    function warning_questions_used($examfile) {
-        global $DB;
+// check exam file origin for special questions usage
+function warning_questions_used($examfile) {
+    global $DB;
 
-        $validquestions = get_config('quiz_makeexam', 'validquestions');
-        if($validquestions) {
-            $validquestions = explode(',', $validquestions);
-        } else {
-            return false;
-        }
+    $validquestions = get_config('quiz_makeexam', 'validquestions');
+    if($validquestions) {
+        $validquestions = explode(',', $validquestions);
+    } else {
+        return false;
+    }
 
-        if(!$validquestions) {
-            $validquestions = array();
-        }
+    if(!$validquestions) {
+        $validquestions = array();
+    }
 
-        $warning = false;
-        if($qme_attempt = $DB->get_record('quiz_makeexam_attempts', array('examid' =>$examfile->examid, 'examfileid'=>$examfile->id, 'status'=>1))) {
-            $qids = explode(',', $qme_attempt->questions);
-            if($usedquestions = $DB->get_records_list('question', 'id', $qids, '', 'id, name, qtype')) {
-                foreach($usedquestions as $question) {
-                    if(!in_array($question->qtype, $validquestions)) {
-                        $warning = true;
-                        break;
-                    }
+    $warning = false;
+    if($qme_attempt = $DB->get_record('quiz_makeexam_attempts', array('examid' =>$examfile->examid, 'examfileid'=>$examfile->id, 'status'=>1))) {
+        $qids = explode(',', $qme_attempt->questions);
+        if($usedquestions = $DB->get_records_list('question', 'id', $qids, '', 'id, name, qtype')) {
+            foreach($usedquestions as $question) {
+                if(!in_array($question->qtype, $validquestions)) {
+                    $warning = true;
+                    break;
                 }
             }
         }
-
-        return $warning;
     }
+
+    return $warning;
+}
+
+/**
+ * Saves response files data creating entries in session_answers table 
+ *
+ * @param object $formdata object data from user input form
+ * @param array $options editor file options
+ * @param int $contextid course context 
+ * @param object $eventdata 
+ */
+function examregistrar_save_attendance_files($formdata, $options, $contextid, $eventdata) {
+    global $DB, $USER;
+
+    if($files = $fs->get_directory_files($contextid, 'mod_examregistrar', 'examresponses', $formdata->examfile, '/'.$formdata->bookedsite, false, false)) {
+        foreach($files as $key => $file) {
+            $files[$key] = $file->get_filename(); 
+        }
+        $eventdata['other']['files'] = implode(', ', $files);
+        $event = \mod_examregistrar\event\responses_uploaded::create($eventdata);
+        $event->trigger();
+    }
+    
+    // add data to database
+    $record = new stdClass();
+    $record->examsession = $formdata->session;
+    $record->bookedsite = $formdata->bookedsite;
+    $record->examid = $formdata->examid;
+    $record->roomid = $formdata->bookedsite;
+    $oldrec = $DB->get_record('examregistrar_responses', get_object_vars($record));
+    
+    $record->examfile = $formdata->examfile;                
+    $record->modifierid = $USER->id;
+    $record->timemodified = $now;
+    foreach(array('numfiles', 'showing', 'taken') as $field) {
+        $record->{$field} = isset($oldrec->{$field}) ? $formdata->{$field} + $oldrec->{$field} : $formdata->{$field};
+    }
+    
+    if($oldrec) {
+        $record->id = $oldrec->id;
+        $DB->update_record('examregistrar_responses', $record);
+    } else {
+        $record->status = 0;
+        $record->id = $DB->insert_record('examregistrar_responses', $record);
+    }
+}
+
+
+/**
+ * Review && confirm response files  in session_seats table 
+ *
+ * @param object $formdata object data from user input form
+ * @param string $filename new standarized filename for files
+ * @param int $contextid course context containing files
+ * @param object $eventdata 
+ */
+function examregistrar_confirm_attendance_files($formdata, $filename, $contextid, $eventdata) {
+    global $DB, $USER;
+
+    // move files to new area
+    if($files = $fs->get_directory_files($contextid, 'mod_examregistrar', 'examresponses', $formdata->examfile, '/'.$formdata->bookedsite, false, false)) {
+        $filerecord = new stdClass();
+        $filerecord->filearea = 'responses';
+        $num = (count($files) > 1) ? 1 : 0;
+        foreach($files as $key => $file) {
+            $files[$key] = $file->get_filename(); 
+            $info = pathinfo($files[$key]);
+            //// TODO  ////
+            // make significant suffixes fron users
+            $name = $num ? $filename."($num)" : $filename;
+            $filerecord['filename'] = $name.$info['extension'];  
+            $filerecord['source'] = $info['basename'];  
+            $fs->create_file_from_storedfile($filerecord, $file);
+            $num++;
+            $file->delete();                    
+        }
+
+        $params = array('examsession'   => $formdata->session,
+                        'bookedsite'    => $formdata->bookedsite,
+                        'examid'        => $formdata->examid,
+                        'roomid'        => $formdata->roomid,
+                        'examfile'      => $formdata->examfile,
+                        );
+
+        $record = $DB->get_record('examregistrar_responses', $params, 'id, examfile, timefiles, reviewerid', MUST_EXIST);
+        $record->timefiles = time();
+        $record->reviewerid = $USER->id;
+        $DB->update_record('examregistrar_responses', $record);
+        
+        $eventdata['other']['files'] = implode(', ', $files);
+        $event = \mod_examregistrar\event\responses_accepted::create($eventdata);
+        $event->trigger;
+    }
+}
+
+/**
+ * Saves user attendance data in session_seats table 
+ *
+ * @param object $formdata object data from user input form
+ * @param object $eventdata 
+ */
+function examregistrar_save_attendance_userdata($formdata, $eventdata) {
+    global $DB, $USER;
+
+    $params = array('examsession'   => $formdata->session,
+                    'bookedsite'    => $formdata->bookedsite,
+                    'examid'        => $formdata->examid,
+                    'roomid'        => $formdata->roomid,
+                    );
+    $now = time();
+    
+    foreach($formdata->users as $uid => $attendance) {
+        $record->userid = $uid;
+        $userdata = $DB->get_record('examregistrar_session_seats', get_object_vars($record), '*', MUST_EXIST);
+        $userdata->showing = $attendance->showing;
+        $userdata->taken = $attendance->taken;
+        $userdata->certified = $attendance->certified;
+        $userdata->status = 0;
+        $userdata->modifierid = $USER->id;
+        $userdata->timemodified = $now;
+        $DB->update_record('examregistrar_session_seats', $userdata);
+    }
+    
+    $event = \mod_examregistrar\event\attendance_uploaded::create($eventdata);
+    $event->trigger();
+}
+
+/**
+ * Saves user attendance data in session_seats table 
+ *
+ * @param object $formdata object data from user input form
+ * @param object $eventdata 
+ */
+function examregistrar_confirm_attendance_userdata($formdata, $eventdata) {
+    global $DB, $USER;
+
+    $params = array('examsession'   => $formdata->session,
+                    'bookedsite'    => $formdata->bookedsite,
+                    'examid'        => $formdata->examid,
+                    'roomid'        => $formdata->roomid,
+                    );
+                    
+    $select = '';
+    foreach($params as $param) {
+        $select .= " $param = :$param AND ";
+    }
+    list($insql, $uparams) = $DB->get_in_or_equal(array_keys($formdata->users), SQL_PARAMS_NAMED, 'u_');
+    $select .= " userid $insql ";
+    $params = $params + $uparams;
+    
+    $DB->set_field_select('examregistrar_session_seats', 'status', 99, $select." userid $insql ", $params + $uparams); 
+    $DB->set_field_select('examregistrar_session_seats', 'reviewerid', $USER->id, $select." userid $insql ", $params + $uparams);
+    $now = time();
+    //$DB->set_field_select('examregistrar_session_seats', 'timereviewed', $now, $select." userid $insql ", $params + $uparams); 
+
+    $params['examfile']  = $formdata->examfile;
+    $DB->set_field_select('examregistrar_responses', 'timeuserdata', time(), $select." examfile = :examfile", $params); 
+    
+    $event = \mod_examregistrar\event\attendance_confirmed::create($eventdata);
+    $event->trigger();
+}
+
+
+
+
 
 
 

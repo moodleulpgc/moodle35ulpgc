@@ -1,9 +1,6 @@
 language: php
 
-# Workaround for fixing that Selenium server is not running and therefore Behat tests not working
-sudo: required
-# ORIGINAL:
-# sudo: false
+sudo: false
 
 addons:
   firefox: "47.0.1"
@@ -24,7 +21,9 @@ php:
 
 env:
  global:
+  - MOODLE_BRANCH=MOODLE_34_STABLE
   - MOODLE_BRANCH=MOODLE_35_STABLE
+  - MOODLE_BRANCH=master
  matrix:
   - DB=pgsql
   - DB=mysqli
@@ -50,4 +49,4 @@ script:
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat --dump
+  - moodle-plugin-ci behat

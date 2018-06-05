@@ -197,7 +197,7 @@ $capabilities = array(
         )
     ),
 
-     'mod/examregistrar:bookothers' => array(
+    'mod/examregistrar:bookothers' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
@@ -205,5 +205,30 @@ $capabilities = array(
         )
     ),
 
+    'mod/examregistrar:reviewtaken' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+    
+    'mod/examregistrar:uploadresponses' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'mod/examregistrar:confirmresponses' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    
 );
 

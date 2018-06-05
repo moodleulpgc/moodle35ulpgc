@@ -68,12 +68,12 @@ trait single_section_page {
      * Output the html for a single section page.
      *
      * @param stdClass $course The course entry from DB.
-     * @param array $sections (argument not used).
-     * @param array $mods (argument not used).
-     * @param array $modnames (argument not used).
-     * @param array $modnamesused (argument not used).
-     * @param boolean $showsectionzero states if section zero is to be shown at the top of the section.
-     * @param int $displaysection The section number in the course which is being displayed.
+     * @param array    $sections (argument not used).
+     * @param array    $mods (argument not used).
+     * @param array    $modnames (argument not used).
+     * @param array    $modnamesused (argument not used).
+     * @param int      $displaysection The section number in the course which is being displayed.
+     * @param boolean  $showsectionzero states if section zero is to be shown at the top of the section.
      */
     protected function print_single_section_page_content($course, $sections, $mods, $modnames, $modnamesused, $displaysection,
             $showsectionzero = 1) {

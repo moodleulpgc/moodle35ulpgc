@@ -106,10 +106,15 @@ class examboard_notify_form extends moodleform {
         $mform->addRule('messagebody', null, 'required', null, 'client');
         $mform->addElement('static', 'messagebodyhelp', '', get_string('defaultbody', 'examboard'));
         
-        
         $mform->addElement('filepicker', 'logofile', get_string('logofile', 'examboard'), null, array('maxbytes' => $CFG->maxbytes, 'accepted_types' => 'image'));
         $mform->addHelpButton('logofile', 'logofile', 'examboard');
 
+        $mform->addElement('text', 'logowidth', get_string('logowidth', 'examboard'), array('size'=>'4'));
+        $mform->setDefault('logowidth', '20');
+        $mform->setType('logowidth', PARAM_FLOAT); 
+        $mform->addRule('logowidth', null, 'numeric', null, 'client');
+        $mform->addHelpButton('logowidth', 'logowidth', 'examboard');
+        
         $mform->addElement('text', 'messagesender', get_string('messagesender', 'examboard'), array('size'=>'64'));
         $mform->setDefault('messagesender', '');
         $mform->setType('messagesender', PARAM_TEXT); 

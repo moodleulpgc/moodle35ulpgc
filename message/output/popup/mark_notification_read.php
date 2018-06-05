@@ -15,17 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local plugin "sandbox" - Version file
+ * Mark a notification read and redirect to the relevant content.
  *
- * @package    local_sandbox
- * @copyright  2014 Alexander Bias, Ulm University <alexander.bias@uni-ulm.de>
+ * @package    message_popup
+ * @copyright  2018 Michael Hawkins
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+require_once(__DIR__ . '/../../../config.php');
 
-$plugin->component = 'local_sandbox';
-$plugin->version = 2018053000;
-$plugin->release = 'v3.5-r1';
-$plugin->requires = 2018051700;
-$plugin->maturity = MATURITY_STABLE;
+require_login(null, false);
+
+if (isguestuser()) {
+    redirect($CFG->wwwroot);
+}
+
+$notificationid = required_param('notificationid', PARAM_INT);
+$redirecturl = optional_param('redirecturl', $CFG->wwwroot, PARAM_LOCALURL);
+$notification = $DB->get_record('notifications', array('id' => $notificationid));
+
+// Check notification belongs to this user.
+if ($USER->id != $notification->useridto) {
+    redirect($CFG->wwwroot);
+}
+
+\core_message\api::mark_notification_as_read($notification);
+redirect($redirecturl);

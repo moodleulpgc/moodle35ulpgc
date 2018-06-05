@@ -402,6 +402,8 @@ $string['logofile_help'] = 'Un archivo gráfico con un logotipo o sello que s ei
 Debe ser una archivo de imagen (png, jpg etc.).
 
 ';
+$string['logowidth'] = 'Anchura del Logo';
+$string['logowidth_help'] = 'La anchura deseada del logo en la imagen impresa, en mm.';
 $string['messagesender'] = 'Firma formal';
 $string['messagesender_help'] = 'Una línea de cierre, después del texto principal y del enlace automático a la actividad. 
 Debería incluir el cargo o rol de la persona que emite la notificación. 

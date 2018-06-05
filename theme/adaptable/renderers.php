@@ -67,16 +67,12 @@ if (file_exists("$CFG->dirroot/course/format/grid/renderer.php")) {
          * @return string HTML to output.
          */
         protected function section_nav_selection($course, $sections, $displaysection) {
-            if (!$this->topic0attop) {
-                $section = 0;
-            } else {
-                $section = 1;
-            }
+            $section = 0;
             return $this->section_nav_selection_content($course, $sections, $displaysection, $section);
         }
 
         /**
-         * Generate next/previous section links for naviation.
+         * Generate next/previous section links for navigation.
          *
          * @param stdClass $course The course entry from DB.
          * @param array $sections The course_sections entries from the DB.
@@ -84,11 +80,8 @@ if (file_exists("$CFG->dirroot/course/format/grid/renderer.php")) {
          * @return array associative array with previous and next section link.
          */
         public function get_nav_links($course, $sections, $sectionno) {
-            if (!$this->topic0attop) {
-                $buffer = -1;
-            } else {
-                $buffer = 0;
-            }
+            $buffer = -1;
+
             return $this->get_nav_links_content($course, $sections, $sectionno, $buffer);
         }
 
@@ -103,8 +96,7 @@ if (file_exists("$CFG->dirroot/course/format/grid/renderer.php")) {
          * @param int $displaysection The section number in the course which is being displayed.
          */
         public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) {
-            $this->print_single_section_page_content($course, $sections, $mods, $modnames, $modnamesused, $displaysection,
-                $this->topic0attop);
+            $this->print_single_section_page_content($course, $sections, $mods, $modnames, $modnamesused, $displaysection, false);
         }
     }
 }
