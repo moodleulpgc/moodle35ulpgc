@@ -49,6 +49,7 @@ define('EXAM_STATUS_VALIDATED', 10);
 // responses statusses
 define('EXAM_RESPONSES_UNSENT', 0);
 define('EXAM_RESPONSES_SENT', 3);
+define('EXAM_RESPONSES_ADDING', 4);
 define('EXAM_RESPONSES_WAITING', 5);
 define('EXAM_RESPONSES_REJECTED', 7);
 define('EXAM_RESPONSES_COMPLETED', 9);
@@ -809,7 +810,9 @@ function examregistrar_update_grades(stdClass $examregistrar, $userid = 0) {
  */
 function examregistrar_get_file_areas($course, $cm, $context) {
     return array('exam'=>get_string('areaexamfile', 'examregistrar'),
-                 'responses'=>get_string('areaexamresponses', 'examregistrar'));
+                 'responses'=>get_string('areaexamresponses', 'examregistrar'),
+                 'examresponses'=>get_string('areaexamresponsestemp', 'examregistrar'),
+                 'sessionresponses'=>get_string('areasesionresponses', 'examregistrar'),);
 }
 
 /**
@@ -884,7 +887,7 @@ function examregistrar_get_file_info($browser, $areas, $course, $cm, $context, $
 function examregistrar_pluginfile($course, $cm, context $context, $filearea, $args, $forcedownload) {
     global $DB, $CFG;
 
-    $fileareas = array('exam', 'responses', 'answers', 'sheet', 'sessionrooms', 'sessionresponses', 'session');
+    $fileareas = array('exam', 'responses', 'answers', 'sheet', 'sessionrooms', 'sessionresponses', 'session', 'examresponses', 'roomresponses');
     if (!in_array($filearea, $fileareas)) {
         return false;
     }
@@ -964,6 +967,14 @@ function examregistrar_pluginfile($course, $cm, context $context, $filearea, $ar
 
 
     function examregistrar_file_decode_type($type) {
+    
+        // a hack to avoid changing other references
+        $path = '';
+        if(is_array($type)) {
+            $type = $type[0];
+            $path = $type[1];
+        }
+    
         switch($type) {
             case 'exam'     :   $area = 'exam';
                                 $path = '/';
@@ -987,6 +998,15 @@ function examregistrar_pluginfile($course, $cm, context $context, $filearea, $ar
                                 $area = 'sessionresponses';
                                 $path = '/';
                                 break;
+            case 'examresponses':
+                                $area = 'examresponses';
+                                $path = '/';
+                                break;
+            case 'roomresponses':
+                                $area = 'roomresponses';
+                                $path = '/';
+                                break;
+
         }
         return array($area, $path);
     }

@@ -541,7 +541,7 @@ class examregistrar_allocatedexam extends examregistrar_exam implements renderab
         return $venues;
     }
 
-    public function get_room_allocations($venue = -1, $room = 0) {
+    public function get_room_allocations($venue = -1, $room = 0, $withresponses = false) {
         global $DB;
 
         if($venue < 0) {
@@ -559,40 +559,44 @@ class examregistrar_allocatedexam extends examregistrar_exam implements renderab
             $params['room'] = $room;
         }
         
+        $responses = '';
+        $responsesjoin = '';
+        if($withresponses) {
+            $responses = ', r.id AS responseid, r.numfiles, r.showing, r.taken, r.status ';
+            $responsesjoin = 'LEFT JOIN {examregistrar_responses} r ON r.examsession = ss.examsession AND r.examid = ss.examid AND r.roomid = ss.roomid ';
+        }
         
-        $sql = "SELECT  ss.roomid, el.name AS name, ss. examid, COUNT(ss.userid) AS allocated
+        $sql = "SELECT  ss.roomid, el.name AS name, el.idnumber, ss. examid, COUNT(ss.userid) AS allocated $responses
                 FROM {examregistrar_session_seats} ss
                 JOIN {examregistrar_locations} l ON l.id = ss.roomid
                 JOIN {examregistrar_elements} el ON l.examregid = el.examregid AND el.type = 'locationitem' AND l.location = el.id
+                $responsesjoin
                 WHERE ss.examid = :exam $where
                 GROUP BY ss.roomid
                 ORDER BY el.name ";
-
 
         $rooms = $DB->get_records_sql($sql, $params);
         return $rooms;
     }
     
-    public function get_responses_status($room = 0) {
+    public function get_responses_status($room = 0, $venue = false) {
         global $DB;
         
+        $rooms = array();
+        
         if($room == 0) {
-            $rooms = $this->get_room_allocations(0);
+            $rooms = $this->get_room_allocations(0, 0, true);
+        } elseif($venue) {
+            $rooms = $this->get_room_allocations($room, 0, true);
         } else {
-            $rooms[$room] = $this->get_room_allocations(-1, $room);
+            $rooms = $this->get_room_allocations(-1, $room, true);
         }
     
         $max = 0;
         $min = 999;
     
-        foreach($rooms as $rid => $allocation) {
-            $response = $DB->get_record('examregistrar_responses', array('examsession'  => $this->session,
-                                                                                'bookedsite'  => $this->venue,
-                                                                                'roomid'      => $rid,
-                                                                                'examid'      => $this->get_id(),
-                                                                                'examfile'    => $this->examfile,
-                                                                                ));
-            $status = isset($response->status) ? $response->status : 0; 
+        foreach($rooms as $rid => $room) {
+            $status = isset($room->status) ? $room->status : 0; 
             $max = max($max, $status);
             $min = min($min, $status);
         }

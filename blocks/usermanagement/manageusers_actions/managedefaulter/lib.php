@@ -213,7 +213,7 @@ function create_course_defaulter($course_category, $course_fullname, $course_sho
 	$DB->delete_records('admin_moroso', array('userid'=>-1));
 
 	//Creamos el curso para los defaulters
-	$data = new object();
+	$data = new stdClass();
 
 	$data->category		= $course_category;
 	$data->sortorder 	= '';
@@ -241,7 +241,7 @@ function create_course_defaulter($course_category, $course_fullname, $course_sho
 	//meter en la tabla admin_moroso
 	//lo identificaremos por el userid = -1
 	$table 			= 'admin_moroso';
-	$aux 			= new object();
+	$aux 			= new stdClass();
 	$aux->course 	= $course; //$contextid;
 	$aux->userid 	= -1;
 

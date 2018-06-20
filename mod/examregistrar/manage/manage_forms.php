@@ -1066,51 +1066,200 @@ class examregistrar_response_files_form extends moodleform {
     }
 }
     
+
     
-class examregistrar_examresponses_form extends moodleform {
+class examregistrar_roomresponses_form extends moodleform {
     function definition() {
         $mform = $this->_form;
 
         $data    = $this->_customdata['data'];
         $options = $this->_customdata['options'];
-
-        $mform->addElement('hidden', 'id', $data->id);
-        $mform->setType('id', PARAM_INT);
-        if(isset($data->tab)) {
-            $mform->addElement('hidden', 'tab', $data->tab);
-            $mform->setType('tab', PARAM_ALPHANUM);
-        }
+        
         if(isset($data->session)) {
             $mform->addElement('hidden', 'session', $data->session);
             $mform->setType('session', PARAM_INT);
         }
-        if(isset($data->period)) {
-            $mform->addElement('hidden', 'period', $data->period);
-            $mform->setType('period', PARAM_INT);
-        }
         if(isset($data->bookedsite)) {
             $mform->addElement('hidden', 'venue', $data->bookedsite);
             $mform->setType('venue', PARAM_INT);
+        }
+        if(isset($data->room)) {
+            $mform->addElement('hidden', 'room', $data->room);
+            $mform->setType('room', PARAM_INT);
+        }
+        if(isset($data->action)) {
+            $mform->addElement('hidden', 'action', $data->action);
+            $mform->setType('action', PARAM_ALPHANUMEXT);
+        }
+        
+        $fields = array('showing' => get_string('usershowing', 'examregistrar'), 
+                        'taken' => get_string('usertaken', 'examregistrar'), 
+                        'certified' => get_string('usercertified', 'examregistrar'),
+                        );
+
+        $users = examregistrar_get_session_venue_users($data->session, $data->bookedsite);
+        $exams = array();
+        $exam = new stdClass();
+        $exam->shortname = '';
+        $exam->fullname = '';
+        $exam->allocated = 1;
+        $exam->showing = 0;
+        $exam->taken = 0;
+
+        $mform->addElement('header', 'headeruserdata', get_string('headeruserdata', 'examregistrar'));
+        $mform->addElement('advcheckbox', 'loadattendance', get_string('loadattendance', 'examregistrar'), 
+                                                    get_string('loadattendance_explain', 'examregistrar')); 
+        
+        $mform->setDefault('loadattendance', 0);
+       
+        $userstatus = array(EXAM_RESPONSES_UNSENT,
+                            EXAM_RESPONSES_SENT,
+                            EXAM_RESPONSES_WAITING,
+                            EXAM_RESPONSES_REJECTED,
+                            EXAM_RESPONSES_COMPLETED,
+                            EXAM_RESPONSES_VALIDATED,
+                            );
+                            
+        foreach($userstatus as $status) {
+            $userstatus[$status] = mod_examregistrar_renderer::get_responses_icon($status);
+        }
+        
+        $stradd = get_string('useradd', 'examregistrar');
+        
+        foreach($users as $bid => $user) {
+        
+            if(!isset($exams[$user->examid])) {
+                $exams[$user->examid] = clone $exam;
+                $exams[$user->examid]->shortname = $user->shortname;
+                $exams[$user->examid]->fullname = $user->fullname;
+            } else {
+                $exams[$user->examid]->allocated++;
+            }
+            if($user->showing) {
+                $exams[$user->examid]->showing++;
+            }
+            if($user->taken) {
+                $exams[$user->examid]->taken++;
+            }
+            
+            $userattendance = array();
+            $userattendance[] = $mform->createElement('static', 'exam', '', $user->shortname);
+            $userattendance[] = $mform->createElement('advcheckbox', 'add', '', $stradd, array('group' => 'add'), array(0, $user->userid));
+            $mform->disabledIf("userattendance[{$user->sid}][add]", "loadattendance", 'notchecked');
+            foreach($fields as $field => $name) {
+                $userattendance[] = $mform->createElement('advcheckbox', $field, '', $name, array('group' => $field));
+                $mform->setDefault("userattendance[{$user->sid}][$field]", $user->$field);
+                $mform->disabledIf("userattendance[{$user->sid}][$field]", "loadattendance", 'notchecked');
+            }
+            $userattendance[] = $mform->createElement('hidden', 'examid', $user->examid);
+            $mform->setType("userattendance[{$user->sid}][examid]", PARAM_INT);
+            
+            $userattendance[] = $mform->createElement('static', '', '', $userstatus[$user->status]);
+            $group = $mform->addGroup($userattendance, "userattendance[$user->sid]", fullname($user), ' ', true);
+        }
+        
+        $allnonestr = get_string('selectallornone', 'form');
+        $this->add_checkbox_controller('add', $stradd.' - '.$allnonestr );
+        foreach($fields as $field => $name) {
+            $this->add_checkbox_controller($field, $name.' - '.$allnonestr );
+        }
+        
+        $statusmenu = array(EXAM_RESPONSES_SENT => get_string('status_sent', 'examregistrar'),
+                            EXAM_RESPONSES_WAITING => get_string('status_waiting', 'examregistrar'),
+                            EXAM_RESPONSES_COMPLETED => get_string('status_completed', 'examregistrar'),
+                            );
+        if($data->canreview) {
+            $statusmenu[EXAM_RESPONSES_VALIDATED] = get_string('status_validated', 'examregistrar');
+        }
+
+        $mform->addElement('select', 'userstatus', get_string('status', 'examregistrar'), $statusmenu);
+        $mform->addHelpButton('userstatus', 'responsestatus', 'examregistrar');
+        $mform->disabledIf('userstatus', 'loadattendance', 'notchecked');
+        
+        $mform->addElement('header', 'headerexamsdata', get_string('headerexamsdata', 'examregistrar'));
+
+        $size = array('size'=>'4');
+        $labelsep = get_string('labelsep', 'langconfig');
+        
+        //    $name = ' '.$room->name.$labelsep;
+          //  $userfiles[$rid] = $mform->createElement('text', "showing[$rid]", $name, $size);
+
+        
+        $examattendance = array();
+        $examattendance[] = $mform->createElement('static', '', '', get_string('allocated', 'examregistrar'));
+        $examattendance[] = $mform->createElement('static', '', '', get_string('taken', 'examregistrar'));
+        $examattendance[] = $mform->createElement('static', '', '', get_string('status', 'examregistrar'));
+        
+        $group = $mform->addGroup($examattendance, "examattendancehead", '', ' &nbsp; ', true);
+        
+        ksort($exams);
+        foreach($exams as $eid => $exam) { 
+        
+            $examattendance = array();
+            $examattendance[] = $mform->createElement('static', ' ee ', ' dd ', ' &nbsp;&nbsp; &nbsp;&nbsp; '.$exam->allocated. ' &nbsp;&nbsp;  &nbsp;&nbsp;');
+            $examattendance[] = $mform->createElement('text', 'taken', $name, $size);
+            $mform->setType("examattendance[$eid][taken]", PARAM_INT);
+            $mform->setDefault("examattendance[$eid][taken]", $exam->taken);
+            //$mform->disabledIf("showing[$rid]", "roomdata[$rid]", 'notchecked');
+            $examattendance[] = $mform->createElement('select', 'status', '', $statusmenu);
+        
+            $group = $mform->addGroup($examattendance, "examattendance[$eid]", $exam->shortname, ' &nbsp; ', true);
+        }                
+                        
+        $mform->addElement('header', 'headerresponsefiles', get_string('headerresponsefiles', 'examregistrar'));
+        
+        $mform->addElement('filemanager', 'files_filemanager', get_string('files'), null, $options);
+
+        $actionmenu = array('add' => get_string('add'), 'replace'=>get_string('delete')); 
+        $mform->addElement('select', 'filesaction', get_string('filesaction', 'examregistrar'), $actionmenu);
+        $mform->setDefault('filesaction', 'add');
+        
+        $mform->setExpanded('headerresponsefiles', true);
+       
+        $submit_string = get_string('savechanges');
+
+        $this->add_action_buttons(true, $submit_string);
+    
+    }
+    
+    
+}
+    
+class examregistrar_examresponses_form extends moodleform {
+    function definition() {
+        $mform = $this->_form;
+//id=8669&tab=printexams&period=1&session=1&venue=0&term=0&searchname=&searchid=&programme=&sorting=shortname&order=ASC&user=2
+        $data    = $this->_customdata['data'];
+        $options = $this->_customdata['options'];
+        
+        if(isset($data->session)) {
+            $mform->addElement('hidden', 'session', $data->session);
+            $mform->setType('session', PARAM_INT);
+        }
+        if(isset($data->room)) {
+            $mform->addElement('hidden', 'room', $data->room);
+            $mform->setType('room', PARAM_INT);
         }
         if(isset($data->action)) {
             $mform->addElement('hidden', 'action', $data->action);
             $mform->setType('action', PARAM_ALPHANUMEXT);
         }
         if(isset($data->examfile)) {
-            $mform->addElement('hidden', 'examf', $data->examfile);
-            $mform->setType('examf', PARAM_INT);
+            $mform->addElement('hidden', 'examfile', $data->examfile);
+            $mform->setType('examfile', PARAM_INT);
         }
-        if(isset($data->examfile)) {
-            $mform->addElement('hidden', 'exam', $data->examid);
-            $mform->setType('exam', PARAM_INT);
+        if(isset($data->examid)) {
+            $mform->addElement('hidden', 'examid', $data->examid);
+            $mform->setType('examid', PARAM_INT);
         }
-        if(isset($data->course)) {
-            $mform->addElement('hidden', 'course', $data->courseid);
-            $mform->setType('course', PARAM_INT);
+        /*
+        if(isset($data->responseid)) {
+            $mform->addElement('hidden', 'responseid', $data->responseid);
+            $mform->setType('responseid', PARAM_INT);
         }
-
-        //print_object($data);
+*/
         
+        //print_object($data);
         
         $mform->addElement('header', 'headeruserdata', get_string('headeruserdata', 'examregistrar'));
         $mform->addElement('advcheckbox', 'loadattendance', get_string('loadattendance', 'examregistrar'), get_string('loadattendance_explain', 'examregistrar')); 
@@ -1139,14 +1288,17 @@ class examregistrar_examresponses_form extends moodleform {
             $userstatus[$status] = mod_examregistrar_renderer::get_responses_icon($status);
         }
         
+        $stradd = get_string('useradd', 'examregistrar');
         foreach($data->users as $bid => $user) {
             if(!isset($data->rooms[$user->roomid])) {
                 continue;
             }
             $userattendance = array();
-            //$userattendance[] = $mform->createElement('static', "usefullrname[$uid]", '', fullname($user));
+            $userattendance[] = $mform->createElement('advcheckbox', 'add', '', $stradd, array('group' => 'add'), array(0, $user->userid));
+            $mform->disabledIf("userattendance[{$user->sid}][add]", "loadattendance", 'notchecked');
             foreach($fields as $field => $name) {
                 $userattendance[] = $mform->createElement('advcheckbox', $field, '', $name, array('group' => $field));
+                $mform->setDefault("userattendance[{$user->sid}][$field]", $user->$field);
                 $mform->disabledIf("userattendance[{$user->sid}][$field]", "loadattendance", 'notchecked');
             }
             
@@ -1156,9 +1308,11 @@ class examregistrar_examresponses_form extends moodleform {
                 $userattendance[] = $mform->createElement('static', '', '', ' &nbsp;  &nbsp;  '.$data->rooms[$user->roomid]->name);
             }
 
-            $group = $mform->addGroup($userattendance, "userattendance[$user->sid]",  fullname($user), ' ', true);
+            $group = $mform->addGroup($userattendance, "userattendance[$user->sid]", fullname($user), ' ', true);
         }
+        
         $allnonestr = get_string('selectallornone', 'form');
+        $this->add_checkbox_controller('add', $stradd.' - '.$allnonestr );
         foreach($fields as $field => $name) {
             $this->add_checkbox_controller($field, $name.' - '.$allnonestr );
         }
@@ -1180,33 +1334,41 @@ class examregistrar_examresponses_form extends moodleform {
         if($multiplerooms) {
             $mform->addElement('header', 'headerroomsdata', get_string('headerroomsdata', 'examregistrar'));
         } else {
-            $mform->addElement('header', 'headerresponsefiles', get_string('headerroomsdata', 'examregistrar'));
+            $mform->addElement('header', 'headerresponsefiles', get_string('headerresponsefiles', 'examregistrar'));
         }
 
         $roomnames = array();
         foreach($data->rooms as $rid => $room) {
             $mform->addElement('hidden', "rooms[$rid]", $room->allocated);
             $mform->setType("rooms[$rid]", PARAM_INT);
-            $roomnames[] = ' '.$room->name.': ';
+             if(isset($data->session)) {
+            $mform->addElement('hidden', 'session', $data->session);
+            $mform->setType('session', PARAM_INT);
+        }       $roomnames[] = ' '.$room->name.': ';
         }
         
         $userfiles = array();
         foreach($data->rooms as $rid => $room) {
-            $userfiles[] = $mform->createElement('advcheckbox', "roomdata[$rid]", '', $room->name.'&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;  &nbsp;&nbsp;', array('group' => 'rooms'));
+            $allocated = get_string('numsuffix', 'examregistrar', $room->allocated);
+            $userfiles[] = $mform->createElement('advcheckbox', "roomdata[$rid]", '', $room->name.$allocated, array('group' => 'rooms'), array(0, $room->allocated));
         }
         $group = $mform->addGroup($userfiles, "roomattendance_group",  get_string('loadroomattendance', 'examregistrar'), '', false);
         
         $userfiles = array();
         $userfiles[] = $mform->createElement('static', $rid, '', '');
         $rules = array();
+        $size = array('size'=>'2');
+        $labelsep = get_string('labelsep', 'langconfig');
         foreach($data->rooms as $rid => $room) {
-            $userfiles[] = $mform->createElement('text', "showing[$rid]", '', array('size'=>'4'));
+            $name = ' '.$room->name.$labelsep;
+            $userfiles[$rid] = $mform->createElement('text', "showing[$rid]", $name, $size);
             $mform->setType("showing[$rid]", PARAM_INT);
+            $mform->setDefault("showing[$rid]", $data->rooms[$rid]->showing);
             $mform->disabledIf("showing[$rid]", "roomdata[$rid]", 'notchecked');
             $rules["showing[$rid]"] = array(array(null, 'numeric', null, 'client'));
         }
         //$userfiles[] = $mform->createElement('static', $rid, '', '');
-        $group = $mform->addGroup($userfiles, 'showing_group',  get_string('usershowing', 'examregistrar'), $roomnames, false);
+        $group = $mform->addGroup($userfiles, 'showing_group',  get_string('usershowing', 'examregistrar'), '', false);
         $mform->addHelpButton('showing_group', 'usershowing', 'examregistrar');
         $mform->addGroupRule('showing_group', $rules);
         
@@ -1214,25 +1376,26 @@ class examregistrar_examresponses_form extends moodleform {
         $userfiles[] = $mform->createElement('static', $rid, '', '');
         $rules = array();
         foreach($data->rooms as $rid => $room) {
-            $userfiles[] = $mform->createElement('text', "taken[$rid]", '', array('size'=>'4'));
+            $name = ' '.$room->name.$labelsep;
+            $userfiles[] = $mform->createElement('text', "taken[$rid]", $name, $size);
             $mform->setType("taken[$rid]", PARAM_INT);
+            $mform->setDefault("taken[$rid]", $data->rooms[$rid]->taken);
             $mform->disabledIf("taken[$rid]", "roomdata[$rid]", 'notchecked');
             $rules["taken[$rid]"] = array(array(null, 'numeric', null, 'client'));
         }
         //$userfiles[] = $mform->createElement('static', $rid, '', '');
-        $group = $mform->addGroup($userfiles, 'taken_group',  get_string('usertaken', 'examregistrar'), $roomnames, false);
+        $group = $mform->addGroup($userfiles, 'taken_group',  get_string('usertaken', 'examregistrar'), '', false);
         $mform->addHelpButton('taken_group', 'usertaken', 'examregistrar');
         $mform->addGroupRule('taken_group', $rules);
         
         $userfiles = array();
-        $userfiles[] = $mform->createElement('static', $rid, '', '');
         foreach($data->rooms as $rid => $room) {
-            $userfiles[] = $mform->createElement('select', $rid, $room->name, $statusmenu);
+            $name = $name = ' '.$room->name.$labelsep;
+            $userfiles[] = $mform->createElement('select', $rid, $name, $statusmenu);
             $mform->disabledIf("roomstatus[$rid]", "roomdata[$rid]", 'notchecked');
+            $mform->setDefault("roomstatus[$rid]", $data->rooms[$rid]->status);
         }
-        $userfiles[] = $mform->createElement('static', $rid, '', '');
-        $group = $mform->addGroup($userfiles, 'roomstatus',  get_string('status', 'examregistrar'), $roomnames, true);
-
+        $group = $mform->addGroup($userfiles, 'roomstatus',  get_string('status', 'examregistrar'), '', true);
         
         if($multiplerooms) {
             $mform->setExpanded('headerroomsdata', false);
@@ -1245,38 +1408,38 @@ class examregistrar_examresponses_form extends moodleform {
         $mform->setExpanded('headerresponsefiles', true);
         
         if($multiplerooms) {
-            
-            
-            $mform->addElement('advcheckbox', 'loadsitedata', get_string('loadsitedata', 'examregistrar'), get_string('loadsitedata_explain', 'examregistrar')); 
-            $mform->setDefault('loadsitedata', 0);
+            $name = "roomdata[{$data->bookedsite}]";
+            $allocated = 0;
             foreach($data->rooms as $rid => $room) {
-                $mform->disabledIf('loadsitedata', "roomdata[$rid]", 'checked');
+                $allocated += $room->allocated;
+            }
+            
+            $mform->addElement('advcheckbox', $name, get_string('loadsitedata', 'examregistrar'), get_string('loadsitedata_explain', 'examregistrar'), array(), array(0, $allocated)); 
+            $mform->setDefault($name, 0);
+            foreach($data->rooms as $rid => $room) {
+                $mform->disabledIf($name, "roomdata[$rid]", 'checked');
             }
             
             unset($fields['certified']);
             foreach($fields as $field => $name) {
                 $fname = $field.'['.$data->bookedsite.']';
-                $mform->addElement('text', $fname, $name, array('size'=>'4'));
+                $mform->addElement('text', $fname, $name, $size);
                 $mform->setType($fname, PARAM_INT);
                 $mform->addRule($fname, null, 'numeric', null, 'client');
                 $mform->addHelpButton($fname, 'user'.$field, 'examregistrar');
-                $mform->disabledIf($fname, 'loadsitedata', 'notchecked');
+                $mform->disabledIf($fname, "roomdata[{$data->bookedsite}]", 'notchecked');
+                foreach($data->rooms as $rid => $room) {
+                    $mform->disabledIf($fname, "roomdata[$rid]", 'checked');
+                }
             }
-           
 
 //            $statusmenu = array(0 => 'unconfirmed', 1=>'confirmed', 2=>'reviewed');
-            $mform->addElement('select', 'filesstatus', get_string('status', 'examregistrar'), $statusmenu);
-
-            
+            $mform->addElement('select', "roomstatus[{$data->bookedsite}]", get_string('status', 'examregistrar'), $statusmenu);
         }
-        
-
         
         $submit_string = get_string('savechanges');
 
         $this->add_action_buttons(true, $submit_string);
-
-
     }
     
     
@@ -1309,4 +1472,222 @@ class examregistrar_examresponses_form extends moodleform {
     
 }
 
- 
+
+class examregistrar_confirmresponses_form extends moodleform {
+    function definition() {
+        $mform = $this->_form;
+
+        $data    = $this->_customdata['data'];
+        $options = $this->_customdata['options'];
+
+        if(isset($data->session)) {
+            $mform->addElement('hidden', 'session', $data->session);
+            $mform->setType('session', PARAM_INT);
+        }
+        if(isset($data->action)) {
+            $mform->addElement('hidden', 'action', $data->action);
+            $mform->setType('action', PARAM_ALPHANUMEXT);
+        }
+        if(isset($data->examfile)) {
+            $mform->addElement('hidden', 'examfile', $data->examfile);
+            $mform->setType('examfile', PARAM_INT);
+        }
+        if(isset($data->examfile)) {
+            $mform->addElement('hidden', 'examid', $data->examid);
+            $mform->setType('examid', PARAM_INT);
+        }
+
+        //print_object($data);
+        //print_object("examregistrar_confirmresponses_form");
+        
+        
+        $mform->addElement('header', 'headeruserdata', get_string('headeruserdata', 'examregistrar'));
+        $mform->addElement('advcheckbox', 'loadattendance', get_string('loadattendance', 'examregistrar'), get_string('loadattendance_explain', 'examregistrar')); 
+        $mform->setDefault('loadattendance', 0);
+        
+        $fields = array('showing' => get_string('usershowing', 'examregistrar'), 
+                        'taken' => get_string('usertaken', 'examregistrar'), 
+                        'certified' => get_string('usercertified', 'examregistrar'),
+                        );
+        
+        $userstatus = array(EXAM_RESPONSES_UNSENT,
+                            EXAM_RESPONSES_SENT,
+                            EXAM_RESPONSES_WAITING,
+                            EXAM_RESPONSES_REJECTED,
+                            EXAM_RESPONSES_COMPLETED,
+                            EXAM_RESPONSES_VALIDATED,
+                            );
+                            
+        foreach($userstatus as $status) {
+            $userstatus[$status] = mod_examregistrar_renderer::get_responses_icon($status);
+        }
+        
+        $strset = get_string('yes');
+        $strunset = get_string('no');
+        foreach($data->users as $bid => $user) {
+            if(!isset($data->rooms[$user->roomid])) {
+                continue;
+            }
+            
+            $status = '';
+            foreach($fields as $field => $name) {
+                $title = $user->$field ? $strset : $strunset;
+                $title = $name.' '.$strset;
+                $icon = $user->$field ? 'check-square-o' : 'square-o';
+                $icon = html_writer::tag('i', $name, array('class' => "fa fa-$icon ",
+                                                'title' => $title,
+                                                'aria-label' => $title,
+                                                ));
+                $status .= ' &nbsp; '.$icon;
+            }
+            
+            
+            
+            
+            $userdata = $userstatus[$user->status].' &nbsp; '.$status.' &nbsp; '.$data->rooms[$user->roomid]->name;
+            $mform->addElement('advcheckbox', "userattendance[{$user->sid}]", fullname($user), $userdata, array('group' => 'ur'.$user->roomid), array(0, $user->userid));
+            $mform->disabledIf("userattendance[{$user->sid}]", "loadattendance", 'notchecked');
+        }
+        $allnonestr = get_string('selectallornone', 'form');
+        foreach($data->rooms as $rid => $room) {
+            if($rid) {
+                $this->add_checkbox_controller('ur'.$rid, $room->name.' - '.$allnonestr );
+            }
+        }
+        
+        $statusmenu = array(EXAM_RESPONSES_SENT => get_string('status_sent', 'examregistrar'),
+                            EXAM_RESPONSES_WAITING => get_string('status_waiting', 'examregistrar'),
+                            EXAM_RESPONSES_COMPLETED => get_string('status_completed', 'examregistrar'),
+                            );
+        if($data->canreview) {
+            $statusmenu[EXAM_RESPONSES_REJECTED] = get_string('status_rejected', 'examregistrar');
+            $statusmenu[EXAM_RESPONSES_VALIDATED] = get_string('status_validated', 'examregistrar');
+        }
+
+        $mform->addElement('select', 'userstatus', get_string('status', 'examregistrar'), $statusmenu);
+        $mform->addHelpButton('userstatus', 'responsestatus', 'examregistrar');
+        $mform->disabledIf('userstatus', 'loadattendance', 'notchecked');
+        
+        $mform->setExpanded('headeruserdata', false);
+       
+        $mform->addElement('header', 'headerroomsdata', get_string('headerroomsdata', 'examregistrar'));
+        
+        if(isset($data->rooms[0]));
+        $allocated = 0;
+        foreach($data->rooms as $rid => $room) {
+            if($rid) {
+                $allocated += $room->allocated;
+            }
+        }
+        $data->rooms[0]->allocated = $allocated;
+        
+        $roomdata = array();
+        foreach($data->rooms as $rid => $room) {
+            $allocated = get_string('numsuffix', 'examregistrar', $room->allocated);
+            $roomdata[] = $mform->createElement('advcheckbox', "roomdata[$rid]", '', $room->name.$allocated, array('group' => 'rooms'), array(0, $room->allocated));
+            $mform->addElement('hidden', "response[$rid]", $room->responseid); 
+            $mform->setType("response[$rid]", PARAM_INT);
+        }
+        $group = $mform->addGroup($roomdata, "roomattendance_group",  get_string('loadroomattendance', 'examregistrar'), '', false);
+
+        $fs = get_file_storage(); 
+        $context = context_course::instance($data->courseid);
+        $roomdata = array();
+        foreach($data->rooms as $rid => $room) {
+            $files = '';
+            //$path = $rid ? $rid : '';
+            //$type = array('examresponses', $path);
+            if($files = $fs->get_directory_files($context->id, 'mod_examregistrar', 'examresponses',  $room->responseid, '/', false, false)) {
+                //print_object($files);
+                foreach($files as $key => $file) {
+                    $fname = $file->get_filename();
+                    $url = examregistrar_file_encode_url($context->id, $room->responseid, 'examresponses',$fname);
+                    $files[$key] = html_writer::link($url, $fname);
+                }
+            
+                $files = html_writer::alist($files, array('class' => 'files'));
+            } else {
+                $files = '';
+            }
+            $roomdata[] = $mform->createElement('static', $rid, ' ', html_writer::span($room->name.' '.$files, 'files'));
+        }
+        $group = $mform->addGroup($roomdata, 'files_group',  get_string('files'), '', true);  
+        
+        $roomdata = array();
+        $rules = array();
+        $size = array('size'=>'5');
+        $labelsep = get_string('labelsep', 'langconfig');
+        foreach($data->rooms as $rid => $room) {
+            $name = $name = ' '.$room->name.$labelsep;
+            $roomdata[] = $mform->createElement('text', "showing[$rid]", $name, $size);
+            $mform->setType("showing[$rid]", PARAM_INT);
+            $mform->setDefault("showing[$rid]", $data->rooms[$rid]->showing);
+            $mform->disabledIf("showing[$rid]", "roomdata[$rid]", 'notchecked');
+            $rules["showing[$rid]"] = array(array(null, 'numeric', null, 'client'));
+        }
+        $group = $mform->addGroup($roomdata, 'showing_group',  get_string('usershowing', 'examregistrar'), '', false);
+        $mform->addHelpButton('showing_group', 'usershowing', 'examregistrar');
+        $mform->addGroupRule('showing_group', $rules);
+        
+        $roomdata = array();
+        $rules = array();
+        foreach($data->rooms as $rid => $room) {
+            $name = $name = ' '.$room->name.$labelsep;
+            $roomdata[] = $mform->createElement('text', "taken[$rid]", $name, $size);
+            $mform->setType("taken[$rid]", PARAM_INT);
+            $mform->setDefault("taken[$rid]", $data->rooms[$rid]->taken);
+            $mform->disabledIf("taken[$rid]", "roomdata[$rid]", 'notchecked');
+            $rules["taken[$rid]"] = array(array(null, 'numeric', null, 'client'));
+        }
+        $group = $mform->addGroup($roomdata, 'taken_group',  get_string('usertaken', 'examregistrar'), '', false);
+        $mform->addHelpButton('taken_group', 'usertaken', 'examregistrar');
+        $mform->addGroupRule('taken_group', $rules);
+        
+        $roomdata = array();
+        foreach($data->rooms as $rid => $room) {
+            $name = $name = ' '.$room->name.$labelsep;
+            $roomdata[] = $mform->createElement('select', $rid, $name, $statusmenu);
+            $mform->setDefault("taken[$rid]", $data->rooms[$rid]->taken);
+            $mform->disabledIf("roomstatus[$rid]", "roomdata[$rid]", 'notchecked');
+            $mform->setDefault("roomstatus[$rid]", $data->rooms[$rid]->status);
+        }
+        $group = $mform->addGroup($roomdata, 'roomstatus',  get_string('status', 'examregistrar'), '', true);
+        
+        $submit_string = get_string('savechanges');
+
+        $this->add_action_buttons(true, $submit_string);
+
+    }
+    
+    
+    function validation($data, $files) {
+        
+        $errors = parent::validation($data, $files);
+        /*
+        $rooms = $data['rooms'];
+        foreach(array('showing', 'taken') as $field) {
+            foreach($rooms as $rid => $allocated) {
+                $error = array();            
+                if(isset($data[$field][$rid])) { 
+                    if($data[$field][$rid] < 1) { 
+                        //$errors["$field[$rid]"] = get_string('error_nonzero', 'examregistrar');
+                        $error[] = get_string('error_nonzero', 'examregistrar'); 
+                        //$errors[$field.'_group'] = get_string('error_nonzero', 'examregistrar'); 
+                    }
+                    if($data[$field][$rid] > $allocated) { 
+                        //$errors[$field.'_group'] = get_string('error_lessthan', 'examregistrar', $allocated);
+                        $error[] =  get_string('error_lessthan', 'examregistrar', $allocated); 
+                    }
+                }
+            }
+            if($error) {
+                $errors[$field.'_group'] = implode('; ', $error);
+            }
+        }
+        */
+        return $errors;
+    }
+    
+}
+
+

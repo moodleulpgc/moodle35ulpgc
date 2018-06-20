@@ -242,31 +242,29 @@ function xmldb_examregistrar_upgrade($oldversion) {
         // Adding fields to table session responses.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('examsession', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('bookedsite', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('examid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('roomid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('additional', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('additional', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
         $table->add_field('examfile', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('numfiles', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('showing', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('taken', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('reviewerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timefiles', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timeuserdata', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('numfiles', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('showing', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('taken', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('reviewerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('timefiles', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('timeuserdata', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
         
         // Adding keys to table session responses.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('examsession', XMLDB_KEY_FOREIGN, array('examsession'), 'examregistrar_sessions', array('id'));
-        $table->add_key('bookedsite', XMLDB_KEY_FOREIGN, array('bookedsite'), 'examregistrar_locations', array('id'));
         $table->add_key('examid', XMLDB_KEY_FOREIGN, array('examid'), 'examregistrar_exams', array('id'));
         $table->add_key('roomid', XMLDB_KEY_FOREIGN, array('roomid'), 'examregistrar_locations', array('id'));
         $table->add_key('examfile', XMLDB_KEY_FOREIGN, array('examfile'), 'examregistrar_examfile', array('id'));
 
         // Adding indexes to table session responses.
-        $table->add_index('examsession-bookedsite-examid-roomid-examfile', XMLDB_INDEX_UNIQUE, array('examsession', 'bookedsite', 'examid', 'roomid', 'examfile'));
+        $table->add_index('examsession-examid-roomid-examfile', XMLDB_INDEX_UNIQUE, array('examsession', 'examid', 'roomid', 'examfile'));
 
         // Conditionally launch create table for exam student response files.
         if (!$dbman->table_exists($table)) {
@@ -274,6 +272,56 @@ function xmldb_examregistrar_upgrade($oldversion) {
         }
     
         upgrade_mod_savepoint(true, 2018051800, 'examregistrar');
+    }
+    
+    
+    if ($oldversion < 2018051803) {
+        $table = new xmldb_table('examregistrar_responses');
+        
+        foreach(array('numfiles', 'showing', 'taken') as $name) {
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '0');
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->change_field_default($table, $field);
+            }
+        }
+        
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_default($table, $field);
+        }
+        
+        foreach(array('additional', 'modifierid', 'reviewerid', 'timefiles', 'timeuserdata', 'timemodified') as $name) {
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->change_field_default($table, $field);
+            }
+        }
+
+        $index = new xmldb_index('examsession-bookedsite-examid-roomid-examfile', XMLDB_INDEX_UNIQUE, array('examsession', 'bookedsite', 'examid', 'roomid', 'examfile'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        $index = new xmldb_index('examsession-examid-roomid-examfile', XMLDB_INDEX_UNIQUE, array('examsession', 'examid', 'roomid', 'examfile'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        $key = new xmldb_key('bookedsite', XMLDB_KEY_FOREIGN, array('bookedsite'), 'examregistrar_locations', array('id'));
+        $dbman->drop_key($table, $key);
+
+        $field = new xmldb_field('bookedsite', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        
+        $table = new xmldb_table('examregistrar_session_seats');
+        $field = new xmldb_field('timereviewed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        // Conditionally launch add field assignplugincm.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2018051803, 'examregistrar');
     }
 
     return true;

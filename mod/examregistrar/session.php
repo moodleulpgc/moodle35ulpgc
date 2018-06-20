@@ -42,6 +42,8 @@ $rsort = optional_param('rsort', '', PARAM_ALPHANUMEXT);
 $esort = optional_param('esort', '', PARAM_ALPHANUMEXT);
 $perpage  = optional_param('perpage', 100, PARAM_INT);
 
+$SESSION->nameformat = 'lastname';
+
 $baseurl = new moodle_url('/mod/examregistrar/view.php', array('id' => $cm->id, 'tab' =>'session'));
 $tab = 'session';
 
@@ -59,16 +61,13 @@ $baseurl->params(array('session'=>$session, 'venue'=>$bookedsite));
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//  print_object($_GET);
-//  print_object("_GET -----------------");
-//  print_object($_POST);
-//  print_object("_POST -----------------");
 
 /// process forms actions
 
 if($action == 'assignseats_venues') {
     // get venues and heck for single room
     $venueelement = examregistrar_get_venue_element($examregistrar);
+    
     if($venues = $DB->get_records('examregistrar_locations', array('examregid'=>$examregprimaryid, 'locationtype'=>$venueelement, 'visible'=>1))) {
         foreach($venues as $venue) {
             if($roomid = examregistrar_is_venue_single_room($venue)) {
@@ -150,7 +149,6 @@ if($action == 'assignseats_venues') {
                             email_to_user($user, $from, $subject, $text, $text);
                         }
                     }
-
                 }
             } else {
                 $info->fail += 1;

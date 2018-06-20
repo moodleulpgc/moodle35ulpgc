@@ -781,7 +781,8 @@ class core_renderer extends renderer_base {
         $output .= $this->theme_switch_links();
 
         if (!empty($CFG->debugpageinfo)) {
-            $output .= '<div class="performanceinfo pageinfo">This page is: ' . $this->page->debug_summary() . '</div>';
+            $output .= '<div class="performanceinfo pageinfo">' . get_string('pageinfodebugsummary', 'core_admin',
+                $this->page->debug_summary()) . '</div>';
         }
         if (debugging(null, DEBUG_DEVELOPER) and has_capability('moodle/site:config', context_system::instance())) {  // Only in developer mode
             // Add link to profiling report if necessary
@@ -1654,7 +1655,7 @@ class core_renderer extends renderer_base {
 
         $output = '';
         if ($title || $controlshtml) {
-            $output .= html_writer::tag('div', html_writer::tag('div', html_writer::tag('div', '', array('class'=>'block_action')). $title . $controlshtml, array('class' => 'title')), array('class' => 'header'));
+            $output .= html_writer::tag('div', html_writer::tag('div', html_writer::tag('div', ' aa ', array('class'=>'block_action')). $title . $controlshtml, array('class' => 'title')), array('class' => 'header'));
         }
         return $output;
     }
@@ -4210,7 +4211,7 @@ EOD;
                     $this->page->requires->string_for_js('changesmadereallygoaway', 'moodle');
                 }
             } else {
-                $heading = null;
+                    $heading = null;
             }
         }
 

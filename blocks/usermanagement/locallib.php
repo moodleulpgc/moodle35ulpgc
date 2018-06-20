@@ -158,7 +158,7 @@
 
         switch($format) {
           case 'html' :
-                        $table = new Object();
+                        $table = new stdClass();
                         $table->head = $headers;
                         $table->align = array('left', 'left', 'left', 'center', 'center', 'center');
                         $table->width = '95%';
@@ -272,7 +272,7 @@
                         $pdf->setHeaderData('', 20);            // ($ln="", $lw=0, $ht="", $hs="")
 
 
-                        $table = new Object();
+                        $table = new stdClass();
                         $table->head = array('courses' =>  get_string('courses'),
                                                 'dialogues' => get_string('messages','block_usermanagement').' ('.get_string('modulenameplural', 'dialogue').')',
                                                 'forums' => get_string('messages', 'block_usermanagement').' ('.get_string('modulenameplural', 'forum').')',

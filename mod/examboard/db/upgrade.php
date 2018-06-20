@@ -144,5 +144,11 @@ function xmldb_examboard_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018032504, 'examboard');   
     }
     
+     if ($oldversion < 2018032505) {
+        upgrade_mod_savepoint(true, 2018032505, 'examboard');   
+    }
+    
+    
+    
     return true;
 }

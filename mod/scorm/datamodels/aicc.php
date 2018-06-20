@@ -45,8 +45,8 @@ if ($scoes = $DB->get_records('scorm_scoes', array('scorm' => $scorm->id), 'sort
                     $count++;
                     $end = strpos($element, $matches[1]) + strlen($matches[1]);
                     $subelement = substr($element, 0, $end);
-                    $cmiobj->{($sco->id)} .= '    '.$subelement." = new Object();\n";
-                    $cmiobj->{($sco->id)} .= '    '.$subelement.".score = new Object();\n";
+                    $cmiobj->{($sco->id)} .= '    '.$subelement." = new stdClass();\n";
+                    $cmiobj->{($sco->id)} .= '    '.$subelement.".score = new stdClass();\n";
                     $cmiobj->{($sco->id)} .= '    '.$subelement.".score._children = score_children;\n";
                     $cmiobj->{($sco->id)} .= '    '.$subelement.".score.raw = '';\n";
                     $cmiobj->{($sco->id)} .= '    '.$subelement.".score.min = '';\n";

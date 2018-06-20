@@ -349,7 +349,7 @@
             die;
         } else if (data_submitted() and !$user->deleted) {
             //following code is also used in auth sync scripts
-            $updateuser = new object();
+            $updateuser = new stdClass();
             $updateuser->id           = $user->id;
             $updateuser->deleted      = 1;
             $updateuser->username     = addslashes("$user->email.".time());  // Remember it just in case
@@ -378,7 +378,7 @@
         }
         $aclrecord = $DB->get_record('mnet_sso_access_control', array('username'=>$user->username, 'mnet_host_id'=>$user->mnethostid));
         if (empty($aclrecord)) {
-            $aclrecord = new object();
+            $aclrecord = new stdClass();
             $aclrecord->mnet_host_id = $user->mnethostid;
             $aclrecord->username = $user->username;
             $aclrecord->accessctrl = $accessctrl;

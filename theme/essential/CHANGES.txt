@@ -1,3 +1,8 @@
+New in 3.5.0.2
+==============
+- FIX: Block editing menu item hover.
+- FIX: Update frontpage home block area information.
+
 New in 3.5.0.1
 ==============
 - NEW: Moodle 3.5 version based on 3.4.1.2 of the theme.

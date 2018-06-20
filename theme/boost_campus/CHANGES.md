@@ -4,6 +4,11 @@ moodle-theme_boost_campus
 Changes
 -------
 
+### Unreleased
+
+* 2018-06-15 - Minor fix to the user menu displaying if switch role is moved to course menu.
+* 2018-06-12 - Added Video JS skin that fits to the brand color.
+
 ### Release v3.5-r1
 
 * 2018-05-23 - Improved footer blocks feature to only use the chosen columns as the region in the config.

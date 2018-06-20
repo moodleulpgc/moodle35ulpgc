@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class responses_uploaded extends \core\event\base {
+class responses_uploaded extends responses_approved {
 
     /**
      * Returns description of what happened.
@@ -42,7 +42,9 @@ class responses_uploaded extends \core\event\base {
      */
     public function get_description() {
         $user = $this->usertext();
-        return "The $user has uploaded response files '{$this->other['files']}' for exam '{$this->other['examid']}' at site '{$this->other['bookedsite']}' 
+        $site = $this->get_site(); 
+        return "The $user has uoloaded response files '{$this->other['files']}' for session '{$this->other['session']}' exam '{$this->other['examid']}' 
+                $site 
                 in the Exam registrar with course module id '$this->contextinstanceid'. ";
     }
 
@@ -56,15 +58,6 @@ class responses_uploaded extends \core\event\base {
     }
 
     /**
-     * Get URL related to the action
-     *
-     * @return \moodle_url
-     */
-    public function get_url() {
-        return new \moodle_url('/mod/examregistrar/view.php', array('id' => $this->contextinstanceid, 'tab'=>'printexams'));
-    }
-
-    /**
      * Init method.
      *
      * @return void
@@ -73,161 +66,4 @@ class responses_uploaded extends \core\event\base {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
-
-    /**
-     * Custom validation.
-     *
-     * @throws \coding_exception
-     * @return void
-     */
-    protected function validate_data() {
-        parent::validate_data();
-
-        if (!isset($this->other['examregid'])) {
-            throw new \coding_exception('The \'examregid\' value must be set in other.');
-        }
-    }
-    
-    /**
-     * Custom user text
-     *
-     * @return string
-     */
-    protected function usertext() {
-        $usertext = "user with id '$this->userid'";
-        if($this->userid != $this->relateduserid) {
-            $usertext .= ", acting as user '$this->relateduserid',";
-        }
-    
-        return $usertext;
-    }
-    
 }
-
-
-/**
- * mod_examregistrar response files deleted event class.
- *
- * @package    mod_examregistrar
- * @copyright  2015 Enrique Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class responses_deleted extends responses_uploaded {
-
-    /**
-     * Returns description of what happened.
-     *
-     * @return string
-     */
-    public function get_description() {
-        $user = $this->usertext();
-        return "Response files '{$this->other['files']}' for the exam '{$this->other['examid']}' deleted by $user
-                in the Exam registrar with course module id '$this->contextinstanceid'. ";
-    }
-
-    /**
-     * Return localised event name.
-     *
-     * @return string
-     */
-    public static function get_name() {
-        return get_string('eventresponsesdeleted', 'mod_examregistrar');
-    }
-
-
-    /**
-     * Init method.
-     *
-     * @return void
-     */
-    protected function init() {
-        $this->data['crud'] = 'd';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-    }
-}
-
-
-/**
- * mod_examregistrar response files accepted event class.
- *
- * @package    mod_examregistrar
- * @copyright  2015 Enrique Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class responses_accepted extends responses_uploaded {
-
-    /**
-     * Returns description of what happened.
-     *
-     * @return string
-     */
-    public function get_description() {
-        $user = $this->usertext();
-        return "The $user has accepted response files '{$this->other['files']}' for exam '{$this->other['examid']}' at site '{$this->other['bookedsite']}' 
-                in the Exam registrar with course module id '$this->contextinstanceid'. ";
-    }
-
-    /**
-     * Return localised event name.
-     *
-     * @return string
-     */
-    public static function get_name() {
-        return get_string('eventresponsesaccepted', 'mod_examregistrar');
-    }
-    
-    /**
-     * Init method.
-     *
-     * @return void
-     */
-    protected function init() {
-        $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-    }
-    
-}
-
-
-/**
- * mod_examregistrar distribute session files event class.
- *
- * @package    mod_examregistrar
- * @copyright  2015 Enrique Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class responses_distributed extends responses_uploaded {
-
-    /**
-     * Returns description of what happened.
-     *
-     * @return string
-     */
-    public function get_description() {
-        $user = $this->usertext();
-        return "Session response files '{$this->other['session']}' distributed to exams by $user 
-                in the Exam registrar with course module id '$this->contextinstanceid'. ";
-    }
-
-    /**
-     * Return localised event name.
-     *
-     * @return string
-     */
-    public static function get_name() {
-        return get_string('eventresponsesdistributed', 'mod_examregistrar');
-    }
-    
-    /**
-     * Init method.
-     *
-     * @return void
-     */
-    protected function init() {
-        $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-    }
-    
-}
-
-

@@ -98,6 +98,18 @@ if ($hassiteconfig) {
                 get_string('res_'.$type, 'local_ulpgccore'),
                 get_string('explainmodsgroup', 'local_ulpgccore'), '', PARAM_TEXT, 10, 6));
     }
+
+    $ADMIN->add('local_ulpgccore_settings', $temp);    
+    
+    $temp = new admin_settingpage('local_ulpgccore_footer', get_string('footersettings','local_ulpgccore')); 
+
+    foreach(array(1,2,3) as $i) {
+        $temp->add(new admin_setting_confightmleditor('local_ulpgccore/footer'.$i, 
+                            get_string('footerblock'.$i, 'local_ulpgccore'),
+                            get_string('footerblock_desc', 'local_ulpgccore'),
+                            null,
+                            PARAM_RAW));
+    }
     
     $ADMIN->add('local_ulpgccore_settings', $temp);    
 

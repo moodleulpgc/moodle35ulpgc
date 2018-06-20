@@ -18,7 +18,7 @@
  * Strings for component 'qformat_glossary'
  *
  * @package    qformat_glossary
- * @copyright  Daniel Thies <dthies@ccal.edu>
+ * @copyright  Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

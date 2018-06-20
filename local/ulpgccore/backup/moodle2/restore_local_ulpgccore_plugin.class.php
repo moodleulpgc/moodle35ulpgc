@@ -57,7 +57,7 @@ class restore_local_ulpgccore_plugin extends restore_local_plugin {
                 // ecastro ULPGC
         // this is a hack to eliminate all adminmodules not desired if root setting adminnmods is set to NO (process_modules will set score=127)
         // Need to be eliminated when a better method, avoiding restoring to then delete, is developed
-        if(!$adminmods = $this->task->get_setting_value('adminmods') && $mods = $DB->get_records('course_modules', array('score'=>-1))) {
+        if($this->task->setting_exists('adminmods') && !$adminmods = $this->task->get_setting_value('adminmods') && $mods = $DB->get_records('course_modules', array('score'=>-1))) {
             foreach($mods as $cm) {
                 course_delete_module($cm->id);
             }
@@ -117,7 +117,7 @@ class restore_local_ulpgccore_plugin extends restore_local_plugin {
         global $DB;
         // hack, course modules with score = -1 will be deleted afterwards
         $data = (object)$data;
-        if(isset($data->score) && $data->score && !$adminmods = $this->task->get_setting_value('adminmods')) {
+        if(isset($data->score) && $data->score && $this->task->setting_exists('adminmods') && !$adminmods = $this->task->get_setting_value('adminmods')) {
             $DB->set_field('course_modules', 'score', -1, array('course'=>$this->task->get_courseid(), 'id'=>$this->task->get_moduleid()));
         }
     }

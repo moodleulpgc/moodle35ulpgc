@@ -216,7 +216,6 @@ class offlinequiz_rimport_report extends offlinequiz_default_report {
             // or one from the filesarea.
             $realfilename = $importform->get_new_filename('newfile');
             // Create a unique temp dir.
-            srand(microtime() * 1000000);
             $unique = str_replace('.', '', microtime(true) . rand(0, 100000));
             $dirname = "{$CFG->tempdir}/offlinequiz/import/$unique";
             check_dir_exists($dirname, true, true);
@@ -358,9 +357,7 @@ class offlinequiz_rimport_report extends offlinequiz_default_report {
         }
     }
     private function convert_black_white($file) {
-    	$imagemagick = new \Imagick(realpath($file));
-    	$imagemagick->quantizeimage(2, \Imagick::COLORSPACE_GRAY, 0, false, false);
-		$imagemagick->writeimage($file);
-		$imagemagick->clear();
+    	$command = "convert " . realpath($file) . " -threshold 50% " . realpath($file);
+     	popen($command, 'r');
     }
 }

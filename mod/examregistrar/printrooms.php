@@ -42,7 +42,7 @@ $tab = 'printrooms';
 
 
 */
-
+$SESSION->nameformat = 'lastname';
 $period   = optional_param('period', '', PARAM_INT);
 $session   = optional_param('session', '', PARAM_INT);
 $bookedsite   = optional_param('venue', '', PARAM_INT);

@@ -149,5 +149,43 @@ class pusher_testcase extends tool_objectfs_testcase {
             $this->assertTrue($this->is_externally_readable_by_hash($object->contenthash));
         }
     }
+
+    public function test_get_candidate_objects_get_one_object_if_files_have_same_hash_different_mimetype() {
+        global $DB;
+        // Push initial objects so they arnt candidates
+        $objects = $this->pusher->get_candidate_objects();
+        $this->pusher->execute($objects);
+
+        $object = $this->create_local_object();
+        $file = $DB->get_record('files', array('contenthash' => $object->contenthash));
+
+        // Update mimetype to something different and insert as new file.
+        $file->mimetype = "differentMimeType";
+        $file->pathnamehash = '1234';
+        $DB->insert_record('files', $file);
+
+        $objects = $this->pusher->get_candidate_objects();
+
+        $this->assertEquals(1, count($objects));
+    }
+
+    public function test_get_candidate_objects_get_one_object_if_files_have_same_hash_different_filesize() {
+        global $DB;
+        // Push initial objects so they arnt candidates
+        $objects = $this->pusher->get_candidate_objects();
+        $this->pusher->execute($objects);
+
+        $object = $this->create_local_object();
+        $file = $DB->get_record('files', array('contenthash' => $object->contenthash));
+
+        // Update filesize to something different and insert as new file.
+        $file->filesize = 999;
+        $file->pathnamehash = '1234';
+        $DB->insert_record('files', $file);
+
+        $objects = $this->pusher->get_candidate_objects();
+
+        $this->assertEquals(1, count($objects));
+    }
 }
 

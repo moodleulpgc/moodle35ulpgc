@@ -10,5 +10,5 @@ Copy this directory to question/format/glossary in Moodle directory. Login
 as admin to complete plugin installation.  Then select this format during
 question bank import or export.
 
-All original files are copyright Daniel Thies 2016 dthies@ccal.edu and
+All original files are copyright Daniel Thies 2016 dethies@gmail.com and
 are licensed under the included GPL 3

@@ -360,5 +360,71 @@ function xmldb_local_ulpgccore_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018021000, 'local', 'ulpgccore');
     }
     
+    if ($oldversion < 2018061800) {
+        // update  table for local_ulpgccore_questions
+        $table = new xmldb_table('local_ulpgccore_questions');
+
+        $index1 = new xmldb_index('qsource-id', XMLDB_INDEX_NOTUNIQUE, array('qsource', 'sourceqid'));
+        if ($dbman->index_exists($table, $index1)) {
+            $dbman->drop_index($table, $index1);
+        }
+        
+        $index1 = new xmldb_index('creatoridnumber', XMLDB_INDEX_NOTUNIQUE, array('creatoridnumber'));
+        if ($dbman->index_exists($table, $index1)) {
+            $dbman->drop_index($table, $index1);
+        }
+
+        $index1 = new xmldb_index('modifieridnumber', XMLDB_INDEX_NOTUNIQUE, array('modifieridnumber'));
+        if ($dbman->index_exists($table, $index1)) {
+            $dbman->drop_index($table, $index1);
+        }
+        
+        $field = new xmldb_field('sourceqid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_default($table, $field);
+        } else {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('qsource', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_notnull($table, $field);
+        } else {
+            $dbman->add_field($table, $field);
+        }
+        
+        $field = new xmldb_field('creatoridnumber', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_notnull($table, $field);
+        } else {
+            $dbman->add_field($table, $field);
+        }
+        
+        $field = new xmldb_field('modifieridnumber', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_notnull($table, $field);
+        } else {
+            $dbman->add_field($table, $field);
+        }
+
+        $index1 = new xmldb_index('qsource-id', XMLDB_INDEX_NOTUNIQUE, array('qsource', 'sourceqid'));
+        if (!$dbman->index_exists($table, $index1)) {
+            $dbman->add_index($table, $index1);
+        }
+        
+        $index1 = new xmldb_index('creatoridnumber', XMLDB_INDEX_NOTUNIQUE, array('creatoridnumber'));
+        if (!$dbman->index_exists($table, $index1)) {
+            $dbman->add_index($table, $index1);
+        }
+        
+        $index1 = new xmldb_index('modifieridnumber', XMLDB_INDEX_NOTUNIQUE, array('modifieridnumber'));
+        if (!$dbman->index_exists($table, $index1)) {
+            $dbman->add_index($table, $index1);
+        }
+        
+        upgrade_plugin_savepoint(true, 2018061800, 'local', 'ulpgccore');
+    }
+
+    
     return true;
 }

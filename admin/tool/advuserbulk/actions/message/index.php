@@ -44,7 +44,7 @@ if ($msgform->is_cancelled()) {
     redirect($return);
 
 } else if ($formdata = $msgform->get_data(false)) {
-    $options = new object();
+    $options = new stdClass();
     $options->para     = false;
     $options->newlines = true;
     $options->smiley   = false;

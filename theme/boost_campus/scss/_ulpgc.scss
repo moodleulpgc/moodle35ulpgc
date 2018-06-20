@@ -2,6 +2,7 @@
     float: right;
     margin-top: 9px;
     margin-left: 9px;
+    min-width: 142px;
 }
 
 #bloque_dch_cabecera ul.enlaces_cabecera {
@@ -89,11 +90,51 @@
 	background:url('https://www2.ulpgc.es/images_nwi/ulpgc_graficos_v14.svg') -202px -140px no-repeat; 
 }
 
+
+.fixed-top.navbar .site-name {
+    display: inline !important;
+}
+
+
+@media(min-width: 768px) {
+    .usermenu span.userbutton span.usertext {
+        display: inline-block;
+        max-width: 17vw;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        vertical-align: middle;
+        line-height: 1.0em;
+    }
+}
+
+@media(min-width: 1032px) {
+    .usermenu span.userbutton span.usertext {
+        max-width: 20vw;
+    }
+}
+
+@media(min-width: 1128px) {
+    .usermenu span.userbutton span.usertext {
+        max-width: 30vw;
+    }
+}
+
+.navbar-light .navbar-nav .show > .nav-link  {
+    color: #fff;
+}
+
+.navbar a.dropdown-toggle:hover, 
 .navbar .navbar-nav .nav-link .icon:hover,
 .navbar a.dropdown-toggle .usertext:hover, 
 .navbar .usermenu .dropdown a:hover {
     color: #ff9a00 !important;
 }
+
+.breadcrumb .breadcrumb-item span.course {
+    color: #ff9a00 ;
+    font-weight: 800;
+}
+
 
 h1 {
     font-size: 1.75rem;
@@ -117,11 +158,13 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     background-color: rgb(0,46,103) !important;
 }
 
+/*
 .breadcrumb-item + .breadcrumb-item::before {
     padding-right: .2rem;
     padding-left: .2rem;
     content: "»"
 }
+*/
 
 .d-flex.flex-wrap {
     background-color: #f2f2f2;
@@ -134,4 +177,120 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 
 .userbutton .avatar img.userpicture {
     margin-right: 0px;
+}
+
+
+
+#page-footer {
+    min-height: unset;
+}
+
+#page-footer div {
+    border-top: unset !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#page-footer .helplink,
+#page-footer .logininfo,
+#page-footer .logininfo,
+#page-footer .nav.navbar-nav {
+    float: left;
+}
+
+#page-footer .d-md-none {
+    display: none;
+}
+
+#page-footer .tool_usertours-resettourcontainer,
+#page-footer .purgecaches {
+    float: right;
+}
+
+#pie_info {
+    padding: 12px 0px;
+}
+
+#pie_info p {
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    margin: 0;
+}
+
+#pie_info h3 {
+    font-size: 1.2rem;
+}
+
+#pie_info .logo_pie {
+    width: 28%;
+    background: url("https://www.ulpgc.es/images/ulpgc_graficos_v14.svg") -157px -1568px no-repeat;
+        background-size: auto auto;
+    background-size: 1400px;
+    display: block;
+    height: 80px;
+    float: left;
+    margin: 0 auto;
+}
+
+#pie_info .columna_pie.primera {
+    border-left: 1px solid;
+    padding-left: 2.5%;
+    padding-right: 2.5%;
+}
+
+#pie_info .columna_pie {
+    width: 27%;
+    float: left;
+    height: auto;
+    margin: 0 auto;
+}
+
+#pie_info .columna_pie.ultima {
+    width: 12%;
+}
+
+.m-t-2.m-b-1 .row {
+    font-size: small;
+}
+
+#next-activity-link, 
+#prev-activity-link {
+    background-color: $secondary;
+}
+
+.forumpost .row .options .commands {
+    color: #fafafa;
+    display: inline-block;
+    float: right;
+}
+
+.forumpost .row .options .commands a {
+    font-size: 12px;
+    border: 1px solid #b4b4b7;
+    background-color: #ecedf0;
+    color: #333537;
+  padding: 1px 6px 2px; /* ecastro ULPGC */
+    line-height: 22px;
+    text-decoration: none;
+    border-radius: 3px;
+    transition: 0.25s;
+}
+
+.forumpost .row .options .commands a:hover {
+    background: $primary;
+    color: #fff;
+    font-weight: 400;
+}
+
+
+.block .calendar_filters.m-t-2 {
+    margin: 0 !important;
+}
+
+.block .calendar_filters ul li {
+    display: table-cell;
+}
+
+.block .calendar_filters ul li .eventname {
+    display: none;
 }

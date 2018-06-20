@@ -153,7 +153,7 @@ class block_supervision extends block_list {
 
         $canmanage = has_capability('block/supervision:manage', $context);
 
-        $icon  = '<img src="' . $OUTPUT->pix_url('i/course') . '" class="icon" alt="" />&nbsp;';
+        $icon  = $OUTPUT->pix_icon('i/course', '').'&nbsp;';
 
         $categories = supervision_get_reviewed_itemnames($USER->id, 'category');
         if($categories) {
@@ -209,15 +209,15 @@ class block_supervision extends block_list {
             $this->content->icons[] = '';
             $url = new moodle_url('/blocks/supervision/supervisors.php', array('cid'=>$course->id, 'type'=>$pagetype));
             $this->content->items[] = $OUTPUT->action_link($url, get_string('editpermissions', 'block_supervision'));
-            $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('i/checkpermissions') . '" class="icon" alt="" />&nbsp;';
+            $this->content->icons[] = $OUTPUT->pix_icon('i/checkpermissions', '').'&nbsp;';
 
             $url = new moodle_url('/blocks/supervision/holidays.php', array('cid'=>$course->id, 'type'=>$pagetype));
             $this->content->items[] = $OUTPUT->action_link($url, get_string('editholidays', 'block_supervision'));
-            $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('i/calendar') . '" class="icon" alt="" />&nbsp;';
+            $this->content->icons[] = $OUTPUT->pix_icon('i/calendar', '').'&nbsp;';
             
             $url = new moodle_url('/admin/settings.php', array('section'=>'blocksettingsupervision'));
             $this->content->items[] = $OUTPUT->action_link($url, get_string('editconfig', 'block_supervision'));
-            $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('t/edit') . '" class="icon" alt="" />&nbsp;';
+            $this->content->icons[] = $OUTPUT->pix_icon('t/edit', '').'&nbsp;';
             
         }
 
