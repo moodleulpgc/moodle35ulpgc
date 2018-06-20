@@ -1,0 +1,49 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_boost_campus/ulpgcfooter
+
+    Boost_campus ulpgcfooter layout template.
+
+    Context variables required for this template:
+    * block1 - The text entered in the setting widget.
+    * block2 - The text entered in the setting widget.
+    * block3 - The text entered in the setting widget.    
+
+    Example context (json):
+    {
+        "blcok1": "<a href='https://moodle.org'>Moodle</a>"
+    }
+}}
+
+
+<div id="pie_info" class="container-fluid">
+    <div class="pie_info_contenido clearfix">
+        <div class="logo_pie"></div>
+        <div class="columna_pie primera">
+            {{{block1}}}
+        </div>
+        <div class="columna_pie">
+            {{{block2}}}
+        </div>
+        <div class="columna_pie ultima">
+            {{{block3}}}
+        </div>
+    </div>
+</div>
+
+
