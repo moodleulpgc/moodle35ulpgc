@@ -15,27 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A two column layout for the moove theme.
- *
- * @package   theme_moove
- * @copyright 2017 Willian Mano - http://conecti.me
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package profilefield_o365
+ * @author James McQuillan <james.mcquillan@remote-learner.net>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright (C) 2014 onwards Microsoft Open Technologies, Inc. (http://msopentech.com/)
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/behat/lib.php');
-
-$bodyattributes = $OUTPUT->body_attributes();
-
-$templatecontext = [
-    'sitename' => format_string($SITE->shortname, true, ["escape" => false]),
-    'output' => $OUTPUT,
-    'bodyattributes' => $bodyattributes
+$plugin->version = 2015060101;
+$plugin->requires = 2015051100;
+$plugin->component = 'profilefield_o365';
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '29.0.0.1';
+$plugin->dependencies = [
+    'local_o365' => 2015060107
 ];
-
-$themesettings = new \theme_moove\util\theme_settings();
-
-$templatecontext = array_merge($templatecontext, $themesettings->footer_items());
-
-echo $OUTPUT->render_from_template('theme_moove/columns2', $templatecontext);

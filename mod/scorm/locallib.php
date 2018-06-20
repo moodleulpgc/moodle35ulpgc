@@ -1,4 +1,4 @@
-<?php
+// <?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -1133,10 +1133,10 @@ function scorm_reconstitute_array_element($sversion, $userdata, $elementname, $c
             $countsub = 0;
             $end = strpos($element, $matches[1]) + strlen($matches[1]);
             $subelement = substr($element, 0, $end);
-            $return .= '    '.$subelement." = new Object();\n";
+            $return .= '    '.$subelement." = new stdClass();\n";
             // Now add the children.
             foreach ($children as $child) {
-                $return .= '    '.$subelement.".".$child." = new Object();\n";
+                $return .= '    '.$subelement.".".$child." = new stdClass();\n";
                 $return .= '    '.$subelement.".".$child."._children = ".$child."_children;\n";
             }
         }
@@ -1160,7 +1160,7 @@ function scorm_reconstitute_array_element($sversion, $userdata, $elementname, $c
             $countsub = 0;
             $end = strpos($element, $matches[1]) + strlen($matches[1]);
             $subelement = substr($element, 0, $end);
-            $return .= '    '.$subelement." = new Object();\n";
+            $return .= '    '.$subelement." = new stdClass();\n";
         }
 
         // Now check the subelement subscript.
@@ -1169,7 +1169,7 @@ function scorm_reconstitute_array_element($sversion, $userdata, $elementname, $c
             $countsub++;
             $end = strrpos($element, $matches[2]) + strlen($matches[2]);
             $subelement = substr($element, 0, $end);
-            $return .= '    '.$subelement." = new Object();\n";
+            $return .= '    '.$subelement." = new stdClass();\n";
         }
 
         $return .= '    '.$element.' = '.json_encode($value).";\n";

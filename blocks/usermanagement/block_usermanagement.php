@@ -96,11 +96,9 @@
 
         $canmanage = has_capability('block/usermanagement:manage', $context);
 
-        //$icon  = '<img src="' . $OUTPUT->pix_url('i/course') . '" class="icon" alt="" />&nbsp;';
-
         if($canview) {
             $this->content->items[] = "<a href=\"".$CFG->wwwroot."/blocks/usermanagement/usereports.php\" >".get_string('usereports', 'block_usermanagement')."</a>";
-            $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('i/report') . '" class="icon" alt="" />&nbsp;';
+            $this->content->icons[] = $OUTPUT->pix_icon('i/report', '').'&nbsp;';
         }
 
         if($canmanage) {
@@ -108,16 +106,16 @@
             $this->content->icons[] = '';
 
             $this->content->items[] = "<a href=\"".$CFG->wwwroot."/blocks/usermanagement/manageusers.php\" >".get_string('usermanagement', 'block_usermanagement')."</a>";
-            $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('i/cohort') . '" class="icon" alt="" />&nbsp;';
+            $this->content->icons[] = $OUTPUT->pix_icon('i/cohort', '').'&nbsp;';
            
             if(has_capability('local/ulpgccore:manage', $systemcontext)) {
                 $this->content->items[] = "<a href=\"".$CFG->wwwroot."/group/index.php?id=1\" >".get_string('frontpagegroups', 'block_usermanagement')."</a>";
-                $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('i/group') . '" class="icon" alt="" />&nbsp;';
+                $this->content->icons[] = $OUTPUT->pix_icon('i/group', '').'&nbsp;';
 
             }
             if(has_capability('local/ulpgccore:upload', $systemcontext)) {
                 $this->content->items[] = "<a href=\"".$CFG->wwwroot."/local/ulpgccore/anadir_manual.php\" >".get_string('addmanual', 'block_usermanagement')."</a>";
-                $this->content->icons[] = '<img src="' . $OUTPUT->pix_url('i/files') . '" class="icon" alt="" />&nbsp;';
+                $this->content->icons[] = $OUTPUT->pix_icon('i/files', '').'&nbsp;';
             }
         }
 

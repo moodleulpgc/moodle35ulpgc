@@ -77,6 +77,7 @@ $esort = optional_param('esort', '', PARAM_ALPHANUMEXT);
 
 require_capability('mod/examregistrar:download', $context);
 
+$SESSION->nameformat = 'lastname';
 
 @set_time_limit(60*30); // 30 min should be enough, if not, stops
 raise_memory_limit(MEMORY_HUGE);  //     @raise_memory_limit('512M');
@@ -740,6 +741,7 @@ function examregistrar_venueallocations_printpdf($examregistrar, $params, $rende
     $pdf->Ln(10);
     $pdf->Ln(10);
 
+    /*
     // get data for usertable
     $names = get_all_user_name_fields(true, 'u');
     $sql = "SELECT  b.id AS bid,  b.userid, b.examid, c.shortname, c.fullname, ss.roomid, u.username, u.idnumber, $names,
@@ -758,8 +760,11 @@ function examregistrar_venueallocations_printpdf($examregistrar, $params, $rende
             ORDER BY u.lastname ASC, u.firstname ASC, u.idnumber ASC, c.shortname ASC ";
 
     $sqlparams = array('session'=>$params['session'], 'bookedsite'=>$params['bookedsite']);
-
     if($users = $DB->get_records_sql($sql, $sqlparams)) {
+    */
+    
+    if($users = examregistrar_get_session_venue_users($params['session'], $params['bookedsite'])) {
+    
         $width = 100;
         $widths = explode('|', $pdf->template['colwidths']);
         $usertable = $renderer->print_venue_users_table($users, $width, $widths, array(get_string('venue', 'examregistrar'), get_string('room', 'examregistrar')), array('numadditionals'=>'*'), array('venuename'=>'text-align:left;', 'roomname'=>'text-align:left;'));

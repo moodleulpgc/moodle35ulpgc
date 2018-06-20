@@ -268,7 +268,7 @@ function to_defaulter($students)
 
 				//registramos al defaulter y sus cursos actuales
 				$table = 'admin_moroso';
-				$aux = new object();
+				$aux = new stdClass();
 				$aux->course 	= $contextid;
 				$aux->userid 	= $userid;
 

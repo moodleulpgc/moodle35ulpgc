@@ -836,6 +836,50 @@ function examregistrar_get_sessionroom_exams($roomid, $sessionid, $bookedsite = 
 }
 
 
+
+
+
+/**
+ * Gets a collection of users booked & allocated assigned to a venue in this session
+ * optionally restrited for room
+ *
+ * @param int $session the ID for the exam session
+ * @param int $bookedsite the ID for the venue the room belongs or is booked
+ * @return array exams
+ */
+function examregistrar_get_session_venue_users($session, $bookedsite, $room = 0) {
+    global $DB;
+
+    $params = array('examsession'=>$session, 'bookedsite'=>$bookedsite);
+    $roomwhere = '';
+    if($room) {
+        $roomwhere = ' AND ss.roomid = :room ';
+        $params['room'] = $room;
+    }
+
+    // get data for usertable
+    $names = get_all_user_name_fields(true, 'u');
+    $sql = "SELECT  b.id AS bid,  b.userid, b.examid, c.shortname, c.fullname, 
+                    ss.id as sid, ss.roomid, ss.seat, ss.showing, ss.taken, ss.certified, ss.status, 
+                    u.username, u.idnumber, $names,
+                    (SELECT COUNT(b2.examid)  FROM {examregistrar_bookings} b2
+                                              JOIN {examregistrar_exams} e2 ON b2.examid = e2.id
+                                                WHERE b2.userid = b.userid AND b2.bookedsite = b.bookedsite AND b2.booked = 1
+                                                AND  e2.examsession = e.examsession
+                                                GROUP BY b2.userid ) AS numexams
+            FROM {examregistrar_bookings} b
+            JOIN {examregistrar_exams} e ON b.examid = e.id AND e.examsession = :examsession
+            JOIN {user} u ON b.userid = u.id
+            JOIN {course} c ON c.id = e.courseid
+            LEFT JOIN {examregistrar_session_seats} ss ON  b.userid = ss.userid AND b.examid = ss.examid AND b.bookedsite = ss.bookedsite AND e.examsession = ss.examsession
+            WHERE b.bookedsite = :bookedsite AND b.booked = 1 $roomwhere
+            GROUP BY b.userid, b.examid
+            ORDER BY u.lastname ASC, u.firstname ASC, u.idnumber ASC, c.shortname ASC";
+
+    return $DB->get_records_sql($sql, $params);
+}
+
+
 /**
  * Looks for and get an instance of examregistrar in a course for an exam
  *
@@ -3651,48 +3695,287 @@ function warning_questions_used($examfile) {
 }
 
 /**
- * Saves response files data creating entries in session_answers table 
+ * Saves response data creating entries in responses table 
  *
  * @param object $formdata object data from user input form
- * @param array $options editor file options
- * @param int $contextid course context 
+ * @param int $contextid context ID for counting & moving files 
  * @param object $eventdata 
  */
-function examregistrar_save_attendance_files($formdata, $options, $contextid, $eventdata) {
+function examregistrar_save_attendance_responsedata($formdata, $contextid, $eventdata) {
     global $DB, $USER;
 
-    if($files = $fs->get_directory_files($contextid, 'mod_examregistrar', 'examresponses', $formdata->examfile, '/'.$formdata->bookedsite, false, false)) {
-        foreach($files as $key => $file) {
-            $files[$key] = $file->get_filename(); 
+    $params = array('examsession' => $formdata->session,
+                    'examid' => $formdata->examid,
+                    'examfile' => $formdata->examfile,
+                    );
+    $now = time();
+    $fs = get_file_storage(); 
+    $updated = 0;
+    
+    foreach($formdata->roomdata as $rid => $allocated) {
+        if(!$allocated) {
+            continue;
         }
-        $eventdata['other']['files'] = implode(', ', $files);
-        $event = \mod_examregistrar\event\responses_uploaded::create($eventdata);
-        $event->trigger();
+        
+        $params['roomid'] = $rid;
+        $response = $DB->get_record('examregistrar_responses', $params);
+        if(!$response) {
+            $response = (object)$params;
+            $response->id = $DB->insert_record('examregistrar_responses', $params);
+        }
+
+        $response->modifierid = $USER->id;
+        $response->timemodified = $now;
+        $response->status = $formdata->roomstatus[$rid];
+        $adding = ($response->status == EXAM_RESPONSES_ADDING);
+        $response->showing = $adding ? $response->showing + $formdata->showing[$rid] : $formdata->showing[$rid];
+        $response->taken = $adding ? $response->taken + $formdata->taken[$rid] : $formdata->taken[$rid];
+        
+        $files = $fs->get_directory_files($contextid, 'mod_examregistrar', 'examresponses', $response->id, '/', false, false);
+        $numfiles = count($files);
+        $response->numfiles = $adding ? $response->numfiles + $numfiles : $numfiles;
+        
+        $message = array();
+        if($response->showing > $allocated) {
+            $message[] = get_string('excessshowing', 'examregistrar',  $allocated);
+        }
+        if($response->taken > $allocated) {
+            $message[] = get_string('excesstaken', 'examregistrar', $allocated);
+        }
+        if($response->taken > $response->showing) {
+            $message[] = get_string('excesstakenshowing', 'examregistrar', $response->showing);
+        }
+        
+        if($message) {
+            list($roomname, $roomidnumber) = examregistrar_get_namecodefromid($rid, 'locations', 'location');
+            array_unshift($message, get_string('roomerror', 'examregistrar', $roomname));
+            $message = implode('<br />', $message);
+            \core\notification::error($message);
+        } else {
+            if($DB->update_record('examregistrar_responses', $response)) {
+                $eventdata['other']['room'] = $rid;
+                $event = \mod_examregistrar\event\attendance_loaded::create($eventdata);
+                $event->trigger();
+                $updated++;
+            }
+        }
+        
+        /*
+        if($oldrec) {
+            $response->id = $oldrec->id;
+            $DB->update_record('examregistrar_responses', $response);
+        } else {
+            $response->id = $DB->insert_record('examregistrar_responses', $response);
+        }
+        */
+        //// TODO  //// TODO //// TODO //// TODO 
+        // move files to new itemid if needed
+    
+        
     }
     
-    // add data to database
-    $record = new stdClass();
-    $record->examsession = $formdata->session;
-    $record->bookedsite = $formdata->bookedsite;
-    $record->examid = $formdata->examid;
-    $record->roomid = $formdata->bookedsite;
-    $oldrec = $DB->get_record('examregistrar_responses', get_object_vars($record));
-    
-    $record->examfile = $formdata->examfile;                
-    $record->modifierid = $USER->id;
-    $record->timemodified = $now;
-    foreach(array('numfiles', 'showing', 'taken') as $field) {
-        $record->{$field} = isset($oldrec->{$field}) ? $formdata->{$field} + $oldrec->{$field} : $formdata->{$field};
-    }
-    
-    if($oldrec) {
-        $record->id = $oldrec->id;
-        $DB->update_record('examregistrar_responses', $record);
-    } else {
-        $record->status = 0;
-        $record->id = $DB->insert_record('examregistrar_responses', $record);
-    }
+    return $updated;
 }
+
+
+/**
+ * Saves response files and data for a room/venue, creating entries in responses table 
+ *
+ * @param object $formdata object data from user input form
+ * @param int $contextid context ID for counting & moving files 
+ * @param object $eventdata 
+ */
+function examregistrar_save_venue_attendance_files($formdata, $contextid, $eventdata) {
+    global $DB, $USER;
+    
+    $params = array('examsession'   => $formdata->session,
+                    'roomid'        => $formdata->room);
+
+    $sql = "SELECT e.*, ef.id AS examfile, c.shortname, c.fullname 
+            FROM {examregistrar_exams} e 
+            JOIN {examregistrar_examfiles} ef ON e.id = ef.examid AND ef.status = :efstatus
+            JOIN {course} c ON e.courseid = c.id
+            WHERE e.id = :examid AND e.examsession = :examsession
+            ORDER BY ef.timeapproved DESC, ef.attempt DESC  ";
+    $sqlparams = array('examsession'=> $formdata->session,
+                        'efstatus'    => EXAM_STATUS_APPROVED,
+                        );
+    $sessionroom =  (int)"{$formdata->session}0000{$formdata->venue}";   
+    
+    $fr = array('component' => 'mod_examregistrar', 
+                'filearea'  =>'examresponses', 
+                'filepath'  =>'/'
+                );
+
+    $now = time();
+    $fs = get_file_storage(); 
+    $updated = 0;
+    
+    foreach($formdata->examattendance as $examid => $attendance) {
+        if(!$attendance['status']) {
+            continue;
+        }
+        $sqlparams['examid'] = $examid;
+        $exam = $DB->get_record_sql($sql, $sqlparams);
+        
+        if(!$exam) {
+            continue;    
+        }
+        
+        $params['examid'] = $examid;
+        $params['examfile'] = $exam->examfile;
+
+        $response = $DB->get_record('examregistrar_responses', $params);
+        if(!$response) {
+            $response = (object)$params;
+            $response->id = $DB->insert_record('examregistrar_responses', $params);
+        }
+    
+        $response->modifierid = $USER->id;
+        $response->timemodified = $now;
+        $response->status = $attendance['status'];
+        $adding = ($response->status == EXAM_RESPONSES_ADDING);
+        //$response->showing = $adding ? $response->showing + $attendance['showing'] : $attendance['showing'];
+        $response->taken = $adding ? $response->taken + $attendance['taken'] : $attendance['taken'];
+        
+        
+        if($DB->update_record('examregistrar_responses', $response)) {
+            $eventdata['other']['room'] = $formdata->room;
+            $eventdata['other']['examid'] = $examid;
+            $event = \mod_examregistrar\event\attendance_loaded::create($eventdata);
+            $event->trigger();
+            $updated++;
+                
+            $ccontext = context_course::instance($exam->courseid);
+            
+            $fr['contextid'] = $ccontext->id;
+            $fr['itemid'] = $response->id;
+            
+            $files = $fs->get_directory_files($contextid, 'mod_examregistrar', 'roomresponses', $sessionroom, '/', false, false);
+            // TODO  
+            // id delete, delete first 
+            //$fs->delete_area_files($contextid, 'mod_examregistrar', 'examresponses', $response->id); 
+            
+            foreach($files as $key => $file) {
+                $filename = basename($file->get_filename(), '.pdf');
+                if(strpos($filename, $exam->shortname) === 0) {
+                    // filename starts with shortname. Move file to examrespones
+                    $count = 0;
+                    $suffix = '';
+                    $ext = '.pdf'; 
+                    while($fs->file_exists($fr['contextid'], $fr['component'], $fr['filearea'], $fr['itemid'], $fr['filepath'], 
+                                $filename.$suffix.$ext)) {
+                        $count++;
+                        $suffix = '_'.$count; 
+                    }
+                    $fr['filename'] = $filename.$suffix.$ext;
+                    $fs->create_file_from_storedfile($fr, $file); 
+                    $file->delete();
+                    $files[$key] = $fr['filename'];
+                } else {
+                    unset($files[$key]);
+                }
+            }
+            
+            $numfiles = count($fs->get_directory_files($ccontext->id, 'mod_examregistrar', 'examresponses', $response->id, '/', false, false));
+            $response->numfiles = $adding ? $response->numfiles + $numfiles : $numfiles;
+                
+                
+            $eventdata['other']['files'] = implode(', ', $files);
+            $event = \mod_examregistrar\event\responses_uploaded::create($eventdata);
+            $event->trigger();
+            $DB->set_field('examregistrar_responses', 'numfiles', $numfiles, array('id'=>$response->id));
+        }
+    }
+    
+    \core\notification::success(get_string('savedresponsefiles', 'examregistrar', $updated));
+    
+}
+
+/**
+ * Saves user attendance data in session_seats table 
+ *
+ * @param object $formdata object data from user input form
+ */
+function examregistrar_save_attendance_userdata($formdata, $examinattendance = false) {
+    global $DB, $USER;
+
+    $params = array('examsession'   => $formdata->session);
+    if(!$examinattendance) {
+        $params['examid'] = $formdata->examid;
+    }
+    $now = time();
+    $updated = 0;
+    
+    foreach($formdata->userattendance as $sid => $attendance) {
+        if(!$attendance['add']) {
+            continue;
+        }
+        $params['userid'] = $attendance['add'];
+        $params['id'] = $sid;
+        if($examinattendance) {
+            $params['examid'] = $attendance['examid'];
+        }
+        $userdata = $DB->get_record('examregistrar_session_seats', $params, '*', MUST_EXIST);
+        $userdata->showing = $attendance['showing'];
+        $userdata->taken = $attendance['taken'];
+        $userdata->certified = $attendance['certified'];
+        $userdata->status = $formdata->userstatus;
+        $userdata->modifierid = $USER->id;
+        $userdata->timemodified = $now;
+
+        if($DB->update_record('examregistrar_session_seats', $userdata)) {
+            $updated++;
+        }
+    }
+
+    return $updated;
+}
+
+
+/**
+ * Saves user attendance data in session_seats table 
+ *
+ * @param object $formdata object data from user input form
+ * @param object $eventdata 
+ */
+function examregistrar_confirm_attendance_userdata($formdata) {
+    global $DB, $USER;
+    
+    $params = array('examsession'   => $formdata->session,
+                    'etakenxamid'        => $formdata->examid,
+                    );
+                    
+    $select = '';
+    foreach($params as $param) {
+        $select .= " $param = :$param AND ";
+    }
+    foreach($formdata->userattendance as $sid => $uid) {
+        if(!$uid) {
+            unset($formdata->userattendance[$sid]);
+        }
+    }
+    
+    list($insqlid, $idparams) = $DB->get_in_or_equal(array_keys($formdata->userattendance), SQL_PARAMS_NAMED, 'id_');
+    list($insqlu, $uparams) = $DB->get_in_or_equal($formdata->userattendance, SQL_PARAMS_NAMED, 'u_');
+    $select .= " userid $insqlu ";
+    $params = $params + $uparams;
+    $select .= " id $insqlid ";
+    $params = $params + $idparams;
+    
+    $success = $DB->set_field_select('examregistrar_session_seats', 'status', $formdata->userstatus, $select, $params); 
+    $DB->set_field_select('examregistrar_session_seats', 'reviewerid', $USER->id, $select, $params);
+    $now = time();
+    $DB->set_field_select('examregistrar_session_seats', 'timereviewed', $now, $select, $params); 
+
+    if($success) {
+        return count($formdata->userattendance);
+    }
+    
+    return false;
+}
+
+
 
 
 /**
@@ -3703,116 +3986,102 @@ function examregistrar_save_attendance_files($formdata, $options, $contextid, $e
  * @param int $contextid course context containing files
  * @param object $eventdata 
  */
-function examregistrar_confirm_attendance_files($formdata, $filename, $contextid, $eventdata) {
+function examregistrar_confirm_attendance_roomdata($formdata, $shortname, $coursectxid, $primaryctxid, $eventdata) {
     global $DB, $USER;
 
-    // move files to new area
-    if($files = $fs->get_directory_files($contextid, 'mod_examregistrar', 'examresponses', $formdata->examfile, '/'.$formdata->bookedsite, false, false)) {
-        $filerecord = new stdClass();
-        $filerecord->filearea = 'responses';
-        $num = (count($files) > 1) ? 1 : 0;
-        foreach($files as $key => $file) {
-            $files[$key] = $file->get_filename(); 
-            $info = pathinfo($files[$key]);
-            //// TODO  ////
-            // make significant suffixes fron users
-            $name = $num ? $filename."($num)" : $filename;
-            $filerecord['filename'] = $name.$info['extension'];  
-            $filerecord['source'] = $info['basename'];  
-            $fs->create_file_from_storedfile($filerecord, $file);
-            $num++;
-            $file->delete();                    
+    $params = array('examsession' => $formdata->session,
+                    'examid' => $formdata->examid,
+                    'examfile' => $formdata->examfile,
+                    );
+    $now = time();
+    $fs = get_file_storage(); 
+    $updated = 0;
+    unset($eventdata['other']['files']);
+    unset($eventdata['other']['users']);
+
+    $fr = array('contextid' => $primaryctxid,
+                'component' => 'mod_examregistrar', 
+                'filearea'  =>'sessionresponses', 
+                'itemid'    => $formdata->session,
+                'filepath'  =>'/'
+                );
+    
+    foreach($formdata->roomdata as $rid => $attandance) {
+        if(!$attendance) {
+            //means not checked by user, not saved
+            continue;
         }
-
-        $params = array('examsession'   => $formdata->session,
-                        'bookedsite'    => $formdata->bookedsite,
-                        'examid'        => $formdata->examid,
-                        'roomid'        => $formdata->roomid,
-                        'examfile'      => $formdata->examfile,
-                        );
-
-        $record = $DB->get_record('examregistrar_responses', $params, 'id, examfile, timefiles, reviewerid', MUST_EXIST);
-        $record->timefiles = time();
-        $record->reviewerid = $USER->id;
-        $DB->update_record('examregistrar_responses', $record);
         
-        $eventdata['other']['files'] = implode(', ', $files);
-        $event = \mod_examregistrar\event\responses_accepted::create($eventdata);
-        $event->trigger;
+        $params['roomid'] = $rid;
+        // get or create the table record
+        if($formdata->response[$rid]) {
+            $params['id'] = $formdata->response[$rid];
+            $response = $DB->get_record('examregistrar_responses', $params, '*', MUST_EXIST);
+        } else {
+            if(!$response = $DB->get_record('examregistrar_responses', $params, '*', MUST_EXIST)) {
+                $response = (object)$params;
+                $response->id = $DB->insert_record('examregistrar_responses', $params);
+            }
+        }
+    
+        $response->showing = $formdata->showing[$rid];
+        $response->taken = $formdata->taken[$rid];
+        $response->status = $formdata->roomstatus[$rid];
+        $response->reviewerid = $USER->id;
+        $response->timereviewed = $now;
+        
+        $files = $fs->get_directory_files($coursectxid, 'mod_examregistrar', 'examresponses', $response->id, '/', false, false);
+        $response->numfiles = count($files);
+
+        $success = $DB->update_record('examregistrar_responses', $response);
+        
+        if($success) {
+            $updated++;
+            $eventdata['other']['room'] = $rid;
+            $event = \mod_examregistrar\event\responses_approved::create($eventdata);
+            $event->trigger;
+
+            $roomname = $roomidnumber = ''; 
+            if($rid) {
+                list($roomname, $roomidnumber) = examregistrar_get_namecodefromid($rid, 'locations', 'location');
+            }
+            
+            // now move files to session
+            $num = 0;
+            if($files) {
+                foreach($files as $key => $file) {
+                    $filename = $shortname;
+                    if($roomidnumber) {
+                        $filename .= '-'.$roomidnumber;
+                    }
+                    $count = 0;
+                    $suffix = '';
+                    $ext = '.pdf'; 
+                    while($fs->file_exists($fr['contextid'], $fr['component'], $fr['filearea'], $fr['itemid'], $fr['filepath'], 
+                                $filename.$suffix.$ext)) {
+                        $count++;
+                        $suffix = '_'.$count; 
+                    }
+                    $fr['filename'] = $filename.$suffix.$ext;
+                    $fs->create_file_from_storedfile($fr, $file);
+                    $num++;
+                    $file->delete();                    
+                    $files[$key] = $fr['filename'];
+                }
+            }
+            $eventdata['other']['room'] = $rid;
+            $eventdata['other']['files'] = implode(', ',$files);
+            $event = \mod_examregistrar\event\attendance_approved::create($eventdata);
+            $event->trigger;
+        }
+    
+    
     }
+    
+    unset($eventdata['other']['files']);
+    unset($eventdata['other']['room']);
+
 }
-
-/**
- * Saves user attendance data in session_seats table 
- *
- * @param object $formdata object data from user input form
- * @param object $eventdata 
- */
-function examregistrar_save_attendance_userdata($formdata, $eventdata) {
-    global $DB, $USER;
-
-    $params = array('examsession'   => $formdata->session,
-                    'bookedsite'    => $formdata->bookedsite,
-                    'examid'        => $formdata->examid,
-                    'roomid'        => $formdata->roomid,
-                    );
-    $now = time();
-    
-    foreach($formdata->users as $uid => $attendance) {
-        $record->userid = $uid;
-        $userdata = $DB->get_record('examregistrar_session_seats', get_object_vars($record), '*', MUST_EXIST);
-        $userdata->showing = $attendance->showing;
-        $userdata->taken = $attendance->taken;
-        $userdata->certified = $attendance->certified;
-        $userdata->status = 0;
-        $userdata->modifierid = $USER->id;
-        $userdata->timemodified = $now;
-        $DB->update_record('examregistrar_session_seats', $userdata);
-    }
-    
-    $event = \mod_examregistrar\event\attendance_uploaded::create($eventdata);
-    $event->trigger();
-}
-
-/**
- * Saves user attendance data in session_seats table 
- *
- * @param object $formdata object data from user input form
- * @param object $eventdata 
- */
-function examregistrar_confirm_attendance_userdata($formdata, $eventdata) {
-    global $DB, $USER;
-
-    $params = array('examsession'   => $formdata->session,
-                    'bookedsite'    => $formdata->bookedsite,
-                    'examid'        => $formdata->examid,
-                    'roomid'        => $formdata->roomid,
-                    );
-                    
-    $select = '';
-    foreach($params as $param) {
-        $select .= " $param = :$param AND ";
-    }
-    list($insql, $uparams) = $DB->get_in_or_equal(array_keys($formdata->users), SQL_PARAMS_NAMED, 'u_');
-    $select .= " userid $insql ";
-    $params = $params + $uparams;
-    
-    $DB->set_field_select('examregistrar_session_seats', 'status', 99, $select." userid $insql ", $params + $uparams); 
-    $DB->set_field_select('examregistrar_session_seats', 'reviewerid', $USER->id, $select." userid $insql ", $params + $uparams);
-    $now = time();
-    //$DB->set_field_select('examregistrar_session_seats', 'timereviewed', $now, $select." userid $insql ", $params + $uparams); 
-
-    $params['examfile']  = $formdata->examfile;
-    $DB->set_field_select('examregistrar_responses', 'timeuserdata', time(), $select." examfile = :examfile", $params); 
-    
-    $event = \mod_examregistrar\event\attendance_confirmed::create($eventdata);
-    $event->trigger();
-}
-
-
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -82,7 +82,7 @@ if (has_capability('moodle/site:config', $systemcontext)) {
     $temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_groups', get_string('backupgroups','tool_backuprestore'), get_string('backupgroups_desc','tool_backuprestore'), array('value'=>0, 'locked'=>0)));
     $temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_keepgroups', get_string('setting_keep_groups_and_groupings','backup'), get_string('restorekeepgroups_desc','tool_backuprestore'), array('value'=>0, 'locked'=>0)));
     $temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_keeproles', get_string('setting_keep_roles_and_enrolments','backup'), get_string('restorekeeproles_desc','tool_backuprestore'), array('value'=>0, 'locked'=>0)));
-    $temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_overwriteconf', get_string('setting_overwriteconf', 'backup'), get_string('restoreoverwriteconf_desc','tool_backuprestore'), array('value'=>1, 'locked'=>0)));
+    $temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_overwriteconf', get_string('setting_overwrite_conf', 'backup'), get_string('restoreoverwriteconf_desc','tool_backuprestore'), array('value'=>1, 'locked'=>0)));
     //$temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_questionbank', get_string('generalquestionbank','backup'), get_string('restorequestionbank_desc','tool_backuprestore'), array('value'=>0, 'locked'=>0)));
     $temp->add(new admin_setting_configcheckbox_with_lock('tool_backuprestore/restore_adminmods', get_string('restoreadminmods','tool_backuprestore'), get_string('restoreadminmods_desc','tool_backuprestore'), array('value'=>1, 'locked'=>0)));
     

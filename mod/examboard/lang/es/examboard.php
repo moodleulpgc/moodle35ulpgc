@@ -363,7 +363,13 @@ El texto llevará como prefijo el código de la asignatura en la que se encuenta
 
 ';
 $string['messagebody'] = 'Texto del mensaje';
-$string['messagebody_help'] = 'El cuerpo principal del mensaje de notificación.  
+$string['messagebody_explain'] = '<p>El mensaje incluirá automáticamente un enlace a la actividad 
+Tribunal que gestiona estos exámenes y notificaciones. </p>
+<p>Puede personalizar el mensaje con una serie de elementos %%CLAVE%% que serán sustituidos 
+por el valor correspondiente al procesar el envío de la notificación a cada usuario y cada examen. 
+Puede ver las claves en el botónde  ayuda.';
+$string['messagebody_help'] = "
+El cuerpo principal del mensaje de notificación.  
 El mensaje incluirá automáticamente un enlace a la actividad Tribunal que gestiona estos exámenes y notificaciones. 
 
 Puede personalizar el mensaje con una serie de elementos que serán sustituidos por el valor correspondiente 
@@ -375,15 +381,19 @@ al procesar el envío de la notificación a cada usuario y cada examen. Las may�
  
  * <strong>%%ROL%%</strong>: El rol o tipo de participación del usuario, bien como examinador, examinando o tutor. 
  * <strong>%%CÓDIGO%%</strong>: La etiqueta o código identificador del Tribunal . 
- * <strong>%%SESIÓN%%</strong>: La sesión de eset examen.  
+ * <strong>%%SESIÓN%%</strong>: La sesión de este examen.  
  * <strong>%%FECHA%%</strong>: La fecha en la que se realizará el examen por Tribunal.
+ * <strong>%%HORA%%</strong>: La hora del día (HH::MM) a la que se realizará el examen por Tribunal.
+ * <strong>%%DÍAHORA%%</strong>: La fecha, dia y hora, en la que se realizará el examen por Tribunal.
+ 
  * <strong>%%DURACIÓN%%</strong>: La duración declarada de la sesión de examen.
  * <strong>%%AULA%%</strong>: El aula, sala o local en el que se realizará el examen.
+ * <strong>%%HOY%%</strong>: La fecha de hoy.
  
  * <strong>%%ESTUDIANTES%%</strong>: La lista de estudiantes a ser examinados por el Tribunal. 
  * <strong>%%TRIBUNAL%%</strong>: La lista de los profesores miembros del Tribunal.
  
-';
+";
 $string['replace_firstname'] = 'NOMBREPILA';
 $string['replace_lastname'] = 'APELLIDOS';
 $string['replace_fullname'] = 'NOMBRE';
@@ -391,11 +401,13 @@ $string['replace_role'] = 'ROL';
 $string['replace_idnumber'] = 'CÓDIGO';
 $string['replace_sessionname'] = 'SESIÓN';
 $string['replace_examdate'] = 'FECHA';
+$string['replace_examtime'] = 'HORA';
+$string['replace_examdatetime'] = 'DÍAHORA';
 $string['replace_venue'] = 'AULA';
 $string['replace_duration'] = 'DURACIÓN';
 $string['replace_students'] = 'ESTUDIANTES';
 $string['replace_committee'] = 'TRIBUNAL';
-$string['replace_date'] = 'FECHA';
+$string['replace_date'] = 'HOY';
 $string['logofile'] = 'Archivo de Logo';
 $string['logofile_help'] = 'Un archivo gráfico con un logotipo o sello que s eincluirá en la esquina superior izquierda del documento.
 

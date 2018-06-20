@@ -228,5 +228,6 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
+$SESSION->nameformat = null;
 // Finish the page
 echo $output->footer();

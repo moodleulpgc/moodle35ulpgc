@@ -18,7 +18,7 @@
  * Version information for the calculated question type.
  *
  * @package    qformat_glossary
- * @copyright  2016 Daniel Thies <dthies@ccal.edu>
+ * @copyright  2016 Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

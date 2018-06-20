@@ -156,7 +156,15 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $header->settingsmenu = $this->context_header_settings_menu();
         ORIGINAL END. */
         $header->contextheader = $this->context_header();
-        $header->hasnavbar = empty($PAGE->layout_options['nonavbar']);
+        
+        $header->hasnavbar = empty($PAGE->layout_options['nonavbar']); // ecastro ULPGC
+        $items = $this->page->navbar->get_items();
+        foreach($items as $item) {
+            if($item->type == 20) {
+                $item->text = html_writer::span($item->text, 'course');
+                break;
+            }
+        }
         $header->navbar = $this->navbar();
         // MODIFICATION START.
         // Show the page heading button on all pages except for the profile page.
@@ -411,4 +419,106 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $this->render_from_template('core/loginform', $context);
         ORIGINAL END. */
     }
+    
+    /*
+     * New language_menu function ensures the lang menu is
+     * always shown, in new position
+     */
+    public function language_menu() { // ecastro ULPGC
+        global $CFG;
+
+        $menu = new custom_menu('');
+        
+        $haslangmenu = $this->lang_menu() != '';
+        if (!$haslangmenu) {
+            return '';
+        }
+
+        $langs = get_string_manager()->get_list_of_translations();
+        if ($haslangmenu) {
+            $strlang = get_string('language');
+            $currentlang = current_language();
+            if (!isset($langs[$currentlang])) {
+                $currentlang = $strlang;
+            }
+            
+            $this->language = $menu->add($currentlang, new moodle_url('#'), $strlang, 10000);
+            
+            foreach ($langs as $langtype => $langname) {
+                $this->language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
+            }
+        }
+
+        $content = '';
+        foreach ($menu->get_children() as $item) {
+            $context = $item->export_for_template($this);
+            if($context->url == '#') {
+                $context->text = '<i class="fa fa-language fa-lg"> </i><span class="langdesc"> '.$context->text.' </span>';
+            }
+            
+            $content .= $this->render_from_template('core/custom_menu_item', $context);
+        }
+
+        return $content;
+    }
+
+    
+    /*
+     * Substituting the custom_menu function to guarantee only top menu
+     * always shown, even if no menu items are configured in the global
+     * theme settings page.
+     */
+    public function custom_site_menu($custommenuitems = '') { // ecastro ULPGC
+        global $CFG, $SITE;
+
+        if (empty($custommenuitems) && !empty($CFG->custommenuitems)) {
+            $custommenuitems = $CFG->custommenuitems;
+        }
+        $menu = new custom_menu($custommenuitems, current_language());
+        
+        $children = '';
+        
+        $children =  $menu->has_children() ?  $menu->get_children() : '';
+        $item =  $children ? reset($children) : '';
+        
+        if (!$children || !$item || !$item->has_children()) {
+            return $SITE->shortname;
+        }
+        
+        $content = '';
+        
+        $item->set_text($SITE->shortname);
+        $context = $item->export_for_template($this);
+        $content .= $this->render_from_template('core/custom_menu_item', $context);
+        
+        return $content;
+    }
+   
+    public function context_header($headerinfo = null, $headinglevel = 1) {
+        global $CFG, $PAGE;
+        
+        $a = $this->page->context->contextlevel;
+        $a = $this->page->course->id;
+        
+        if(($PAGE->context->contextlevel == CONTEXT_COURSE) || 
+            ($PAGE->context->contextlevel == CONTEXT_MODULE)) {
+            if($PAGE->course->id > 1) {
+                $headerinfo = array();
+                $headerinfo['heading'] = $PAGE->course->shortname.' - '.$PAGE->course->fullname;
+            }
+        }
+        
+        return parent::context_header($headerinfo, $headinglevel);
+    }
+    
+    
+    public function block33(block_contents $bc, $region) {
+    
+        print_object($bc->controls);
+        $this->init_block_hider_js($bc);
+        return parent::block($bc, $region);
+
+    }
+    
+   
 }

@@ -35,4 +35,3 @@ Feature: Test importing questions from Moodle glossary export.
     And I set the field "Export category" to "Vocabulary"
     And I press "Export questions to file"
     And following "click here" should download between "6500" and "7500" bytes
-

@@ -18,7 +18,7 @@
  * Code for exporting questions as Moodle XML.
  *
  * @package    qformat_glossary
- * @copyright  2016 Daniel Thies <dthies@ccal.edu>
+ * @copyright  2016 Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
 /**
  * Question Import for Moodle XML glossary format.
  *
- * @copyright  2016 Daniel Thies <dthies@ccal.edu>
+ * @copyright  2016 Daniel Thies <dethies@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qformat_glossary extends qformat_xml {

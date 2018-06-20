@@ -136,7 +136,7 @@ i.fa.responseicon:hover {
 .examregallocationcontrolsright {width:22%; float:right; }
 .examregallocation {float:both;}
 
-.allocatedroomheaderleft  {width:50%; float:left; }
+.allocatedroomheaderleft  {width:58%; float:left; }
 .allocatedroomheaderright  {width:40%; float:right; }
 .allocatedexamregistered  {float:left; }
 
@@ -156,15 +156,39 @@ i.fa.responseicon:hover {
 .allocatedroombody ul,
 .allocatedexambody ul {padding-left: 2.0em; }
 
-#page-mod-examregistrar-view   .bookingform .fitemtitle  {width:40%; text-align:left;}
-#page-mod-examregistrar-view  .bookingform .felement  {width:50%; text-align:left;}
+#page-mod-examregistrar-view .bookingform .fitemtitle  {width:40%; text-align:left;}
+#page-mod-examregistrar-view .bookingform .felement  {width:50%; text-align:left;}
 
 
-#id_headeruserdata  .fitem.fitem_fgroup  div.fitemtitle {
+#id_headeruserdata .fitem.fitem_fgroup  div.fitemtitle {
     width: 400px;
 }
 #id_headeruserdata  .fitem.fitem_fgroup  div.fitemtitle label {
     font-weight: normal !important;
+}
+
+#id_headerroomsdata .fitem.fitem_fgroup .fitemtitle {
+    width: 150px;
+}
+
+#id_headerroomsdata .felement.fgroup label.accesshide {
+    position: static;
+    margin-left: 12px;
+    margin-right: 2px;
+}
+
+#id_headerroomsdata fieldset.felement.fgroup {
+    max-width: 90%;
+    display: inline-flex;
+}
+
+.mform #id_headerroomsdata .fgroup > span {
+    min-width: 13.3em;
+}
+
+.mform #id_headerroomsdata .fgroup input[size] {
+    width: auto;
+    min-width: 7.3em;
 }
 
 div.singlelinebutton {

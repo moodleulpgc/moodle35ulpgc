@@ -104,7 +104,7 @@ class examboard_notify_form extends moodleform {
         $mform->setDefault('messagebody', get_string('defaultbody', 'examboard'));
         $mform->addHelpButton('messagebody', 'messagebody', 'examboard');
         $mform->addRule('messagebody', null, 'required', null, 'client');
-        $mform->addElement('static', 'messagebodyhelp', '', get_string('defaultbody', 'examboard'));
+        $mform->addElement('static', 'messagebodyhelp', '', get_string('messagebody_explain', 'examboard'));
         
         $mform->addElement('filepicker', 'logofile', get_string('logofile', 'examboard'), null, array('maxbytes' => $CFG->maxbytes, 'accepted_types' => 'image'));
         $mform->addHelpButton('logofile', 'logofile', 'examboard');

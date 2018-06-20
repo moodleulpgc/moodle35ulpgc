@@ -354,6 +354,10 @@ The text will be prefixed automatically with the course shortname of this instan
 
 ';
 $string['messagebody'] = 'Message body';
+$string['messagebody_explain'] = '<p>The message will automatically include 
+a link to this instance of the Exam Board module. </p>
+<p>You may customize the message text with some %%data%% substituted with actual values for each user or exam. 
+You may find the data keys in the Help button.';
 $string['messagebody_help'] = 'The main text of the notification message. 
 The message will automatically include a link to this instance of the Exam Board module. 
 
@@ -368,9 +372,13 @@ The case must be maintained.
  * <strong>%%IDNUMBER%%</strong>: The identification label or code for the Examination. 
  * <strong>%%SESSION%%</strong>: The session name for a particular Examination.  
  * <strong>%%DATE%%</strong>: The date the examination will take place.
+ * <strong>%%TIME%%</strong>: The time of day (hour:minute) the examination will take place.
+ * <strong>%%DATETIME%%</strong>: The date, including time, the examination will take place.
+ 
  * <strong>%%DURATION%%</strong>: The specified duration of the examination.
  * <strong>%%VENUE%%</strong>: The venue, classroom or other place where the examination will take place.
- 
+ * <strong>%%TODAY%%</strong>: Todays date. 
+  
  * <strong>%%STUDENTS%%</strong>: The list of students to be assessed in this Examination. 
  * <strong>%%COMMITTEE%%</strong>: The list of examiners, tha Committee members.
  
@@ -382,11 +390,13 @@ $string['replace_role'] = 'ROLE';
 $string['replace_idnumber'] = 'IDNUMBER';
 $string['replace_sessionname'] = 'SESSION';
 $string['replace_examdate'] = 'DATE';
+$string['replace_examtime'] = 'TIME';
+$string['replace_examdatetime'] = 'DATETIME';
 $string['replace_venue'] = 'VENUE';
 $string['replace_duration'] = 'DURATION';
 $string['replace_students'] = 'STUDENTS';
 $string['replace_committee'] = 'COMMITTEE';
-$string['replace_date'] = 'DATE';
+$string['replace_date'] = 'TODAY';
 $string['logofile'] = 'Logo file';
 $string['logofile_help'] = 'A logo or stamp file to include in the upper left corner of the document.
 
@@ -405,8 +415,7 @@ If the graphical signature below is not used, you may include here a typed signa
 $string['signaturefile'] = 'Signature file';
 $string['signaturefile_help'] = 'An image file to be included below the closing, may be a graphic signature or official stamp.';
 $string['defaultsubject'] = 'Committee appointment';
-$string['defaultbody'] = 'You have been appointed 
-
+$string['defaultbody'] = '
 
 You may customize the message text with some data substituted with actual values for each user or exam. 
 The case must be maintained.

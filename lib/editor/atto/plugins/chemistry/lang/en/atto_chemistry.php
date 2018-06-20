@@ -50,6 +50,7 @@ $string['librarygroup7_title'] = 'Lanthanoid and actinoid elements';
 $string['librarygroup7_desc'] = 'TeX commands listed on the elements: La-Lu and Ac-Lr tab.';
 $string['pluginname'] = 'Chemistry editor';
 $string['preview'] = 'Chemistry preview';
+$string['privacy:metadata'] = 'The atto_chemistry plugin does not store any personal data.';
 $string['cursorinfo'] = 'An arrow indicates the position that new elements from the element library will be inserted.';
 $string['savechemistry'] = 'Save chemistry';
 $string['settings'] = 'Chemistry editor settings';

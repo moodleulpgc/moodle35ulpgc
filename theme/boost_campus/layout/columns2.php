@@ -135,6 +135,9 @@ if (!empty($imageareaitems)) {
     // Add imagearea layout file.
     require_once(__DIR__ . '/includes/imagearea.php');
 }
+
+require_once(__DIR__ . '/includes/ulpgcfooter.php'); // ecastro ULPGC
+
 // Get footnote config.
 $footnote = get_config('theme_boost_campus', 'footnote');
 if (!empty($footnote)) {

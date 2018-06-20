@@ -347,37 +347,37 @@ if (!empty($issues)) {
         
         $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $solution = ($hassolution) ? "<img src=\"".$OUTPUT->pix_url('solution', 'tracker').'" height="15" alt="'.tracker_getstring('hassolution','tracker')."\" />" : '' ;
+        $solution = ($hassolution) ? $OUTPUT->pix_icon('solution', tracker_getstring('hassolution','tracker'), 'mod_tracker', array('height'=>15)) : '' ;
         $actions = '';
 
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}&screen=editanissue\" title=\"".tracker_getstring('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
+            $actions = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}&screen=editanissue\" title=\"".tracker_getstring('update')."\" >".$OUTPUT->pix_icon('t/edit', '')."</a>";
         }
 
         if (has_capability('mod/tracker:manage', $context)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".tracker_getstring('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
+            $actions .= "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".tracker_getstring('delete')."\" >".$OUTPUT->pix_icon('t/delete', '')."</a>";
         }
 
         if (!$DB->get_record('tracker_issuecc', array('userid' => $USER->id, 'issueid' => $issue->id))) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen={$screen}&amp;issueid={$issue->id}&what=register\" title=\"".tracker_getstring('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
+            $actions .= "<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen={$screen}&amp;issueid={$issue->id}&what=register\" title=\"".tracker_getstring('register', 'tracker')."\" >".$OUTPUT->pix_icon('register', '', 'mod_tracker')."</a>";
         }
 
         if (preg_match('/^resolutionpriority/', $sort) && has_capability('mod/tracker:managepriority', $context)) {
 
             if ($issue->resolutionpriority < $maxpriority) {
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisetotop\" title=\"".tracker_getstring('raisetotop', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('totop', 'mod_tracker')."\" border=\"0\" /></a>";
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisepriority\" title=\"".tracker_getstring('raisepriority', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('up', 'mod_tracker')."\" border=\"0\" /></a>";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisetotop\" title=\"".tracker_getstring('raisetotop', 'tracker')."\" >".$OUTPUT->pix_icon('totop', '', 'mod_tracker', array('height'=>15))."</a>";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisepriority\" title=\"".tracker_getstring('raisepriority', 'tracker')."\" >".$OUTPUT->pix_icon('up', '', 'mod_tracker', array('height'=>15))."</a>";
             } else {
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('up_shadow', 'mod_tracker')."\" border=\"0\" />";
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('totop_shadow', 'mod_tracker')."\" border=\"0\" />";
+                $actions .= $OUTPUT->pix_icon('up_shadow', '', 'mod_tracker', array('height'=>15));
+                $actions .= $OUTPUT->pix_icon('totop_shadow', '', 'mod_tracker', array('height'=>15));
             }
 
             if ($issue->resolutionpriority > 1) {
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowerpriority\" title=\"".tracker_getstring('lowerpriority', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('down', 'mod_tracker')."\" border=\"0\" /></a>";
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowertobottom\" title=\"".tracker_getstring('lowertobottom', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('tobottom', 'mod_tracker')."\" border=\"0\" /></a>";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowerpriority\" title=\"".tracker_getstring('lowerpriority', 'tracker')."\" >".$OUTPUT->pix_icon('down', '', 'mod_tracker', array('height'=>15))."</a>";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowertobottom\" title=\"".tracker_getstring('lowertobottom', 'tracker')."\" >".$OUTPUT->pix_icon('tobottom', '', 'mod_tracker', array('height'=>15))."</a>";
             } else {
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('down_shadow', 'mod_tracker')."\" border=\"0\" />";
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('tobottom_shadow', 'mod_tracker')."\" border=\"0\" />";
+                $actions .= $OUTPUT->pix_icon('down_shadow', '', 'mod_tracker', array('height'=>15));
+                $actions .= $OUTPUT->pix_icon('tobottom_shadow', '', 'mod_tracker', array('height'=>15));
             }
         }
 
@@ -398,9 +398,9 @@ if (!empty($issues)) {
         }
         if($ulpgckey !== false) {
             $hascomment = tracker_userlastcomment($issue, $tracker, $context);
-            $lastcomment = ($hascomment) ? "&nbsp;<img src=\"".$OUTPUT->pix_url($hascomment, 'mod_tracker')."\" height=\"15\" alt=\"".tracker_getstring('lastcomment','tracker')."\" />" : '' ;
+            $lastcomment = ($hascomment) ? $OUTPUT->pix_icon($hascomment, tracker_getstring('lastcomment','tracker'), 'mod_tracker', array('height'=>15)) : '' ;
             $haslastseen = tracker_userlastseen($issue, $tracker, $context);
-            $lastseen = ($haslastseen) ? "&nbsp;<img src=\"".$OUTPUT->pix_url($haslastseen, 'mod_tracker')."\" height=\"15\" border=\"0\" alt=\"".tracker_getstring('userlastseen','tracker')."\" />" : '' ;
+            $lastseen = ($haslastseen) ? '&nbsp;'.$OUTPUT->pix_icon($haslastseen, tracker_getstring('userlastseen','tracker'), 'mod_tracker', array('height'=>15)) : '' ;
             $lastcomment .= $lastseen;
             if ($canviewpriority && !$resolved){
                 $ticketpriority = ($issue->status < RESOLVED || $issue->status == TESTING) ? round(($issue->resolutionpriority / DAYSECS), 2)*100 : '' ;

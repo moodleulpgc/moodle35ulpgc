@@ -286,10 +286,9 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="examsession" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="bookedsite" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="examid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="additional" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="additional" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="examfile" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="numfiles" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="showing" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -300,17 +299,17 @@
         <FIELD NAME="timefiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timeuserdata" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timereviewed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="examsession" TYPE="foreign" FIELDS="examsession" REFTABLE="examregistrar_sessions" REFFIELDS="id"/>
-        <KEY NAME="bookedsite" TYPE="foreign" FIELDS="bookedsite" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
         <KEY NAME="examid" TYPE="foreign" FIELDS="examid" REFTABLE="examregistrar_exams" REFFIELDS="id"/>
         <KEY NAME="roomid" TYPE="foreign" FIELDS="roomid" REFTABLE="examregistrar_locations" REFFIELDS="id"/>
         <KEY NAME="examfile" TYPE="foreign" FIELDS="examfile" REFTABLE="examregistrar_examfiles" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="examsession-bookedsite-examid-roomid-examfile" UNIQUE="true" FIELDS="examsession, bookedsite, examid, roomid, examfile"/>
+        <INDEX NAME="examsession-examid-roomid-examfile" UNIQUE="true" FIELDS="examsession, examid, roomid, examfile"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="examregistrar_session_seats" COMMENT="Stores information about students placed in rooms for a particular session">
@@ -332,6 +331,7 @@
         <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the component which added this exam (e.g. 'examregistrar_cron'), or blank if it was added manually."/>
         <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If the 'component' field is set, this defines the instance of the component that created the entry. Otherwise it indicates the userid tha added it manually."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timereviewed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

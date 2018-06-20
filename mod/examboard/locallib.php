@@ -1597,7 +1597,7 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
     global $CFG, $DB, $USER;
     
     $replaceable = array_fill_keys(array('firstname', 'lastname', 'fullname', 'role', 'idnumber', 
-                                        'sessionname', 'examdate', 'venue', 'duration', 'date',
+                                        'sessionname', 'examdate', 'examdatetime', 'examtime', 'venue', 'duration', 'date',
                                         'students', 'committee'),
                                         '');
     foreach($replaceable as $key => $value) {
@@ -1684,7 +1684,9 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
         
         $replaces = array($replaceable['idnumber'] => $exam->idnumber,
                             $replaceable['sessionname'] => $exam->sessionname,
-                            $replaceable['examdate'] => userdate($exam->examdate),
+                            $replaceable['examdatetime'] => userdate($exam->examdate),
+                            $replaceable['examdate'] => userdate($exam->examdate, get_string('strftimedate', 'langconfig')),
+                            $replaceable['examtime'] => userdate($exam->examdate, get_string('strftimetime24', 'langconfig')),
                             $replaceable['duration'] => format_time($exam->duration),
                             $replaceable['venue'] => $exam->venue,
                             $replaceable['students'] => $students,
@@ -1698,7 +1700,8 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
         $link = html_writer::link($url, $examboard->name);
         $messagehtml .= get_string('notification_moreinfo', 'examboard', $link);
         
-        
+        // OK, now define this exam users to notify
+        $users = array();
                             
         if($fromform->usertype == EXAMBOARD_USERTYPE_MEMBER ||
             $fromform->usertype == EXAMBOARD_USERTYPE_STAFF ||
@@ -1762,6 +1765,7 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
                                 $replaceable['role'] => $role,);
         
             $messagehtmluser = str_replace(array_keys($replaces), array_values($replaces), $messagehtml);
+            
         
             // process file attachment en tempdir
             $attachment = '';
@@ -1781,11 +1785,12 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
                     $attachname = clean_filename($fromform->attachname.'.pdf');
                 }
             }
-            
-            $messagehtml .= '<br /><br />'.$fromform->messagesender;
-            $messagetext = html_to_text($messagehtml);
+
+            $messagehtmluser .= '<br />--<br />'.$fromform->messagesender;
+            $messagetext = html_to_text($messagehtmluser);
         
-            if(email_to_user($user, $noreplyuser, $subject, $messagetext, $messagehtml, $attachment, $attachname)) {
+            if(email_to_user($user, $noreplyuser, $subject, $messagetext, $messagehtmluser, $attachment, $attachname)) {
+                print_object($user);
                 $notification->examid = $exam->id;
                 $notification->userid = $user->id;
                 $notification->role = $role;

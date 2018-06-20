@@ -218,7 +218,7 @@ function chairman_get_coursemodule_info($coursemodule) {
     global $DB;
 
     if ($chairman = $DB->get_record('chairman', array('id'=>$coursemodule->instance))) {
-        $info = new object();
+        $info = new stdClass();
         $info->name = $chairman->name;
         return $info;
     } else {
@@ -426,7 +426,7 @@ function chairman_cron(){
                     
                 }
                 //update sent notification
-                $chairman_event = new object();
+                $chairman_event = new stcClass();
                 $chairman_event->id = $event->id;
                 $chairman_event->notify_week_sent = 1;
                 //enter info into DB
@@ -463,7 +463,7 @@ function chairman_cron(){
                     
                 }
                 //update sent notification
-                $chairman_event = new object();
+                $chairman_event = new stcClass();
                 $chairman_event->id = $event->id;
                 $chairman_event->notify_sent = 1;
                 //enter info into DB
