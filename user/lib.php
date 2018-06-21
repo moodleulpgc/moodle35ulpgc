@@ -912,9 +912,9 @@ function user_get_user_navigation_info($user, $page, $options = array()) {
             'id' => $course->id,
             'sesskey' => sesskey()
         ));
-        $userrevert->pix = "a/logout";
-        $userrevert->title = get_string('logout');
-        $userrevert->titleidentifier = 'logout,moodle';
+        $userrevert->pix = 't/reset'; // ecastro ULPGC
+        $userrevert->title = get_string('revert');
+        $userrevert->titleidentifier = 'revert,moodle';  /// ecastro ULPGC
         $returnobject->navitems[] = $userrevert;
 
     } else {

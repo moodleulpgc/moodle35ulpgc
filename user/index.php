@@ -101,17 +101,6 @@ if ($node) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('participants'));
 
-if($ulpgc) {
-    $sortorder = trim(substr(trim($sort), 8)); // ecastro ULPGC to enforce name formatting
-    $p = strpos($sortorder, ' ');
-    $sortorder = trim(substr($sortorder, 0, $p));
-    if ($sortorder == 'firstname' ) {
-        $SESSION->nameformat = 'firstname';
-    } else if ($sortorder == 'lastname' ) {
-        $SESSION->nameformat = 'lastname';
-    }
-}
-
 // Get the currently applied filters.
 $filtersapplied = optional_param_array('unified-filters', [], PARAM_NOTAGS);
 $filterwassubmitted = optional_param('unified-filter-submitted', 0, PARAM_BOOL);
@@ -243,6 +232,25 @@ echo '<div class="userlist">';
 $participanttable = new \core_user\participants_table($course->id, $groupid, $lastaccess, $roleid, $enrolid, $status,
     $searchkeywords, $bulkoperations, $selectall);
 $participanttable->define_baseurl($baseurl);
+
+
+if($ulpgc) {
+    $participanttable->setup();
+    if ($participanttable->get_sql_sort()) {
+        $sort = ' ORDER BY '.$participanttable->get_sql_sort();
+    } else {
+        $sort = '';
+    }
+
+    $sortorder = trim(substr(trim($sort), 8)); // ecastro ULPGC to enforce name formatting
+    $p = strpos($sortorder, ' ');
+    $sortorder = trim(substr($sortorder, 0, $p));
+    if ($sortorder == 'firstname' ) {
+        $SESSION->nameformat = 'firstname';
+    } else if ($sortorder == 'lastname' ) {
+        $SESSION->nameformat = 'lastname';
+    }
+}
 
 // Do this so we can get the total number of rows.
 ob_start();

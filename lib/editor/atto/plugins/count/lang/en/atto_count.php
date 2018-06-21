@@ -25,4 +25,5 @@
 $string['countwordsandletters'] = 'Word and letter counts';
 $string['lettersinalltext'] = 'Letters in text';
 $string['pluginname'] = 'Word count';
+$string['privacy:metadata'] = 'The atto_count plugin does not store any personal data.';
 $string['wordsinalltext'] = 'Words in text';

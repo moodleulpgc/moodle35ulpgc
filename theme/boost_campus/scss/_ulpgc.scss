@@ -5,6 +5,14 @@
     min-width: 142px;
 }
 
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    /*your rules for chrome*/
+    #bloque_dch_cabecera ul.enlaces_cabecera li.ultimo  { 
+        margin-top: -21px;
+    }
+}
+
 #bloque_dch_cabecera ul.enlaces_cabecera {
     padding: 0;
     margin: 0;
@@ -294,3 +302,5 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 .block .calendar_filters ul li .eventname {
     display: none;
 }
+
+

@@ -1,0 +1,60 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_news_slider/slider
+
+    Display news slider
+
+    News content json template
+
+    {
+    "news": [
+        {"headline":"Headline 1", "message":"Content 1"},
+        {"headline":"Headline 1", "message":"Content 2"},
+        {"headline":"Headline 1", "content":"Content 3"}
+    ]
+}
+}}
+
+<div id="slider-container" {{{slidercontainerstyles}}}>
+
+    <div class="slider-banner-col" style="height: 100%">
+            <span>{{title}}</span>
+    </div>
+
+    <div class="news-slider responsive slider-col">
+        {{#news}}
+            <div>
+                <div style="float: right;">
+                    <div class="slider-col-date">{{userdayofdate}} {{userdatemodified}}</div>
+                    <div class="slider-col-date-minimal">{{userdatemodified}}</div>
+                </div>
+
+                <div style="float: left; padding: 0px 10px 0px 10px; min-height: 90px;">
+                    {{{userpicture}}}
+                </div>
+                <span class="newscontent">
+                    <span class="headline">{{{headline}}}</span>
+                    <span class="authorline"><strong>{{{courseshortname}}}</strong>{{author}}</span>
+                    <span class="slider-message">{{{message}}}</span>
+                    <span class="slider-message-short">{{{shortmessage}}}</span>
+                    </span>
+            </div>
+        {{/news}}
+    </div>
+
+</div>

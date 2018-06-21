@@ -155,7 +155,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         /* ORIGINAL START
         $header->settingsmenu = $this->context_header_settings_menu();
         ORIGINAL END. */
-        $header->contextheader = $this->context_header();
+        $header->contextheader = $this->context_course_header();
         
         $header->hasnavbar = empty($PAGE->layout_options['nonavbar']); // ecastro ULPGC
         $items = $this->page->navbar->get_items();
@@ -169,6 +169,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         // MODIFICATION START.
         // Show the page heading button on all pages except for the profile page.
         // There we replace it with an edit profile button.
+        
         if ($PAGE->pagelayout != 'mypublic') {
             $header->pageheadingbutton = $this->page_heading_button();
         } else {
@@ -180,7 +181,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 has_capability('moodle/user:update', \context_system::instance())) {
                 $url = new moodle_url('/user/editadvanced.php', array('id'       => $userid, 'course' => $COURSE->id,
                                                                       'returnto' => 'profile'));
-                $header->pageheadingbutton .= $this->single_button($url, get_string('editmyprofile', 'core'));
+                $header->pageheadingbutton = $this->single_button($url, get_string('editmyprofile', 'core')); // ecastro ULPGC
             } else if ((has_capability('moodle/user:editprofile', \context_user::instance($userid)) &&
                     !is_siteadmin($USER)) || ($currentuser &&
                     has_capability('moodle/user:editownprofile', \context_system::instance()))) {
@@ -494,31 +495,37 @@ class core_renderer extends \theme_boost\output\core_renderer {
         return $content;
     }
    
-    public function context_header($headerinfo = null, $headinglevel = 1) {
+   
+
+    public function context_course_header($headerinfo = null, $headinglevel = 1) {
         global $CFG, $PAGE;
-        
-        $a = $this->page->context->contextlevel;
-        $a = $this->page->course->id;
-        
         if(($PAGE->context->contextlevel == CONTEXT_COURSE) || 
             ($PAGE->context->contextlevel == CONTEXT_MODULE)) {
             if($PAGE->course->id > 1) {
-                $headerinfo = array();
+                if(!isset($headerinfo)) {
+                    $headerinfo = array();
+                }
                 $headerinfo['heading'] = $PAGE->course->shortname.' - '.$PAGE->course->fullname;
             }
         }
         
         return parent::context_header($headerinfo, $headinglevel);
     }
+  
     
+    public function region_main_settings_menu() {
     
-    public function block33(block_contents $bc, $region) {
+        if ($this->page->context->contextlevel == CONTEXT_MODULE) {
+ 
+               $this->page->navigation->initialise();
+               $node = $this->page->navigation->find_active_node();
     
-        print_object($bc->controls);
-        $this->init_block_hider_js($bc);
-        return parent::block($bc, $region);
-
-    }
-    
+            if (!empty($node) && ($node->type == navigation_node::TYPE_ACTIVITY ||
+                                    $node->type == navigation_node::TYPE_RESOURCE)) {
+                $this->page->force_settings_menu(true);
+            }
+        }
    
+        return parent::region_main_settings_menu();
+   }
 }

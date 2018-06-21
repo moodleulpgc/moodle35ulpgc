@@ -1,0 +1,4 @@
+# Ignore these files / folders in this git repository.
+*.swp
+.DS_Store
+/node_modules/

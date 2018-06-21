@@ -146,9 +146,9 @@ git submodule add https://github.com/ewallah/moodle-availability_language.git  a
 git submodule add https://github.com/jleyva/moodle-block_configurablereports.git  blocks/configurable_reports
 #Branch MOODLE_30_STABLE
 cd blocks/configurable_reports && git checkout MOODLE_30_STABLE && cd ../../
-
-git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git  blocks/admin_presets
-git submodule add https://github.com/deraadt/moodle-block_simple_clock.git  blocks/simple_clock
+git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git      blocks/admin_presets
+git submodule add  https://bitbucket.org/covuni/moodle-block_news_slider.git      blocks/news_slider
+git submodule add https://github.com/deraadt/moodle-block_simple_clock.git        blocks/simple_clock
 
 #Course formats
 git submodule add https://github.com/brandaorodrigo/moodle-format_board.git         course/format/board
@@ -162,6 +162,7 @@ git submodule add https://github.com/gjb2048/moodle-format_topcoll.git          
 git submodule add https://github.com/emeneo/moodle-enrol_apply.git          enrol/apply
 git submodule add https://github.com/ndunand/moodle-enrol_attributes.git    enrol/attributes
 git submodule add https://github.com/bobopinna/moodle-enrol_autoenrol.git   enrol/autoenrol
+git submodule add https://github.com/moodlehq/moodle-enrol_groupsync.git    enrol/groupsync
 git submodule add https://github.com/emeneo/moodle-enrol_waitlist.git       enrol/waitlist  
 
 #Filters
