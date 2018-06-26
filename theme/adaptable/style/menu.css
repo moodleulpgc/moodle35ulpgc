@@ -149,10 +149,15 @@
 .navbar .dropdown:hover .dropdown-menu, .headermenu .dropdown:hover .dropdown-menu {
     max-height: 800px;
     opacity: 1;
+    overflow: visible;
 }
 
 .navbar .nav .dropdown-menu {
-    margin-top: 14px!important;
+    margin-top: 14px !important;
+}
+
+.navbar .nav .dropdown .dropdown-menu .dropdown-submenu .dropdown-menu {
+    margin-top: 2px !important;
 }
 
 .nav .dropdown-menu .icon-time{
@@ -187,7 +192,7 @@
     left: 100%;
     margin-top: -6px;
     margin-left: -1px;
-    border-radius: 6px !important;
+    border-radius: [[setting:navbardropdownborderradius]];
 }
 
 .nav-tabs .dropdown-menu, .nav-pills .dropdown-menu, .navbar .dropdown-menu {

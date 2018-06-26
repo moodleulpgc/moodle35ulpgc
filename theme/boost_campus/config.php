@@ -93,8 +93,8 @@ $THEME->layouts = [
     ),
     // My dashboard page.
     'mydashboard' => array(
-        'file' => 'columns2.php',
-        'regions' => $regions,
+        'file' => 'mydashboard.php',
+        'regions' => array_merge($regions, array('toprow', 'side-side', 'bottomrow')),
         'defaultregion' => 'side-pre',
         'options' => array('nonavbar' => true, 'langmenu' => true),
     ),

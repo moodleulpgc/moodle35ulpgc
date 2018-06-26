@@ -180,7 +180,7 @@ $temp->add($setting);
 $name = 'theme_adaptable/mycoursesmenulimit';
 $title = get_string('mycoursesmenulimit', 'theme_adaptable');
 $description = get_string('mycoursesmenulimitdesc', 'theme_adaptable');
-$setting = new admin_setting_configtext($name, $title, $description, '20', PARAM_RAW, 5);
+$setting = new admin_setting_configtext($name, $title, $description, '20', PARAM_INT);
 $setting->set_updatedcallback('theme_reset_all_caches');
 $temp->add($setting);
 

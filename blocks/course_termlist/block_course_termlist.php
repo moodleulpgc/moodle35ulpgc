@@ -157,7 +157,8 @@ class block_course_termlist extends block_base {
                             $attributes['class'] .= ' dimmed ';
                         }
                         if ($news = local_ulpgccore_course_recent_activity($ccourse)) {
-                            $news = '&nbsp;'.$OUTPUT->pix_icon('news8', get_string('newactivity', 'block_course_termlist') );
+                            //$news = '&nbsp;'.$OUTPUT->pix_icon('news8', get_string('newactivity', 'block_course_termlist') );
+                            $news = '&nbsp;'.html_writer::tag('i', '', array('class'=>'fa fa-dot-circle-o'));
                         } else {
                             $news = '&nbsp;';
                         }

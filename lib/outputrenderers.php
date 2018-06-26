@@ -1655,7 +1655,7 @@ class core_renderer extends renderer_base {
 
         $output = '';
         if ($title || $controlshtml) {
-            $output .= html_writer::tag('div', html_writer::tag('div', html_writer::tag('div', ' aa ', array('class'=>'block_action')). $title . $controlshtml, array('class' => 'title')), array('class' => 'header'));
+            $output .= html_writer::tag('div', html_writer::tag('div', html_writer::tag('div', '', array('class'=>'block_action')). $title . $controlshtml, array('class' => 'title')), array('class' => 'header'));
         }
         return $output;
     }
@@ -4147,6 +4147,7 @@ EOD;
         $subheader = null;
         $userbuttons = null;
         // Make sure to use the heading if it has been set.
+        
         if (isset($headerinfo['heading'])) {
             $heading = $headerinfo['heading'];
         }

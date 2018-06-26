@@ -72,6 +72,11 @@ $string['examregistrar:resolve'] = 'Approve/reject exam attempts';
 $string['examregistrar:delete'] = 'Delete exam attempts';
 $string['examregistrar:book'] = 'Book an exam for oneself';
 $string['examregistrar:bookothers'] = 'Book an exam for others';
+$string['examregistrar:reviewtaken'] = 'Review exam response data';
+$string['examregistrar:confirmresponses'] = 'Confirm exam response files';
+$string['examregistrar:uploadresponses'] = 'Upload exam response files';
+$string['examregistrar:reviewtaken'] = 'Review exam response data';
+
 
 $string['elementtypes'] = 'Element types';
 $string['configelementtypes'] = 'A comma separated list of element type names.

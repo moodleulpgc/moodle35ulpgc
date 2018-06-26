@@ -13,7 +13,6 @@
     margin-right: -5px  !important;
     padding-right: -5px  !important;
     margin-bottom: 5px;
-    border-style: solid !important;
 }
 
 h3.my-term {
@@ -29,8 +28,15 @@ h3.my-term {
 }
 
 .block_course_termlist .my-course-name {
-    line-height: 2.0em ;
+    line-height: 2.0em;
 }
+
+.block_course_termlist .my-course-name .fa {
+    color: #ff9a00;
+    font-size: smaller;
+    vertical-align: super;
+}
+
 
 .block_course_termlist .dimmed {
     color: #999 !important;

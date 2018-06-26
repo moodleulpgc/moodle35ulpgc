@@ -1,0 +1,43 @@
+{
+  "name": "news_slider-tasks",
+  "version": "0.1.0",
+  "description": "Grunt tasks for Adaptable News slider.",
+  "main": "Gruntfile.js",
+  "author": {
+    "name": "Manoj Solanki",
+    "url": "https://moodle.org/user/profile.php?id=2227655"
+  },
+  "contributors": [
+    {
+      "name": "Gareth J Barnard",
+      "url": "http://about.me/gjbarnard"
+    },
+    {
+      "name": "David Scotson"
+    },
+    {
+      "name": "Joby Harding",
+      "url": "http://www.iamjoby.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/covuni/moodle-block_news_slider.git"
+  },
+  "bugs": {
+    "url": "https://bitbucket.org/covuni/moodle-block_news_slider/issues"
+  },
+  "devDependencies": {
+    "grunt": "~1.0.1",
+    "grunt-contrib-less": "~1.4.1",
+    "grunt-contrib-watch": "~1.0.0",
+    "grunt-exec": "~0.4.6",
+    "grunt-text-replace": "~0.4.0",
+    "grunt-css-metrics": "~0.1.2",
+    "grunt-contrib-cssmin": "~2.0.0",
+    "grunt-contrib-copy": "~1.0.0",
+    "grunt-contrib-jshint": "~1.1.0",
+    "grunt-contrib-uglify": "~1.0.1"
+  },
+  "license": "GPL-3.0"
+}

@@ -78,6 +78,7 @@ $string['ulpgccore:modmove'] = 'Move a module instance';
 $string['ulpgccore:modduplicate'] = 'Duplicate a module instance';
 $string['ulpgccore:modpermissions'] = 'Set roles with permission in module';
 $string['ulpgccore:modroles'] = 'Assign roles to users in module';
+$string['ulpgccore:upload'] = 'Upload files or manuals';
 
 //exams
 $string['examssitesmessage'] = 'Texto a mostrar en la pantalla de Selecci&oacute;n de Ex&aacute;menes';
