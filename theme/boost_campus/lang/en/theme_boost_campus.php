@@ -189,3 +189,8 @@ $string['switchroleto'] = 'Switch role to';
 
 // PRIVACY.
 $string['privacy:metadata'] = 'The Boost Campus theme does not store any personal data about any user.';
+
+// ecastro ULPGC
+$string['region-toprow'] = 'Top row, above content ';
+$string['region-side-side'] = 'Content lateral side';
+$string['region-bottomrow'] = 'Bottom row, below content';

@@ -174,7 +174,7 @@ defined('MOODLE_INTERNAL') || die;
     $name = 'theme_adaptable/coursetitlemaxwidth';
     $title = get_string('coursetitlemaxwidth', 'theme_adaptable');
     $description = get_string('coursetitlemaxwidthdesc', 'theme_adaptable');
-    $setting = new admin_setting_configtext($name, $title, $description, '20');
+    $setting = new admin_setting_configtext($name, $title, $description, '20', PARAM_INT);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 

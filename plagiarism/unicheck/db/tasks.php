@@ -13,19 +13,29 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Version info.
+ * tasks.php
  *
- * @package availability_language
- * @copyright 2018 Renaat Debleu (www.eWallah.net)
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     plagiarism_unicheck
+ * @subpackage  plagiarism
+ * @author      Andrew Chirskiy <a.chirskiy@p1k.co.uk>
+ * @copyright   UKU Group, LTD, https://www.unicheck.com
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');
+}
 
-$plugin->version   = 2018041802;
-$plugin->requires  = 2017111300;
-$plugin->component = 'availability_language';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.4+';
+$tasks = [
+    [
+        'classname' => '\plagiarism_unicheck\task\sync_frozen_task',
+        'blocking'  => 0,
+        'minute'    => '*',
+        'hour'      => '*/5',
+        'day'       => '*',
+        'dayofweek' => '*',
+        'month'     => '*',
+        'disabled'  => 1
+    ]
+];

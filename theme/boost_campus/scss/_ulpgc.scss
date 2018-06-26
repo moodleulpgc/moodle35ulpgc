@@ -187,8 +187,6 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     margin-right: 0px;
 }
 
-
-
 #page-footer {
     min-height: unset;
 }
@@ -232,7 +230,7 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 #pie_info .logo_pie {
     width: 28%;
     background: url("https://www.ulpgc.es/images/ulpgc_graficos_v14.svg") -157px -1568px no-repeat;
-        background-size: auto auto;
+    background-size: auto auto;
     background-size: 1400px;
     display: block;
     height: 80px;
@@ -277,7 +275,7 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     border: 1px solid #b4b4b7;
     background-color: #ecedf0;
     color: #333537;
-  padding: 1px 6px 2px; /* ecastro ULPGC */
+    padding: 1px 6px 2px; /* ecastro ULPGC */
     line-height: 22px;
     text-decoration: none;
     border-radius: 3px;
@@ -303,4 +301,42 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     display: none;
 }
 
+
+#region-main.dashboard {
+    display: table;
+    width: 100%;
+}
+
+#region-main div.card.dashboard {
+    display: table-cell;
+}
+
+#bottom-blocks  section,
+[data-region="blocks-column2"] {
+    background-color: #fff;
+    display: table-cell;
+    max-width: 0;
+    min-width: 240px;
+    padding: 1.25rem;
+}
+
+
+#block-region-bottomrow {
+    display: table;
+    width: 100%;
+}
+
+#bottom-blocks  .card-body {
+    border: 1px solid rgba(0,0,0,.125);
+}
+
+@media only screen and (max-width: 768px) {
+    #region-main div.card.dashboard,
+    #bottom-blocks  section, 
+    [data-region="blocks-column2"] {
+        display: block;
+        width: 100%;
+        max-width: unset;
+    }
+}
 
