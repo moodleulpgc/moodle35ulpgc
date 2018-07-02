@@ -54,7 +54,7 @@ $blockshtml_side = $OUTPUT->blocks('side-side');
 $blockshtml_top = $OUTPUT->blocks('toprow');
 $blockshtml_bottom = $OUTPUT->blocks('bottomrow');
 $hasblocks = strpos($blockshtml, 'data-block=') !== false;
-
+$hassideblocks = strpos($blockshtml_side, 'data-block=') !== false;
 
 
 // ecastro ULPGC from moove
@@ -101,6 +101,7 @@ $templatecontext = [
     'topblocks' => $blockshtml_top,
     'bottomblocks' => $blockshtml_bottom,
     'hasblocks' => $hasblocks,
+    'hassideblocks' => $hassideblocks,
     'bodyattributes' => $bodyattributes,
     'navdraweropen' => $navdraweropen,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,

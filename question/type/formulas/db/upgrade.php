@@ -354,7 +354,7 @@ function xmldb_qtype_formulas_upgrade($oldversion=0) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             // Now fill it with 'none' for compatibility with existing questions'.
-            $DB->set_field('qtype_formulas_answers', 'answernumbering', 'none');
+            $DB->set_field('qtype_formulas_options', 'answernumbering', 'none'); // ecastro corrected answers->options
         }
 
         // Formulas savepoint reached.

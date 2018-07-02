@@ -87,9 +87,11 @@
 
                 <section id="region-main"  class="dashboard {{#hasblocks}}has-blocks mb-3{{/hasblocks}} ">
                 
-                    <section id="sidepost-blocks" data-region="blocks-column2" class="d-print-none">
-                        {{{ sidepostblocks }}}
-                    </section>
+                    {{#hassideblocks}}
+                        <section id="sidepost-blocks" data-region="blocks-column2" class="d-print-none">
+                            {{{ sidepostblocks }}}
+                        </section>
+                    {{/hassideblocks}}
                 
                     <div class="card  dashboard">
                         <div class="card-body">

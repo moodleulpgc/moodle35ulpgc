@@ -161,14 +161,13 @@ class tool_batchmanage_setting_managejobs extends admin_setting {
             if (isset($enabled[$managejob])) {
                 $aurl = new moodle_url($url, array('action' => 'disable', 'managejob' => $managejob));
                 $hideshow = "<a href=\"$aurl\">";
-                $hideshow .= "<img src=\"" . $OUTPUT->pix_url('t/hide') . "\" class=\"iconsmall\" alt=\"$strdisable\" /></a>";
+                $hideshow .= $OUTPUT->pix_icon('t/hide', $strdisable, 'moodle', array('class'=>'iconsmall'));
                 $isenabled = true;
                 $displayname = "<span>$name</span>";
             } else {
                 if (isset($available[$managejob])) {
                     $aurl = new moodle_url($url, array('action' => 'enable', 'managejob' => $managejob));
-                    $hideshow = "<a href=\"$aurl\">";
-                    $hideshow .= "<img src=\"" . $OUTPUT->pix_url('t/show') . "\" class=\"iconsmall\" alt=\"$strenable\" /></a>";
+                    $hideshow = html_writer::link($aurl, $OUTPUT->pix_icon('t/show', $strenable, 'moodle', array('class'=>'iconsmall')));
                     $isenabled = false;
                     $displayname = "<span class=\"dimmed_text\">$name</span>";
                 } else {
@@ -188,17 +187,15 @@ class tool_batchmanage_setting_managejobs extends admin_setting {
             if ($isenabled) {
                 if ($updowncount > 1) {
                     $aurl = new moodle_url($url, array('action' => 'up', 'managejob' => $managejob));
-                    $updown .= "<a href=\"$aurl\">";
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('t/up') . "\" alt=\"$strup\" class=\"iconsmall\" /></a>&nbsp;";
+                    $updown .= html_writer::link($aurl, $OUTPUT->pix_icon('t/up', $strup, 'moodle', array('class'=>'iconsmall')).' &nbsp; ');
                 } else {
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('spacer') . "\" class=\"iconsmall\" alt=\"\" />&nbsp;";
+                    $updown .= $OUTPUT->pix_icon('spacer', '', 'moodle', array('class'=>'iconsmall'));
                 }
                 if ($updowncount < $managejobcount) {
                     $aurl = new moodle_url($url, array('action' => 'down', 'managejob' => $managejob));
-                    $updown .= "<a href=\"$aurl\">";
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('t/down') . "\" alt=\"$strdown\" class=\"iconsmall\" /></a>";
+                    $updown .= html_writer::link($aurl, $OUTPUT->pix_icon('t/down', $strup, 'moodle', array('class'=>'iconsmall')).' &nbsp; ');
                 } else {
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('spacer') . "\" class=\"iconsmall\" alt=\"\" />";
+                    $updown .= $OUTPUT->pix_icon('spacer', '', 'moodle', array('class'=>'iconsmall'));
                 }
                 ++$updowncount;
             }
