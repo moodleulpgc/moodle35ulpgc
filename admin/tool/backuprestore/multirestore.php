@@ -205,6 +205,7 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
         /// search backup files and iteratively process them
         $localfiles = get_directory_list($sourcedir, '', false, false, true);
         foreach($localfiles as $file) {
+            print_object($file);
             if(fnmatch($includepattern, $file)) {
                 if(fnmatch($excludepattern, $file)) {
                     $excluded[] = $file;
@@ -252,9 +253,12 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                         $courseshortname = isset($idnumberparts[5]) ? $idnumberparts[5] : '';
                         $courses = $DB->get_records('course', array('shortname'=>$courseshortname));
                     }
+                    print_object("idnumber: $idnumber |  courseshortname: $courseshortname"):
+                    
                 }
                 if($courses) {
                     foreach($courses as $course) {
+                        print_object($course);
                         $success = ' testing';
                         if(isset($course->shortname)) {
                             $coursename = $course->shortname;
@@ -312,12 +316,14 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                                 if(!$testing) {
                                     rename($sourcedir.'/'.$file, $sourcedir.'/restored/'.$file);
                                 }
+                                
+                                $controller->destroy();
+                                unset($controller);
+
                             } catch (backup_exception $e) {
                                 $error = '  <<< ERROR '.$e->errorcode;
                                 $controller->log($strcourse.': '.$coursename, backup::LOG_WARNING, $error);
                             }
-                            $controller->destroy();
-                            unset($controller);
                         }
                         /*
                         if(!$error) {

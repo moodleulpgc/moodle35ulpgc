@@ -286,5 +286,19 @@ class restore_root_task extends restore_task {
         $competencies = new restore_competencies_setting($hascompetencies);
         $competencies->set_ui(new backup_setting_ui_checkbox($competencies, get_string('rootsettingcompetencies', 'backup')));
         $this->add_setting($competencies);
+        
+
+        // Define adminmods  // ecastro ULPGC
+        $defaultvalue = true;                      // Safer default
+        $changeable = true;
+        if (isset($rootsettings['adminmods']) && $rootsettings['adminmods']) { // Only enabled when available
+            $defaultvalue = true;
+            $changeable = true;
+        }
+        $adminmods = new restore_generic_setting('adminmods', base_setting::IS_BOOLEAN, $defaultvalue);
+        $adminmods->set_ui(new backup_setting_ui_checkbox($adminmods, get_string('rootsettingadminmods', 'local_ulpgccore')));
+        $adminmods->get_ui()->set_changeable($changeable);
+        $this->add_setting($adminmods); // ecastro ULPGC new restore groupings setting        
+
     }
 }
