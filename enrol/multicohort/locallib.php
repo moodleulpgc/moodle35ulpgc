@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/enrol/locallib.php');
 require_once($CFG->dirroot.'/group/lib.php');
-require_once('lib.php');
+require_once($CFG->dirroot.'/enrol/multicohort/lib.php');
 
 /**
  * Event handler for multicohort enrolment plugin.

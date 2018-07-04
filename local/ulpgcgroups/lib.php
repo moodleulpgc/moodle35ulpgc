@@ -110,7 +110,7 @@ function local_ulpgcgroups_group_style($group, $groupingid = 0, $exclusive = 0, 
     }
 
     $style = '';
-    if($group->component && $color) {
+    if(isset($group->component) && $group->component && $color) {
         $style = 'style="color:'.$color.';"';
     }
    
