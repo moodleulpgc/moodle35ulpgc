@@ -205,7 +205,6 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
         /// search backup files and iteratively process them
         $localfiles = get_directory_list($sourcedir, '', false, false, true);
         foreach($localfiles as $file) {
-            print_object($file);
             if(fnmatch($includepattern, $file)) {
                 if(fnmatch($excludepattern, $file)) {
                     $excluded[] = $file;
@@ -247,18 +246,20 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                    $courses = array($course);
                 } else {
                     // EXISTING, ADDING or DELETING
-                    $courses = $DB->get_records('course', array('idnumber'=>$idnumber));
+                    $courses = array();
+                    if($idnumber) {
+                        $courses = $DB->get_records('course', array('idnumber'=>$idnumber));
+                    }
                     if (!$courses) {
                     	$idnumberparts = explode('_', $idnumber);
                         $courseshortname = isset($idnumberparts[5]) ? $idnumberparts[5] : '';
-                        $courses = $DB->get_records('course', array('shortname'=>$courseshortname));
+                        if($courseshortname) {
+                            $courses = $DB->get_records('course', array('shortname'=>$courseshortname));
+                        }
                     }
-                    print_object("idnumber: $idnumber |  courseshortname: $courseshortname"):
-                    
                 }
                 if($courses) {
                     foreach($courses as $course) {
-                        print_object($course);
                         $success = ' testing';
                         if(isset($course->shortname)) {
                             $coursename = $course->shortname;
