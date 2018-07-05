@@ -97,7 +97,7 @@ function local_ulpgcgroups_member_style($member, $color = '', $recover = false) 
  * @param $recover bool indicate if group creator component should be retrived fron DB
  * @return string HTML snippet with group name in styled span tag
  */
-function local_ulpgcgroups_group_style($group, $groupingid = 0, $exclusive = 0, $conflictgroups = array(), $color = '', $recover = true) {
+function local_ulpgcgroups_group_style($group, $groupingid = 0, $exclusive = 0, $conflictgroups = array(), $color = '', $recover = false) {
     global $DB;
 
     $prepend = '';
