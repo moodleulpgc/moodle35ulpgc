@@ -332,7 +332,7 @@ function groups_index_member_style($member, $color = '', $recover = false) { //e
     }
     
     $style = '';
-    if($member->component && $color) {
+    if(isset($member->component) && $member->component && $color) {
         $style = 'color:'.$color;
     }
    

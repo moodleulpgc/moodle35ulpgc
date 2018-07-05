@@ -1045,7 +1045,7 @@ function examregistrar_qc_counts($sessionid, $bookedsite = 0) {
 
     $sql = "SELECT COUNT(b.id)
                 FROM {examregistrar_bookings} b
-                JOIN {examregistrar_exams} e ON e.id = b.examid AND e.examsession = :examsession
+                JOIN {examregistrar_exams} e ON e.id = b.examid AND e.examsession = :examsession AND e.visible = 1
                 WHERE b.booked = 1 $venuewhere ";
     $totalbooked = $DB->count_records_sql($sql, $params);
 
@@ -1090,7 +1090,7 @@ function examregistrar_booking_seating_qc($sessionid, $bookedsite = 0, $sort='')
     $sql = "SELECT b.id, b.examid, b.userid, b.bookedsite, e.examsession, e.programme, e.callnum, c.shortname, c.fullname,
                 u.idnumber, $names
             FROM {examregistrar_bookings} b
-            JOIN {examregistrar_exams} e ON e.id = b.examid AND e.examsession = :session1
+            JOIN {examregistrar_exams} e ON e.id = b.examid AND e.examsession = :session1 AND e.visible = 1
             JOIN {course} c ON c.id = e.courseid
             JOIN {user} u ON b.userid = u.id
             LEFT JOIN {examregistrar_session_seats} ss ON (ss.examsession = e.examsession AND ss.examid = b.examid
@@ -2323,7 +2323,7 @@ function examregistrar_get_examallocations_byexam(array $filters, $courseids = a
                 JOIN {course} c ON c.id = e.courseid
                 LEFT JOIN {examregistrar_bookings} b ON e.id = b.examid AND b.booked = 1
                 LEFT JOIN {examregistrar_session_seats} ss ON e.id = ss.examid AND  ss.examsession = e.examsession AND b.bookedsite = ss.bookedsite
-                WHERE 1 $where
+                WHERE e.visible = 1 $where
                 GROUP BY e.id
                 ORDER BY c.shortname ASC, c.fullname ASC ";
                 
@@ -2434,7 +2434,7 @@ function examregistrar_get_roomallocations_byroom(array $filters, $roomids = arr
             FROM {examregistrar_session_seats} ss
             JOIN {examregistrar_locations} r ON ss.roomid = r.id
             JOIN {examregistrar_elements} er ON r.examregid = er.examregid AND er.type ='locationitem' AND r.location = er.id
-            JOIN {examregistrar_exams} e ON ss.examid = e.id
+            JOIN {examregistrar_exams} e ON ss.examid = e.id AND e.visible = 1
             JOIN {course} c ON e.courseid = c.id
             LEFT JOIN {examregistrar_locations} l ON r.parent = l.id
             LEFT JOIN {examregistrar_elements} el ON l.examregid = el.examregid AND el.type ='locationitem' AND l.location = el.id
