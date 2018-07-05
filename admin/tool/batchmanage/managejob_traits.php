@@ -105,7 +105,7 @@ trait batchmanage_mod_selector {
             }
         } else {
             $mform->addElement('hidden', 'adminrestricted', 0);
-            $mform->setType($key, PARAM_INT);
+            $mform->setType('adminrestricted', PARAM_INT);
         }
 
         $this->add_action_buttons(true, $next);
@@ -173,7 +173,7 @@ trait batchmanage_mod_selector_sql {
         if(isset($formdata->adminrestricted) && $formdata->adminrestricted != -1) {
             if($formdata->adminrestricted == 1) {
                 $wheremodule .= " AND cm.score > 0 ";
-            } elseif($formdata->modadminrestricted  >=0) {
+            } elseif($formdata->adminrestricted >= 0) {
                 $wheremodule .= " AND cm.score = ? ";
                 $params[] =  $formdata->adminrestricted;
             }
