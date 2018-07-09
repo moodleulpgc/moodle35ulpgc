@@ -383,10 +383,15 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
         $output .= $this->heading(get_string('reports_group', ratingallocate_MOD_NAME), 2);
         $output .= $this->box_start();
 
-        $tableurl = new moodle_url($PAGE->url, array('action' => ACTION_SHOW_ALLOC_TABLE));
+        $tableurl = new moodle_url($PAGE->url, array('action' => ACTION_SHOW_RATINGS_AND_ALLOCATION_TABLE));
 
         // Button with link to display information about the allocations and ratings
         $output .= $this->single_button($tableurl, get_string('show_table', ratingallocate_MOD_NAME));
+
+        $tableurl = new moodle_url($PAGE->url, array('action' => ACTION_SHOW_ALLOCATION_TABLE));
+
+        // Button with link to display information about the allocations and ratings
+        $output .= $this->single_button($tableurl, get_string('show_allocation_table', ratingallocate_MOD_NAME));
 
         $tableurl = new moodle_url($PAGE->url, array('action' => ACTION_SHOW_STATISTICS));
 
@@ -533,7 +538,7 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
      *
      * @return string html code representing the distribution table
      */
-    public function distribution_table_for_ratingallocate(ratingallocate $ratingallocate) {
+    public function statistics_table_for_ratingallocate(ratingallocate $ratingallocate) {
         // Count the number of allocations with a specific rating
         $distributiondata = array();
 
@@ -600,6 +605,33 @@ class mod_ratingallocate_renderer extends plugin_renderer_base {
                     'unassigned' => count($usersinchoice) - count($memberships))));
             $output .= html_writer::table($allocationtable);
         }
+        $output .= $this->box_end();
+
+        return $output;
+    }
+
+    /**
+     * Shows table containing information about the allocation of users.
+     *
+     * @return string html code representing ratings table
+     */
+    public function allocation_table_for_ratingallocate($ratingallocate) {
+
+        // Create and set up the flextable for ratings and allocations.
+        $table = new mod_ratingallocate\allocations_table($ratingallocate);
+        $table->setup_table();
+
+        // The rest must be done through output buffering due to the way flextable works.
+        ob_start();
+        $table->build_table_by_sql();
+        $tableoutput = ob_get_contents();
+        ob_end_clean();
+
+        $output = $this->heading(get_string('allocations_table', ratingallocate_MOD_NAME), 2);
+        $output .= $this->format_text(get_string('allocation_table_description',
+            ratingallocate_MOD_NAME));
+        $output .= $this->box_start();
+        $output .= $this->box($tableoutput);
         $output .= $this->box_end();
 
         return $output;

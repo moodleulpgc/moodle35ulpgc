@@ -89,7 +89,7 @@ class mod_lightboxgallery_imageadd_form extends moodleform {
 
 
     private function can_resize() {
-        $gallery = $this->_customdata;
+        $gallery = $this->_customdata['gallery'];
         return !in_array($gallery->autoresize, array(AUTO_RESIZE_UPLOAD, AUTO_RESIZE_BOTH));
     }
 }

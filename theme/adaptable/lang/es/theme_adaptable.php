@@ -156,16 +156,16 @@ $string['frontpagerendereroption4'] = 'Tipo Coventry';
 
 // Ticker **********************************************************.
 $string['tickersettings'] = 'Anuncios';
-$string['tickersettingsheading'] = 'Configura los anuncios de la página de inicio. Ver posición <a href="./adaptable/pix/layout.png" target="_blank"> aquí</a>';
+$string['tickersettingsheading'] = 'Configura los anuncios de la página de inicio. Ver posición <a href="../theme/adaptable/pix/layout.png" target="_blank"> aquí</a>';
 $string['tickerdesc'] = 'Aquí puedes configurar los anuncios de la página de inicio de tu moodle.
-    Solo debes introducir una lista tipo HTML e incluir enlaces.
-    Nota: No debes añadir etiquetas ul en la lista, solo li. Los editores de Moodle tienden a añadir etiquetas ul en las listas.
-    Si no funciona correctamente, cambia a modo HTML y comprueba que solo hay etiquetas li:
+    Solo debes introducir una serie de párrafos, uno para cada anuncio.
+    Nota: Cambia el editor a modo HTML y comprueba que solo hay etiquetas &lt;p&gt;:
     <pre>
-    &lt;li&gt;Anuncio 1.....&lt;/li&gt;
-    &lt;li&gt;Anuncio 2.....&lt;/li&gt;
+    &lt;p&gt;Anuncio 1.....&lt;/p&gt;
+    &lt;p&gt;Anuncio 2.....&lt;/p&gt;
+    &lt;p&gt;Anuncio 3.....&lt;/p&gt;
     </pre>
-    <br>
+
     Puedes controlar diferentes secciones de anuncios dependiendo de un campo de perfil de usuario personalizado y así mostrar diferentes anuncios a diferentes perfiles.';
 $string['tickerdefault'] = 'No hay anuncios para mostrar';
 

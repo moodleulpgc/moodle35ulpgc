@@ -18,7 +18,7 @@
  * format_buttons_renderer
  *
  * @package    format_buttons
- * @author     Rodrigo Brandão (rodrigo_brandao@me.com)
+ * @author     Rodrigo Brandão <rodrigo_brandao@me.com>
  * @copyright  2018 Rodrigo Brandão
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -66,6 +66,10 @@ class format_buttons extends format_topics
                 'default' => get_config('format_buttons', 'sectionposition'),
                 'type' => PARAM_INT,
             );
+            $courseformatoptions['inlinesections'] = array(
+                'default' => get_config('format_buttons', 'inlinesections'),
+                'type' => PARAM_INT,
+            );
             $courseformatoptions['sequential'] = array(
                 'default' => get_config('format_buttons', 'sequential'),
                 'type' => PARAM_INT,
@@ -96,10 +100,6 @@ class format_buttons extends format_topics
             if (!$colorcurrent) {
                 $colorcurrent = '';
             }
-            $courseformatoptions['inlinesections'] = array(
-                'default' => get_config('format_buttons', 'inlinesections'),
-                'type' => PARAM_INT,
-            );
             $courseformatoptions['colorcurrent'] = array(
                 'default' => $colorcurrent,
                 'type' => PARAM_TEXT,
@@ -164,6 +164,18 @@ class format_buttons extends format_topics
                     ),
                 ),
             );
+            $courseformatoptionsedit['inlinesections'] = array(
+                'label' => get_string('inlinesections', 'format_buttons'),
+                'help' => 'inlinesections',
+                'help_component' => 'format_buttons',
+                'element_type' => 'select',
+                'element_attributes' => array(
+                    array(
+                        1 => get_string('yes', 'format_buttons'),
+                        0 => get_string('no', 'format_buttons'),
+                    ),
+                ),
+            );
             $courseformatoptionsedit['sequential'] = array(
                 'label' => get_string('sequential', 'format_buttons'),
                 'help_component' => 'format_buttons',
@@ -200,31 +212,19 @@ class format_buttons extends format_topics
             );
             for ($i = 1; $i <= 12; $i++) {
                 $courseformatoptionsedit['divisortext'.$i] = array(
-                    'label' => get_string('divisortext', 'format_buttons').' '.$i,
+                    'label' => get_string('divisortext', 'format_buttons', $i),
                     'help' => 'divisortext',
                     'help_component' => 'format_buttons',
                     'element_type' => 'text',
                 );
                 $courseformatoptionsedit['divisor'.$i] = array(
-                    'label' => get_string('divisor', 'format_buttons').' '.$i,
+                    'label' => get_string('divisor', 'format_buttons', $i),
                     'help' => 'divisortext',
                     'help_component' => 'format_buttons',
                     'element_type' => 'select',
                     'element_attributes' => array($sectionmenu),
                 );
             }
-            $courseformatoptionsedit['inlinesections'] = array(
-                'label' => get_string('inlinesections', 'format_buttons'),
-                'help' => 'inlinesections',
-                'help_component' => 'format_buttons',
-                'element_type' => 'select',
-                'element_attributes' => array(
-                    array(
-                        1 => get_string('yes', 'format_buttons'),
-                        0 => get_string('no', 'format_buttons'),
-                    ),
-                ),
-            );
             $courseformatoptionsedit['colorcurrent'] = array(
                 'label' => get_string('colorcurrent', 'format_buttons'),
                 'help' => 'colorcurrent',

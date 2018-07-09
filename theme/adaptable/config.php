@@ -167,6 +167,7 @@ $THEME->layouts = array(
         'file' => 'columns2.php',
         'regions' => array('side-post'),
         'defaultregion' => 'side-post',
+        'options' => array('nonavbar' => true),
     ),
     // My dashboard page.
     'mydashboard' => array(

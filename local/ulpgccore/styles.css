@@ -14,11 +14,6 @@
     background-color: #EDEDFF;
     opacity: 0;
     border: 1px solid #003867;
-    /*
-    transition: opacity .25s ease-in-out;
-    -moz-transition: opacity .25s ease-in-out;
-    -webkit-transition: opacity .25s ease-in-out;
-    */
 }
 
 .section.sectiondraggable .activity .availabilityinfo {
@@ -66,36 +61,21 @@
 
 #page-mod-forum-view .forumaddnew {
     text-align: center;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.forumpost .header {
-    padding-bottom: 10px;
-    margin-bottom: 0px;
+.path-mod-forum .forumheaderlist {
+    border-collapse: collapse !important;
 }
 
-
-.forumheaderlist  {
-    border: 1px solid;
-    border-collapse: collapse;
-}
 
 .path-mod-forum .forumheaderlist th {
-    padding: 5px;
-}
-
-.path-mod-forum .forumheaderlist td {
-    border-color: #DDD;
-    border-style: solid none solid none;
-}
-
-.forumheaderlist .header {
     border: 1px solid;
-    border-collapse: collapse;
-    background: #dedede;
-}
-
-.forumheaderlist td.author {
-    border-style: solid solid solid none;
+    border-color: #bbb; 
+    border-style: solid;
+    background-color: #e9e9e9;
 }
 
 .forumheaderlist td.lastpost {
@@ -103,9 +83,6 @@
     word-wrap: normal;
 }
 
-.forumheaderlist tbody>tr:nth-child(odd)>td {
-    background-color: #F4F4F4;
-}
 .forumheaderlist tbody tr:hover>td {
     background-color: #FAFADA;
 }

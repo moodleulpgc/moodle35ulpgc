@@ -67,13 +67,11 @@ class report_table extends \table_sql {
 
         $columns = array(
             'fullname',
-            'timecreated',
-            'code'
+            'timecreated'
         );
         $headers = array(
             get_string('fullname'),
-            get_string('receiveddate', 'customcert'),
-            get_string('code', 'customcert')
+            get_string('receiveddate', 'customcert')
         );
 
         // Check if we were passed a filename, which means we want to download it.
@@ -95,7 +93,6 @@ class report_table extends \table_sql {
         $this->define_headers($headers);
         $this->collapsible(false);
         $this->sortable(true);
-        $this->no_sorting('code');
         $this->no_sorting('download');
         $this->is_downloadable(true);
 
@@ -131,16 +128,6 @@ class report_table extends \table_sql {
     }
 
     /**
-     * Generate the code column.
-     *
-     * @param \stdClass $user
-     * @return string
-     */
-    public function col_code($user) {
-        return $user->code;
-    }
-
-    /**
      * Generate the download column.
      *
      * @param \stdClass $user
@@ -150,10 +137,12 @@ class report_table extends \table_sql {
         global $OUTPUT;
 
         $icon = new \pix_icon('download', get_string('download'), 'customcert');
-        $link = new \moodle_url('/mod/customcert/report.php',
-            array('id' => $this->cm->id,
-                  'downloadcert' => '1',
-                  'userid' => $user->id));
+        $link = new \moodle_url('/mod/customcert/view.php',
+            [
+                'id' => $this->cm->id,
+                'downloadissue' => $user->id
+            ]
+        );
 
         return $OUTPUT->action_link($link, '', null, null, $icon);
     }
@@ -168,7 +157,7 @@ class report_table extends \table_sql {
         global $OUTPUT;
 
         $icon = new \pix_icon('i/delete', get_string('delete'));
-        $link = new \moodle_url('/mod/customcert/report.php',
+        $link = new \moodle_url('/mod/customcert/view.php',
             [
                 'id' => $this->cm->id,
                 'deleteissue' => $user->issueid,

@@ -1712,13 +1712,43 @@ function xmldb_game_upgrade($oldversion) {
         upgrade_mod_savepoint(true, $ver, 'game');
     }
 
-    if ($oldversion < ($ver = 2017081102)) {
+    if ($oldversion < ($ver = 2018060401)) {
         // Define field highscore to be added to game.
         $table = new xmldb_table('game');
         $field = new xmldb_field('highscore', XMLDB_TYPE_INTEGER, '2', null, null, null, 0);
 
         // Conditionally launch add field completionpass.
-        $dbman->add_field($table, $field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'game');
+    }
+
+    if ($oldversion < ($ver = 2018060402)) {
+        // Change the number of imageset on hangman to 2.
+        $config = get_config('game');
+        if ($config->hangmanimagesets < 2) {
+            set_config( 'hangmanimagesets', 2, 'game');
+        }
+
+        upgrade_mod_savepoint(true, $ver, 'game');
+    }
+
+    if ($oldversion < ($ver = 2018060404)) {
+        // Import 2 new boards.
+
+        require( 'importsnakes.php');
+        $sql = "SELECT * FROM {$CFG->prefix}game_snakes_database WHERE fileboard='fidaki3.jpg'";
+        $rec = $DB->get_record_sql( $sql);
+        if ($rec === false) {
+            game_importsnakes3();
+        }
+        $sql = "SELECT * FROM {$CFG->prefix}game_snakes_database WHERE fileboard='fidaki4.jpg'";
+        $rec = $DB->get_record_sql( $sql);
+        if ($rec === false) {
+            game_importsnakes4();
+        }
 
         upgrade_mod_savepoint(true, $ver, 'game');
     }

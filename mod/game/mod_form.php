@@ -396,7 +396,7 @@ class mod_game_mod_form extends moodleform_mod {
         }
 
         // Header/Footer options.
-        $mform->addElement('header', 'headerfooteroptions', get_string('headerfooteroptions', 'game'));
+        $mform->addElement('header', 'headerfooteroptions', get_string('header_footer_options', 'game'));
         $mform->addElement('htmleditor', 'toptext', get_string('toptext', 'game'));
         $mform->addElement('htmleditor', 'bottomtext', get_string('bottomtext', 'game'));
 
@@ -554,9 +554,10 @@ class mod_game_mod_form extends moodleform_mod {
             // Default values for every game.
             if ($defaultvalues->type == 'hangman') {
                 $defaultvalues->param10 = 6;    // Maximum number of wrongs.
+                $defaultvalues->param3 = 2;
             } else if ($defaultvalues->type == 'snakes') {
                 $defaultvalues->gamekind = $defaultvalues->type;
-                $defaultvalues->param3 = 1;
+                $defaultvalues->param3 = 3;
                 $defaultvalues->questioncategoryid = 0;
             } else if ($defaultvalues->type == 'millionaire') {
                 $defaultvalues->shuffle = 1;

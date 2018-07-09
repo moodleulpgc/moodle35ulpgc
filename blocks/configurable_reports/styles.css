@@ -60,7 +60,7 @@
     box-shadow:inset 0px 1px 0px 0px #dcecfb;
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bddbfa), color-stop(1, #80b5ea) );
     background:-moz-linear-gradient( center top, #bddbfa 5%, #80b5ea 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#bddbfa', endColorstr='#80b5ea');
+    filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr='#bddbfa', endColorstr='#80b5ea')";
     background-color:#bddbfa;
     -webkit-border-top-left-radius:0px;
     -moz-border-radius-topleft:0px;
@@ -92,7 +92,7 @@
 .linkbutton:hover {
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #80b5ea), color-stop(1, #bddbfa) );
     background:-moz-linear-gradient( center top, #80b5ea 5%, #bddbfa 100% );
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#80b5ea', endColorstr='#bddbfa');
+    filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr='#80b5ea', endColorstr='#bddbfa')";
     background-color:#80b5ea;
 }.linkbutton:active {
      position:relative;

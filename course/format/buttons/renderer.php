@@ -18,7 +18,7 @@
  * format_buttons_renderer
  *
  * @package    format_buttons
- * @author     Rodrigo Brandão (rodrigo_brandao@me.com)
+ * @author     Rodrigo Brandão <rodrigo_brandao@me.com>
  * @copyright  2018 Rodrigo Brandão
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -168,8 +168,7 @@ class format_buttons_renderer extends format_topics_renderer
         }
         $html = html_writer::tag('div', $html, ['id' => 'buttonsectioncontainer', 'class' => $course->buttonstyle]);
         if ($PAGE->user_is_editing()) {
-            $buttonsectionediting = html_writer::tag('div', get_string('editing', 'format_buttons'), ['id' => 'buttonsectionediting']);
-            $html .= html_writer::tag('div', $buttonsectionediting, ['id' => 'divsectionediting']);
+            $html .= html_writer::tag('div', get_string('editing', 'format_buttons'), ['class' => 'alert alert-warning alert-block fade in']);
         }
         return $html;
     }

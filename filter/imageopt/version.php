@@ -22,8 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018012100;
+$plugin->version   = 2018062800;
 $plugin->requires  = 2011111500;
 $plugin->component = 'filter_imageopt';
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '3.4.0.0';
+$plugin->release   = '3.5.0.0';

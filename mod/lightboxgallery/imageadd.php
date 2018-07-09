@@ -41,7 +41,7 @@ $PAGE->set_url('/mod/lightboxgallery/view.php', array('id' => $cm->id));
 $PAGE->set_title($gallery->name);
 $PAGE->set_heading($course->shortname);
 
-$mform = new mod_lightboxgallery_imageadd_form(null, array('id' => $cm->id));
+$mform = new mod_lightboxgallery_imageadd_form(null, array('id' => $cm->id, 'gallery' => $gallery));
 
 if ($mform->is_cancelled()) {
     redirect($CFG->wwwroot.'/mod/lightboxgallery/view.php?id='.$cm->id);

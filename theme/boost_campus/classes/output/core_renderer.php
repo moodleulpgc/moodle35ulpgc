@@ -528,4 +528,9 @@ class core_renderer extends \theme_boost\output\core_renderer {
    
         return parent::region_main_settings_menu();
    }
+   
+   public function logout() {
+    global $CFG;
+        return $CFG->wwwroot.'/login/logout.php?sesskey='.sesskey();
+   }
 }

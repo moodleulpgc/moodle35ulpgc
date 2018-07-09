@@ -81,6 +81,10 @@ $string['ratings_table'] = 'Ratings and Allocations';
 $string['ratings_table_sum_allocations'] = 'Number of allocations / Maximum';
 $string['ratings_table_sum_allocations_value'] = '{$a->sum} / {$a->max}';
 $string['ratings_table_user'] = 'User';
+$string['allocations_table'] = 'Allocations Overview';
+$string['allocations_table_choice'] = 'Choice';
+$string['allocations_table_users'] = 'Users';
+$string['allocations_table_noallocation'] = 'No Allocation';
 $string['start_distribution_explanation'] = ' An algorithm will automatically try to fairly allocate the users according to their given ratings.';
 $string['distribution_table'] = 'Distribution Table';
 $string['download_problem_mps_format'] = 'Download Equation (mps/txt)';
@@ -145,7 +149,7 @@ $string['filter_show_alloc_necessary'] = 'Hide users with allocation';
 $string['update_filter'] = 'Update Filter';
 
 $string['show_table'] = 'Show Ratings and Allocations';
-
+$string['show_allocation_table'] = 'Show Allocations Overview';
 $string['allocation_statistics'] = 'Allocation Statistics';
 $string['show_allocation_statistics'] = 'Show Allocation Statistics';
 $string['allocation_statistics_description'] = 'This statistic gives an impression of the overall satisfaction of the allocation.
@@ -155,6 +159,8 @@ It is counting the allocations according to the rating the user has given to the
 <li>{$a->users} out of {$a->total} user(s) got a choice they rated with "{$a->rating}".</li>
 <li>{$a->unassigned} user(s) could not be allocated to a choice yet.</li>
 </ul>';
+$string['allocation_table_description'] = 'This statistic gives an overview over all allocations of this instance.</br>
+All users, which rated and were not allocated, are listed under \'No Allocation\'';
 $string['allocation_statistics_description_no_alloc'] = 'This statistic gives an impression of the overall satisfaction of the allocation.
 It is counting the allocations according to the rating the user has given to the respective choice.
 <ul>
@@ -317,6 +323,9 @@ $string['log_ratingallocate_viewed_description'] =  'The user with id "{$a->user
 
 $string['log_allocation_table_viewed'] = 'Allocation table viewed';
 $string['log_allocation_table_viewed_description'] =  'The user with id "{$a->userid}" viewed the allocation table for the Fair Allocation with id "{$a->ratingallocateid}".';
+
+$string['log_ratings_and_allocation_table_viewed'] = 'Ratings and allocation table viewed';
+$string['log_ratings_and_allocation_table_viewed_description'] =  'The user with id "{$a->userid}" viewed the ratings and allocation table for the Fair Allocation with id "{$a->ratingallocateid}".';
 
 $string['log_allocation_statistics_viewed'] = 'Allocation statistics viewed';
 $string['log_allocation_statistics_viewed_description'] =  'The user with id "{$a->userid}" viewed the allocation statistics for the Fair Allocation with id "{$a->ratingallocateid}".';

@@ -29,13 +29,13 @@ defined('MOODLE_INTERNAL') || die;
 $plugin->component = 'theme_adaptable';
 
 // Adaptable version date.
-$plugin->version   = 2018051700;
+$plugin->version   = 2018051701;
 
 // Moodle required version (+3.4.2).
 $plugin->requires  = 2016120500;
 
 // Adaptable version.
-$plugin->release = '1.7';
+$plugin->release = '1.7.0.1';
 
 // Adaptable maturity (do not use ALPHA or BETA versions in production sites).
 $plugin->maturity = MATURITY_STABLE;

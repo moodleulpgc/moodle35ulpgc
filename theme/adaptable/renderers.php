@@ -67,7 +67,14 @@ if (file_exists("$CFG->dirroot/course/format/grid/renderer.php")) {
          * @return string HTML to output.
          */
         protected function section_nav_selection($course, $sections, $displaysection) {
-            $section = 0;
+            $settings = $this->courseformat->get_settings();
+            if (!$this->section0attop) {
+                $section = 0;
+            } else if ($settings['setsection0ownpagenogridonesection'] == 2) {
+                $section = 0;
+            } else {
+                $section = 1;
+            }
             return $this->section_nav_selection_content($course, $sections, $displaysection, $section);
         }
 
@@ -80,8 +87,14 @@ if (file_exists("$CFG->dirroot/course/format/grid/renderer.php")) {
          * @return array associative array with previous and next section link.
          */
         public function get_nav_links($course, $sections, $sectionno) {
-            $buffer = -1;
-
+            $settings = $this->courseformat->get_settings();
+            if (!$this->section0attop) {
+                $buffer = -1;
+            } else if ($settings['setsection0ownpagenogridonesection'] == 2) {
+                $buffer = -1;
+            } else {
+                $buffer = 0;
+            }
             return $this->get_nav_links_content($course, $sections, $sectionno, $buffer);
         }
 
@@ -96,7 +109,16 @@ if (file_exists("$CFG->dirroot/course/format/grid/renderer.php")) {
          * @param int $displaysection The section number in the course which is being displayed.
          */
         public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) {
-            $this->print_single_section_page_content($course, $sections, $mods, $modnames, $modnamesused, $displaysection, false);
+            $settings = $this->courseformat->get_settings();
+            if (!$this->section0attop) {
+                $section0attop = 0;
+            } else if ($settings['setsection0ownpagenogridonesection'] == 2) {
+                $section0attop = 0;
+            } else {
+                $section0attop = 1;
+            }
+            $this->print_single_section_page_content($course, $sections, $mods, $modnames, $modnamesused, $displaysection,
+                $section0attop);
         }
     }
 }
@@ -541,7 +563,7 @@ class theme_adaptable_core_renderer extends core_renderer {
         global $PAGE;
         $analytics = '';
         $analyticscount = $PAGE->theme->settings->enableanalytics;
-        $anonymize = 1;
+        $anonymize = true;
 
         // Anonymize IP.
         if (($PAGE->theme->settings->anonymizega = 1) || (empty($PAGE->theme->settings->anonymizega))) {
@@ -1956,7 +1978,15 @@ EOT;
 
                     default:
                         // None.
-                        $retval .= '<div id="sitetitle"></div>';
+//                        $retval .= '<div id="sitetitle"></div>';
+
+                        $header = theme_adaptable_remove_site_fullname($PAGE->theme->settings->sitetitletext);
+                        $sitetitlehtml = $PAGE->theme->settings->sitetitletext;
+//                        $header = format_string($header);
+//                        $PAGE->set_heading($header);
+
+                        $retval .= '<div id="sitetitle">' . format_text($sitetitlehtml, FORMAT_HTML) . '</div>';
+
                         break;
                 }
             }
@@ -1980,9 +2010,12 @@ EOT;
                             $retval .= '<div id="sitetitle">' . format_text($sitetitlehtml, FORMAT_HTML) . '</div>';
                         }
 
-                    default:
+//                    default:
                         // None.
-                        break;
+//                        $header = theme_adaptable_remove_site_fullname($PAGE->theme->settings->sitetitletext);
+//                        $sitetitlehtml = $PAGE->theme->settings->sitetitletext;
+//                        $retval .= '<div id="sitetitle">' . format_text($sitetitlehtml, FORMAT_HTML) . '</div>';
+//                        break;
                 }
             }
         }
@@ -2601,4 +2634,3 @@ EOT;
         return html_writer::tag($tag, $this->blocks_for_region($region), $attributes);
     }
 }
-

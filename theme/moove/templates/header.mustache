@@ -22,7 +22,6 @@
     Example context (json): {}
 }}
 <nav class="fixed-top navbar navbar-light bg-white navbar-expand moodle-has-zindex">
-
     {{#hasdrawertoggle}}
         <div data-region="drawer-toggle" class="d-inline-block mr-3 drawer-toggle">
             <button aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}" aria-controls="nav-drawer" type="button" class="btn nav-link float-sm-left mr-1 btn-secondary" data-action="toggle-drawer" data-side="left" data-preference="drawer-open-nav">{{#pix}}i/menubars{{/pix}}<span class="sr-only">{{#str}}sidepanel, core{{/str}}</span></button>
@@ -54,13 +53,13 @@
         <div class="d-none d-lg-block">
             {{{ output.search_box }}}
         </div>
-        <!-- navbar_plugin_output -->
-        <li class="nav-item">
-            {{{ output.navbar_plugin_output }}}
+
+        <li class="nav-item lang-menu">
+            {{{ output.render_lang_menu }}}
         </li>
-        <!-- user_menu -->
-        <li class="nav-item d-flex align-items-center">
-            {{{ output.user_menu }}}
-        </li>
+
+        {{{ output.navbar_plugin_output }}}
+
+        {{{ output.user_menu }}}
     </ul>
 </nav>

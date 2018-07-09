@@ -229,13 +229,23 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 
 #pie_info .logo_pie {
     width: 28%;
-    background: url("https://www.ulpgc.es/images/ulpgc_graficos_v14.svg") -157px -1568px no-repeat;
+    background: url("https://www.ulpgc.es/sites/all/themes/ulpgc/images/ulpgc_graficos_v14.svg") -157px -1568px no-repeat;
     background-size: auto auto;
     background-size: 1400px;
     display: block;
     height: 80px;
     float: left;
     margin: 0 auto;
+}
+
+@media only screen and (max-width:899px){
+    #pie_info .logo_pie{width:28%;background:url("https://www.ulpgc.es/sites/all/themes/ulpgc/images/ulpgc_graficos_v14.svg") -125px -1328px no-repeat;background-size:1200px;display:block;height:80px;float:left;margin:0 auto;}
+}
+
+@media only screen and (max-width:768px){
+    #pie_info .logo_pie{
+        display: none;
+    }
 }
 
 #pie_info .columna_pie.primera {
@@ -257,11 +267,6 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 
 .m-t-2.m-b-1 .row {
     font-size: small;
-}
-
-#next-activity-link, 
-#prev-activity-link {
-    background-color: $secondary;
 }
 
 .forumpost .row .options .commands {
@@ -315,8 +320,7 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 [data-region="blocks-column2"] {
     background-color: #fff;
     display: table-cell;
-    max-width: 0;
-    min-width: 240px;
+    min-width: 260px;
     padding: 1.25rem;
 }
 
@@ -340,3 +344,48 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     }
 }
 
+.section .activity .activityinstance,
+.section .activity .activityinstance div {
+    display: inline-flex;
+}
+
+.userlist img.userpicture {
+    float: left;
+}
+
+.btn-group input.btn.btn-secondary {
+    margin: 0 2px;
+}
+
+.nav-tabs .nav-link:hover {
+    border: 2px solid #ddd;
+    border-bottom: none;
+}
+
+.path-course-view .unread {
+    vertical-align: middle;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.block .unlist div.icon.column {
+    float: left;
+}
+
+//.forumpost.unread .row.header, 
+.path-course-view .unread, span.unread {
+    background-color: #ffdb99;
+    padding: 0 0.5rem;
+}
+
+.path-mod-forum .forumpost.unread::before {
+    display: block;
+    content: "";
+    width: 6px;
+    position: absolute;
+    background: #ff9a00;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+
+}

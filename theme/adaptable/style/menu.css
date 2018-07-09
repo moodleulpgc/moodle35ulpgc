@@ -133,9 +133,12 @@
 
 }
 
-.navbar .nav .dropdown-menu, .headermenu .dropdown-menu  {
+/* If another dropdown menu is added, please check the below two as definitions may need to be added
+   to ensure dropdown is hidden and displayed appropriately. */
+.navbar .nav .dropdown-menu, .headermenu .dropdown-menu, .langmenu .dropdown-menu  {
     max-height: 0;
 
+    visibility:hidden;
     -webkit-transition: all [[setting:navbardropdowntransitiontime]];
     -moz-transition: all [[setting:navbardropdowntransitiontime]];
     -ms-transition: all [[setting:navbardropdowntransitiontime]];
@@ -146,10 +149,16 @@
     opacity: 0;
 }
 
-.navbar .dropdown:hover .dropdown-menu, .headermenu .dropdown:hover .dropdown-menu {
+.navbar .dropdown:hover .dropdown-menu, .headermenu .dropdown:hover .dropdown-menu,
+.langmenu:hover .dropdown-menu {
     max-height: 800px;
     opacity: 1;
     overflow: visible;
+    visibility: visible;
+}
+
+#above-header .nav li.dropdown {
+	line-height: 24px;
 }
 
 .navbar .nav .dropdown-menu {
