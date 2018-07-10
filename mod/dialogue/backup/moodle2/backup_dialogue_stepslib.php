@@ -45,6 +45,9 @@ class backup_dialogue_activity_structure_step extends backup_activity_structure_
                                                     'notifications',
                                                     'notificationcontent',
                                                     'multipleconversations',
+                                                    'completionconversations', // ecastro ULPGC
+                                                    'completionreplies', // ecastro ULPGC
+                                                    'completionpsots', // ecastro ULPGC
                                                     'timemodified'));
         $conversations = new backup_nested_element('conversations');
         $conversation = new backup_nested_element('conversation', array('id'),

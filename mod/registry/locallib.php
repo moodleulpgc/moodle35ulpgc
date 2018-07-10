@@ -422,7 +422,7 @@ function registry_update_tracker_issue($registry, $regsubmission, $status) {
 
     // add other teachers as cc in tracker issue
     $fields = get_all_user_name_fields(true, 'u');
-    if($users = get_role_users($roles, $coursecontext, false, 'ra.id AS raid, u.id AS userid, u.idnumber, u.firstname, u.lastname, '.$fields, 'lastname ASC', false, '', '', '', ' u.id <> '.$regsubmission->userid)) {
+    if($users = get_role_users($roles, $coursecontext, false, 'ra.id AS raid, u.id AS userid, u.idnumber, u.firstname, u.lastname, '.$fields, 'u.lastname, u.firstname', false, '', '', '', ' u.id <> '.$regsubmission->userid)) {
         $tracker = $DB->get_record('tracker', array('id'=>$issue->trackerid, 'course'=>$registry->course));
         $done = array();
         foreach($users as $user) {

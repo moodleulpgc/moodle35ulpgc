@@ -29,7 +29,7 @@
 		<TABLE NAME="qtype_kprime_rows" COMMENT="The options of kprime questions">
 			<FIELDS>
 				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
-					SEQUENCE="true" />3.5beta+ (Build: 20180427) (2018042700.00)
+					SEQUENCE="true" />
 				<FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true"
 					SEQUENCE="false" COMMENT="FK to question table" />
 				<FIELD NAME="number" TYPE="int" LENGTH="4" NOTNULL="true"

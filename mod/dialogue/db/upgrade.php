@@ -204,7 +204,7 @@ function xmldb_dialogue_upgrade($oldversion=0) {
 
                         // insert entries as messages
                         if($entries = $DB->get_records('dialogue_entries_old', array('dialogueid'=>$conversation->dialogueid,
-                                                                                    'conversationid'=>$conversation->id), 'timecreated ASC')) {
+                                                                                'conversationid'=>$conversation->id), 'timecreated ASC')) {
                             $index = 0;
                             foreach($entries as $entry) {
                                 $index += 1;
@@ -278,5 +278,23 @@ function xmldb_dialogue_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015051103, 'dialogue');
     }
 
+    if ($oldversion < 2017051502) {
+        $table = new xmldb_table('dialogue');
+        $field = new xmldb_field('completionposts', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, 0, 'notificationcontent');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('completionreplies', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, 0, 'notificationcontent');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('completionconversations', XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, 0, 'notificationcontent');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2017051502, 'dialogue');
+    }
+    
     return true;
 }

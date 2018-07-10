@@ -18,6 +18,9 @@
         <FIELD NAME="alternatemode" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" DEFAULT="0" COMMENT=" eastro ULPGC" />
         <FIELD NAME="notifications" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" DEFAULT="1"/>
         <FIELD NAME="notificationcontent" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="completionconversations" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if a certain number of conversations are required to mark this dialogue completed for a user."/>
+        <FIELD NAME="completionreplies" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if a certain number of replies are required to mark this dialogue complete for a user."/>
+        <FIELD NAME="completionposts" TYPE="int" LENGTH="9" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if a certain number of posts or replies (total) are required to mark this dialogue complete for a user."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
       </FIELDS>
       <KEYS>
