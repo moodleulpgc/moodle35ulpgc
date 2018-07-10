@@ -551,7 +551,7 @@ class mod_dialogue_renderer extends plugin_renderer_base {
 
         $html .= get_string('sortedby', 'dialogue', $option);
                 $html .= ' ';
-        $html .= html_writer::tag('tag', null, array('class' => 'caret'));
+        //$html .= html_writer::tag('tag', null, array('class' => 'caret'));
 
         $html .= html_writer::end_tag('button');
         $html .= html_writer::start_tag('ul', array('class' => 'dropdown-menu'));
@@ -621,7 +621,7 @@ class mod_dialogue_renderer extends plugin_renderer_base {
                                                         'class' =>'btn btn-small dropdown-toggle'));
 
         $html .= get_string('sortedby', 'dialogue', get_string($sort, 'dialogue'));
-        $html .= html_writer::tag('tag', null, array('class' => 'caret'));
+        //$html .= html_writer::tag('tag', null, array('class' => 'caret'));
         $html .= html_writer::end_tag('button');
         $html .= html_writer::start_tag('ul', array('class' => 'dropdown-menu'));
 
@@ -687,7 +687,7 @@ class mod_dialogue_renderer extends plugin_renderer_base {
 
         $html .= get_string('replyby', 'dialogue', $replystr); // ecastro ULPGC
         $html .= ' ';
-        $html .= html_writer::tag('tag', null, array('class' => 'caret'));
+        //$html .= html_writer::tag('tag', null, array('class' => 'caret'));
         $html .= html_writer::end_tag('button');
         $html .= html_writer::start_tag('ul', array('class' => 'dropdown-menu'));
         foreach ($options as $option) {
@@ -760,7 +760,7 @@ class mod_dialogue_renderer extends plugin_renderer_base {
 
         $html .= get_string('viewanyby', 'dialogue', $replystr); // ecastro ULPGC
         $html .= ' ';
-        $html .= html_writer::tag('tag', null, array('class' => 'caret'));
+        //$html .= html_writer::tag('tag', null, array('class' => 'caret'));
         $html .= html_writer::end_tag('button');
         $html .= html_writer::start_tag('ul', array('class' => 'dropdown-menu'));
         foreach ($options as $option) {
@@ -816,7 +816,7 @@ class mod_dialogue_renderer extends plugin_renderer_base {
         $html .= html_writer::tag('input', '', array('id'=>'participant_autocomplete_input', 'class' => 'input-large', 'placeholder' => get_string('searchpotentials', 'dialogue')));
         $html .= html_writer::tag('span', '', array('class'=>'drop-down-arrow'));
         $html .= html_writer::end_tag('div');
-        $html .= html_writer::tag('input', '', array('type'=>'submit', 'value'=>get_string('search')));        
+        $html .= html_writer::tag('input', '', array('type'=>'submit', 'class'=>'btn btn-small', 'value'=>get_string('search')));        
         $html .= html_writer::end_tag('div');
         //$html .= html_writer::end_tag('div');
         $html .= '</form>';
