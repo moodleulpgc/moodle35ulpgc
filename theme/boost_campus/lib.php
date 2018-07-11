@@ -62,6 +62,10 @@ function theme_boost_campus_get_main_scss_content($theme) {
     // load moove _blocks
     $blocks = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_blocks.scss');
     $ulpgc = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_ulpgc.scss');
+    if($modchooser = get_config('local_ulpgccore', 'enabledadvchooser')) {
+        $ulpgc .= "\n".file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_modchooser.scss');
+    }
+    
     $post .= "\n". $blocks."\n".$ulpgc ;
 
     // Combine them together.

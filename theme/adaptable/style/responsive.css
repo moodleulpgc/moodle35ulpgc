@@ -214,9 +214,12 @@ Only screen and (max-width : 480px)
     .popover-region-container {
         height: 600px;
         float: left;
-        left: -90px;
+        left: -100px;
         top: 30px;
         width: 300px;
+    }
+    .navbar .nav .dropdown-menu, .headermenu .dropdown-menu, .langmenu .dropdown-menu {
+        min-width: 150px;
     }
 
 .icon {
@@ -482,6 +485,10 @@ Only screen and (max-width : 480px)
 
     #coursesearchbox2 {
         display: none;
+    }
+
+    #above-header .headermenu .dropdown-menu {
+        margin-top: 15px;
     }
 
 }

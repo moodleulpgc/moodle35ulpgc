@@ -1,0 +1,92 @@
+/* ULPGC header
+ ========================================================================= */
+
+/* mods chooser styles
+ ========================================================================= */
+.moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd.yui3-widget-hd {
+    display: inline-block;
+    padding: 4px;
+    min-height: 0.5rem;
+    font-size: .9375rem;
+    text-align: center;
+}
+
+.moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd .yui3-widget-buttons {
+    padding: 4px 12px;
+    
+}
+
+@media (min-width: 576px) {
+
+    .jschooser .choosercontainer #chooseform .alloptions {
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        -webkit-justify-content: flex-start;
+        justify-content: flex-start;
+        -webkit-flex-flow: row wrap;
+        flex-flow: row wrap;
+        max-width: 75%;
+    }
+
+    .jschooser .choosercontainer #chooseform .instruction, 
+    .jschooser .choosercontainer #chooseform .typesummary {
+        left: 75%;
+        padding: .6em;
+        max-width: 25%;
+        min-width: 24px;
+        font-size: .9375rem;
+        line-height: 1.2rem;
+    }
+
+    .choosercontainer #chooseform .choosercategory {
+        width: 32%;
+    }
+
+    .jschooser .choosercontainer #chooseform .alloptions .option .typename {
+        display: -webkit-flex;
+        display: flex;
+        width: auto;
+    }
+}
+
+.choosercontainer #chooseform .alloptions .option label {
+    font-size: inherit;
+}
+
+.jschooser .choosercontainer #chooseform .alloptions .option input[type="radio"] {
+    margin-left: 0;
+    display: none;
+}
+
+
+.choosercontainer #chooseform .option {
+    padding: 0 0 0 1.6em;
+}
+.choosercontainer #chooseform .option label {
+    padding: .2rem 0;
+}
+
+.choosercontainer #chooseform .moduletypetitle {
+    padding: .5rem 0 0 1.2rem;
+}
+
+.choosercontainer #chooseform .moduletypetitle label {
+    margin-bottom: 0;
+    font-weight: 550;
+}
+
+.choosercontainer #chooseform .choosercategory .option span.modicon img.icon {
+    padding: 0 5px 0 5px;
+    float: left;
+    
+}
+
+.choosercontainer #chooseform .selected {
+    background-color: yellowgreen;  
+}
+
+.jschooser .choosercontainer #chooseform .alloptions .option.selected .typename {
+    font-weight: 550;
+}

@@ -144,10 +144,22 @@
 }
 
 
-h1 {
-    font-size: 1.75rem;
+h1, .h1 {
+    font-size: 1.6rem;
     font-weight: 500;
 }
+
+h2, .h2 {
+    font-size: 1.5rem;
+}
+   
+h3, .h3 {
+    font-size: 1.4rem;
+}
+h4, .h4 {
+    font-size: 1.25rem;
+}
+
 
 button[data-action=toggle-drawer] {    
     padding: .375rem .75rem;
@@ -166,18 +178,9 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     background-color: rgb(0,46,103) !important;
 }
 
-/*
-.breadcrumb-item + .breadcrumb-item::before {
-    padding-right: .2rem;
-    padding-left: .2rem;
-    content: "»"
-}
-*/
-
 .d-flex.flex-wrap {
     background-color: #f2f2f2;
 }
-
 
 .nav .caret, .dropdown-toggle::after {
     margin-left: 0px;
@@ -346,8 +349,26 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 
 .section .activity .activityinstance,
 .section .activity .activityinstance div {
+    display: -webkit-inline-flex;
     display: inline-flex;
 }
+
+.course-content ul.topics li.section.main, 
+.course-content ul.weeks li.section.main, 
+.course-content ul.periods li.section.main {
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.course-content ul.topics li.section.main.current, 
+.course-content ul.weeks li.section.main.current, 
+.course-content ul.periods li.section.main.current {
+    margin-top: -1px;
+    border-bottom: #ff9a00 6px solid;
+    border-top: #ff9a00 4px solid;
+}
+
+
 
 .userlist img.userpicture {
     float: left;

@@ -60,18 +60,22 @@ class mobile {
             $certificate->introformat, $context->id, 'mod_customcert', 'intro');
 
         // Get any issues this person may have.
-        $issues = $DB->get_records('customcert_issues', ['userid' => $USER->id, 'customcertid' => $certificate->id]);
+        $issue = false;
+        if ($issues = $DB->get_records('customcert_issues', ['userid' => $USER->id, 'customcertid' => $certificate->id],
+                'timecreated DESC')) {
+            $issue = reset($issues);
+        }
 
-        $candownload = true;
+        $requiredtimemet = true;
         $canmanage = has_capability('mod/customcert:manage', $context);
         if ($certificate->requiredtime && !$canmanage) {
             if (\mod_customcert\certificate::get_course_time($certificate->course) < ($certificate->requiredtime * 60)) {
-                $candownload = false;
+                $requiredtimemet = false;
             }
         }
 
         $fileurl = "";
-        if ($candownload) {
+        if ($requiredtimemet) {
             $fileurl = new \moodle_url('/mod/customcert/mobile/pluginfile.php', ['certificateid' => $certificate->id,
                 'userid' => $USER->id]);
             $fileurl = $fileurl->out(true);
@@ -101,12 +105,11 @@ class mobile {
         $data = [
             'certificate' => $certificate,
             'cmid' => $cm->id,
-            'hasissues' => !empty($issues),
-            'issues' => array_values($issues),
+            'issue' => $issue,
             'showgroups' => !empty($groups),
             'groups' => array_values($groups),
             'canmanage' => $canmanage,
-            'candownload' => $candownload,
+            'requiredtimemet' => $requiredtimemet,
             'fileurl' => $fileurl,
             'showreport' => $showreport,
             'hasrecipients' => !empty($recipients),

@@ -26,14 +26,21 @@
     z-index: 100;
 }
 
-.sectionname:hover~.availabilityinfo {
+.sectionname:hover~.section_availability .availabilityinfo {
     opacity: 1;
     z-index: 100;
-    top: -12px;
-    left: 15%;
-    position: relative;
-    max-width: 75%;
+    top: unset;
+    position: absolute;
 }
+
+.section_availability:not(:empty)::before {
+    font-family: FontAwesome;
+    content: "\f070";
+    float: left;
+    margin-top: -4.2rem;
+}
+
+
 
 .section .activity .restriction {
     position: absolute;
