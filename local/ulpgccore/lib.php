@@ -1013,6 +1013,8 @@ function local_ulpgccore_course_recent_activity($course) {
 function local_ulpgccore_mod_recent_activity($cm, $timestart=0) {
     global $CFG, $DB, $USER, $QTYPES;
   
+    $news = false;
+    
     $course = $cm->get_course();
     $courseid = $course->id;
     $module = $cm->modname;
@@ -1032,7 +1034,7 @@ function local_ulpgccore_mod_recent_activity($cm, $timestart=0) {
     if(!isset($USER->ulpgclastmodactivity[$cm->id])) {
         $USER->ulpgclastmodactivity[$cm->id] = false;
     }
-
+    
     $delay = 60;
     $now = time();
     if(isset($USER->ulpgcrecentmodactivity[$cm->id]) && ($USER->ulpgclastmodactivity[$cm->id] > (time() - $delay))  ) {

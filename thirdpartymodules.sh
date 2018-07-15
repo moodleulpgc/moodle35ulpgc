@@ -149,6 +149,7 @@ cd blocks/configurable_reports && git checkout MOODLE_30_STABLE && cd ../../
 git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git      blocks/admin_presets
 git submodule add  https://bitbucket.org/covuni/moodle-block_news_slider.git      blocks/news_slider
 git submodule add https://github.com/deraadt/moodle-block_simple_clock.git        blocks/simple_clock
+git submodule add https://github.com/mudrd8mz/moodle-block_todo.git               blocks/todo
 
 #Course formats
 git submodule add https://github.com/brandaorodrigo/moodle-format_board.git         course/format/board

@@ -1424,10 +1424,14 @@ class cm_info implements IteratorAggregate {
      * @return string Extra HTML code to display after link
      */
     private function get_after_link() {
+        global $CFG;    
+        
         $this->obtain_view_data();
+        
         if($this->recentactivity) { // ecastro ULPGC get custom recent activity
             $infoexists = function_exists($this->modname . '_' . 'cm_info_view');
-            if(empty($this->afterlink) && !$infoexists) { // ecastro ULPGC get custom recent activity
+            if(empty($this->afterlink) && !$infoexists && get_config('local_ulpgccore', 'enabledrecentactivity')) { // ecastro ULPGC get custom recent activity
+                include_once($CFG->dirroot . '/local/ulpgccore//lib.php');
                 if($newactivity = local_ulpgccore_mod_recent_activity($this)) {
                     $this->afterlink = $newactivity;
                 }

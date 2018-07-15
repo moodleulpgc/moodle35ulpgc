@@ -25,8 +25,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once($CFG->dirroot.'/mod/unedtrivial/emailform.php');
-require_once($CFG->dirroot.'/lib/phpmailer/class.phpmailer.php');
-require_once($CFG->dirroot.'/lib/phpmailer/class.smtp.php');
+//require_once($CFG->dirroot.'/lib/phpmailer/class.phpmailer.php');
+//require_once($CFG->dirroot.'/lib/phpmailer/class.smtp.php');
         
 global $DB;
 

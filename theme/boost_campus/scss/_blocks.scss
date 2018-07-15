@@ -73,6 +73,11 @@
     z-index: 999;
 }
 
+
+.path-grade-report-grader [data-region="blocks-column"] {
+    width: 280px;
+}
+
 body.drawer-open-right {
     #sidepreopen-control {
         right: 265px;

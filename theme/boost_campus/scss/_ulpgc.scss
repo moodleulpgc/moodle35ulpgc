@@ -408,5 +408,15 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     left: -1px;
     top: -1px;
     bottom: -1px;
+}
 
+
+#page-mod-studentquiz-view input[type="checkbox"].toggle + span, 
+#page-mod-studentquiz-view input[type="checkbox"].toggle + label span {
+    background: $gray-300;
+}
+
+#page-mod-studentquiz-view .toggle:checked + span, #page-mod-studentquiz-view .toggle:checked + label span {
+    color: darkgreen;
+    font-weight: 600;
 }

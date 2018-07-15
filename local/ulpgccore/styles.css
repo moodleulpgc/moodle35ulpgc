@@ -41,6 +41,11 @@
 }
 
 
+.section.current h3.sectionname::after {
+    font-family: FontAwesome;
+    content: "\f097";
+    margin-left: 1.0rem;
+}
 
 .section .activity .restriction {
     position: absolute;
@@ -60,7 +65,6 @@
     list-style-type: initial;
     margin-left: 0px;
 }
-
 
 
 /* mod_forum styles
