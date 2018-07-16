@@ -140,6 +140,7 @@ class batchmanage_managejob_coursetemplate extends batchmanage_managejob_plugin 
         list($wherecourse, $join, $params) = $this->courses_selector_sql();
         $formdata = json_decode($this->formsdata['course_template']);
         if(isset($formdata->restorenullmodinfo) and $formdata->restorenullmodinfo) {
+            $join .= "LEFT JOIN {course_modules} cm ON cm.course = c.id ";
             $wherecourse .= ' AND cm.course IS NULL';
         }
         
