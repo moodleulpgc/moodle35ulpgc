@@ -384,7 +384,7 @@ class batchmanage_managejob_modconfig extends batchmanage_managejob_plugin {
         $data->module             = $cm->module;
         $data->modulename         = $mod_selector->module;
         $data->instance           = $cm->instance;
-        $data->update             = true;
+        $data->update             = $cm->id;
         $data->completion         = $cm->completion;
         $data->completionview     = $cm->completionview;
         $data->completionexpected = $cm->completionexpected;

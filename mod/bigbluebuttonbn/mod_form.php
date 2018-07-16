@@ -45,6 +45,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
     public function definition() {
         global $CFG, $DB, $OUTPUT, $PAGE;
         // Validates if the BigBlueButton server is running.
+        
         $serverversion = bigbluebuttonbn_get_server_version();
         if (is_null($serverversion)) {
             print_error('general_error_unable_connect', 'bigbluebuttonbn',
@@ -58,9 +59,19 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         if ($courseid) {
             $course = get_course($courseid);
         }
+        
+        $modconfig = false;
         if (!$course) {
+            if($update = optional_param('upadte', 0, PARAM_INT)) {
+            } elseif($update = optional_param('refmod_cmid', 0, PARAM_INT)) { // ecastro ULPGC allo modconfig managejobplugin
+                $modconfig = true;
+            } elseif($update = optional_param('formsdata__mod_configurator', '', PARAM_ALPHANUM)) {
+                $modconfig = true;
+            }
+        
             $cm = get_coursemodule_from_id('bigbluebuttonbn',
-                optional_param('update', 0, PARAM_INT), 0, false, MUST_EXIST);
+                $update, 0, false, MUST_EXIST); // ecastro ULPGC
+                //optional_param($update, 0, PARAM_INT), 0, false, MUST_EXIST); 
             $course = $DB->get_record('course', array('id' => $cm->course),
                 '*', MUST_EXIST);
             $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn',
@@ -91,13 +102,17 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
         // JavaScript for locales.
-        $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-        $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context);
-        $jsvars['participantList'] = $participantlist;
-        $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
-        $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
-        $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
-            'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
+        if(!$modconfig) { //ecastro ULPGC
+            $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
+            $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context);
+            $jsvars['participantList'] = $participantlist;
+            $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
+            $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');
+            
+
+            $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-modform',
+                'M.mod_bigbluebuttonbn.modform.init', array($jsvars));
+        }
     }
 
     /**

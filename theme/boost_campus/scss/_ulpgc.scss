@@ -309,44 +309,6 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     display: none;
 }
 
-
-#region-main.dashboard {
-    display: table;
-    width: 100%;
-}
-
-#region-main div.card.dashboard {
-    display: table-cell;
-}
-
-#bottom-blocks  section,
-[data-region="blocks-column2"] {
-    background-color: #fff;
-    display: table-cell;
-    min-width: 260px;
-    padding: 1.25rem;
-}
-
-
-#block-region-bottomrow {
-    display: table;
-    width: 100%;
-}
-
-#bottom-blocks  .card-body {
-    border: 1px solid rgba(0,0,0,.125);
-}
-
-@media only screen and (max-width: 768px) {
-    #region-main div.card.dashboard,
-    #bottom-blocks  section, 
-    [data-region="blocks-column2"] {
-        display: block;
-        width: 100%;
-        max-width: unset;
-    }
-}
-
 .section .activity .activityinstance,
 .section .activity .activityinstance div {
     display: -webkit-inline-flex;
