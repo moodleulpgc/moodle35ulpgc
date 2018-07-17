@@ -72,7 +72,7 @@ class format_topicgroup_renderer extends format_topics_renderer {
         if (!$PAGE->user_is_editing()) {
             return array();
         }
-        
+
         $coursecontext = context_course::instance($course->id);
 
         if ($onsectionpage) {
@@ -85,18 +85,6 @@ class format_topicgroup_renderer extends format_topics_renderer {
         //$controls = array_merge($controls, parent::section_edit_controls($course, $section, $onsectionpage));
         $controls = parent::section_edit_control_items($course, $section, $onsectionpage);
 
-        /*
-                           $url->param('section', $section->section);
-                            $url->param('move', 1);
-                            $strmovedown = get_string('movedown');
-                            $controls['movedown'] = array(
-                                'url' => $url,
-                                'icon' => 'i/down',
-                                'name' => $strmovedown,
-                                'pixattr' => array('class' => '', 'alt' => $strmovedown),
-                                'attr' => array('class' => 'icon movedown', 'title' => $strmovedown));
-                        }
-        */
         if (has_capability('format/topicgroup:manage', $coursecontext)) {
                 $groupingid = (isset($section->groupingid) && $section->groupingid) ? $section->groupingid : 0;
                 $url = new moodle_url('/course/format/topicgroup/setgrouping.php', array('id'=>$section->id, 'sesskey'=>sesskey()));
@@ -110,15 +98,6 @@ class format_topicgroup_renderer extends format_topics_renderer {
                         'pixattr' => array('class' => '', 'alt' => $strrestriction),
                         'attr' => array('class' => 'icon editing_unsetgrouping', 'title' => $strrestriction)); 
                 
-        /*
-                $url = new moodle_url('/course/format/topicgroup/setgrouping.php', array('id'=>$section->id, 'sesskey'=>sesskey()));
-                $icon = ($section->groupingid) ? 'locked' : 'lock';
-                $restrictstr = ($section->groupingid) ? 'editrestrictsection' : 'restrictsection';
-                $controls['aa'] = html_writer::link($url,
-                                    html_writer::empty_tag('img', array('src' => $this->output->pix_url($icon, 'format_topicgroup'),
-                                        'class' => 'iconlarge ', 'alt' => get_string('restrictsection', 'format_topicgroup'))),
-                                    array('title' => get_string($restrictstr, 'format_topicgroup'), 'class' => 'editing_setgrouping'));
-                                    */
                 if($groupingid) {
                     $url->param('unset', 1);
                     $strrestriction = 
@@ -150,9 +129,8 @@ class format_topicgroup_renderer extends format_topics_renderer {
         if(isset($section->groupingid) && $section->groupingid) {
             $url = new moodle_url('/course/format/topicgroup/setgrouping.php', array('id'=>$section->id, 'sesskey'=>sesskey()));
             $mark = html_writer::link($url,
-                                    html_writer::empty_tag('img', array('src' => $this->output->pix_url('locked', 'format_topicgroup'),
-                                        'class' => 'icon', 'alt' => get_string('restrictsection', 'format_topicgroup'))),
-                                    array('title' => get_string('editrestrictsection', 'format_topicgroup'), 'class' => 'editing_setgrouping'));
+                                    $this->pix_icon('locked', get_string('restrictsection', 'format_topicgroup'),'format_topicgroup',
+                                    array('title' => get_string('editrestrictsection', 'format_topicgroup'), 'class' => 'editing_setgrouping')));
         }
         
         $o = $mark.parent::section_right_content($section, $course, $onsectionpage);
@@ -177,10 +155,11 @@ class format_topicgroup_renderer extends format_topics_renderer {
         $course = course_get_format($course)->get_course();
 
         // Can we view the section in question?
-        if (!($sectioninfo = $modinfo->get_section_info($displaysection))) {
-            // This section doesn't exist
-            print_error('unknowncoursesection', 'error', null, $course->fullname);
-            return;
+        if (!($sectioninfo = $modinfo->get_section_info($displaysection)) || !$sectioninfo->uservisible) {
+            // This section doesn't exist or is not available for the user.
+            // We actually already check this in course/view.php but just in case exit from this function as well.
+            print_error('unknowncoursesection', 'error', course_get_url($course),
+                format_string($course->fullname));
         }
 
         $context = context_course::instance($course->id);
@@ -219,17 +198,22 @@ class format_topicgroup_renderer extends format_topics_renderer {
 
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
+        
+        
+        
 
         $context = context_course::instance($course->id);
         // Title with completion help icon.
         $completioninfo = new completion_info($course);
         echo $completioninfo->display_help_icon();
+        echo $this->output->heading($this->page_title(), 2, 'accesshide');
 
         // Copy activity clipboard..
         echo $this->course_activity_clipboard($course, 0);
 
         // Now the list of sections..
         echo $this->start_section_list();
+        $numsections = course_get_format($course)->get_last_section_number();
 
         $groupings = groups_get_all_groupings($course->id);
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
@@ -253,15 +237,16 @@ class format_topicgroup_renderer extends format_topics_renderer {
                 $thissection->uservisible = 0;
             }
 
-            if ($section > $course->numsections) {
+            if ($section > $numsections) {
                 // activities inside this section are 'orphaned', this section will be printed as 'stealth' below
                 continue;
             }
             // Show the section if the user is permitted to access it, OR if it's not available
-            // but showavailability is turned on (and there is some available info text).
+            // but there is some available info text which explains the reason & should display,
+            // OR it is hidden but the course has a setting to display hidden sections as unavilable.
             $showsection = $thissection->uservisible ||
-                    ($thissection->visible && !$thissection->available &&
-                    !empty($thissection->availableinfo));
+                    ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo)) ||
+                    (!$thissection->visible && !$course->hiddensections);
 
             if (!$showsection) {
                 // If the hiddensections option is set to 'show hidden sections in collapsed
@@ -278,9 +263,9 @@ class format_topicgroup_renderer extends format_topics_renderer {
                 // Display section summary only.
                 echo $this->section_summary($thissection, $course, null);
             } else {
+                echo $this->section_header($thissection, $course, false, 0);
                 if ($thissection->uservisible) {
                     /// TODO if canview all but not membership => show collapsed
-                    echo $this->section_header($thissection, $course, false, 0);
                     echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
                     echo $this->courserenderer->course_section_add_cm_control($course, $section, 0);
 
@@ -289,16 +274,15 @@ class format_topicgroup_renderer extends format_topics_renderer {
                                 array('class' => 'groupinglabel groupinglabelright'));
                         echo $groupinglabel ;
                     }
-
-                    echo $this->section_footer();
                 }
+                echo $this->section_footer();
             }
         }
 
         if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
             // Print stealth sections if present.
             foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-                if ($section <= $course->numsections or empty($modinfo->sections[$section])) {
+                if ($section <= $numsections or empty($modinfo->sections[$section])) {
                     // this is not stealth section or it is empty
                     continue;
                 }
@@ -309,29 +293,7 @@ class format_topicgroup_renderer extends format_topics_renderer {
 
             echo $this->end_section_list();
 
-            echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
-
-            // Increase number of sections.
-            $straddsection = get_string('increasesections', 'moodle');
-            $url = new moodle_url('/course/changenumsections.php',
-                array('courseid' => $course->id,
-                      'increase' => true,
-                      'sesskey' => sesskey()));
-            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-            echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
-
-            if ($course->numsections > 0) {
-                // Reduce number of sections sections.
-                $strremovesection = get_string('reducesections', 'moodle');
-                $url = new moodle_url('/course/changenumsections.php',
-                    array('courseid' => $course->id,
-                          'increase' => false,
-                          'sesskey' => sesskey()));
-                $icon = $this->output->pix_icon('t/switch_minus', $strremovesection);
-                echo html_writer::link($url, $icon.get_accesshide($strremovesection), array('class' => 'reduce-sections'));
-            }
-
-            echo html_writer::end_tag('div');
+            echo $this->change_number_sections($course, 0);
         } else {
             echo $this->end_section_list();
         }

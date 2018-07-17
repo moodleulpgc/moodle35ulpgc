@@ -62,7 +62,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         
         $modconfig = false;
         if (!$course) {
-            if($update = optional_param('upadte', 0, PARAM_INT)) {
+            if($update = optional_param('update', 0, PARAM_INT)) {
             } elseif($update = optional_param('refmod_cmid', 0, PARAM_INT)) { // ecastro ULPGC allo modconfig managejobplugin
                 $modconfig = true;
             } elseif($update = optional_param('formsdata__mod_configurator', '', PARAM_ALPHANUM)) {
