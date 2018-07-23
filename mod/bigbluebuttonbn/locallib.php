@@ -2156,17 +2156,37 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
  *
  * @return array
  */
-function bigbluebuttonbn_get_instance_type_profiles() {
-    $instanceprofiles = array(
-            array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
-                'features' => array('all')),
-            array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
-                'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
-                    'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
-                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection')),
-            array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
-                'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
-    );
+function bigbluebuttonbn_get_instance_type_profiles($context = null) {
+    if($context) { // ecastro ULPGC
+        $instanceprofiles = array();
+        if(has_capability('mod/bigbluebuttonbn:room', $context)) {
+            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+                    'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
+                        'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                        'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection'));
+        }
+        if(has_capability('mod/bigbluebuttonbn:record', $context)) {
+            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ALL] = array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+                    'features' => array('all'));
+        }
+        $instanceprofiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
+                    'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings'));
+    
+    } else {
+        $instanceprofiles = array(
+                BIGBLUEBUTTONBN_TYPE_ALL => 
+                array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+                    'features' => array('all')),
+                BIGBLUEBUTTONBN_TYPE_ROOM_ONLY =>     
+                array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+                    'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
+                        'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                        'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection')),
+                BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY =>         
+                array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
+                    'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
+        );
+    }
     return $instanceprofiles;
 }
 

@@ -105,6 +105,7 @@ cd lib/editor/atto/plugins/cloze && git checkout 11STABLE && cd ../../../../../
 git submodule add https://github.com/damyon/moodle-atto_count.git                   lib/editor/atto/plugins/count
 git submodule add https://github.com/andrewnicols/moodle-atto_fontsize              lib/editor/atto/plugins/fontsize
 git submodule add https://github.com/dthies/moodle-atto_fullscreen                  lib/editor/atto/plugins/fullscreen
+git submodule add https://github.com/justinhunt/moodle-atto_generico.git            lib/editor/atto/plugins/generico
 git submodule add https://github.com/damyon/moodle-atto_hr.git                      lib/editor/atto/plugins/hr
 git submodule add https://github.com/ndunand/moodle-atto_morebackcolors.git         lib/editor/atto/plugins/morebackcolors
 git submodule add https://github.com/ndunand/moodle-atto_morefontcolors.git         lib/editor/atto/plugins/morefontcolors
@@ -112,9 +113,10 @@ git submodule add https://github.com/cdsmith-umn/pastespecial.git               
 git submodule add https://github.com/dthies/moodle-atto_preview.git                 lib/editor/atto/plugins/preview
 git submodule add https://github.com/Syxton/atto_sketch.git                         lib/editor/atto/plugins/sketch
 git submodule add https://github.com/moodleuulm/moodle-atto_styles.git              lib/editor/atto/plugins/styles
-git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git       lib/editor/atto/plugins/wordimport
+git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git           lib/editor/atto/plugins/wordimport
 git submodule add https://github.com/moodleuulm/moodle-atto_styles.git              lib/editor/atto/plugins/styles
 git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git           lib/editor/atto/plugins/wordimport
+
 
 #Admin tools
 git submodule add https://github.com/unikent/moodle-tool_adhoc.git                      admin/tool/adhoc
@@ -174,6 +176,7 @@ git submodule add https://github.com/gthomas2/moodle-filter_imageopt.git        
 git submodule add https://github.com/geoffrowland/moodle-filter_jmol.git            filter/jmol
 git submodule add https://github.com/frederic-nevers/moodle-filter_multiembed.git   filter/multiembed
 git submodule add https://github.com/JosePFs/moodle-filter_tabs.git                 filter/tabs
+git submodule add https://github.com/justinhunt/moodle-filter_generico.git          filter/generico
 
 #Advanced  Grading methods
 git submodule add  https://github.com/marcusgreen/moodle-gradingform_btec.git       grade/grading/form/btec

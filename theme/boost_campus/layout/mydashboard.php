@@ -36,9 +36,10 @@ require_once($CFG->dirroot . '/theme/boost_campus/locallib.php');
 // MODIFICATION END.
 
 if (isloggedin()) {
-    $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+    // ecastro default closed
+    $navdraweropen = (get_user_preferences('drawer-open-nav', 'false') == 'true');
     // ecastro ULPGC from moove
-    $draweropenright = (get_user_preferences('sidepre-open', 'true') == 'true');
+    $draweropenright = (get_user_preferences('sidepre-open', 'false') == 'true');
 } else {
     $navdraweropen = false;
     // ecastro ULPGC from moove 

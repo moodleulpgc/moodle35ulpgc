@@ -84,7 +84,11 @@ function advuserbulk_get_string($identifier, $component, $a = NULL) {
         return "[[$identifier]]";
     }
 
-    $string = $string[$identifier];
+    if(isset($string[$identifier])) {
+        $string = $string[$identifier];
+    } else {
+        return "[[$identifier]]";
+    }
 
     if ($a !== NULL) {
         if (is_object($a) or is_array($a)) {

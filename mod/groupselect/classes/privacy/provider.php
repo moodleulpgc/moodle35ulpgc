@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The export_link_created event.
+ * Privacy Subsystem implementation for mod_groupselect.
  *
  * @package    mod_groupselect
  * @copyright  2018 HTW Chur Roger Barras

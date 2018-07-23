@@ -134,7 +134,9 @@ function bigbluebuttonbn_supports($feature) {
 function bigbluebuttonbn_add_instance($data) {
     global $DB;
     // Excecute preprocess.
+    
     bigbluebuttonbn_process_pre_save($data);
+    
     // Pre-set initial values.
     $data->presentation = bigbluebuttonbn_get_media_file($data);
     // Insert a record.
@@ -145,6 +147,7 @@ function bigbluebuttonbn_add_instance($data) {
     $DB->set_field('bigbluebuttonbn', 'meetingid', $meetingid, array('id' => $data->id));
     // Complete the process.
     bigbluebuttonbn_process_post_save($data);
+    
     return $data->id;
 }
 
@@ -158,8 +161,8 @@ function bigbluebuttonbn_add_instance($data) {
  */
 function bigbluebuttonbn_update_instance($data) {
     global $DB;
+    
     // Excecute preprocess.
-    bigbluebuttonbn_process_pre_save($data);
     // Pre-set initial values.
     $data->id = $data->instance;
     $data->presentation = bigbluebuttonbn_get_media_file($data);

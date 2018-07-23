@@ -63,4 +63,33 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
         ),
     ),
+
+    // ecastro ULPGC capabilities
+    // Ability to generate live meeting.
+    'mod/bigbluebuttonbn:room' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+        ),
+    ),
+    
+    
+    // Ability to record a meeting.
+    'mod/bigbluebuttonbn:record' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_PREVENT,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+        ),
+    ),
+    
 );
