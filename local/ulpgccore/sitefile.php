@@ -58,6 +58,7 @@
 
             $dirname = 'manuales/'.clean_filename($faculty_degree);
             $filename = clean_filename('M-'.$faculty_degree.'-'.$shortname.$year.'.'.$ext);
+            $pattern = clean_filename('M-'.$faculty_degree.'-'.$shortname.'-[0-9][0-9][0-9]-20[0-9][0-9]{,'.$year.'}.'.$ext);
             break;
         case 'calendarios' :
             $dirname = 'calendarios/'.clean_filename($title);
@@ -72,8 +73,6 @@
             $dirname = 'respuestas/'.clean_filename($title);
             $filename = clean_filename('R-'.$title.'-'.$shortname.'-'.$conv.$year.'.'.$ext);
             break;
-
-
         default :
             $dirname = clean_filename($repository);
             $filename = clean_filename($title.'-'.$shortname.'.'.$ext);
@@ -82,10 +81,18 @@
 
     $relativepath = '/repository/'.$dirname.'/';
     $pathname = $CFG->dataroot.$relativepath.$filename;
-
+    
     // check that file exists
     if (!file_exists($pathname)) {
-        not_found($course, $filename);
+        if($files = glob($CFG->dataroot.$relativepath.$pattern, GLOB_BRACE)) {
+            natsort($files);
+            $pathname = end($files);
+            $filename = basename($pathname);
+        }
+
+        if (!file_exists($pathname)) {
+            not_found($course, $filename);
+        }
     }
 
     // ========================================
