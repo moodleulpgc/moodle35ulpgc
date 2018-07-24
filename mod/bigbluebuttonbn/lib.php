@@ -163,6 +163,7 @@ function bigbluebuttonbn_update_instance($data) {
     global $DB;
     
     // Excecute preprocess.
+    bigbluebuttonbn_process_pre_save($data);
     // Pre-set initial values.
     $data->id = $data->instance;
     $data->presentation = bigbluebuttonbn_get_media_file($data);
