@@ -31,6 +31,8 @@ $string['bbbdurationwarning'] = 'The maximum duration for this session is %durat
 $string['bbbrecordwarning'] = 'This session may be recorded.';
 $string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activity';
 $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
+$string['bigbluebuttonbn:record'] = 'Record a bigbluebuttonbn meeting';
+$string['bigbluebuttonbn:room'] = 'Create a bigbluebuttonbn live meeting';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 
