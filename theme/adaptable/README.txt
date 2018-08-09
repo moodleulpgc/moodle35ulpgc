@@ -1,14 +1,13 @@
 Adaptable - the most adaptable moodle theme
 ===========================================
 
-Version 1.7 (2018051700)
+Version 1.7.1 (2018073000)
 
-Adaptable is a highly customisable responsive two column moodle theme
-based on the popular BCU theme adding:
+Adaptable is a highly customisable responsive two column moodle theme based on the popular BCU theme adding:
 
 -Customisable fonts (Google Fonts)
 -Fully customisable colors
--Fully customisable block styles (including icons)
+-Fully customisable block styles (including FA icons)
 -Fully customisable buttons
 -Additional header navigation
 -News Ticker
@@ -27,22 +26,18 @@ based on the popular BCU theme adding:
 -Dashboard layout builder
 -Course layout builder
 -Activities status
-- Pricacy API (compatible with GDPR)
+-Privacy API (compatible with GDPR)
 
 
-In addition many fields (menus, news items, alerts and help links) can
-be targeted using custom profile fields, thus it is possible to present
-different users with different nagivation items and notices. It is also
-possible for individual users to customise where they want top menu
-navigation to appear (disable, home pages only, sitewide) using custom
-profile fields.
+In addition many fields (menus, news items, alerts and help links) can be targeted using custom profile fields, thus it is possible
+to present different users with different nagivation items and notices. It is also possible for individual users to customise where 
+they want top menu navigation to appear (disable, home pages only, sitewide) using custom profile fields.
 
-Adaptable has a lot of settings and may seem daunting at first, our
-advice is to simply install with the default settings and play with it
-afterwards.
+Adaptable has a lot of settings and may seem daunting at first, our advice is to simply install with the default settings and play 
+with it afterwards.
 
-With a little time you should be able to setup an attractive Moodle site
-with a high degree of individuality without without knowing any CSS.
+With a little time you should be able to setup an attractive Moodle site with a high degree of individuality without without 
+knowing any CSS.
 
 This theme has been developed by:
 Lead Developers
@@ -64,12 +59,10 @@ The change log is available in: https://adaptable.ws/overview/change-log
 
 HTML/CSS sample code for block areas
 ------------------------------------
-Here you will find some code samples to help you to customize the Info
-Box and the Marketing Blocks.
+Here you will find some code samples to help you to customize the Info Box and the Marketing Blocks.
 
-You can insert any HTML tag to customize the frontpage blocks. Use a
-`<div>` as a main container and add the height to keep the same value in
-all the blocks.
+You can insert any HTML tag to customize the frontpage blocks. Use a <div> tag as a main container and add the height to keep the 
+same value in all the blocks.
 
 The Font Awesome icons set is available in
 http://fortawesome.github.io/Font-Awesome/icons/.
@@ -80,9 +73,8 @@ http://fortawesome.github.io/Font-Awesome/examples/
 
 Front Page Slider Styles
 ------------------------
-Add images with at least 1900x400px. If you want to reduce or increase 
-the height, Adaptable will resize the image automatically. There are two 
-possible slider styles each with different markup required:
+Add images with at least 1900x400px. If you want to reduce or increase the height, Adaptable will resize the image automatically.
+There are two possible slider styles each with different markup required:
 
 
 Original BCU Slider Markup:
@@ -117,17 +109,15 @@ Frontpage Marketing Block HTML structure Coventry
 Front page Info Box and Marketing Blocks
 ----------------------------------------
 
-There are two Info blocks in the frontpage located above and below the
-Marketing Blocks. These are just for compatibility with the old BCU.
+There are two Info blocks in the frontpage located above and below the Marketing Blocks. These are just for compatibility with the
+old BCU.
 
-It is recommended to use the new marketing blocks builder that allows
-you to create your own layout and add much more blocks.
+It is recommended to use the new marketing blocks builder that allows you to create your own layout and add much more blocks.
 
-There are 8 rows where you can add up to 4 blocks in each with a total
-of 32 block of different size. See pix/layout.png for more information.
+There are 8 rows where you can add up to 4 blocks in each with a total of 32 block of different size. See pix/layout.png for 
+more information.
 
-You can enter any HTML code to the block, include FA icons, images,
-videos and apply inline styles.
+You can enter any HTML code to the block, include FA icons, images, videos and apply inline styles.
 
 Some samples:
 
@@ -213,8 +203,7 @@ Made with <i class="fa fa-heart" style="color: #ff0000;"></i> in Europe
 
 News Ticker
 -----------
-From version 1.3 the news ticker do not need to create an unordered
-list. Just add paragraphs using <p> tags
+From version 1.3 the news ticker do not need to create an unordered list. Just add paragraphs using <p> tags:
 
 <p>Configure all the theme colours</p>
 <p>Use any Google Font for the content, headings and site title</p>
@@ -228,9 +217,8 @@ Messages / Notifications
 From version 3.2 moodle includes a new system to display messages and 
 notifications in the screen. 
 
-The new system displays a hardcoded black icons that are difficult 
-to see when using dark background colour in the top header. In that case, 
-you can use an alternate icons pack using white colour.
+The new system displays a hardcoded black icons that are difficult to see when using dark background colour in the top header. 
+In that case, you can use an alternate icons pack using white colour.
 
 Login the server by FTP or SFTP and open /theme/adaptable/pix_core/i and 
 delete notifications.png and rename notifications-white.png to notifications.png
@@ -250,8 +238,8 @@ You will find more information, tips and tricks in: https://adaptable.ws
 
 Versioning
 ----------
-Adaptable is maintained under the Semantic Versioning guidelines as much
-as possible. Releases will be numbered with the following format:
+Adaptable is maintained under the Semantic Versioning guidelines as much as possible. Releases will be numbered with the 
+following format:
 
 major.minor.patch
 
@@ -265,9 +253,8 @@ For more information on SemVer, please visit http://semver.org.
 
 Acknowledgments
 ---------------
-Big thanks to all the volunteers that are collaborating and testing
-Adaptable continuously. We really appreciate your help and support to
-develop the most adaptable theme for moodle.
+Big thanks to all the volunteers that are collaborating and testing Adaptable continuously. We really appreciate your help and 
+support to develop the most adaptable theme for moodle.
 
 Development:
 - Justin Hunt
@@ -321,4 +308,4 @@ Follow Us
 Twitter - https://twitter.com/adaptable_theme 
 Facebook - https://www.facebook.com/adaptable.theme
 
-### Modify it! - Improve it! - Share it!
+Modify it! - Improve it! - Share it!

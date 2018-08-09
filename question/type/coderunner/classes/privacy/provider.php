@@ -13,29 +13,26 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Plugin event classes are defined here.
+ * Privacy Subsystem implementation for qtype_coderunner.
  *
- * @package     mod_examboard
- * @copyright   2017 Enrique Castro @ ULPGC
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    qtype_coderunner
+ * @copyright  2018 Richard Lobb
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_examboard\event;
+namespace qtype_coderunner\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The board_created event class.
- *
- * @package    mod_examboard
- * @copyright  2017 Enrique Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class board_created extends base {
-
-    // For more information about the Events API, please visit:
-    // https://docs.moodle.org/dev/Event_2
-
+class provider implements \core_privacy\local\metadata\null_provider {
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() {
+        return 'privacy:metadata';
+    }
 }

@@ -54,6 +54,9 @@ class examinees_table extends \flexible_table implements renderable {
     /** @var bool the capabilities in this viewer. */
     public $canmanage = false;
     
+    /** @var bool if this instance use any advanced grading method. */
+    public $advancedgrading = false;
+    
     /** @var bool if this examboard uses tutors or requires them. */
     public $usetutors = false;
 
@@ -67,8 +70,17 @@ class examinees_table extends \flexible_table implements renderable {
     public $mingraders = 0;
 
     /** @var object the gradebook grade item for this instance of examboard PLUS scale . */
-    public $gradeitm = false;
+    public $gradeitem = false;
     
+    /** @var modinfo the course module containing gradeable && submission data . */
+    public $gradeable = false;
+    
+    /** @var modinfo the course module containing proposal complementary data . */
+    public $proposal = false;
+
+    /** @var modinfo the course module containing defense complementary data . */
+    public $defense = false;
+
     /** @var string the word used . */
     public $chair = '';
     
@@ -92,7 +104,7 @@ class examinees_table extends \flexible_table implements renderable {
      * @param object $examboard the examboard record from database
      */
     public function __construct(\moodle_url $url, $examination, $examboard) {
-    
+        
         parent::__construct('examboard_examinees_table_viewer');
         $this->baseurl = clone $url;
         $this->cmid = $url->get_param('id');
@@ -104,7 +116,7 @@ class examinees_table extends \flexible_table implements renderable {
         $this->grademode    = $examboard->grademode;
         $this->grademax     = $examboard->grade;
         $this->mingraders   = $examboard->mingraders;
-        $this->gradeitem    = examboard_get_grade_item( $examboard->id, $examboard->course);
+        $this->gradeitem    = examboard_get_grade_item($examboard->id, $examboard->course);
         
         $this->gradeitem->scale = examboard_get_scale($examboard->grade);
         
@@ -113,5 +125,36 @@ class examinees_table extends \flexible_table implements renderable {
         $this->vocal        = $examboard->vocal;
         $this->examinee     = $examboard->examinee;
         $this->tutor        = $examboard->tutor;
+        
+        $mods = get_fast_modinfo($examboard->course)->get_cms();
+        
+        foreach(array('gradeable', 'proposal', 'defense') as $type) {
+            if($examboard->{$type}) {
+                foreach($mods as $cmid => $cm) {
+                    if($cm->idnumber == $examboard->{$type}) {
+                        $this->{$type} = $cm;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        $this->check_advanced_grading();
+    }
+    
+    
+    private function check_advanced_grading() {
+        global $CFG;
+        
+        require_once($CFG->dirroot . '/grade/grading/lib.php');
+    
+        $context = \context_module::instance($this->cmid);
+        $gradingmanager = get_grading_manager($context, 'mod_examboard', 'usergrades');
+        $hasgrade = ($this->grademax != GRADE_TYPE_NONE );
+        if ($hasgrade) {
+            if ($controller = $gradingmanager->get_active_controller()) {
+                $this->advancedgrading = true;
+            }
+        }
     }
 }

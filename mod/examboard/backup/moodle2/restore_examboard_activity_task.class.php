@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 // https://docs.moodle.org/dev/Backup_2.0_for_developers
 // https://docs.moodle.org/dev/Restore_2.0_for_developers
 
-require_once($CFG->dirroot.'//mod/examboard/backup/moodle2/restore_examboard_stepslib.php');
+require_once($CFG->dirroot.'/mod/examboard/backup/moodle2/restore_examboard_stepslib.php');
 
 /**
  * Restore task for mod_examboard.
@@ -59,7 +59,7 @@ class restore_examboard_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
 
-        // Define the contents.
+        $contents[] = new restore_decode_content('examboard', array('intro'), 'examboard');
 
         return $contents;
     }
@@ -72,7 +72,13 @@ class restore_examboard_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
 
-        // Define the rules.
+        $rules[] = new restore_decode_rule('EXAMBOARDVIEWBYID',
+                                           '/mod/examboard/view.php?id=$1',
+                                           'course_module');
+        $rules[] = new restore_decode_rule('EXAMBOARDINDEX',
+                                           '/mod/examboard/index.php?id=$1',
+                                           'course_module');
+
 
         return $rules;
     }
@@ -87,7 +93,10 @@ class restore_examboard_activity_task extends restore_activity_task {
     static public function define_restore_log_rules() {
         $rules = array();
 
-        // Define the rules.
+        $rules[] = new restore_log_rule('examboard', 'add', 'view.php?id={course_module}', '{examboard}');
+        $rules[] = new restore_log_rule('examboard', 'update', 'view.php?id={course_module}', '{examboard}');
+        $rules[] = new restore_log_rule('examboard', 'view', 'view.php?id={course_module}', '{examboard}');
+
 
         return $rules;
     }

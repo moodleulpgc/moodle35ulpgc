@@ -225,6 +225,36 @@ $setting->set_updatedcallback('theme_reset_all_caches');
 $setting = new admin_setting_configselect($name, $title, $description, 'shortcodehover', $displaychoices);
 $temp->add($setting);
 
+// This course section.
+$temp->add(new admin_setting_heading('theme_adaptable_thiscourse_heading',
+        get_string('headernavbarthiscourseheading', 'theme_adaptable'),
+        format_text(get_string('headernavbarthiscourseheadingdesc', 'theme_adaptable'), FORMAT_MARKDOWN)));
+
+// Display participants.
+$name = 'theme_adaptable/displayparticipants';
+$title = get_string('displayparticipants', 'theme_adaptable');
+$description = get_string('displayparticipantsdesc', 'theme_adaptable');
+$radchoices = array(
+    0 => get_string('hide', 'theme_adaptable'),
+    1 => get_string('show', 'theme_adaptable'),
+);
+$setting = new admin_setting_configselect($name, $title, $description, 1, $radchoices);
+$setting->set_updatedcallback('theme_reset_all_caches');
+$temp->add($setting);
+
+// Display Grades.
+$name = 'theme_adaptable/displaygrades';
+$title = get_string('displaygrades', 'theme_adaptable');
+$description = get_string('displaygradesdesc', 'theme_adaptable');
+$radchoices = array(
+    0 => get_string('hide', 'theme_adaptable'),
+    1 => get_string('show', 'theme_adaptable'),
+);
+$setting = new admin_setting_configselect($name, $title, $description, 1, $radchoices);
+$setting->set_updatedcallback('theme_reset_all_caches');
+$temp->add($setting);
+
+
 // Help section.
 $temp->add(new admin_setting_heading('theme_adaptable_help_heading',
         get_string('headernavbarhelpheading', 'theme_adaptable'),
@@ -263,7 +293,8 @@ $choices = array(
     '_self' => get_string('targetsamewindow', 'theme_adaptable'),
 );
 $setting = new admin_setting_configselect($name, $title, $description, '_blank', $choices);
-
 $temp->add($setting);
 
+
+// Create page.
 $ADMIN->add('theme_adaptable', $temp);

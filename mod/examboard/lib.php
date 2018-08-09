@@ -91,6 +91,18 @@ function examboard_add_instance($examboard, $mform = null) {
     
        // Update related grade item.
     examboard_grade_item_update($examboard);
+    
+    // update related grouping name
+    if($examboard->groupingname) {
+        if(!$grouping = groups_get_grouping_by_idnumber($examboard->course, $examboard->groupingname)) {
+            $grouping = new stdClass();
+            $grouping->courseid = $examboard->course;
+            $grouping->name = $examboard->groupingname;
+            $grouping->idnumber = $examboard->groupingname;
+            
+            $grouping->id = groups_create_grouping($grouping); 
+        }
+    }
 
     return $examboard->id;
 }
@@ -106,7 +118,7 @@ function examboard_add_instance($examboard, $mform = null) {
  * @return bool True if successful, false otherwise.
  */
 function examboard_update_instance($examboard, $mform = null) {
-    global $DB;
+    global $CFG, $DB;
 
     $examboard->timemodified = time();
     $examboard->id = $examboard->instance;
@@ -126,6 +138,31 @@ function examboard_update_instance($examboard, $mform = null) {
         //examboard_update_grades($examboard);
     }
     
+    // update associated grouping
+    if($examboard->examgroups) {
+        if($examboard->groupingname && ($examboard->groupingname != $oldeb->groupingname)) {
+            $grouping = false;
+            if($oldeb->groupingname) {
+                if($grouping = groups_get_grouping_by_idnumber($examboard->course, $oldeb->groupingname)) {
+                    $grouping->name = $examboard->groupingname;
+                    $grouping->idnumber = $examboard->groupingname;
+                    groups_update_grouping($grouping);
+                }
+            }
+            if(!$grouping) {
+                $grouping = new stdClass();
+                $grouping->courseid = $examboard->course;
+                $grouping->name = $examboard->groupingname;
+                $grouping->idnumber = $examboard->groupingname;
+                
+                $grouping->id = groups_create_grouping($grouping); 
+            }
+        }
+        include_once($CFG->dirroot.'/mod/examboard/locallib.php');
+        examboard_synchronize_groups($examboard);
+        examboard_synchronize_gradeables($examboard);
+    }
+    
     return true;
 }
 
@@ -138,13 +175,45 @@ function examboard_update_instance($examboard, $mform = null) {
 function examboard_delete_instance($id) {
     global $DB;
 
-    $exists = $DB->get_record('examboard', array('id' => $id));
-    if (!$exists) {
+    $examboard = $DB->get_record('examboard', array('id' => $id));
+    if (!$examboard) {
         return false;
     }
 
-    $DB->delete_records('examboard', array('id' => $id));
 
+    if($exams = $DB->get_records_menu('examboard_exam', array('examboardid'=>$id), 'id,boardid')) {
+        $exams = array_keys($exams);
+        
+        foreach(array('examinee', 'tutor', 'grade', 'confirmation', 'notification') as $field) {
+            $DB->delete_records_list('examboard_'.$field, 'examid', $exams);
+        }
+    }
+
+    if($boards = $DB->get_records_menu('examboard_board', array('examboardid'=>$examboard->id), 'id,idnumber')) {
+        $boards = array_keys($boards);
+        $DB->delete_records_list('examboard_member', 'boardid', $boards);
+        
+    }
+
+    $DB->delete_records('examboard_exam', array('examboardid' => $id));
+    $DB->delete_records('examboard_board', array('examboardid' => $id));
+    
+    $DB->delete_records('examboard', array('id' => $id));
+    
+    // delete associated grouping & groups 
+    if($examboard->groupingname) {
+        if($grouping = groups_get_grouping_by_idnumber($examboard->course, $examboard->groupingname)) {
+            if($groups = groups_get_all_groups($examboard->course, 0, $grouping->id)) {
+                foreach($groups as $group) {
+                    groups_delete_group($group);
+                }
+            }
+            groups_delete_grouping($grouping); 
+        }
+    }
+    
+    examboard_grade_item_delete($examboard);
+    
     return true;
 }
 
@@ -228,38 +297,168 @@ function examboard_get_scale($grade) {
  * @return array('string'=>'string') An array with area names as keys and descriptions as values
  */
 function examboard_grading_areas_list() {
-    return array('grades'=>get_string('grades', 'examboard'));
+    return array('usergrades'=>get_string('usergrades', 'examboard'));
 }
 
- function examboard_get_gradeables() {
-    global $PAGE;
+
+/**
+ * Determine if this users grade can be edited.
+ *
+ * @param object $examboard record from DB with module instance information
+ * @param int $userid - The student userid
+ * @return bool $gradingdisabled
+ */
+function examboard_grading_disabled($examboard, $userid) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
     
-    $options = array(0=>get_string('choose'));
+    $gradinginfo = grade_get_grades($examboard->course,
+                                    'mod',
+                                    'examboard',
+                                    $examboard->id,
+                                    array($userid));
+    if (!$gradinginfo) {
+        return false;
+    }
+
+    if (!isset($gradinginfo->items[0]->grades[$userid])) {
+        return false;
+    }
+    $gradingdisabled = $gradinginfo->items[0]->grades[$userid]->locked ||
+                        $gradinginfo->items[0]->grades[$userid]->overridden;
+    return $gradingdisabled;
+}
+
+/**
+ * Get an instance of a grading form if advanced grading is enabled.
+ * This is specific to the assignment, marker and student.
+ *
+ * @param object $examboard record from DB with module instance information
+ * @param int $userid - The student userid
+ * @param stdClass|false $grade - The grade record
+ * @param bool $gradingdisabled
+ * @return mixed gradingform_instance|null $gradinginstance
+*/
+function examboard_get_grading_instance($examboard, $userid, $grade, $gradingdisabled) {
+    global $CFG, $USER;
+    //require_once($CFG->libdir . '/gradelib.php');
+    require_once($CFG->dirroot . '/grade/grading/lib.php');
     
-    $instances = get_all_instances_in_course('assign', $PAGE->course);
-    foreach($instances as $instance) {
-        $options[$instance->coursemodule] = format_string($instance->name);
+    
+    $grademenu = make_grades_menu($examboard->grade);
+    $allowgradedecimals = $examboard->grade > 0;
+
+    $advancedgradingwarning = false;
+    
+    $context = context_module::instance($examboard->cmid);
+    
+    $gradingmanager = get_grading_manager($context, 'mod_examboard', 'usergrades');
+    $gradinginstance = null;
+    if ($gradingmethod = $gradingmanager->get_active_method()) {
+        $controller = $gradingmanager->get_controller($gradingmethod);
+        if ($controller->is_form_available()) {
+            $itemid = null;
+            if ($grade) {
+                $itemid = $grade->id;
+            }
+            if ($gradingdisabled && $itemid) {
+                $gradinginstance = $controller->get_current_instance($USER->id, $itemid);
+            } else if (!$gradingdisabled) {
+                $instanceid = optional_param('advancedgradinginstanceid', 0, PARAM_INT);
+                $gradinginstance = $controller->get_or_create_instance($instanceid,
+                                                                        $USER->id,
+                                                                        $itemid);
+            }
+        } else {
+            $advancedgradingwarning = $controller->form_unavailable_notification();
+        }
+    }
+    if ($gradinginstance) {
+        $gradinginstance->get_controller()->set_grade_range($grademenu, $allowgradedecimals);
+    }
+    return $gradinginstance;
+}
+
+
+function examboard_get_gradeable_cm($courseorid, $idnumber) {
+    $mods = get_fast_modinfo($courseorid)->get_cms();
+    $cm = false;
+    foreach($mods as $cmid => $cm) {
+        if($cm->idnumber ==  $idnumber) {
+            return $cm;
+        }
+    }
+}
+
+
+function examboard_get_gradeables($courseorid) {
+    
+    $options = array();
+    
+    $gradeables = explode(',', get_config('examboard','gradeables'));
+    
+    //$gradeables = get_config('examboard','gradeables');
+    
+    if(!$gradeables) {
+        return $options;
+    }
+    
+    $mods = get_fast_modinfo($courseorid)->get_cms();
+
+    foreach($mods as $cmid => $cm) {
+        if (!in_array($cm->module, $gradeables) || !$cm->idnumber || !$cm->uservisible) {
+            continue;
+        }
+        $options[$cm->idnumber] = format_string($cm->name);
+    }
+    
+    if($options) {
+        $options = array('' => get_string('none')) + $options;
     }
     
     return $options;
- }
+}
+
+
+function examboard_get_board_members($boardid,  $deputy = null,  $names = false ) {
+    global $DB;
+    
+    $params = array('boardid'=>$boardid);
+    $search = '';
+    if(isset($deputy)) {
+        $params['deputy'] = (int)boolval($deputy);
+        $search .= ' AND m.deputy = :deputy ';
+    }
+    
+    if($names) {
+        $names = get_all_user_name_fields(true, 'u');
+        $sql = "SELECT m.userid AS uid, m.id AS mid, m.*, u.id, u.idnumber, u.picture, u.imagealt, u.email, u.mailformat, $names
+                FROM {examboard_member} m 
+                JOIN {user} u ON m.userid = u.id
+                WHERE m.boardid = :boardid $search 
+                ORDER BY m.deputy ASC, m.sortorder ASC ";
+        return $DB->get_records_sql($sql, $params);
+    }
+    
+    return $DB->get_records('examboard_member', $params, 'deputy ASC, sortorder ASC');
+}
 
 /**
  * Creates or updates grade item for the given examboard instance.
  *
  * Needed by {@link grade_update_mod_grades()}.
  *
- * @param stdClass $examboard Instance object with extra cmidnumber and modname property.
- * @param bool $reset Reset grades in the gradebook.
+ * @param stdClass $examboard Instance object with extra cmidnumber property.
+ * @param array $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return void.
  */
-function examboard_grade_item_update($examboard, $reset=false) {
+function examboard_grade_item_update($examboard, $grades=false) {
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
     $item = array();
     $item['itemname'] = clean_param($examboard->name, PARAM_NOTAGS);
-    $item['gradetype'] = GRADE_TYPE_VALUE;
+    $item['idnumber'] = $examboard->cmidnumber;
 
     if ($examboard->grade > 0) {
         $item['gradetype'] = GRADE_TYPE_VALUE;
@@ -271,11 +470,13 @@ function examboard_grade_item_update($examboard, $reset=false) {
     } else {
         $item['gradetype'] = GRADE_TYPE_NONE;
     }
-    if ($reset) {
+    
+    if ($grades  === 'reset') {
         $item['reset'] = true;
+        $grades = null;
     }
-
-    grade_update('mod/examboard', $examboard->course, 'mod', 'examboard', $examboard->id, 0, null, $item);
+    
+    grade_update('mod/examboard', $examboard->course, 'mod', 'examboard', $examboard->id, 0, $grades, $item);
 }
 
 /**
@@ -292,6 +493,111 @@ function examboard_grade_item_delete($examboard) {
                         $examboard->id, 0, null, array('deleted' => 1));
 }
 
+
+/**
+ * Return grade for given user set by a grader
+ *
+ * @param int $examid the examination ID
+ * @param int $userid user id
+ * @param bool $create flag if create grade if not existing
+ * @param int $graderid user id, if 0, the current user
+ * @return array array of grades, false if none
+ */
+function examboard_get_grader_grade($examid, $userid, $create = false, $graderid = 0) {
+    global $DB, $USER;
+
+    if(!$graderid) {
+        $graderid = $USER->id;
+    }
+    
+    $grade = $DB->get_record('examboard_grades', array('examid'=>$examid, 'userid'=>$userid, 'grader'=>$graderid));
+    
+    if($grade) {
+        return $grade;
+    }
+    
+    if($create) {
+        $grade = new stdClass();
+        $grade->examid       = $examid;
+        $grade->userid       = $userid;
+        $grade->grader       = $graderid;
+        $grade->timecreated  = time();
+        $grade->timemodified = $grade->timecreated;
+        $grade->grade = -1;
+        $gid = $DB->insert_record('examboard_grades', $grade);
+        $grade->id = $gid;
+        return $grade;
+    }
+    
+    return $DB->get_record('examboard_grades', array('examid'=>$examid, 'userid'=>'userid', 'grader'=>$graderid));
+}
+    
+/**
+ * Return grade for given user or all users.
+ *
+ * @param stdClass $examboard record of examboard with an additional cmidnumber
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function examboard_get_user_grades($examboard, $userid=0) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot . '/mod/examboard/locallib.php');
+
+    // When the gradebook asks us for grades - only return the last graded exam for each user.
+    $grades = array();
+    
+    $params = array('examboardid' => $examboard->id);
+    
+    $userwhere = '';
+    if($userid) {
+        $userwhere = ' AND g.userid = :userid';
+        $params['userid'] = $userid;
+    }
+    
+    $sql = "SELECT e.*
+            FROM {examboard_exams}  e 
+            JOIN {examboard_grades} g ON g.examid = e.id
+            WHERE e.examboardid = :examboardid  AND e.active = 1
+            AND EXISTS (SELECT 1 FROM {examboard_grades} g WHERE g.examid = e.id $userwhere)
+            ORDER BY e.examdate DESC ";
+    
+    $members = array();
+    if($exam = $DB->get_records_sql($sql, $params, 0, 1)) {
+        $exam = reset($exam);
+        $members = array_keys(examboard_get_board_members($exam->boardid));
+    } 
+    
+    if(!$exam || !$members) {
+        return $grades;
+    }
+    
+    list($insql, $params) = $DB->get_in_or_equal($members, SQL_PARAMS_NAMED, 'mem_');
+    $params['examid'] = $exam->id;
+    $userwhere = '';
+    if($userid) {
+        $userwhere = ' AND userid = :userid';
+        $params['userid'] = $userid;
+    }
+    
+    $select = " examid = :examid AND userid $insql $userwhere ";
+    
+    $graderesults = $DB->get_recordset_select('examboard_grades', $select, $params);
+    foreach ($graderesults as $result) {
+        $grades[$result->userid][$result->id] = $result;
+    }
+    $graderesults->close();
+    
+    foreach($grades as $userid => $rawgrades) {
+        $grades[$userid] = examboard_calculate_grades($examboard->grademode, $examboard->mingraders, $rawgrades);
+    }
+    
+    return $grades;
+}
+
+
+
+
 /**
  * Update examboard grades in the gradebook.
  *
@@ -304,7 +610,7 @@ function examboard_update_grades($examboard, $userid = 0) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
 
-    if ($examboard->grade == 0) {
+    if ($examboard->save_gradegrade == 0) {
         examboard_grade_item_update($examboard);
 
     } else if ($grades = examboard_get_user_grades($examboard, $userid)) {
@@ -336,14 +642,13 @@ function examboard_update_grades($examboard, $userid = 0) {
  * @return string[].
  */
 function examboard_get_file_areas($course, $cm, $context) {
-
-    $areas = array();
-
-    return $areas;
+    return array(
+        'notification' => get_string('areanotification', 'examboard'),
+    );
 }
 
 /**
- * File browsing support for examboard file areas.
+ * File browsing supsave_gradeport for examboard file areas.
  *
  * @package     mod_examboard
  * @category    files
@@ -489,6 +794,9 @@ function examboard_extend_settings_navigation(settings_navigation $settings, nav
         
         $link->param('action', 'allocateusers');
         $node = $allocnode->add(get_string('userallocation', 'examboard'), clone $link, navigation_node::TYPE_SETTING);
+        
+        $link->param('action', 'synchusers');
+        $node = $allocnode->add(get_string('synchusers', 'examboard'), clone $link, navigation_node::TYPE_SETTING);
     }
 
     if (has_capability('mod/examboard:manage', $PAGE->cm->context)) {

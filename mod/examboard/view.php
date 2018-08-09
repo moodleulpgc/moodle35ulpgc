@@ -49,6 +49,8 @@ if ($id) {
 
 require_login($course, true, $cm);
 
+$examboard->cmidnumber = $cm->idnumber;
+$examboard->cmid = $cm->id; 
 $context = context_module::instance($cm->id);
 
 // set url params 
@@ -97,27 +99,41 @@ if($ulpgc = get_config('local_ulpgccore')) {
     $SESSION->nameformat = $nameformat;
 }
 
-/// Process any submitted data, if there is any, or redirections, before headers
-
-
-
-
-
-
-// Completion and trigger events.
-examboard_view($examboard, $course, $cm, $context);
-
 $canviewallgroups = has_capability('moodle/site:accessallgroups', $context);
 $canmanage = has_capability('mod/examboard:manage', $context);
 $cangrade = has_capability('mod/examboard:grade', $context);
 $canviewall = has_capability('mod/examboard:viewall', $context);
 
 
+/// Process any submitted data, if there is any, or redirections, before headers
+
+$action = optional_param('action', '', PARAM_ALPHANUMEXT);
+
+if($action == 'submitgrade' && $itemid && $cangrade) {
+    $userid = optional_param('user', 0, PARAM_INT);
+    if($itemid && $userid) {
+        examboard_process_save_grade($examboard, $itemid, $userid);
+    }
+}
+
+// Completion and trigger events.
+examboard_view($examboard, $course, $cm, $context);
+
+
+
+// event params.
+$eventparams = array(
+    'context' => $context,
+);
+
 $renderer = $PAGE->get_renderer('mod_examboard');
 
 echo $renderer->header();
 
 $strnorallowed = get_string('nopermissiontoviewpage', 'error');
+
+
+
 
 
 if($view == 'board' && ($cangrade || $canmanage)) {
@@ -135,6 +151,9 @@ if($view == 'board' && ($cangrade || $canmanage)) {
 
     $url->remove_params('view', 'item');
     echo $renderer->view_board($board, $url, $committee, $otherexams);   
+    
+    $event = \mod_examboard\event\board_viewed::create_from_object($eventparams, $board);
+    $event->trigger();
 
 } elseif($view == 'exam' && ($cangrade || $canmanage)) {
     $examination = \mod_examboard\examination::get_from_id($itemid);
@@ -145,13 +164,34 @@ if($view == 'board' && ($cangrade || $canmanage)) {
         $examinees_table->editurl = $editurl;
         $examinees_table->canmanage = $canmanage;
         echo $renderer->render($examinees_table);   
+        
+
+        $event = \mod_examboard\event\exam_viewed::create_from_object($eventparams, $examination);
+        $event->trigger();
     } else {
         echo $OUTPUT->heading($strnorallowed, 4, ' alert-info');
         $url->remove_params('view', 'item');
         echo $OUTPUT->continue_button($url);
         //echo $OUTPUT->notice($strnorallowed, $url, $course); 
     }
-
+} elseif($view == 'grading' && ($cangrade || $canmanage)) {
+    // we are about to grade a singleuser
+    $userid = optional_param('user', 0, PARAM_INT);
+    $examination = \mod_examboard\examination::get_from_id($itemid);
+    $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
+    echo $renderer->view_user_grade_page($examboard, $examination, $user);
+    
+} elseif($view == 'graded' && $itemid) {
+    $userid = optional_param('user', 0, PARAM_INT);
+    $gid = optional_param('gid', 0, PARAM_INT);
+    $grade = $DB->get_record('examboard_grades', array('id'=>$gid), '*', MUST_EXIST);
+    if((($userid == $USER->id) || $canmanage) && ($userid == $grade->userid)) {
+        $examination = \mod_examboard\examination::get_from_id($itemid);
+        $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
+        $grader = $DB->get_record('user', array('id'=>$grade->grader), '*', MUST_EXIST);
+        echo $renderer->view_grading_explanation($examboard, $examination, $grade, $user, $grader);
+    }
+    
 } else {
     //$examinations = examboard_get_user_exams($examboard, $currentgroup, $canviewall); 
 

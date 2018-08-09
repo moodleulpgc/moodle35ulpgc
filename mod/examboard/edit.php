@@ -51,6 +51,8 @@ if ($id) {
 
 require_login($course, true, $cm);
 
+$examboard->cmidnumber = $cm->idnumber;
+$examboard->cmid = $cm->id; 
 $context = context_module::instance($cm->id);
 
 // set url params 
@@ -112,13 +114,13 @@ if($ulpgc = get_config('local_ulpgccore')) {
 
 /*
 print_object($_POST);
-print_object($_POST);
 print_object($_GET);
 */
 //die();
 
 // actions not requiring interface form
 $actions = array('examhide', 'userup', 'userdown', 'reorder');
+
 if($examid && in_array($action, $actions)) {
     if($action == 'examhide') {
         $DB->set_field('examboard_exam', 'active', 0, array('id' => $examid));
@@ -155,49 +157,11 @@ if($examid && in_array($action, $actions)) {
     redirect($returnurl);
 }
 
-/*
-if($action == 'examhide') {
-    if($examid) {
-        $DB->set_field('examboard_exam', 'active', 0, array('id' => $examid));
-    }
+if($action == 'synchusers') {
+    examboard_synchronize_groups($examboard);
+    examboard_synchronize_gradeables($examboard, false, false);
     redirect($returnurl);
-    
-} elseif($action == 'examshow') {
-    if($examid) {
-        $DB->set_field('examboard_exam', 'active', 1, array('id' => $examid));
-    }
-    redirect($returnurl);
-    
-} elseif($action == 'userup') {
-    if($examid && $userid = optional_param('user', 0, PARAM_INT)) {
-        $params = array('examid'=>$examid, 'userid'=>$userid);
-        if($sortorder = $DB->get_field('examboard_examinee', 'sortorder', $params)) {
-            $upper = $DB->get_field('examboard_examinee', 'id', array('examid'=>$examid, 'sortorder' => ($sortorder - 1)));
-            $DB->set_field('examboard_examinee', 'sortorder', ($sortorder -1), $params);
-            $DB->set_field('examboard_examinee', 'sortorder', $sortorder, array('id'=>$upper));
-        }
-    }
-    redirect($returnurl);
-} elseif($action == 'userdown') {
-    if($examid && $userid = optional_param('user', 0, PARAM_INT)) {
-        $params = array('examid'=>$examid, 'userid'=>$userid);
-        if($max = $DB->get_records_menu('examboard_examinee', $params, 'sortorder DESC', 'id, sortorder', 0, 1)) {
-            $max = reset($max) + 1;
-        } else {
-            $max = 0;$examid
-        }
-        $params = array('examid'=>$examid, 'userid'=>$userid);
-        $sortorder = $DB->get_field('examboard_examinee', 'sortorder', $params);
-        if($sortorder < $max) {
-            $lower = $DB->get_field('examboard_examinee', 'id', array('examid'=>$examid, 'sortorder' => ($sortorder + 1)));
-            $DB->set_field('examboard_examinee', 'sortorder', ($sortorder + 1), $params);
-            $DB->set_field('examboard_examinee', 'sortorder', $sortorder, array('id'=>$lower));
-        }
-    }
-    redirect($returnurl);
-} 
-
-*/
+}
 
 
 $straction = get_string($action, 'examboard');

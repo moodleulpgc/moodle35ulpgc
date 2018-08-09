@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['areanotification'] = 'Notifications';
 $string['board'] = 'Exam board';
 $string['member'] = 'Board member';
 $string['exemption'] = 'Exemption';
@@ -43,9 +44,11 @@ $string['examboard:releasegrades'] = 'Release grades to be seen by participants'
 $string['examboard:allocate'] = 'Allocate teachers to boards and students to exams';
 $string['examboard:manage'] = 'Manage exam boards, allocation and members';
 $string['examboard:notify'] = 'Send notifications to assigned users';
+$string['examboard:tutorize'] = 'Tutorize students in exams';
 $string['messageprovider:examboard_notify'] = 'Message';
 $string['modulename'] = 'Exam Board';
 $string['modulenameplural'] = 'Exam Boards';
+$string['partialgrading'] = 'Incomplete grading';
 $string['pluginname'] = 'Exam Board';
 $string['pluginadministration'] = 'Exam Board Administration';
 $string['manageallocation'] = 'Manage allocations';
@@ -54,6 +57,10 @@ $string['notify_help'] = 'Allows to issue notification messages to participants 
 $string['addexam'] = 'Add examination';
 $string['submit'] = 'Submit';
 $string['grade'] = 'Grade';
+$string['groupingname'] = 'Grouping name';
+$string['groupingname_help'] = 'If groups creation is enabled, the groups can be assigned automatically to this grouping. 
+
+If a grouping with this idnumber exists, it is used, if not it is created to hold exam groups.';
 $string['boarddata'] = 'Board data';
 $string['existingboard'] = 'Board to assign';
 $string['existingboard_help'] = 'The exam may be assigned to an existing Board, 
@@ -69,6 +76,11 @@ $string['boardactive'] = 'Visibility';
 $string['boardactive_help'] = 'If the board will be visible by non-managing users. 
 You may create inactive boards to hold a reserve, or keep inactive until all names are agreed on.';
 $string['examdata'] = 'Examination data';
+$string['examgroups'] = 'Exam groups';
+$string['examgroups_help'] = 'If enabled, then a group will be created for each separate examination 
+and populated with board members as well as tutors and examinees. 
+
+These groups will be automatically updated when users are assigned o de-assigned as board members, tutors or examinees.';
 $string['examvenue'] = 'Exam venue';
 $string['examvenue_help'] = 'The venue or classroom where the examination will take place.';
 $string['examdate'] = 'Exam date';
@@ -197,9 +209,11 @@ $string['tobepublishedafter'] = 'To be published after {$a}';
 $string['viewboard'] = 'Board committee';
 $string['viewusers'] = 'Examinees';
 $string['viewexam'] = 'Examination';
+$string['returntoexam'] = 'Return to exam';
 $string['returntoexams'] = 'Return to exams';
 $string['examboardname'] = 'Name on page';
 $string['examboardfieldset'] = 'Exam Board options';
+$string['distributionfieldset'] = 'Distribution options';
 $string['notifyfieldset'] = 'Notifications';
 $string['publishfieldset'] = 'Publish dates';
 $string['maxboardsize'] = 'Max. number board members';
@@ -300,7 +314,33 @@ $string['gradeablemod'] = 'Graded activity';
 $string['gradeablemod_help'] = 'This module is a grading helper for another graded activity. 
 This setting allows to specify which other activity holds the submissions that are graded here.
 
-This activity must be an existing Assignment in the same course.
+This must be an existing activity in the same course with a non-blank grade IDnumber.
+';
+$string['gradeable'] = 'Submission';
+$string['gradeablemods'] = 'Companion activities';
+$string['gradeablemods_help'] = 'This module is a grading helper for another graded activity. 
+This setting allows to specify which other modules holds complementary data needen by Examination board members to perform their task. 
+These may include the activity(ies) holding the actual paper submission, or other complementary data as Project Proposal or Defense Requets. 
+';
+$string['proposal'] = 'Proposal';
+$string['proposalmod'] = 'Proposal submission';
+$string['proposalmod_help'] = 'This module is a grading helper for other course activities. 
+This setting allows to specify which other activity holds complementary data, in this case Project proposal. 
+If examinations on this module do not need a previous Project Proposal step, just select none here.
+
+If used, this must be an existing activity in the same course with a non-blank grade IDnumber.
+
+May be coincident with graded or Defense items.
+';
+$string['defense'] = 'Defense';
+$string['defensemod'] = 'Defense submission';
+$string['defensemod_help'] = 'This module is a grading helper for other course activities. 
+This setting allows to specify which other activity holds complementary data, in this case Project defense request. 
+If examinations on this module do not need a previous Defense request approval step, just select none here.
+
+If used, this must be an existing activity in the same course with a non-blank grade IDnumber.
+
+May be coincident with graded or Proposal items.
 ';
 $string['grademode'] = 'Grade calculation';
 $string['grademode_help'] = 'How the final grade is computed from each separate assessment grade by each Committee member. 
@@ -316,6 +356,7 @@ then final grade is not calculated, the student remains ungraded.
 
 ';
 $string['grades'] = 'Examboard Grades';
+$string['gradinguser'] = 'Grading user in {$a}';
 $string['gradingaverage'] = 'Average mean';
 $string['gradingmax'] = 'Highest grade';
 $string['gradingmin'] = 'Lowest grade';
@@ -598,4 +639,33 @@ Total number of exams to add and the number of the first added exam need to be i
 ';
 $string['bulkaddstart'] = 'Starting no';
 $string['submitbulkaddexam'] = 'Add series';
+$string['submissionstatus'] = 'Submission & complementary items';
+$string['viewgraded'] = 'Grading details';
+$string['viewgrading'] = 'Grading';
 $string['visibility_explain'] = 'Hidden items are inactive, visible only for managers.';
+$string['viewgradingdetails'] = 'Click to view grading details by criteria.';
+$string['usergrades'] = 'User grades';
+$string['synchusers'] = 'Update groups & access';
+$string['event_board_viewed'] = 'Board viewed';
+$string['event_board_viewed_desc'] = 'The user with id \'{$a->userid}\' viewed the Board panel 
+with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_exam_viewed'] = 'Board Exam viewed';
+$string['event_exam_viewed_desc'] = 'The user with id \'{$a->userid}\' viewed the Exam page 
+with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_member_updated'] = 'Board member updated';
+$string['event_member_updated_desc'] = 'The user with id \'{$a->userid}\' updated Board member \'{$a->relateduserid}\' in {$a->other}
+Board with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_tutor_updated'] = 'Tutor updated';
+$string['event_tutor_updated_desc'] = 'The user with id \'{$a->userid}\' updated Tutor \'{$a->relateduserid}\' in 
+Exam with id \'{$a->objectid}\' for examinee {$a->other} in activity with cm id \'{$a->cmid}\'.';
+
+
+
+
+
+
+
+
+
+
+

@@ -57,7 +57,19 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'student' => CAP_ALLOW
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'mod/assign:submit',
+    ),
+    
+    'mod/examboard:tutorize' => array(
+        'riskbitmask' => RISK_XSS,
+    
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
         ),
         'clonepermissionsfrom' => 'mod/assign:submit',
     ),

@@ -1763,16 +1763,23 @@ EOT;
                     $branchurl = $this->page->url;
                     $branch = $menu->add($branchlabel, $branchurl, '', 10002);
 
-                    $branchtitle = get_string('people', 'theme_adaptable');
-                    $branchlabel = '<i class="fa fa-users"></i>'.$branchtitle;
-                    $branchurl = new moodle_url('/user/index.php', array('id' => $PAGE->course->id));
-                    $branch->add($branchlabel, $branchurl, '', 100003);
+                    // Display Participants.
+                    if ($PAGE->theme->settings->displayparticipants) {
+                        $branchtitle = get_string('people', 'theme_adaptable');
+                        $branchlabel = '<i class="fa fa-users"></i>'.$branchtitle;
+                        $branchurl = new moodle_url('/user/index.php', array('id' => $PAGE->course->id));
+                        $branch->add($branchlabel, $branchurl, '', 100003);
+                    }
 
-                    $branchtitle = get_string('grades');
-                    $branchlabel = $OUTPUT->pix_icon('i/grades', '', '', array('class' => 'icon')).$branchtitle;
-                    $branchurl = new moodle_url('/grade/report/index.php', array('id' => $PAGE->course->id));
-                    $branch->add($branchlabel, $branchurl, '', 100004);
+                    // Display Grades.
+                    if ($PAGE->theme->settings->displaygrades) {
+                        $branchtitle = get_string('grades');
+                        $branchlabel = $OUTPUT->pix_icon('i/grades', '', '', array('class' => 'icon')).$branchtitle;
+                        $branchurl = new moodle_url('/grade/report/index.php', array('id' => $PAGE->course->id));
+                        $branch->add($branchlabel, $branchurl, '', 100004);
+                    }
 
+                    // Display activities.
                     foreach ($data as $modname => $modfullname) {
                         if ($modname === 'resources') {
                             $icon = $OUTPUT->pix_icon('icon', '', 'mod_page', array('class' => 'icon'));
@@ -1978,13 +1985,8 @@ EOT;
 
                     default:
                         // None.
-//                        $retval .= '<div id="sitetitle"></div>';
-
                         $header = theme_adaptable_remove_site_fullname($PAGE->theme->settings->sitetitletext);
                         $sitetitlehtml = $PAGE->theme->settings->sitetitletext;
-//                        $header = format_string($header);
-//                        $PAGE->set_heading($header);
-
                         $retval .= '<div id="sitetitle">' . format_text($sitetitlehtml, FORMAT_HTML) . '</div>';
 
                         break;
@@ -2009,13 +2011,6 @@ EOT;
 
                             $retval .= '<div id="sitetitle">' . format_text($sitetitlehtml, FORMAT_HTML) . '</div>';
                         }
-
-//                    default:
-                        // None.
-//                        $header = theme_adaptable_remove_site_fullname($PAGE->theme->settings->sitetitletext);
-//                        $sitetitlehtml = $PAGE->theme->settings->sitetitletext;
-//                        $retval .= '<div id="sitetitle">' . format_text($sitetitlehtml, FORMAT_HTML) . '</div>';
-//                        break;
                 }
             }
         }

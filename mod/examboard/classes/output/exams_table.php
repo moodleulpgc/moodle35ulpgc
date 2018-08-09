@@ -71,6 +71,12 @@ class exams_table extends \flexible_table implements renderable {
     
     /** @var bool if this examboard uses tutors or requires them. */
     public $usetutors = false;
+
+    /** @var bool if this examboard uses groups by exam or requires them. */
+    public $examgroups = false;
+
+    /** @var string the grouping holding the groups . */
+    public $groupingname = '';
     
     /** @var bool if board members  are shown to users. */
     public $publishboard = false;
@@ -125,7 +131,8 @@ class exams_table extends \flexible_table implements renderable {
         $this->defaultconfirm   = $examboard->confirmdefault;
         $this->confirmtime      = $examboard->confirmtime;
         $this->usetutors        = $examboard->usetutors;
-       
+        $this->examgroups       = $examboard->examgroups;
+        $this->groupingname     = $examboard->groupingname;
 
         $this->publishboard     = $examboard->publishboard;
         $this->publishboarddate = $examboard->publishboarddate;

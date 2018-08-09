@@ -15,27 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin event classes are defined here.
+ * Add event handlers for the examboard
  *
- * @package     mod_examboard
- * @copyright   2017 Enrique Castro @ ULPGC
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_examboard
+ * @category   event
+ * @copyright  2018 Enrique castro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_examboard\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The member_assigned event class.
- *
- * @package    mod_examboard
- * @copyright  2017 Enrique Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class member_assigned extends base {
+$observers = array(
 
-    // For more information about the Events API, please visit:
-    // https://docs.moodle.org/dev/Event_2
-
-}
+    array(
+        'eventname' => '\mod_examboard\event\tutor_assigned',
+        'callback' => '\mod_examboard\user_observers::tutor_assigned',
+        'includefile' => '/mod/examboard/lib.php',
+        'internal' => false,
+    ),
+);

@@ -191,7 +191,8 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
             case 'none':
                 return '';
             default:
-                return 'ERR';
+                // Default similar to none for compatibility with old questions.
+                return '';
         }
         return $number . '. ';
     }
@@ -287,7 +288,8 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
                         }
                         $choices = array();
                         foreach ($stexts->value as $x => $mctxt) {
-                            $choices[$x] = $mctxt;
+                            $choices[$x] = $question->format_text($mctxt, $part->subqtextformat , $qa,
+                                    'qtype_formulas', 'answersubqtext', $part->id, false);
                         }
                         $select = html_writer::select($choices, $inputname,
                                 $currentanswer, array('' => ''), $inputattributes);
@@ -305,7 +307,9 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
                         }
                         $output = $this->all_choices_wrapper_start();
                         foreach ($stexts->value as $x => $mctxt) {
-                            $mctxt = html_writer::span($this->number_in_style($x, $question->answernumbering), 'answernumber') . $mctxt;
+                            $mctxt = html_writer::span($this->number_in_style($x, $question->answernumbering), 'answernumber')
+                                    . $question->format_text($mctxt, $part->subqtextformat , $qa,
+                                    'qtype_formulas', 'answersubqtext', $part->id, false);
                             $inputattributes['id'] = $inputname.'_'.$x;
                             $inputattributes['value'] = $x;
                             $isselected = ($currentanswer != '' && $x == $currentanswer);
@@ -432,8 +436,10 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
      */
     public function part_correct_response($i, question_attempt $qa) {
         $question = $qa->get_question();
+        $part = $question->parts[$i];
 
-        $correctanswer = $question->correct_response_formatted($question->parts[$i]);
+        $correctanswer = $question->format_text($question->correct_response_formatted($part),
+                $part->subqtextformat , $qa, 'qtype_formulas', 'answersubqtext', $part->id, false);
         return html_writer::nonempty_tag('div', get_string('correctansweris', 'qtype_formulas', $correctanswer),
                     array('class' => 'formulaspartcorrectanswer'));
     }

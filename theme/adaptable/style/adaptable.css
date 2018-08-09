@@ -2034,3 +2034,22 @@ img.smallicon {
 .groupmanagementtable .row {
     margin-left: 0px;
 }
+
+/* Added to style the grid of letters etc on participants page */
+.userlist .initialbar .letter {
+    height: 1.8em;
+    min-width: 1.8em;
+    border: 0;
+}
+
+.userlist .initialbar .letter.active {
+    line-height: 2em;
+}
+
+.userlist .initialbar {
+    margin-bottom: 10px;
+}
+
+.userlist .initialbar .letter:hover {
+    color: #FFFFFF !important;
+}

@@ -27,6 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
 
+    $modules = new admin_setting_configmultiselect_modules('examboard/gradeables', 
+                                                        get_string('gradeablemods', 'examboard'), 
+                                                        get_string('gradeablemods_help', 'examboard'), 
+                                                        array('assign'));
+    $modules->load_choices();
+    
+    $settings->add($modules);
+
     $discharges = array();
     foreach(array('holidays','illness', 'study', 'service', 'leave','maternal','congress', 'other', 'other1', 'other2', 'other3') as $motive) {                                        
         $discharges[$motive] = get_string('discharge_'.$motive, 'examboard');
@@ -36,4 +44,7 @@ if ($ADMIN->fulltree) {
                                                         get_string('discharges_help', 'examboard'), 
                                                         array('holidays','illness', 'study', 'service', 'leave','maternal','congress', 'other'),
                                                         $discharges));
+                                                        
+                                                        
+                                                        
 }

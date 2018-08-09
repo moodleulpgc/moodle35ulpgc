@@ -75,21 +75,19 @@ class examboard_members_form extends moodleform {
         //$grouparr[] =& $mform->createElement('advcheckbox', "member[0]", '', 'exampted'); // use if exempted is put in use
         $options['noselectionstring'] = isset($knownmembers[0][1]) ? $knownmembers[0][1] : $strnothingselected;
         $grouparr[] =& $mform->createElement('autocomplete', "deputyids[0]", '', $users, $options);
-        $grouparr[] =& $mform->createElement('static', "static[0]", '', $strdeputy);
-        $mform->addGroup($grouparr, 'usergroup0', $examboard->chair, array(' ', ' '), false);
+        //
+        $mform->addGroup($grouparr, 'usergroup0', $examboard->chair, array($strdeputy, ''), false);
 
         $grouparr = array();
         $grouparr[] =& $mform->createElement('autocomplete', "memberids[1]", '', $users, $options);
         $grouparr[] =& $mform->createElement('autocomplete', "deputyids[1]", '', $users, $options);
-        $grouparr[] =& $mform->createElement('static', "static[1]", '', $strdeputy);
-        $mform->addGroup($grouparr, 'usergroup1', $examboard->secretary, array(' ', ' '), false);
+        $mform->addGroup($grouparr, 'usergroup1', $examboard->secretary, array($strdeputy, ''), false);
         
         foreach(range(2, $examboard->maxboardsize - 1) as $n) {
             $grouparr = array();
             $grouparr[] =& $mform->createElement('autocomplete', "memberids[$n]", '', $users, $options);
             $grouparr[] =& $mform->createElement('autocomplete', "deputyids[$n]", '', $users, $options);
-            $grouparr[] =& $mform->createElement('static', "static[$n]", '', $strdeputy);
-            $mform->addGroup($grouparr, "usergroup$n", $examboard->vocal.' '.($n-1), array(' ', ' '), false);
+            $mform->addGroup($grouparr, "usergroup$n", $examboard->vocal.' '.($n-1), array($strdeputy, ''), false);
         }
         
         //assign exams

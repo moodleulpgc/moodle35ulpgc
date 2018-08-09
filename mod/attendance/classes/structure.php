@@ -96,6 +96,10 @@ class mod_attendance_structure {
     /** @var array of sessionid. */
     private $sessioninfo = array();
 
+    /** @var float number [0..1], the threshold for student to be shown at low grade report */
+    private $lowgradethreshold;
+
+
     /**
      * Initializes the attendance API instance using the data from DB
      *
@@ -530,6 +534,7 @@ class mod_attendance_structure {
             array('subdirs' => false, 'maxfiles' => -1, 'maxbytes' => 0), $formdata->sdescription['text']);
         $sess->description = $description;
         $sess->descriptionformat = $formdata->sdescription['format'];
+        $sess->calendarevent = empty($formdata->calendarevent) ? 0 : $formdata->calendarevent;
 
         $sess->studentscanmark = 0;
         $sess->autoassignstatus = 0;
@@ -575,7 +580,7 @@ class mod_attendance_structure {
              // This shouldn't really happen, but just in case to prevent fatal error.
             attendance_create_calendar_event($sess);
         } else {
-            attendance_update_calendar_event($sess->caleventid, $sess->duration, $sess->sessdate);
+            attendance_update_calendar_event($sess);
         }
 
         $info = construct_session_full_date_time($sess->sessdate, $sess->duration);
@@ -1196,7 +1201,7 @@ class mod_attendance_structure {
             $sess->timemodified = $now;
             $DB->update_record('attendance_sessions', $sess);
             if ($sess->caleventid) {
-                attendance_update_calendar_event($sess->caleventid, $duration, $sess->sessdate);
+                attendance_update_calendar_event($sess);
             }
             $event = \mod_attendance\event\session_duration_updated::create(array(
                 'objectid' => $this->id,
@@ -1270,5 +1275,26 @@ class mod_attendance_structure {
             }
         }
         return;
+    }
+
+    /**
+     * Gets the lowgrade threshold to use.
+     *
+     */
+    public function get_lowgrade_threshold() {
+        if (!isset($this->lowgradethreshold)) {
+            $this->lowgradethreshold = 1;
+
+            if ($this->grade > 0) {
+                $gradeitem = grade_item::fetch(array('courseid' => $this->course->id, 'itemtype' => 'mod',
+                    'itemmodule' => 'attendance', 'iteminstance' => $this->id));
+                if ($gradeitem->gradepass > 0 && $gradeitem->grademax != $gradeitem->grademin) {
+                    $this->lowgradethreshold = ($gradeitem->gradepass - $gradeitem->grademin) /
+                        ($gradeitem->grademax - $gradeitem->grademin);
+                }
+            }
+        }
+
+        return $this->lowgradethreshold;
     }
 }

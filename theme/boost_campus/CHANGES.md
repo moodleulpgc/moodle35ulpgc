@@ -4,8 +4,15 @@ moodle-theme_boost_campus
 Changes
 -------
 
-### Unreleased
+### Release v3.5-r2
 
+* 2018-07-31 - Fixed bug in function theme_boost_campus_process_flatnav.
+* 2018-07-31 - Removed deprecated.txt file because it is unnecessary.
+* 2018-07-24 - Setting to display help texts in modal dialogues instead of popups.
+* 2018-07-24 - Fixed brand colors due to Bootstrap changes in Boost.
+* 2018-07-24 - Fixed logo width when loginform is active.
+* 2018-07-24 - Fixed debugging output for admins on profile page.
+* 2018-07-24 - Removed rules for local_boostnavigation due to core integration.
 * 2018-06-15 - Minor fix to the user menu displaying if switch role is moved to course menu.
 * 2018-06-12 - Added Video JS skin that fits to the brand color.
 

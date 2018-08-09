@@ -65,6 +65,194 @@ class renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Generates the view exams table page
+     *
+     * @param object $examboard record from DB with module instance information
+     * @param object $cm Course Module cm_info
+     * @param exams_table $viewer object with the examinations list and vieweing options
+     * @return string
+     */
+    public function view_user_grade_page($examboard, $exam, $user) {
+        global $CFG, $USER;
+        
+        require_once($CFG->dirroot . '/mod/examboard/grading_form.php');
+        
+        require_capability('mod/examboard:grade', $this->page->context);
+        
+        $output = '';    
+    
+        $title = get_string('gradinguser', 'examboard', $this->format_exam_name($exam));
+        $output .= $this->heading($title, 2);    
+        
+        $output .= $this->output->container_start('usersummary');
+        $output .= $this->output->box_start('boxaligncenter usersummarysection');
+        $output .= $this->output->user_picture($user);
+        $output .= $this->output->spacer(array('width'=>30));
+        
+        $urlparams = array('id' => $user->id, 'course'=>$examboard->course);
+        $url = new moodle_url('/user/view.php', $urlparams);
+        $fullname = fullname($user);
+        foreach(get_extra_user_fields($this->page->context) as $extrafield) {
+            $extrainfo[] = $user->$extrafield;
+        }
+        if (count($extrainfo)) {
+            $fullname .= ' (' . implode(', ', $extrainfo) . ')';
+        }
+        $output .= $this->output->action_link($url, $fullname);
+        
+        $output .= $this->output->box_end();
+        $output .= $this->output->container_end();
+        
+        $output .= $this->heading(get_string('submissionstatus', 'examboard'), 3);    
+        
+        $mods = get_fast_modinfo($examboard->course)->get_cms();
+        
+        $output .= $this->output->container_start('submissionsummary');
+        foreach(array('gradeable', 'proposal', 'defense') as $field) {
+            if($examboard->$field) {
+                foreach($mods as $cmid => $cm) {
+                    if($cm->idnumber == $examboard->$field) {
+                        break;
+                    }
+                }
+                if($link = $this->gradeable_link($cm, $user->id, get_string($field, 'examboard'))) {
+                    $output .= $link.'  ';
+                }
+            }
+        }
+        $output .= $this->output->container_end();
+        
+        $grade = examboard_get_grader_grade($exam->id, $user->id, true);
+        
+        $gradingdisabled = examboard_grading_disabled($examboard, $user->id);
+                
+        $params = array('userid' => $user->id,
+                        'gradingdisabled' => $gradingdisabled,
+                        'gradinginstance' => examboard_get_grading_instance($examboard, $user->id, $grade, $gradingdisabled),
+                        'examboard' => $examboard,
+                        'currentgrade' => $grade,
+
+        );
+        
+        $mform = new \mod_examboard_grade_form(null, $params, 'post', '', array('class'=>'gradeform'));
+        
+        $output .= $this->output->box_start('boxaligncenter gradeform');
+        $output .= $this->moodleform($mform);
+        $output .= $this->output->box_end();
+    
+        return $output;
+    }
+
+    /**
+     * Generates the grading explanation page for advanced grading
+     *
+     * @param object $examboard record from DB with module instance information
+     * @param object $exam examination object
+     * @param object $grade record from the DB
+     * @return string
+     */
+    public function view_grading_explanation($examboard, $exam, $grade, $user, $grader) {
+        global $CFG, $PAGE, $USER;
+
+        $context = $this->page->context;
+        if($USER->id != $grade->userid) { 
+            require_capability('mod/examboard:manage', $context);
+        }
+        
+        require_once($CFG->dirroot . '/grade/grading/lib.php');
+
+        $gradingmanager = get_grading_manager($context, 'mod_examboard', 'usergrades');
+        $hasgrade = ($examboard->grade != GRADE_TYPE_NONE );
+        if ($hasgrade) {
+            if ($controller = $gradingmanager->get_active_controller()) {
+                $menu = make_grades_menu($examboard->grade);
+                $controller->set_grade_range($menu, $examboard->grade > 0);
+                $gradefordisplay = $controller->render_grade($PAGE,
+                                                                $grade->id,
+                                                                examboard_get_grade_item($examboard->id, $examboard->course),
+                                                                '',
+                                                                false);
+
+            }
+        }
+
+        //print_object($gradefordisplay);
+        
+        $output = '';
+        
+        $title = get_string('gradinguser', 'examboard', $this->format_exam_name($exam));
+        $output .= $this->heading($title, 2);    
+        
+        $output .= $this->output->container_start('usersummary');
+        $output .= $this->output->box_start('boxaligncenter usersummarysection');
+        $output .= $this->output->user_picture($user);
+        $output .= $this->output->spacer(array('width'=>30));
+        
+        $urlparams = array('id' => $user->id, 'course'=>$examboard->course);
+        $url = new moodle_url('/user/view.php', $urlparams);
+        $fullname = fullname($user);
+        foreach(get_extra_user_fields($this->page->context) as $extrafield) {
+            $extrainfo[] = $user->$extrafield;
+        }
+        if (count($extrainfo)) {
+            $fullname .= ' (' . implode(', ', $extrainfo) . ')';
+        }
+        $output .= $this->output->action_link($url, $fullname);
+        
+        $output .= $this->output->box_end();
+        $output .= $this->output->container_end();
+
+        $output .= $this->output->container_start('feedback');
+        $output .= $this->output->box_start('boxaligncenter feedbacktable');
+        $t = new \html_table();
+
+        if ($grader) {
+            // Grader.
+            $row = new \html_table_row();
+            $cell1 = new \html_table_cell(get_string('gradedby', 'assign'));
+            $userdescription = $this->output->user_picture($grader) .
+                               $this->output->spacer(array('width'=>30)) .
+                               fullname($grader);
+            $cell2 = new \html_table_cell($userdescription);
+            $row->cells = array($cell1, $cell2);
+            $t->data[] = $row;
+        }
+
+        // Grade.
+        if (isset($gradefordisplay)) {
+            $row = new \html_table_row();
+            $cell1 = new \html_table_cell(get_string('grade'));
+            $cell2 = new \html_table_cell($gradefordisplay);
+            $row->cells = array($cell1, $cell2);
+            $t->data[] = $row;
+
+            // Grade date.
+            $row = new \html_table_row();
+            $cell1 = new \html_table_cell(get_string('gradedon', 'assign'));
+            $cell2 = new \html_table_cell(userdate($grade->timemodified));
+            $row->cells = array($cell1, $cell2);
+            $t->data[] = $row;
+        }
+        
+
+        $output .= html_writer::table($t);
+        $output .= $this->output->box_end();
+
+        $output .= $this->output->container_end();
+        
+        
+        $url = new moodle_url('/mod/examboard/view.php', array('id' => $examboard->cmid,
+                                                                'view' => 'exam',
+                                                                'item' => $exam->id,
+                                                                ));
+        $output .= $this->single_button($url, get_string('returntoexam', 'examboard'), 'get',
+                                                array('class' => 'continuebutton'));
+        
+        
+        return $output;
+    }
+    
     
     /**
      * Generates the view single board page
@@ -696,6 +884,9 @@ class renderer extends plugin_renderer_base {
         }
         
         $table->editurl->param('exam', $table->examination->id);
+        $table->viewgradeurl = clone($table->baseurl);
+        $table->viewgradeurl->params(array('item' => $table->examination->id,
+                                            'view'=>'graded'));
         
         foreach($table->examination->examinees as $uid => $user) {
             $table->editurl->param('user', $uid);
@@ -714,7 +905,7 @@ class renderer extends plugin_renderer_base {
                 $row['grade'] = $this->display_user_grades($table, $uid);
             }
 
-            $row['action'] = $this->examinee_table_user_actions($table->editurl, $user, $numusers, $table->canmanage, ($table->grademax && !$user->excluded));
+            $row['action'] = $this->examinee_table_user_actions($table->editurl, $table->baseurl, $user, $numusers, $table->canmanage, ($table->grademax && !$user->excluded));
             
             $class = $user->excluded  ? ' dimmed excluded ' : ''; 
         
@@ -756,6 +947,49 @@ class renderer extends plugin_renderer_base {
         return $main.$cotutors;
     }
 
+    
+    /**
+     * Render the link to a gradeable item
+     *
+     * @param object $cminfo, course module infor of complementary data
+     * @param int $userid, student id
+     * @param string $word, word to use in link
+     * @return string
+     */
+    public function gradeable_link($cminfo, $userid, $word) {
+        global $DB;
+        $link = '';
+        $submitflag = true;
+    
+        $url = new moodle_url("/mod/{$cminfo->modname}/view.php", array('id'=>$cminfo->id));
+    
+        switch($cminfo->modname) {
+            case 'assign'   :   $url->params(array('action' => 'grade', 'userid' => $userid));
+                                $select = "assignment = :assignment AND userid = :userid AND latest = 1 AND status <> 'new' ";
+                                $submitflag = $DB->record_exists_select('assign_submission', $select, array('assignment' => $cminfo->instance, 'userid'=>$userid));
+                        break;
+
+            case 'tracker'  :   $url->param('view','view'); 
+                                $select = "trackerid = :trackerid AND reportedby = :userid AND status > 0 AND status <> 5 ";
+                                $params = array('trackerid' => $cminfo->instance, 'userid'=>$userid);
+                                if($submitflag = $DB->record_exists_select('tracker_issue', $select, $params)) {
+                                    $issue = reset($DB->get_records_select('tracker_issue', $select, $params, 'datereported DESC', 0, 1));
+                                    $url->param('issueid', $issue->id);
+                                }
+                        break;        
+
+            case 'data'  :
+                        break;        
+        
+        }
+    
+        if($submitflag) {
+            $link = $this->action_link($url, $word);
+        }
+        
+        return $link;
+    }
+    
     /**
      * Render the grades for a user in the examinee table
      *
@@ -763,45 +997,61 @@ class renderer extends plugin_renderer_base {
      * @return string
      */
     public function display_user_grades($table, $userid) {
+        global $USER;
+        
         $output = '';
 
+        if($table->gradeable && 
+            $link = $this->gradeable_link($table->gradeable, $userid, get_string('gradeable', 'examboard'))) {
+            $output .= $link.'<br>';
+        }
+        
+        if($table->proposal && 
+            $link = $this->gradeable_link($table->proposal, $userid, get_string('proposal', 'examboard'))) {
+            $output .= $link.'<br>';
+        }
+        
+        if($table->defense &&
+            $link = $this->gradeable_link($table->defense, $userid, get_string('defense', 'examboard'))) {
+            $output .= $link.'<br>';
+        }
+        
         if(!$table->grademax || !isset($table->examination->grades[$userid]) ) {
             //there are no grades, activity not graded
-            return '';
+            return $output;
         }
     
         $grades = $table->examination->grades[$userid];
         
         $finalgrade = '';
         if($grades) {
-            $icon = $this->output->pix_icon('i/completion-manual-enabled',
-                                        get_string('gradeuser', 'assign', ' xxxxx '),
-                                        'moodle', array('class'=>'icon'));
-            $url = clone $table->editurl;
-            $urlparams = array('rownum'=>$this->rownum,
-                                'action' => 'grade',
-                                'userid'=> 0,
-                                'useridlistid' => $this->assignment->get_useridlist_key_id());
+            $finalgrade = examboard_calculate_grades($table->grademode, $table->mingraders, $grades);
+            $finalgrade = $this->display_grade($finalgrade, $table->grademax, $table->gradeitem, false);
 
-        
-            $finalgrade = examboard_calculate_grade($table->grademode, $grades);
-            $finalgrade = $this->display_grade($finalgrade, $grademax, $gradeitem, $downloading);
             $bgrades = '';
+            $table->viewgradeurl->param('user', $userid);
+            $attributes = array('title' => get_string('viewgradingdetails', 'examboard'));
             foreach($grades as $gid => $grade) {
-                if($grade->$sortorder == 0) {
+                if($grade->sortorder == 0) {
                     $role = $table->chair;
                 } elseif($grade->sortorder == 1) {
                     $role = $table->secretary;
                 } else {
                     $role = $table->vocal.' '.($grade->sortorder -1);
                 }
-                $grade = format_float($grade->grade, $gradeitem->get_decimals());
-                $bgrades .= $this->box($role.': '. $grade, 'membergrade');
+                $grade = format_float($grade->grade, $table->gradeitem->get_decimals());
+                $text = $role.': '. $grade;
+                if($table->advancedgrading && ($userid == $USER->id || $table->canmanage)) {
+                    $table->viewgradeurl->param('gid', $gid);
+                    $text = html_writer::link($table->viewgradeurl, $text, $attributes);
+                }
+                
+                $bgrades .= $this->box($text, 'membergrade');
             }
             
-            $output .= $this->box($finalgrade, 'finalgrade');
+            //$output .= $this->box($finalgrade, 'finalgrade');
             if($bgrades) {
-                $output .= print_collapsible_region($bgrade, '', 'examboard_grades_'.$userid, 
+                $output .= print_collapsible_region($bgrades, '', 'examboard_grades_'.$userid, 
                                                     $finalgrade, 'examboard_grades', false, true); 
             }
         }
@@ -816,11 +1066,16 @@ class renderer extends plugin_renderer_base {
      * @param int $grademax the grade settih in the module instance. 
      *             Indicates if graded (!=0) and scales used (negative) 
      * @param stdclass $gradeitem record from grade_item table PLUS scale record as scale
-     * @param bool $downloading if the data are been downloade to a file (vs displayed on screen)
+     * @param bool $downloading if the data are been downloaded to a file (vs displayed on screen)
      * @return string User-friendly representation of grade
      */
-    public function display_grade($grade, $grademax, $gradeitem, $downloading) {  
+    public function display_grade($grade, $grademax, $gradeitem, $downloading = false) {  
         $o = '';
+        
+        if ($grade == -2) {
+            return get_string('partialgrading', 'examboard');
+        }
+        
         
         if ($grademax >= 0) {
             if ($grade == -1 || $grade === null || $grademax == 0) {
@@ -865,7 +1120,7 @@ class renderer extends plugin_renderer_base {
      * @param array $tutors including names, first is main tutor
      * @return string
      */
-    public function examinee_table_user_actions($url, $user, $maxusers, $canmanage, $cangrade) {
+    public function examinee_table_user_actions($url, $gradeurl, $user, $maxusers, $canmanage, $cangrade) {
         global $PAGE;
         $action = '';       
         $attributes = array(); //array('class' => 'icon');
@@ -900,8 +1155,14 @@ class renderer extends plugin_renderer_base {
         if($cangrade) {
             $action .= '<br />';        
             //$action .= '<a href="' . $url . '" class="btn btn-primary">' . get_string('grade') . '</a>';
-            $url->param('action', 'grade');
-            $action .= html_writer::link($url, get_string('grade'), array('class' =>'btn btn-primary'));
+            $params = $url->params();
+            $params['item'] = $params['exam'];
+            unset($params['action']);
+            unset($params['exam']);
+            $gradeurl->params($params);
+            $gradeurl->param('view', 'grading');
+//            $gradeurl->remove_params('action', 'item');
+            $action .= html_writer::link($gradeurl, get_string('grade', 'examboard'), array('class' =>'btn btn-primary'));
         }
         
         return $action;
@@ -1157,6 +1418,22 @@ class renderer extends plugin_renderer_base {
         return $o;
     }
 
+        /**
+     * Helper method dealing with the fact we can not just fetch the output of moodleforms
+     *
+     * @param moodleform $mform
+     * @return string HTML
+     */
+    protected function moodleform($mform) {
+
+        $o = '';
+        ob_start();
+        $mform->display();
+        $o = ob_get_contents();
+        ob_end_clean();
+
+        return $o;
+    }
     
 
     

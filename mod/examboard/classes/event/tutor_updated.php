@@ -27,15 +27,34 @@ namespace mod_examboard\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The tutor_assigned event class.
+ * The board members update event class.
  *
  * @package    mod_examboard
  * @copyright  2017 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tutor_assigned extends base {
+class tutot_updated extends base {
 
-    // For more information about the Events API, please visit:
-    // https://docs.moodle.org/dev/Event_2
+    /**
+     * Init method.
+     */
+    protected function init() {
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['objecttable'] = 'examboard_exam';
 
+    }
+
+
+    /**
+     * Returns relevant UR params arrayL.
+     *
+     * @return array
+     */
+    public function set_url_params() {
+        $params = array('view' => 'exam',
+                        'item' => $this->objectid);
+        return $params;
+    }
+    
 }

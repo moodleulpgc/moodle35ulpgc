@@ -63,8 +63,15 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
 
 // Run the tests.
-list($allpassed, $failingtests, $notests) = $bulktester->run_all_tests_for_context($context);
+list($allpassed, $failing) = $bulktester->run_all_tests_for_context($context);
 
 // Display the final summary.
-$bulktester->print_overall_result($allpassed, $failingtests, $notests);
+$bulktester->print_overall_result($allpassed, $failing);
+
+$config = stack_utils::get_config();
+if ('db' == $config->casresultscache) {
+    echo html_writer::tag('p', stack_string('healthcheckcachestatus',
+            stack_cas_connection_db_cache::entries_count($DB)));
+}
+
 echo $OUTPUT->footer();

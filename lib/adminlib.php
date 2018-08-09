@@ -7970,9 +7970,7 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
  * @return object admin_root object
  */
 function admin_get_root($reload=false, $requirefulltree=true) {
-    global $CFG, $DB, $OUTPUT;
-
-    static $ADMIN = NULL;
+    global $CFG, $DB, $OUTPUT, $ADMIN;
 
     if (is_null($ADMIN)) {
     // create the admin tree!
@@ -7982,11 +7980,12 @@ function admin_get_root($reload=false, $requirefulltree=true) {
     if ($reload or ($requirefulltree and !$ADMIN->fulltree)) {
         $ADMIN->purge_children($requirefulltree);
     }
-
+    
     if (!$ADMIN->loaded) {
     // we process this file first to create categories first and in correct order
         require($CFG->dirroot.'/'.$CFG->admin.'/settings/top.php');
 
+        
         // now we process all other files in admin/settings to build the admin tree
         foreach (glob($CFG->dirroot.'/'.$CFG->admin.'/settings/*.php') as $file) {
             if ($file == $CFG->dirroot.'/'.$CFG->admin.'/settings/top.php') {
@@ -7998,6 +7997,7 @@ function admin_get_root($reload=false, $requirefulltree=true) {
             }
             require($file);
         }
+        
         require($CFG->dirroot.'/'.$CFG->admin.'/settings/plugins.php');
 
         $ADMIN->loaded = true;

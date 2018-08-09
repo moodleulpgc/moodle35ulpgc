@@ -89,7 +89,7 @@ function theme_boost_campus_get_pre_scss($theme) {
     $scss = '';
     $configurable = [
         // Config key => [variableName, ...].
-        'brandcolor' => ['brand-primary'],
+        'brandcolor' => ['primary'],
         // MODIFICATION START: Add own variables.
         'section0title' => ['section0title'],
         'showswitchedroleincourse' => ['showswitchedroleincourse'],
@@ -98,10 +98,10 @@ function theme_boost_campus_get_pre_scss($theme) {
         'footerhidelogininfo' => ['footerhidelogininfo'],
         'footerhidehomelink' => ['footerhidehomelink'],
         'blockicon' => ['blockicon'],
-        'brandsuccesscolor' => ['brand-success'],
-        'brandinfocolor' => ['brand-info'],
-        'brandwarningcolor' => ['brand-warning'],
-        'branddangercolor' => ['brand-danger'],
+        'brandsuccesscolor' => ['success'],
+        'brandinfocolor' => ['info'],
+        'brandwarningcolor' => ['warning'],
+        'branddangercolor' => ['danger'],
         'darknavbar' => ['darknavbar'],
         'footerblocks' => ['footerblocks'],
         'imageareaitemsmaxheight' => ['imageareaitemsmaxheight'],
@@ -109,7 +109,8 @@ function theme_boost_campus_get_pre_scss($theme) {
         'incoursesettingsswitchtorole' => ['incoursesettingsswitchtorole'],
         'hidefooteronloginpage' => ['hidefooteronloginpage'],
         'footerhideusertourslink' => ['footerhideusertourslink'],
-        'navdrawerfullwidth' => ['navdrawerfullwidth']
+        'navdrawerfullwidth' => ['navdrawerfullwidth'],
+        'helptextmodal' => ['helptextmodal']
         // MODIFICATION END.
     ];
 

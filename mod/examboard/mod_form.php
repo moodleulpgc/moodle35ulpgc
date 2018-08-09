@@ -87,6 +87,8 @@ class mod_examboard_mod_form extends moodleform_mod {
         $mform->setDefault('usetutors', EXAMBOARD_TUTORS_YES);
         $mform->addHelpButton('usetutors', 'usetutors', 'examboard');
         
+        $mform->addElement('header', 'distributionfieldset', get_string('distributionfieldset', 'examboard'));
+        
         $options = array(EXAMBOARD_USERTYPE_NONE => get_string('allocmodenone', 'examboard'),
                         EXAMBOARD_USERTYPE_MEMBER => get_string('allocmodemember', 'examboard'),
                         EXAMBOARD_USERTYPE_TUTOR => get_string('allocmodetutor', 'examboard'),
@@ -94,6 +96,17 @@ class mod_examboard_mod_form extends moodleform_mod {
         $mform->addElement('select', 'allocation', get_string('allocation', 'examboard'), $options);
         $mform->setDefault('allocation', EXAMBOARD_USERTYPE_MEMBER);
         $mform->addHelpButton('allocation', 'allocation', 'examboard');
+        
+        $mform->addElement('selectyesno', 'examgroups', get_string('examgroups', 'examboard'));
+        $mform->setDefault('examgroups', 0);
+        $mform->addHelpButton('examgroups', 'examgroups', 'examboard');
+
+        $mform->addElement('text', 'groupingname', get_string('groupingname', 'examboard'), array('size'=>'30'));
+        $mform->setType('groupingname', PARAM_ALPHANUMEXT);
+        $mform->setDefault('groupingname', '');
+        $mform->addHelpButton('groupingname', 'groupingname', 'examboard');
+        $mform->disabledIf('groupingname', 'examgroups', 0);
+
         
         $mform->addElement('header', 'notifyfieldset', get_string('notifyfieldset', 'examboard'));
         
@@ -166,11 +179,6 @@ class mod_examboard_mod_form extends moodleform_mod {
         // Add standard grading elements.
         $this->standard_grading_coursemodule_elements();
 
-        
-        $options = examboard_get_gradeables();
-        $mform->addElement('select', 'gradeable', get_string('gradeablemod', 'examboard'), $options);
-        $mform->addHelpButton('gradeable', 'gradeablemod', 'examboard');
-        
         $options = array(EXAMBOARD_GRADING_AVG => get_string('gradingaverage', 'examboard'),
                         EXAMBOARD_GRADING_MAX => get_string('gradingmax', 'examboard'),
                         EXAMBOARD_GRADING_MIN => get_string('gradingmin', 'examboard'),
@@ -191,7 +199,19 @@ class mod_examboard_mod_form extends moodleform_mod {
         $mform->setDefault('mingraders', 1);
         $mform->disabledIf('mingraders', 'grade[modgrade_type]', 'eq', 'none');
         $mform->disabledIf('mingraders', 'grademode', 'neq', EXAMBOARD_GRADING_AVG);
-        
+
+        $course = $this->get_course();
+        if($gradeables = examboard_get_gradeables($course)) {
+            $mform->addElement('select', 'gradeable', get_string('gradeablemod', 'examboard'), $gradeables);
+            $mform->addHelpButton('gradeable', 'gradeablemod', 'examboard');
+            
+            $mform->addElement('select', 'proposal', get_string('proposalmod', 'examboard'), $gradeables);
+            $mform->addHelpButton('proposal', 'proposalmod', 'examboard');
+            
+            $mform->addElement('select', 'defense', get_string('defensemod', 'examboard'), $gradeables);
+            $mform->addHelpButton('defense', 'defensemod', 'examboard'); 
+        }
+       
         // Add standard elements.
         $this->standard_coursemodule_elements();
 

@@ -46,6 +46,7 @@ $string['examboard:notify'] = 'Realizar notificaciones a los participantes en un
 $string['messageprovider:examboard_notify'] = 'Notificación';
 $string['modulename'] = 'Tribunal';
 $string['modulenameplural'] = 'Tribunales';
+$string['partialgrading'] = 'Incompleta';
 $string['pluginname'] = 'Tribunal';
 $string['pluginadministration'] = 'Admnistración de Tribunales';
 $string['manageallocation'] = 'Gestionar asignaciones';
@@ -54,6 +55,12 @@ $string['notify_help'] = 'Permite enviar mensajes de notificación a los partici
 $string['addexam'] = 'Agregar examen';
 $string['submit'] = 'Entregar';
 $string['grade'] = 'Calificar';
+$string['groupingname'] = 'Agrupamiento';
+$string['groupingname_help'] = 'Si se emplean grupos para cada Examen, 
+esos grupos se pueden asignar automáticamente a este agrupamiento. 
+
+Si un agrupamiento con este nombre/código ya existe, se usa tal cual, si no, 
+se crea un nuevo agrupamiento con este nombre para contener los grupos de examen.';
 $string['boarddata'] = 'Datos del Tribunal';
 $string['existingboard'] = 'Tribunal encargado';
 $string['existingboard_help'] = 'El examen puede ser asignado a un Tribunal ya existente, 
@@ -69,6 +76,11 @@ $string['boardactive'] = 'Visibilidad';
 $string['boardactive_help'] = 'Indica si el Tribunal será visible por los usuarios no gestores.  
 Puede crear tribunales inactivos como sustitutos, o mantenerlos invisibles hasta que se complete la asignación de miembros o estudiantes.';
 $string['examdata'] = 'Datos del Examen';
+$string['examgroups'] = 'Grupos por Examen';
+$string['examgroups_help'] = 'Si se habilita se creará automáticamente un grupo separado para cada Examen definido en el módulo. 
+El grupo tendrá por miembros a los estudiantes, tutores y examinadores asignados al examen.
+
+Los grupos se actualizarán automáticamente cada vez que se asigna o desasigna a una persona como estudiante, tutor o examinador en un examen.';
 $string['examvenue'] = 'Local';
 $string['examvenue_help'] = 'El aula, sala o auditorio donde tendrá lugar el examen.';
 $string['examdate'] = 'Fecha del examen';
@@ -198,9 +210,11 @@ $string['tobepublishedafter'] = 'Se publicará el {$a}';
 $string['viewboard'] = 'Tribunal';
 $string['viewusers'] = 'Estudiantes';
 $string['viewexam'] = 'Examen por Tribunal';
+$string['returntoexam'] = 'Volver';
 $string['returntoexams'] = 'Volver a Tribunales';
 $string['examboardname'] = 'Nombre del ítem';
 $string['examboardfieldset'] = 'Opciones para Tribunal';
+$string['distributionfieldset'] = 'Distribución y grupos';
 $string['notifyfieldset'] = 'Notificaciones y confirmaciones';
 $string['publishfieldset'] = 'Fechas de publicación';
 $string['maxboardsize'] = 'Máximo nº de miembros';
@@ -305,12 +319,40 @@ $string['secretaryword'] = 'Secretario';
 $string['vocalword'] = 'Vocal';
 $string['examineeword'] = 'Estudiante';
 $string['tutorword'] = 'Tutor';
+$string['gradeable'] = 'Entrega evaluable';
 $string['gradeablemod'] = 'Actividad evaluada';
 $string['gradeablemod_help'] = 'Un Tribunal es usualmente un mecanismo de calificación de otra actividad entregable. 
-Esta opción permite especificar en qué otra activida se encuentran las entregas calificadas aquí. 
+Esta opción permite especificar en qué otra actividad se encuentran las entregas calificadas aquí. 
 
-Esa actividad DEBE ser una Tarea coexistente en el mismo curso.
+Esa actividad <strong>debe</strong> ser un ítem coexistente en el mismo curso y que declare un <strong>código de calificación</strong> no vacío. 
 ';
+$string['gradeablemods'] = 'Actividades complementarias';
+$string['gradeablemods_help'] = 'Un Tribunal es usualmente un mecanismo de calificación de otra actividad entregable.
+Esta opción permite especificar en qué otras actividades se encuentran los datos complementarios qu epueden sernecesariso para la actividad evaluadora del Tribunal.
+Esto incluye tanto la actividad donde se realiza la entrega del material evaluable así como otros datos adicionales, la Propuesta de trabajo o la Solicitud de Defensa, en su caso.
+';
+$string['proposal'] = 'Propuesta de trabajo';
+$string['proposalmod'] = 'Propuesta de trabajo';
+$string['proposalmod_help'] = 'Un Tribunal es usualmente un mecanismo de calificación de otra actividad entregable. 
+Esta opción permite especificar en qué otra actividad se encuentran las Propuestas de trabajo, en su caso.
+Si los Exámenes en este Tribunal no necesitan un paso previo de Propuesta de trabajo, simplemente seleccione ninguno aquí.
+
+Si se usa, <strong>debe</strong> ser un ítem coexistente en el mismo curso y que declare un <strong>código de calificación</strong> no vacío. 
+
+Puede ser el mismo ítem que la Actividad evaluada o la Solicitud de Defensa.
+';
+$string['defense'] = 'Solicitud de Defensa';
+$string['defensemod'] = 'Solicitud de Defensa';
+$string['defensemod_help'] = 'Un Tribunal es usualmente un mecanismo de calificación de otra actividad entregable. 
+Esta opción permite especificar en qué otra actividad se encuentran las Solicitudes de defensa, en su caso.
+Si los Exámenes en este Tribunal no necesitan un paso previo de Solicitud de Defensa, simplemente seleccione ninguno aquí.
+
+Si se usa, <strong>debe</strong> ser un ítem coexistente en el mismo curso y que declare un <strong>código de calificación</strong> no vacío. 
+
+Puede ser el mismo ítem que la Actividad evaluada o la Solicitud de Defensa.
+';
+
+
 $string['grademode'] = 'Cómputo de calificación';
 $string['grademode_help'] = 'Cómo se calcula la calificación final de un estudianet a partir de las puntuaciones individuales de cada miembro del Tribunal. 
 Los métodos disponbles son:
@@ -325,6 +367,7 @@ entonces la calificación final no es calculada y el estudiante queda no calific
 
 ';
 $string['grades'] = 'Calificaciones de Tribunal'; 
+$string['gradinguser'] = 'Calificar estudiante en {$a}';
 $string['gradingaverage'] = 'Media';
 $string['gradingmax'] = 'Mayor';
 $string['gradingmin'] = 'Menor';
@@ -614,3 +657,10 @@ Se debe indicar el número total de exámenes de exámenes a añadir en el lote 
 ';
 $string['bulkaddstart'] = 'Empezar en';
 $string['submitbulkaddexam'] = 'Agregar lote';
+$string['submissionstatus'] = 'Ítem evaluable y datos complementarios';
+$string['viewgraded'] = 'Detalles de calificación';
+$string['viewgrading'] = 'Calificar estudiante';
+$string['visibility_explain'] = 'Los ítems ocultos estan inactivos, visibles sólo para los gestores.';
+$string['viewgradingdetails'] = 'Clic para ver detalles de la calificación por criterio.';
+$string['usergrades'] = 'User grades';
+$string['synchusers'] = 'Actualizar grupos y accesos';

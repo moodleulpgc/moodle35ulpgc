@@ -37,7 +37,8 @@ defined('MOODLE_INTERNAL') || die;
         0 => get_string('hide', 'theme_adaptable'),
         1 => get_string('show', 'theme_adaptable'),
     );
-    $setting = new admin_setting_configselect($name, $title, $description, ', .socialbox', $radchoices);
+    $default = 0;
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $radchoices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
@@ -61,7 +62,8 @@ defined('MOODLE_INTERNAL') || die;
         0 => get_string('hide', 'theme_adaptable'),
         1 => get_string('show', 'theme_adaptable'),
     );
-    $setting = new admin_setting_configselect($name, $title, $description, ', .socialbox', $radchoices);
+    $default = 0;
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $radchoices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
@@ -83,7 +85,8 @@ defined('MOODLE_INTERNAL') || die;
         '20px' => "20px",
         '22px' => "22px",
     );
-    $setting = new admin_setting_configselect($name, $title, $description, '10px', $choices);
+    $default = '10px';
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
@@ -93,7 +96,8 @@ defined('MOODLE_INTERNAL') || die;
     $title = get_string('socialboxpaddingbottommobile', 'theme_adaptable');
     $description = get_string('socialboxpaddingbottommobile', 'theme_adaptable');
     $choices = $from0to12px;
-    $setting = new admin_setting_configselect($name, $title, $description, '10px', $choices);
+    $default = '10px';
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $choices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
@@ -105,7 +109,8 @@ defined('MOODLE_INTERNAL') || die;
         0 => get_string('hide', 'theme_adaptable'),
         1 => get_string('show', 'theme_adaptable'),
     );
-    $setting = new admin_setting_configselect($name, $title, $description, ', #logocontainer', $radchoices);
+    $default = 0;
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $radchoices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
@@ -117,7 +122,8 @@ defined('MOODLE_INTERNAL') || die;
         0 => get_string('hide', 'theme_adaptable'),
         1 => get_string('show', 'theme_adaptable'),
     );
-    $setting = new admin_setting_configselect($name, $title, $description, ', #coursetitle, #titlecontainer', $radchoices);
+    $default = 0;
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $radchoices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
@@ -153,7 +159,8 @@ defined('MOODLE_INTERNAL') || die;
         0 => get_string('hide', 'theme_adaptable'),
         1 => get_string('show', 'theme_adaptable'),
     );
-    $setting = new admin_setting_configselect($name, $title, $description, ', #page-footer', $radchoices);
+    $default = 0;
+    $setting = new admin_setting_configselect($name, $title, $description, $default, $radchoices);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 

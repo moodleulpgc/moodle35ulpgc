@@ -40,51 +40,189 @@ class backup_examboard_activity_structure_step extends backup_activity_structure
      * @return backup_nested_element The structure wrapped by the common 'activity' element.
      */
     protected function define_structure() {
+        // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
+        // To know if we are including groups and groupings.
+        $groupinfo = $this->get_setting_value('groups');
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $root = new backup_nested_element('mod_examboard', $attributes, $final_elements);
+        // Define each element separately.
+        $examboard = new backup_nested_element('examboard',  array('id'),
+                                                array('name',
+                                                        'intro',
+                                                        'introformat',
+                                                        'maxboardsize',
+                                                        'grademode',
+                                                        'gradeable',
+                                                        'proposal',
+                                                        'defense',
+                                                        'mingraders',
+                                                        'allocation',
+                                                        'usetutors',
+                                                        'examgroups',
+                                                        'requireconfirm',
+                                                        'notifyconfirm',
+                                                        'confirmtime',
+                                                        'confirmdefault',
+                                                        'warntime',
+                                                        'grade',
+                                                        'publishboard',
+                                                        'publishboarddate',
+                                                        'publishgrade',
+                                                        'publishgradedate',
+                                                        'chair',
+                                                        'secretary',
+                                                        'vocal',
+                                                        'examinee',
+                                                        'tutor',
+                                                        'timemodified'));
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $examboard = new backup_nested_element('examboard', $attributes, $final_elements);
+                                                
+                                                
+        $boards = new backup_nested_element('boards');
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $board = new backup_nested_element('board', $attributes, $final_elements);
+        $board = new backup_nested_element('board', array('id'), 
+                                                array('title',
+                                                        'idnumber',
+                                                        'name',
+                                                        'groupid',
+                                                        'active',
+                                                        'timemodified'));
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $member = new backup_nested_element('member', $attributes, $final_elements);
+        $exams = new backup_nested_element('exams');
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $examinee = new backup_nested_element('examinee', $attributes, $final_elements);
+        $exam = new backup_nested_element('exam', array('id'), 
+                                                array('boardid',
+                                                        'sessionname',
+                                                        'venue',
+                                                        'examdate',
+                                                        'duration',
+                                                        'active',
+                                                        'timemodified'));
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $tutor = new backup_nested_element('tutor', $attributes, $final_elements);
+                                                        
+        $members = new backup_nested_element('members');
 
-        // Replace with the attributes and final elements that the element will handle.
-        $attributes = null;
-        $final_elements = null;
-        $grades = new backup_nested_element('grades', $attributes, $final_elements);
+        $member = new backup_nested_element('member', array('id'), 
+                                                array('userid',
+                                                        'sortorder',
+                                                        'role',
+                                                        'deputy',
+                                                        'timecreated',
+                                                        'timemodified'));
 
-        // Build the tree with these elements with $root as the root of the backup tree.
+                                                        
+        $examinees = new backup_nested_element('examinees');
+
+        $examinee = new backup_nested_element('examinee', array('id'), 
+                                                array('userid',
+                                                        'sortorder',
+                                                        'excluded',
+                                                        'userlabel',
+                                                        'timecreated',
+                                                        'timeexcluded',
+                                                        'timemodified'));
+
+        $tutors = new backup_nested_element('tutors');
+
+        $tutor = new backup_nested_element('tutor', array('id'), 
+                                                array('userid',
+                                                        'tutorid',
+                                                        'main',
+                                                        'approved',
+                                                        'timecreated',
+                                                        'timemodified'));
+
+        $grades = new backup_nested_element('grades');
+
+        $grade = new backup_nested_element('grade', array('id'), 
+                                                array('userid',
+                                                        'grader',
+                                                        'grade',
+                                                        'timecreated',
+                                                        'timemodified'));
+
+        $confirmations = new backup_nested_element('confirmations');
+
+        $confirmation = new backup_nested_element('confirmation', array('id'), 
+                                                array('userid',
+                                                        'confirmed',
+                                                        'discharge',
+                                                        'dischargetext',
+                                                        'dischargeformat',
+                                                        'available',
+                                                        'exemption',
+                                                        'timecreated',
+                                                        'timeconfirmed',
+                                                        'timeunconfirmed'));                                                        
+
+        $notifications = new backup_nested_element('notifications');
+
+        $notification = new backup_nested_element('notification', array('id'), 
+                                                array('userid',
+                                                        'managerid',
+                                                        'role',
+                                                        'timeissued')); 
+
+        // Build the tree with thesmembere elements with $examboard as the root of the backup tree.
+        $examboard->add_child($boards);
+        $boards->add_child($board);
+        $examboard->add_child($exams);
+        $exams->add_child($exam);
+        
+        $board->add_child($members);
+        $members->add_child($member);
+        
+        $exam->add_child($examinees);
+        $examinees->add_child($examinee);
+
+        $exam->add_child($tutors);
+        $tutors->add_child($tutor);
+
+        $exam->add_child($grades);
+        $grades->add_child($grade);
+
+        $exam->add_child($confirmations);
+        $confirmations->add_child($confirmation);
+        
+        $exam->add_child($notifications);
+        $notifications->add_child($notification);
 
         // Define the source tables for the elements.
+        $examboard->set_source_table('examboard', array('id' => backup::VAR_ACTIVITYID));
+        
+        if ($groupinfo) {
+            $board->set_source_table('examboard_board', array('examboardid' => backup::VAR_PARENTID), 'id ASC');
+            
+            $exam->set_source_table('examboard_exam', array('examboardid' => backup::VAR_PARENTID), 'id ASC');
+        }
 
+        if ($userinfo && $groupinfo) {
+            $member->set_source_table('examboard_member', array('boardid' => backup::VAR_PARENTID), 'id ASC');
+            
+            $examinee->set_source_table('examboard_examinee', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $tutor->set_source_table('examboard_tutor', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $grade->set_source_table('examboard_grade', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $confirmation->set_source_table('examboard_examinee', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $notification->set_source_table('examboard_examinee', array('examid' => backup::VAR_PARENTID), 'id ASC');
+        }
+        
         // Define id annotations.
-
+        $board>annotate_ids('group', 'groupid');
+        $member->annotate_ids('user', 'userid');
+        $examinee->annotate_ids('user', 'userid');
+        $tutor->annotate_ids('user', 'userid');
+        $tutor->annotate_ids('user', 'tutorid');
+        $grade->annotate_ids('user', 'userid');
+        $grade->annotate_ids('user', 'grader');
+        
+        $confirmation->annotate_ids('user', 'userid');
+        $notification->annotate_ids('user', 'userid');
+        $notification->annotate_ids('user', 'managerid');
+        
         // Define file annotations.
-
-        return $this->prepare_activity_structure($root);
+        $examboard->annotate_files('mod_examboard', 'intro', null);
+        $notification->annotate_files('mod_examboard', 'notification', 'id');
+        
+        return $this->prepare_activity_structure($examboard);
     }
 }

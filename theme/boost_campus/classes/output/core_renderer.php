@@ -181,7 +181,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 has_capability('moodle/user:update', \context_system::instance())) {
                 $url = new moodle_url('/user/editadvanced.php', array('id'       => $userid, 'course' => $COURSE->id,
                                                                       'returnto' => 'profile'));
-                $header->pageheadingbutton = $this->single_button($url, get_string('editmyprofile', 'core')); // ecastro ULPGC
+                $header->pageheadingbutton = $this->single_button($url, get_string('editmyprofile', 'core'));
             } else if ((has_capability('moodle/user:editprofile', \context_user::instance($userid)) &&
                     !is_siteadmin($USER)) || ($currentuser &&
                     has_capability('moodle/user:editownprofile', \context_system::instance()))) {
@@ -533,4 +533,25 @@ class core_renderer extends \theme_boost\output\core_renderer {
     global $CFG;
         return $CFG->wwwroot.'/login/logout.php?sesskey='.sesskey();
    }
+
+    /**
+     * Implementation of user image rendering.
+     *
+     * @param help_icon $helpicon A help icon instance
+     * @return string HTML fragment
+     */
+    protected function render_help_icon(help_icon $helpicon) {
+        $context = $helpicon->export_for_template($this);
+        // MODIFICATION START.
+        // ID needed for modal dialog.
+        $context->linkid = $helpicon->identifier;
+        // Fill body variable needed for modal mustache with text value.
+        $context->body = $context->text;
+        if (get_config('theme_boost_campus', 'helptextmodal') == 'yes') {
+            return $this->render_from_template('theme_boost_campus/help_icon', $context);
+        } else {
+            return $this->render_from_template('core/help_icon', $context);
+        }
+        // MODIFICATION END.
+    }
 }
