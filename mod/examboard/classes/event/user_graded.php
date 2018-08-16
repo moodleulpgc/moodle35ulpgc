@@ -27,15 +27,56 @@ namespace mod_examboard\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The user_graded event class.
+ * The user grade updated event class.
  *
  * @package    mod_examboard
  * @copyright  2017 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_graded extends \core\event\base {
+class user_graded extends base {
 
-    // For more information about the Events API, please visit:
-    // https://docs.moodle.org/dev/Event_2
+    /**
+     * Init method.
+     *
+     * @return void
+     */
+    protected function init() {
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
+        $this->data['objecttable'] = 'examboard_grades';
+    }
 
+
+    /**
+     * Create instance of event.
+     *
+     * @param array $data common eventparams
+     * @param \stdClass $grade
+     * @return feedback_viewed
+     */
+    public static function create_from_grade($event, $grade) {
+        $data = array(
+            'objectid' => $grade->id,
+            'relateduserid' = $grade->userid;
+        );
+
+        $event['other']['exam'] = $grade->examid;
+        
+        $event = self::create(array_merge($event, $data));
+        $event->add_record_snapshot('examboard_grades', $grade);
+        return $event;
+    }
+    
+    /**
+     * Returns relevant UR params arrayL.
+     *
+     * @return array
+     */
+    public function set_url_params() {
+        $params = array('view' => 'exam', 
+                        'item' => $this->other['exam']);
+        //http://localhost/moodle35ulpgc/mod/examboard/view.php?id=3521&view=graded&item=1&user=43&gid=7
+        return $params;
+    }
+    
 }

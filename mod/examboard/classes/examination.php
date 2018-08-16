@@ -282,5 +282,20 @@ class examination {
         } 
         return $this->grades;
     }
+
+    public function is_grader($userid = 0, $wodeputies = false) {
+        global $DB, $USER;
+        
+        if(!$userid) {
+            $userid = $USER->id;
+        }
+        
+        $params = array('boardid' => $this->boardid, 'userid'=>$userid);
+        if($wodeputies) {
+            $params['deputy'] = 0; 
+        }
+        
+        return $DB->record_exists('examboard_member', $params);
+    }
     
 }

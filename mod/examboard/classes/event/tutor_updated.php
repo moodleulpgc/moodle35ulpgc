@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2017 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tutot_updated extends base {
+class tutor_updated extends base {
 
     /**
      * Init method.

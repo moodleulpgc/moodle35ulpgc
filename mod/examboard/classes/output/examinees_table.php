@@ -143,6 +143,20 @@ class examinees_table extends \flexible_table implements renderable {
     }
     
     
+    public static function get_from_url($url) {
+        global $DB;
+        
+        $cmid = $url->get_param('id');
+        list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'examboard');
+        
+        $examboard = $DB->get_record('examboard', array('id'=>$cm->instance, 'course' =>$cm->course));
+        $examboard->cmid = $cmid;
+        $examboard->cmidnumber = $cm->idnumber;
+        
+        return new examinees_table($url, null, $examboard); 
+    }
+    
+    
     private function check_advanced_grading() {
         global $CFG;
         

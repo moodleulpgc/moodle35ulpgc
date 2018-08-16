@@ -82,7 +82,15 @@ abstract class base extends \core\event\base {
                            'objecttable'   => $this->objecttable,
                            'userid'        => $this->userid,
                            'relateduserid' => $this->relateduserid,
-                           'other'         => $this->other);
+                           );
+
+        if($this->other) {
+            foreach($this->other as $key => $value) {
+                $field = 'other_'.$key;
+                $a->$field = $value;
+            }
+        }
+                           
         return get_string(self::get_event_string_name('_desc'), 'examboard', $a);
     }
 

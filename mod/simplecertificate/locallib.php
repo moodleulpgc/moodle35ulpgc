@@ -732,11 +732,13 @@ class simplecertificate {
                     $grade = new grade_grade(array('itemid' => $courseitem->id, 'userid' => $userid));
                     $courseitem->gradetype = GRADE_TYPE_VALUE;
                     $coursegrade = new stdClass();
+
+                    $decimals = $courseitem->get_decimals();
                     // String used.
                     $coursegrade->points = grade_format_gradevalue($grade->finalgrade, $courseitem, true, GRADE_DISPLAY_TYPE_REAL,
-                                                                $decimals = 2);
+                                                                $decimals);
                     $coursegrade->percentage = grade_format_gradevalue($grade->finalgrade, $courseitem, true,
-                                                                    GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals = 2);
+                                                                    GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals);
                     $coursegrade->letter = grade_format_gradevalue($grade->finalgrade, $courseitem, true,
                                                                 GRADE_DISPLAY_TYPE_LETTER, $decimals = 0);
                 }
@@ -818,17 +820,16 @@ class simplecertificate {
     }
 
     /**
-     * Generate a version 1 UUID (time based)
+     * Generate a UUID
      * you can verify the generated code in:
      * http://www.famkruithof.net/uuid/uuidgen?typeReq=-1
      *
-     * @return string UUID_v1
+     * @return string UUID
      */
     protected function get_issue_uuid() {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/simplecertificate/lib/lib.uuid.php');
-        $uuid = UUID::mint(UUID::VERSION_1, self::CERTIFICATE_COMPONENT_NAME);
-        return $uuid->__toString();
+        require_once($CFG->libdir . '/horde/framework/Horde/Support/Uuid.php');
+        return (string)new Horde_Support_Uuid();
     }
 
     /**
@@ -1448,12 +1449,12 @@ class simplecertificate {
     }
 
     // Auto link filter puts links in the certificate text,
-    // and it's must be removed. See #111
+    // and it's must be removed. See #111.
     protected function remove_links($htmltext) {
         global $CFG;
         require_once($CFG->libdir.'/htmlpurifier/HTMLPurifier.safe-includes.php');
         require_once($CFG->libdir.'/htmlpurifier/locallib.php');
-    
+
         // This code is in weblib.php (purify_html function).
         $config = HTMLPurifier_Config::createDefault();
         $version = empty($CFG->version) ? 0 : $CFG->version;
@@ -1466,13 +1467,13 @@ class simplecertificate {
             $purifiers = array();
             $caches = array();
             gc_collect_cycles();
-    
+
             make_localcache_directory('htmlpurifier', false);
             check_dir_exists($cachedir);
         }
         $config->set('Cache.SerializerPath', $cachedir);
         $config->set('Cache.SerializerPermissions', $CFG->directorypermissions);
-        $config->set('HTML.ForbiddenElements', array('script','style','applet','a'));
+        $config->set('HTML.ForbiddenElements', array('script', 'style', 'applet', 'a'));
         $purifier = new HTMLPurifier($config);
         return $purifier->purify($htmltext);
     
@@ -1578,12 +1579,12 @@ class simplecertificate {
             $sql = "SELECT MAX(c.timecompleted) as timecompleted FROM {course_completions} c
                  WHERE c.userid = :userid AND c.course = :courseid";
 
-            if ($timecompleted = $DB->get_record_sql($sql, array('userid' => $issuecert->userid,
-              'courseid' => $this->get_course()->id)) && !empty($timecompleted->timecompleted)) {
-                    $date = $timecompleted->timecompleted;
-
+            $timecompleted = $DB->get_record_sql($sql, array('userid' => $issuecert->userid,
+                            'courseid' => $this->get_course()->id));
+            if ($timecompleted && !empty($timecompleted->timecompleted)) {
+                $date = $timecompleted->timecompleted;
             }
-            // Get the module grade date.
+        // Get the module grade date.
         } else if ($this->get_instance()->certdate > 0
             && $modinfo = $this->get_mod_grade($this->get_instance()->certdate, $issuecert->userid)) {
                 $date = $modinfo->dategraded;
@@ -1610,6 +1611,16 @@ class simplecertificate {
         if (empty($items)) {
             return '';
         }
+
+        //Sorting grade itens by sortorder
+        usort($items, function($a, $b) {
+            $a_sortorder = $a->sortorder;
+            $b_sortorder = $b->sortorder;
+            if ($a_sortorder == $b_sortorder) {
+                return 0;
+            }
+            return ($a_sortorder < $b_sortorder) ? -1 : 1;
+        });
 
         $retval = '';
         foreach ($items as $id => $item) {
@@ -1990,9 +2001,10 @@ class simplecertificate {
             $users = array_slice($users, intval($page * $perpage), $perpage);
 
             foreach ($users as $user) {
-                $chkbox = html_writer::checkbox('selectedusers[]', $user->id, false);
+                $user_cert = $this->get_issue($user);
                 $name = $OUTPUT->user_picture($user) . fullname($user);
-                $date = userdate($user->timecreated) . simplecertificate_print_issue_certificate_file($this->get_issue($user));
+                $chkbox = html_writer::checkbox('selectedusers[]', $user->id, false);
+                $date = userdate($user_cert->timecreated) . simplecertificate_print_issue_certificate_file($user_cert);
                 $code = $user->code;
                 $table->data[] = array($chkbox, $name, $date, $this->get_grade($user->id), $code);
             }
@@ -2062,6 +2074,9 @@ class simplecertificate {
 
                 case 'download':
                     $page = $perpage = 0;
+
+                    // Override $users param, if there is a selected users.
+                    $users = $this->get_issued_certificate_users($orderby, $groupmode);
 
                     // Calculate file name.
                     $filename = clean_filename($this->get_instance()->coursename . '-' .

@@ -631,4 +631,86 @@ class core_renderer extends \theme_boost\output\core_renderer {
 
         return $html;
     }
+
+    /**
+     * The standard tags (typically performance information and validation links,
+     * if we are in developer debug mode) that should be output in the footer area
+     * of the page. Designed to be called in theme layout.php files.
+     *
+     * @return string HTML fragment.
+     */
+    public function standard_footer_html() {
+        global $CFG, $SCRIPT;
+
+        $output = '<div class="plugins_standard_footer_html">';
+        if (during_initial_install()) {
+            return $output;
+        }
+
+        $pluginswithfunction = get_plugins_with_function('standard_footer_html', 'lib.php');
+        foreach ($pluginswithfunction as $plugins) {
+            foreach ($plugins as $function) {
+                if ($function === 'tool_mobile_standard_footer_html') {
+                    $output .= $this->get_mobileappurl();
+
+                    continue;
+                }
+
+                $output .= $function();
+            }
+        }
+
+        $output .= $this->unique_performance_info_token;
+        if ($this->page->devicetypeinuse == 'legacy') {
+            // The legacy theme is in use print the notification.
+            $output .= html_writer::tag('div', get_string('legacythemeinuse'), array('class' => 'legacythemeinuse'));
+        }
+
+        // Get links to switch device types (only shown for users not on a default device)
+        $output .= $this->theme_switch_links();
+
+        if (!empty($CFG->debugpageinfo)) {
+            $output .= '<div class="performanceinfo pageinfo">This page is: ' . $this->page->debug_summary() . '</div>';
+        }
+
+        if (debugging(null, DEBUG_DEVELOPER) and has_capability('moodle/site:config', context_system::instance())) {
+            // Add link to profiling report if necessary.
+            if (function_exists('profiling_is_running') && profiling_is_running()) {
+                $txt = get_string('profiledscript', 'admin');
+                $title = get_string('profiledscriptview', 'admin');
+                $url = $CFG->wwwroot . '/admin/tool/profiling/index.php?script=' . urlencode($SCRIPT);
+                $link = '<a title="' . $title . '" href="' . $url . '">' . $txt . '</a>';
+                $output .= '<div class="profilingfooter">' . $link . '</div>';
+            }
+            $purgeurl = new moodle_url('/admin/purgecaches.php', array('confirm' => 1,
+                'sesskey' => sesskey(), 'returnurl' => $this->page->url->out_as_local_url(false)));
+            $output .= '<div class="purgecaches">' .
+                html_writer::link($purgeurl, get_string('purgecaches', 'admin')) . '</div>';
+        }
+
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    /**
+     * Returns the mobile app url
+     *
+     * @return string
+     *
+     * @throws \coding_exception
+     */
+    private function get_mobileappurl() {
+        global $CFG;
+        $output = '';
+        if (!empty($CFG->enablemobilewebservice) && $url = tool_mobile_create_app_download_url()) {
+            $url = html_writer::link($url,
+                                "<i class='icon-screen-smartphone'></i> ".get_string('getmoodleonyourmobile', 'tool_mobile'),
+                                     ['class' => 'btn btn-primary']);
+
+            $output .= html_writer::div($url, 'mobilefooter mb-2');
+        }
+
+        return $output;
+    }
 }

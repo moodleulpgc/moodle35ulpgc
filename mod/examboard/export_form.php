@@ -69,14 +69,14 @@ class examboard_export_form extends moodleform {
         $mform->addElement('header', 'exportfields', get_string('exportfields', 'examboard'));
         
         $grouparray = array();
-            $grouparray[] =& $mform->createElement('static','fixed', '', implode(', ', $mandatory));  
-            $grouparray[] =& $mform->createElement('advcheckbox','useridnumber', '', get_string('useridnumber', 'examboard'));
-        $group = $mform->addGroup($grouparray, 'fixedfielsdgroup', get_string('fixedfields', 'examboard'), array('  '), false);
+            $grouparray[] =& $mform->createElement('static','fixed', ' ', implode(',&nbsp;  ', $mandatory));  
+            $grouparray[] =& $mform->createElement('advcheckbox','useridnumber', get_string('useridnumber', 'examboard') , ' ');
+        $group = $mform->addGroup($grouparray, 'fixedfielsdgroup', get_string('fixedfields', 'examboard'), array(' &nbsp; '), false);
         $mform->addHelpButton('fixedfielsdgroup', 'fixedfields', 'examboard');
 
         $grouparray = array();
         foreach($optional as $key => $field) {
-            $grouparray[] =& $mform->createElement('advcheckbox', $key, ' ', $field, array('group' => 1));
+            $grouparray[] =& $mform->createElement('advcheckbox', $key, $field, ' ', array('group' => 1));
         }
         $group = $mform->addGroup($grouparray, 'optionalfieldgroup', get_string('optionalfields', 'examboard'), array('  '), false);
         //$this->add_checkbox_controller(1);

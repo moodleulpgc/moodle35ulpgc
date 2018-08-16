@@ -12,8 +12,8 @@
 }
 
 @media (max-width: 767px) {
-  #page-navbar .breadcrumb li:first-of-type > * {
-      font-size: .7375rem;
+  h1 {
+    font-size: 1.634375rem;
   }
 
   #nav-drawer .metismenu .has-arrow {
@@ -85,7 +85,6 @@
           }
 
           &:hover {
-            width: 260px;
             background-color: $navbar-bg-hover;
 
             &[data-key="mycourses"] {
@@ -93,11 +92,7 @@
             }
 
             a .text {
-              display: inline-block;
-            }
-
-            .text {
-              margin-left: 4px;
+              display: none;
             }
 
             > ul {
@@ -222,6 +217,21 @@
 
     .title {
       font-size: 1.6rem;
+    }
+  }
+
+  #page-course-view-topics {
+    .course-content {
+      .topics {
+        .card {
+          .pgr-img {
+            display: none !important;
+          }
+          .pgr-content {
+            width: 100% !important;
+          }
+        }
+      }
     }
   }
 }

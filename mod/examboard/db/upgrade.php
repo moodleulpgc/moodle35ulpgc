@@ -144,12 +144,7 @@ function xmldb_examboard_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018032504, 'examboard');   
     }
     
-    if ($oldversion < 2018032505) {
-        upgrade_mod_savepoint(true, 2018032505, 'examboard');   
-    }
-    
-    
-    if ($oldversion < 2018032506) {
+    if ($oldversion < 2018080600) {
         // Define table examboard to be modified
         $table = new xmldb_table('examboard');
         
@@ -169,14 +164,6 @@ function xmldb_examboard_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
     
-        upgrade_mod_savepoint(true, 2018032506, 'examboard');   
-    }
-    
-    
-    if ($oldversion < 2018032507) {
-        // Define table examboard to be modified
-        $table = new xmldb_table('examboard');
-
         $field = new xmldb_field('examgroups', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'usetutors');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -186,9 +173,8 @@ function xmldb_examboard_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-
     
-        upgrade_mod_savepoint(true, 2018032507, 'examboard');   
+        upgrade_mod_savepoint(true, 2018080600, 'examboard');   
     }
 
     

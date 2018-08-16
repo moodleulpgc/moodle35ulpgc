@@ -23,3 +23,4 @@
  */
 
 $string['pluginname'] = 'Adaptive mode (multi-part questions)';
+$string['privacy:metadata'] = 'The Adaptive mode (multi-part questions) plugin does not store any personal data.';

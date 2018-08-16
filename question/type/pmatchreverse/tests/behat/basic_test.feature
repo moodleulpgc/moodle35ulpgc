@@ -1,5 +1,5 @@
-@ou @ou_vle @qtype @qtype_pmatchrevers @_switch_window @javascript
-Feature: Test all the basic functionality of this question type
+@ou @ou_vle @qtype @qtype_pmatchreverse @_switch_window @javascript
+Feature: Test all the basic functionality of pmatchreverse question type
   In order train people about the pmatch syntax
   As a trainer
   I need to create and preview reverse pattern match questions.
@@ -15,7 +15,7 @@ Feature: Test all the basic functionality of this question type
       | user    | course | role           |
       | teacher | C1     | editingteacher |
     And I log in as "teacher"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Question bank" node in "Course administration"
 
   Scenario: Create, edit then preview a reverse pattern match question.

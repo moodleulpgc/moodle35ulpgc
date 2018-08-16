@@ -115,8 +115,9 @@ if($ulpgc = get_config('local_ulpgccore')) {
 /*
 print_object($_POST);
 print_object($_GET);
+
+die();
 */
-//die();
 
 // actions not requiring interface form
 $actions = array('examhide', 'userup', 'userdown', 'reorder');
@@ -182,6 +183,7 @@ if(is_subclass_of($mform, 'moodleform')) {
         
         if($action == 'addexam' || $action == 'updateexam') {
             $message = examboard_process_add_update_exam($examboard->id, $fromform);
+            $returnurl->remove_params('view', 'item');
 
         } elseif($action == 'editmembers') {
             $message = examboard_process_editmembers($examboard, $fromform);
@@ -215,7 +217,7 @@ if(is_subclass_of($mform, 'moodleform')) {
             
         } elseif(($action == 'deleteuser') && ($fromform->confirmed == 'deleteuser')) {
             // OK, delete it
-            $success = examboard_remove_user_from_exam($fromform->exam, $fromform->user);
+            $success = examboard_remove_user_from_exam($examboard, $fromform->exam, $fromform->user);
             if($success) {
                 $message = get_string('deletedexaminees', 'examboard', 1);
             } else {
@@ -226,7 +228,7 @@ if(is_subclass_of($mform, 'moodleform')) {
             $users = examboard_get_exam_examinees($fromform->exam);
             $deleted = 0;
             foreach($users as $examinee) {
-                if(examboard_remove_user_from_exam($fromform->exam, $examinee->userid)) {
+                if(examboard_remove_user_from_exam($examboard, $fromform->exam, $examinee->userid)) {
                     $deleted++;
                 }
             }
@@ -276,7 +278,10 @@ if(is_subclass_of($mform, 'moodleform')) {
             } else {
                 $returnurl->remove_params('view', 'item');
             }
-            
+        } elseif($action == 'allocateboard') {
+            $message = examboard_process_allocateboard($examboard, $fromform);
+        } elseif($action == 'allocateusers') {
+            $message = examboard_process_allocateusers($examboard, $fromform);
         } else {
             print_object($_POST);
             

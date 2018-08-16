@@ -37,76 +37,34 @@ require_once($CFG->dirroot . '/mod/examboard/locallib.php');
 class user_observers {
 
     /**
-     * A user has been assigned as tutor
+     * A user has been assigned/unassigned as tutor or student
      *
      * @param \core\event\base $event The event.
      * @return void
      */
-    public static function tutor_assigned($event) {
-        
+    public static function synch_exam($event) {
+        global $DB;
+        $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']);
+        $exam = examboard_get_exam_with_board($event->objectid); 
+        if($examboard && $exam) {
+            examboard_synchronize_groups($examboard, $exam);
+            examboard_synchronize_gradeables($examboard, $exam, false); 
+        }
     }
 
-    /**
-     * A user has been unassigned as tutor
-     *
-     * @param \core\event\base $event The event.
-     * @return void
-     */
-    public static function tutor_unassigned($event) {
-        
-    }
-    
     /**
      * A user has been assigned as board member
      *
      * @param \core\event\base $event The event.
      * @return void
      */
-    public static function member_assigned($event) {
-        
-    }
-    
-    /**
-     * A user has been unassigned as board member
-     *
-     * @param \core\event\base $event The event.
-     * @return void
-     */
-    public static function member_unassigned($event) {
-        
-    }
-
-    
-    
-    
-    
-    /**
-     * A course reset has ended.
-     *
-     * @param \core\event\base $event The event.
-     * @return void
-     */
-    public static function course_reset_ended($event) {
-        if (!empty(self::$resetinprogress)) {
-            if (!empty($event->other['reset_options']['reset_groups_remove'])) {
-                examboard_process_group_deleted_in_course($event->courseid);
+    public static function synch_board($event) {
+        $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']);
+        if($examboard && $exams = examboard_get_board_exams($event->objectid, $event->other['examboardid'], false)) {
+            foreach($exams as $exam) {
+                examboard_synchronize_groups($examboard, $exam);
+                examboard_synchronize_gradeables($examboard, $exam, false); 
             }
         }
-
-        self::$resetinprogress = null;
-    }
-
-    /**
-     * A group was deleted.
-     *
-     * @param \core\event\base $event The event.
-     * @return void
-     */
-    public static function group_deleted($event) {
-        if (!empty(self::$resetinprogress)) {
-            // We will take care of that once the course reset ends.
-            return;
-        }
-        examboard_process_group_deleted_in_course($event->courseid, $event->objectid);
     }
 }

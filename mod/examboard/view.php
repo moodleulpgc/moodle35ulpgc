@@ -34,7 +34,7 @@ $itemid = optional_param('item', 0, PARAM_INT);     // ... item to view
 
 $groupid = optional_param('group', 0, PARAM_INT);
 $sort = optional_param('tsort', '', PARAM_ALPHANUMEXT);
-$order = optional_param('order', '', PARAM_ALPHANUMEXT);
+$fuser = optional_param('fuser', 0, PARAM_INT);
 $userorder = optional_param('uorder', 1, PARAM_INT); 
 
 if ($id) {
@@ -56,12 +56,12 @@ $context = context_module::instance($cm->id);
 // set url params 
 $urlparams = array('id' => $cm->id);
 if($sort) {
-    //$urlparams['tsort'] = $sort;
+    $urlparams['tsort'] = $sort;
 }
-if($order) {
-   // $urlparams['order'] = $order;
+if($fuser) {
+   $urlparams['fuser'] = $fuser;
 }
-if(!$userorder) {
+if($userorder) {
     $urlparams['uorder'] = $userorder;
 }
 
@@ -157,7 +157,6 @@ if($view == 'board' && ($cangrade || $canmanage)) {
 
 } elseif($view == 'exam' && ($cangrade || $canmanage)) {
     $examination = \mod_examboard\examination::get_from_id($itemid);
-
     // regular users should acces only their own exam   
     if($canviewall || $canmanage || $examination->is_grader($USER->id)) {
         $examinees_table = new \mod_examboard\output\examinees_table($url, $examination, $examboard);
@@ -193,17 +192,12 @@ if($view == 'board' && ($cangrade || $canmanage)) {
     }
     
 } else {
-    //$examinations = examboard_get_user_exams($examboard, $currentgroup, $canviewall); 
-
-    //$exams_list_viewer = new examboard_exams_list_viewer($url, $examboard);
     $exams_list_viewer = new \mod_examboard\output\exams_table($url, $examboard);
     $exams_list_viewer->canmanage = $canmanage;
     $exams_list_viewer->cansubmit = has_capability('mod/examboard:submit', $context);
     $exams_list_viewer->cangrade = $examboard->grade &&  $cangrade;
     $exams_list_viewer->editurl = $editurl;
     $exams_list_viewer->canviewall = $canviewall || $canmanage;
-    //$exams_list_viewer->examinations = examboard_get_user_exams($examboard, $canviewall, $sort, $order, $groupid, true); 
-
     echo $renderer->view_exams($examboard, $cm, $exams_list_viewer);   
 }
 

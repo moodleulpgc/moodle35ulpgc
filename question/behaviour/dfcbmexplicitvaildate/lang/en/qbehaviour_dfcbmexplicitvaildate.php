@@ -23,3 +23,4 @@
  */
 
 $string['pluginname'] = 'Deferred feedback with CBM and explicit validation';
+$string['privacy:metadata'] = 'The Deferred feedback with CBM and explicit validation plugin does not store any personal data.';

@@ -249,6 +249,39 @@ $string['allocmodenone'] = 'Sin distribución automática';
 $string['allocmodemember'] = 'Distribuir examinadores dados estudiantes';
 $string['allocmodeuser'] = 'Distribuir estudiantes dados examinadores';
 $string['allocmodetutor'] = 'Distribuir estudiantes dados examinadores';
+$string['allocnumusers'] = 'Ubicados {$a} estudiantes';
+$string['allocnumexams'] = 'Asignados miembros en {$a} exámenes';
+$string['allocemptied'] = 'No quedan usuarios que ubicar';
+$string['allocprevious'] = 'Borrar existentes';
+$string['allocprevious_help'] = 'Si se activa, se eliminarán todas las asignaciones previas 
+antes de proceder a la distribución al azar de miembrs de tribunal.';
+$string['allocdeputy'] = 'Asignar sustitutos';
+$string['allocdeputy_help'] = 'Si se activa, además de los miembros titulares se asignará un sustituto en cada posición.';
+$string['allocrepeatable'] = 'Permitir repeticiones';
+$string['allocrepeatable_help'] = 'Si se activa, un usuario asignado en un Examen como miembro del Tribunal podrá ser ubicado también en otros exámenes diferentes.';
+$string['allocateboard'] = 'Ubicar miembros de Tribunal';
+$string['allocateboard_help'] = 'Los usuarios que se asignaran como miembros en cada posición se escogerán de entre los grupos indicados en cada caso. 
+
+Se pueden indicar los mismos grupos repetidos en varias posiciones, si se desea.';
+$string['allocateusers'] = 'Ubicar estudiantes';
+$string['allocateusers_help'] = 'Los usuarios de los grupos seleccionados serán asignados como estudiantes en los exámenes indicados.';
+$string['allocationsettings'] = 'Opciones de distribución';
+$string['allocatedexams'] = 'Exámenes diana';
+$string['allocatedexams_help'] = 'Los usuarios disponibles se asignarán al azar entre los exámenes seleccionados.';
+$string['examsallocated'] = 'Exámenes ubicados';
+$string['choosegroup'] = 'Grupos para posición {$a}';
+$string['allocatewarningboard'] = 'Los estudiantes pueden tener asignados tutores.
+Se tomarán medidas para evitar que la misma persona aparezca como miembro del Tribunal y tutor de un estudiante en el mismo examen.'; 
+$string['allocatewarningusers'] = 'Los estudiantes pueden tener asignados tutores.
+Los usuarios con capacidad para calificar existentes en un grupo serán considerados los tutores de los estudiantes de ese grupo. 
+La herramienta espera encontrar grupos que contengan solo estudiantes o bien grupos separados que contengan un tutor (o co-tutores) y los estudiantes que tutoriza (pero no otros).
+
+Se tomarán medidas para evitar que la misma persona aparezca como miembro del Tribunal y tutor de un estudiante en el mismo examen.'; 
+$string['sourcegroups'] = 'Grupos con estudiantes';
+$string['usersperexam'] = 'Estudiantes por examen';
+$string['usersperexam_help'] = 'El número máximo de estudiantes que será asignado a un Tribunal o Examen. 
+Los usuarios ya asignados antes de la ubicación aleatoria también serán tenidos en cuenta para este máximo. ';
+$string['nolimit'] = 'Sin límite';
 $string['requireconfirm'] = 'Requiere confirmación';
 $string['requireconfirm_help'] = 'Controla si los miembros del Tribunal deben confirmar su participación como examinadores. 
 Si se habilita, entonces se realizan comprobaciones y avisos adicionales para el Tribunal y los gestores.';
@@ -664,3 +697,4 @@ $string['visibility_explain'] = 'Los ítems ocultos estan inactivos, visibles s�
 $string['viewgradingdetails'] = 'Clic para ver detalles de la calificación por criterio.';
 $string['usergrades'] = 'User grades';
 $string['synchusers'] = 'Actualizar grupos y accesos';
+$string['foruser'] = 'Participante';

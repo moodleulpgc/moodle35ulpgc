@@ -40,8 +40,9 @@
     display: table-cell;
 }
 
-.examinee {
+.examinee, .usergrades {
     margin-bottom: 6px;
+    display: table:
 }
 
 .examineename {
@@ -80,4 +81,16 @@
 
 .path-mod-examboard .csverror {
     text-align: left;
+}
+
+.path-mod-examboard .mform textarea.form-control {
+    width: 100%;
+}
+
+.path-mod-examboard td .box.py-3 {
+    padding: 0 !important; 
+}
+
+.path-mod-examboard div.no-overflow  {
+    overflow: inherit;
 }

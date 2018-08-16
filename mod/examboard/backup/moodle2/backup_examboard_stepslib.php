@@ -59,6 +59,7 @@ class backup_examboard_activity_structure_step extends backup_activity_structure
                                                         'allocation',
                                                         'usetutors',
                                                         'examgroups',
+                                                        'groupingname',
                                                         'requireconfirm',
                                                         'notifyconfirm',
                                                         'confirmtime',

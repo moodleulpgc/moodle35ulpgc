@@ -29,9 +29,33 @@ defined('MOODLE_INTERNAL') || die();
 $observers = array(
 
     array(
-        'eventname' => '\mod_examboard\event\tutor_assigned',
-        'callback' => '\mod_examboard\user_observers::tutor_assigned',
-        'includefile' => '/mod/examboard/lib.php',
+        'eventname' => '\mod_examboard\event\tutor_updated',
+        'callback' => '\mod_examboard\user_observers::synch_exam',
+        'includefile' => '/mod/examboard/locallib.php',
         'internal' => false,
     ),
+
+    array(
+        'eventname' => '\mod_examboard\event\examinee_updated',
+        'callback' => '\mod_examboard\user_observers::synch_exam',
+        'includefile' => '/mod/examboard/locallib.php',
+        'internal' => false,
+    ),
+    
+    array(
+        'eventname' => '\mod_examboard\event\examinee_removed',
+        'callback' => '\mod_examboard\user_observers::synch_exam',
+        'includefile' => '/mod/examboard/locallib.php',
+        'internal' => false,
+    ),
+
+    array(
+        'eventname' => '\mod_examboard\event\member_updated',
+        'callback' => '\mod_examboard\user_observers::synch_board',
+        'includefile' => '/mod/examboard/locallib.php',
+        'internal' => false,
+    ),
+
+    
+    
 );

@@ -246,6 +246,39 @@ $string['allocmodenone'] = 'No automatic allocation';
 $string['allocmodemember'] = 'Allocate board members given students';
 $string['allocmodeuser'] = 'Allocate students given board members';
 $string['allocmodetutor'] = 'Allocate students given board members';
+$string['allocnumusers'] = 'Allocated {$a} examinees';
+$string['allocnumexams'] = 'Assigned Board members in {$a} exams';
+$string['allocemptied'] = 'No more users to allocate';
+$string['allocprevious'] = 'Erase previous';
+$string['allocprevious_help'] = 'If enabled, existing assignations will be deleted previously to random allocation.';
+$string['allocdeputy'] = 'Allocate deputies';
+$string['allocdeputy_help'] = 'If enabled, in addition to regular members other users will be allocated as deputy members.';
+$string['allocrepeatable'] = 'Allow repetitions';
+$string['allocrepeatable_help'] = 'If enabled, allocated users can be selected again in a separate exam.';
+$string['allocateboard'] = 'Allocate board members';
+$string['allocateboard_help'] = 'Users to fill each position in a Board will be selected from the designated groups. 
+You may repeat a group for several positions, if desired.';
+$string['allocateusers'] = 'Allocate examinees';
+$string['allocateusers_help'] = 'Users from the selected groups will be randomly assigned as examinees in the target exams.';
+$string['allocationsettings'] = 'Allocation settings';
+$string['allocatedexams'] = 'Target Exams';
+$string['allocatedexams_help'] = 'The available users will be distributed randomly into the selected exams.';
+$string['examsallocated'] = 'Exams allocated ';
+$string['choosegroup'] = 'Groups for position {$a}';
+$string['allocatewarningboard'] = 'Students may have tutors. 
+Provisions are taken to avoid assigning the same person as tutor and board member in the same exam '; 
+$string['allocatewarningusers'] = 'Students may have tutors. 
+Users with grading capability in a group will be considered as Tutors of eachs student in a group. 
+The tool expects to deal with separate groups that contain only a tutor (and co-tutors) and their tutorized students. 
+
+Provisions will be taken to avoid assigning an student to a board wher any of the students tutors may serve a board member role. 
+'; 
+$string['sourcegroups'] = 'Groups with examinees';
+$string['usersperexam'] = 'Examinees per exam';
+$string['usersperexam_help'] = 'The number of distinct examinees allocated to each exam. 
+The already assigned users will be taken into account.  ';
+$string['nolimit'] = 'as needed';
+
 $string['requireconfirm'] = 'Require confirmation';
 $string['requireconfirm_help'] = 'Controls if Committee members must confirm their participation as examimners. 
 If active then extra checks and warnings are issued to examboard managers.';
@@ -646,6 +679,7 @@ $string['visibility_explain'] = 'Hidden items are inactive, visible only for man
 $string['viewgradingdetails'] = 'Click to view grading details by criteria.';
 $string['usergrades'] = 'User grades';
 $string['synchusers'] = 'Update groups & access';
+$string['foruser'] = 'Participant';
 $string['event_board_viewed'] = 'Board viewed';
 $string['event_board_viewed_desc'] = 'The user with id \'{$a->userid}\' viewed the Board panel 
 with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
@@ -653,11 +687,23 @@ $string['event_exam_viewed'] = 'Board Exam viewed';
 $string['event_exam_viewed_desc'] = 'The user with id \'{$a->userid}\' viewed the Exam page 
 with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
 $string['event_member_updated'] = 'Board member updated';
-$string['event_member_updated_desc'] = 'The user with id \'{$a->userid}\' updated Board member \'{$a->relateduserid}\' in {$a->other}
-Board with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_member_updated_desc'] = 'The user with id \'{$a->userid}\' updated Board member \'{$a->relateduserid}\' in 
+Board with id \'{$a->objectid}\'  as sortorder {$a->other_sortorder} and deputy {$a->other_deputy} in activity with cm id \'{$a->cmid}\'.';
 $string['event_tutor_updated'] = 'Tutor updated';
 $string['event_tutor_updated_desc'] = 'The user with id \'{$a->userid}\' updated Tutor \'{$a->relateduserid}\' in 
-Exam with id \'{$a->objectid}\' for examinee {$a->other} in activity with cm id \'{$a->cmid}\'.';
+Exam with id \'{$a->objectid}\' for examinee {$a->other_examinee} in activity with cm id \'{$a->cmid}\'.';
+$string['event_examinee_removed'] = 'Tutor updated';
+$string['event_examinee_removed_desc'] = 'The user with id \'{$a->userid}\' removed examinee \'{$a->relateduserid}\' in 
+Exam with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_examinee_updated'] = 'Examinee updated';
+$string['event_examinee_updated_desc'] = 'The user with id \'{$a->userid}\' has updated examinee \'{$a->relateduserid}\' in 
+Exam with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_user_graded'] = 'Student graded';
+$string['event_user_graded_desc'] = 'The user with id \'{$a->userid}\' has graded student \'{$a->relateduserid}\' in 
+Exam with id \'{$a->other_exam}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_member_confirmed'] = 'Board member confirmed';
+$string['event_member_confirmed_desc'] = 'The user with id \'{$a->userid}\' confirmed participation on Exam with 
+id \'{$a->objectid}\'  in activity with cm id \'{$a->cmid}\'.';
 
 
 

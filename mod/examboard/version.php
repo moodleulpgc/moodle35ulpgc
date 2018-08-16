@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_examboard';
-$plugin->release = '1.2';
-$plugin->version = 2018032506;
+$plugin->release = '1.3';
+$plugin->version = 2018080600;
 $plugin->requires = 2016052300;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;
