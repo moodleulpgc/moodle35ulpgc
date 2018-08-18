@@ -85,6 +85,7 @@ class batchmanage_mod_config_form extends batchmanageform {
         $formclass = 'mod_'.$modselector->module.'_mod_form';
         $cm = get_coursemodule_from_id($modselector->module,$managejob->refmod_cmid);
         $modinfo = $managejob->get_modinfodata($cm);
+        
         $configform = new $formclass($modinfo, $modinfo->section, null, $refcourse);
         $configform->set_data($modinfo);
         
@@ -104,6 +105,9 @@ class batchmanage_mod_config_form extends batchmanageform {
             if($key && !$ignored) {
                 $element = $innerform->getElement($key);
                 $type = $element->getType();
+                
+                //print_object("key $key -> type: $type");
+                
                 if($type != 'hidden') {
                     if($type != 'header') {
                         $this->add_grouped_element($element, $key);
@@ -143,7 +147,6 @@ class batchmanage_mod_config_form extends batchmanageform {
         $element = $mform->createElement('select', 'roles', get_string('roles'), $rolechoices);
         $element->setMultiple(true);
         $this->add_grouped_element($element, 'roles');
-        
         
         $this->add_action_buttons(true, $next);
     }

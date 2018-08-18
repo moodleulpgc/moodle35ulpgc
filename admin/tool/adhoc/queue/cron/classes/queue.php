@@ -26,7 +26,7 @@
 namespace queue_cron;
 
 if (!class_exists("\\Pheanstalk\\Pheanstalk")) {
-    //require_once(dirname(__FILE__) . "/../vendor/autoload.php");
+    //require_once(dirname(__FILE__) . "/../vendor/autoload.php"); // ecastro ULPGC out
 }
 
 use Pheanstalk\Pheanstalk;

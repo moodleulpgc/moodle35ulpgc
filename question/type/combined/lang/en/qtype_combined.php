@@ -68,6 +68,7 @@ $string['err_unrecognisedqtype'] = 'The question type identifier \'{$a->qtype}\'
 \'{$a->fullcode}\'is not known.';
 $string['err_weightingsdonotaddup'] = 'Weightings for sub questions do not add up to 1.';
 $string['err_you_must_provide_third_param'] = 'You must provide a third param for question type {$a}.';
+$string['err_youneedmorechoices'] = 'You need to enter two or more choices.';
 $string['incorrectfeedback'] = 'Feedback for any incorrect response';
 $string['noembeddedquestions'] = 'You have deleted all embedded sub question elements from the question text!';
 $string['nosubquestiontypesinstalled'] = 'This question type allows for the combination of the functionality of other question
@@ -112,3 +113,4 @@ $string['weighting'] = 'Weighting';
 $string['widthspecifier_embed_code'] = '[[{$a->qid}:{$a->qtype}:{width specifier}]] or just [[{$a->qid}:{$a->qtype}]]';
 $string['yougotnright'] = '{$a->num} of your answers are correct.';
 $string['yougot1right'] = '1 of your answers is correct.';
+$string['privacy:metadata'] = 'The Combined plugin does not store any personal data.';

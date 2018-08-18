@@ -402,6 +402,7 @@ $string['partcheckedwithresult'] = '{$a} checked participants with result';
 $string['partcheckedwithoutresult'] = '<a href="{$a->url}">{$a->count} checked participants without result</a>';
 $string['partuncheckedwithresult'] = '<a href="{$a->url}">{$a->count} unchecked participants with result</a>';
 $string['partuncheckedwithoutresult'] = '{$a} unchecked participants without result';
+$string['partial'] = 'partial';
 $string['participantslist'] = 'List of participants';
 $string['participantslists'] = 'Participants';
 $string['participants'] = 'Participants';
@@ -489,6 +490,7 @@ $string['privacy:metadata:offlinequiz_hotspots:y'] = 'the y value of the hotspot
 $string['privacy:metadata:offlinequiz_hotspots:blank'] = 'If the hotspot is analyzed successfully';
 $string['privacy:metadata:offlinequiz_hotspots:time'] = 'the last update time for this hotspot';
 $string['privacy:metadata:offlinequiz_hotspots'] = 'This table saves all the positions of the boxes and if they are evaluated successfully.';
+$string['privacy:metadata:offlinequiz:papergray'] = 'The grayscale of this offlinequiz';
 $string['privacy:metadata:offlinequiz_page_corners:scannedpageid'] = 'The scannedpage this corner is on';
 $string['privacy:metadata:offlinequiz_page_corners:x'] = 'The x value of the corner';
 $string['privacy:metadata:offlinequiz_page_corners:y'] = 'The y value of the corner';
@@ -507,6 +509,7 @@ $string['privacy:metadata:offlinequiz_p_lists:name'] = 'the name of the particip
 $string['privacy:metadata:offlinequiz_p_lists:number'] = 'the number of the list in the offlinequiz';
 $string['privacy:metadata:offlinequiz_p_lists:filename'] = 'the name of the file for the list';
 $string['privacy:metadata:offlinequiz_p_lists'] = 'this table saves information about participants lists where the teachers can cross out, if a student was there or not';
+$string['privacy:metadata:offlinequiz_queue'] = 'This table saves a queue of an upload. For every upload there is an own object in this table';
 $string['privacy:metadata:offlinequiz_queue:offlinequizid'] = 'The offlinequiz id of the queue';
 $string['privacy:metadata:offlinequiz_queue:importuserid'] = 'The userid of the teacher who imported the files';
 $string['privacy:metadata:offlinequiz_queue:timecreated'] = 'The time this offlinequiz sheets were imported';
@@ -593,10 +596,10 @@ $string['questionsheetlatextemplate'] = '% !TEX encoding = UTF-8 Unicode
 
 % ===========================================================================================================
 %%% Course data:
-\newcommand{\Group}{A}
-\newcommand{\Title}{Test Course}
+\newcommand{\Group}{{$a->groupname}}
+\newcommand{\Title}{{$a->coursename}}
 \newcommand{\Date}
- 
+
 \newcommand{\TestTitle}{%
 \begin{center}
 {\bf \Large Questionnaire}\\\\[3mm]
@@ -609,9 +612,9 @@ Student ID: & $\underline{\hspace*{8cm}}$\\\\[5mm]
 \end{tabular}}
 \end{center}
 }
- 
+
 \InputIfFileExists{offline_test_extras.tex}{}{} % Input extra user definitions
- 
+
 \begin{document}
 
 
@@ -631,7 +634,7 @@ Student ID: & $\underline{\hspace*{8cm}}$\\\\[5mm]
 \newpage
 
 % ===========================================================================================================
- 
+
 
 {$a->latexforquestions}
 

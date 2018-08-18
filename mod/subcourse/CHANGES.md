@@ -1,3 +1,19 @@
+### 7.0.0 ###
+
+* Progress in the referenced course is displayed.
+* The main view page now provides links to the gradebook in the referenced course
+  instead of the link to the gradebook in the current course (issue #22).
+* Overall cleanup and UI improvements of the main view page.
+
+### 6.0.0 ###
+
+* Filters are applied displaying course names - credit goes to Philipp Hager
+* The "should be completed" event is displayed on the dashboard if expected completion
+  date/time is set.
+* Privacy API implemented to make it GDPR friendly. No personal data are stored by the
+  module itself.
+* Requires Moodle 3.3 or higher, updated tests for Moodle 3.5.
+
 ### 5.0.1 ###
 
 * Fixed a typo in the string (currrent -> current).

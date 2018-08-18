@@ -1,5 +1,5 @@
 @ou @ou_vle @qtype @qtype_combined
-Feature: Test all the basic functionality of this question type
+Feature: Test all the basic functionality of combined question type
   In order to evaluate students responses, As a teacher I need to
   create and preview combined (Combined) questions.
 
@@ -17,7 +17,7 @@ Feature: Test all the basic functionality of this question type
   @javascript
   Scenario: Create, edit and preview a combined question.
     Given I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I navigate to "Question bank" node in "Course administration"
     Then I press "Create a new question ..."
     And I set the field "Combined" to "1"
@@ -47,17 +47,20 @@ Feature: Test all the basic functionality of this question type
 
     # Multiresponse part.
     Then I follow "'multiresponse' input '3'"
+    And I click on "Expand all" "link"
+    And I press "Blanks for 3 more choices"
     And I set the following fields to these values:
-      | id_subqmultiresponse3defaultmark     | 25%      |
-      | id_subqmultiresponse3answer_0        | carbon   |
-      | id_subqmultiresponse3correctanswer_0 | 1        |
-      | id_subqmultiresponse3answer_1        | hydrogen |
-      | id_subqmultiresponse3correctanswer_1 | 1        |
-      | id_subqmultiresponse3answer_2        | oxygen   |
-      | id_subqmultiresponse3correctanswer_2 | 1        |
-      | id_subqmultiresponse3answer_3        | nitrogen |
-      | id_subqmultiresponse3answer_4        | fluorine |
-      | id_subqmultiresponse3answer_5        | chlorine |
+      | id_subqmultiresponse3defaultmark     | 25%                                              |
+      | id_subqmultiresponse3answer_0        | carbon                                           |
+      | id_subqmultiresponse3correctanswer_0 | 1                                                |
+      | id_subqmultiresponse3answer_1        | hydrogen                                         |
+      | id_subqmultiresponse3correctanswer_1 | 1                                                |
+      | id_subqmultiresponse3answer_2        | oxygen                                           |
+      | id_subqmultiresponse3correctanswer_2 | 1                                                |
+      | id_subqmultiresponse3answer_3        | nitrogen                                         |
+      | id_subqmultiresponse3answer_4        | fluorine                                         |
+      | id_subqmultiresponse3answer_5        | chlorine                                         |
+      | id_subqmultiresponse3answer_6        | <b>bromine</b>                                   |
       | id_subqmultiresponse3generalfeedback | Your choice of elements is not entirely correct. |
 
     # Selectmenu part.
@@ -92,6 +95,8 @@ Feature: Test all the basic functionality of this question type
     And I press "Start again with these options"
 
     # Attempt the question
+    # Test html editor for answer field in Combined MultiResponse.
+    And "//label/b[contains(text(), 'bromine')]" "xpath_element" should be visible
     And I set the field "Answer 1" to "2.88"
     And I set the field "Answer 2" to "ethanoic acid"
     And I set the field "Answer 4" to "Vinagrette"
@@ -142,17 +147,18 @@ Feature: Test all the basic functionality of this question type
       | id_subqpmatch2answer_0        | match_mw (ethanoic acid)           |
       | id_subqpmatch2generalfeedback | You have the incorrect IUPAC name. |
 
-      | id_subqmultiresponse3defaultmark     | 25%      |
-      | id_subqmultiresponse3answer_0        | carbon   |
-      | id_subqmultiresponse3correctanswer_0 | 1        |
-      | id_subqmultiresponse3answer_1        | hydrogen |
-      | id_subqmultiresponse3correctanswer_1 | 1        |
-      | id_subqmultiresponse3answer_2        | oxygen   |
-      | id_subqmultiresponse3correctanswer_2 | 1        |
-      | id_subqmultiresponse3answer_3        | nitrogen |
-      | id_subqmultiresponse3answer_4        | fluorine |
-      | id_subqmultiresponse3answer_5        | chlorine |
-      | id_subqmultiresponse3generalfeedback | Your choice of elements is not entirely correct. |
+      | id_subqmultiresponse3defaultmark     | 25%                                                                                                                                                                                                                                                         |
+      | id_subqmultiresponse3answer_0        | carbon                                                                                                                                                                                                                                                      |
+      | id_subqmultiresponse3correctanswer_0 | 1                                                                                                                                                                                                                                                           |
+      | id_subqmultiresponse3answer_1        | hydrogen                                                                                                                                                                                                                                                    |
+      | id_subqmultiresponse3correctanswer_1 | 1                                                                                                                                                                                                                                                           |
+      | id_subqmultiresponse3answer_2        | oxygen                                                                                                                                                                                                                                                      |
+      | id_subqmultiresponse3correctanswer_2 | 1                                                                                                                                                                                                                                                           |
+      | id_subqmultiresponse3answer_3        | nitrogen                                                                                                                                                                                                                                                    |
+      | id_subqmultiresponse3answer_4        | fluorine                                                                                                                                                                                                                                                    |
+      | id_subqmultiresponse3answer_5        | chlorine                                                                                                                                                                                                                                                    |
+      | id_subqmultiresponse3answer_6        | <b>bromine</b>                                                                                                                                                                                                                                              |
+      | id_subqmultiresponse3generalfeedback | Your choice of elements is not entirely correct.                                                                                                                                                                                                            |
 
       | id_subqselectmenu4defaultmark        | 25%           |
       | id_subqselectmenu4answer_0           | Wine          |
@@ -168,3 +174,47 @@ Feature: Test all the basic functionality of this question type
       | Question name | Edited question name |
     And I press "id_submitbutton"
     Then I should see "Edited question name"
+
+  @javascript
+  Scenario: Test pmatch combine question for convert and synonyms.
+    Given I log in as "teacher1"
+    When I am on "Course 1" course homepage
+    And I navigate to "Question bank" node in "Course administration"
+    And I press "Create a new question ..."
+    And I set the field "Combined" to "1"
+    And I press "Add"
+    And I should see "Adding a combined question"
+    And I set the field "Question name" to "Combined 001"
+    And I set the field "Question text" to "[[1:pmatch]]"
+    And I press "Verify the question text and update the form"
+    And I follow "'pmatch' input '1'"
+    And I set the following fields to these values:
+      | Weighting                           | 100%              |
+      | Check spelling of student           | No                |
+      | Answer                              | match(number ten) |
+      | Feedback for any incorrect response | General feedback  |
+      | Word                                | ten               |
+      | Synonyms                            | 10                |
+    And I press "Save changes and continue editing"
+    # Preview it.
+    And I follow "Preview"
+    # Check entering the correct answer.
+    And I switch to "questionpreview" window
+    And I set the field "Answer 1" to "number ten"
+    And I press "Submit and finish"
+    Then I should see "Your answer is correct."
+    # Check entering using synonyms feature.
+    When I press "Start again"
+    And I set the field "Answer 1" to "number 10"
+    And I press "Submit and finish"
+    Then I should see "Your answer is correct."
+    # Check entering using convert to space feature.
+    When I press "Start again"
+    And I set the field "Answer 1" to "number;ten"
+    And I press "Submit and finish"
+    Then I should see "Your answer is correct."
+    # Check entering incorrect answer.
+    When I press "Start again"
+    And I set the field "Answer 1" to "number_ten"
+    And I press "Submit and finish"
+    And I should see "Your answer is incorrect."

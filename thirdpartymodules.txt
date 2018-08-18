@@ -73,7 +73,7 @@ cd mod/vpl && git checkout v3.3.3 && cd ../../
 git submodule add  https://github.com/bostelm/moodle-assignfeedback_solutionsheet.git   mod/assign/feedback/solutionsheet
 git submodule add  https://github.com/geogebra/moodle-assignsubmission_geogebra.git         mod/assign/submission/geogebra
 git submodule add  https://github.com/mouneyrac/moodle-assignsubmission_gradereviews.git    mod/assign/submission/gradereviews
-git submodule add  https://github.com/MaharaProject/moodle-assignsubmission_mahara.git      mod/assign/submission/
+git submodule add  https://github.com/MaharaProject/moodle-assignsubmission_mahara.git          mod/assign/submission/mahara
 
 #mod Book plugins
 git submodule add  https://github.com/ecampbell/moodle-booktool_wordimport.git          mod/book/tool/wordimport
@@ -82,6 +82,8 @@ git submodule add  https://github.com/ecampbell/moodle-booktool_wordimport.git  
 git submodule add https://github.com/IITBombayWeb/moodle-quiz_downloadsubmissions.git   mod/quiz/report/downloadsubmissions
 git submodule add https://github.com/moodleou/moodle-quiz_gradingstudents.git           mod/quiz/report/gradingstudents
 git submodule add https://github.com/moodleou/moodle-quizaccess_honestycheck.git        mod/quiz/accessrule/honestycheck
+git submodule add https://github.com/timhunt/moodle-quizaccess_offlinemode              mod/quiz/accessrule/offlinemode
+git submodule add https://github.com/catalyst/moodle-quizaccess_passgrade               mod/quiz/accessrule/passgrade
 git submodule add https://github.com/moodleou/moodle-quizaccess_safeexambrowser.git     mod/quiz/accessrule/safeexambrowser  
 git submodule add https://github.com/daveyboond/moodle-quiz_mcq.git                     mod/quiz/report/mcq
 git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
@@ -103,7 +105,8 @@ cd lib/editor/atto/plugins/cloze && git checkout 11STABLE && cd ../../../../../
 
 git submodule add https://github.com/damyon/moodle-atto_count.git                   lib/editor/atto/plugins/count
 git submodule add https://github.com/andrewnicols/moodle-atto_fontsize              lib/editor/atto/plugins/fontsize
-git submodule add https://github.com/damyon/moodle-atto_count.git                   lib/editor/atto/plugins/count
+git submodule add https://github.com/dthies/moodle-atto_fullscreen                  lib/editor/atto/plugins/fullscreen
+git submodule add https://github.com/justinhunt/moodle-atto_generico.git            lib/editor/atto/plugins/generico
 git submodule add https://github.com/damyon/moodle-atto_hr.git                      lib/editor/atto/plugins/hr
 git submodule add https://github.com/ndunand/moodle-atto_morebackcolors.git         lib/editor/atto/plugins/morebackcolors
 git submodule add https://github.com/ndunand/moodle-atto_morefontcolors.git         lib/editor/atto/plugins/morefontcolors
@@ -162,8 +165,8 @@ git submodule add https://github.com/gjb2048/moodle-format_topcoll.git          
 git submodule add https://github.com/emeneo/moodle-enrol_apply.git          enrol/apply
 git submodule add https://github.com/ndunand/moodle-enrol_attributes.git    enrol/attributes
 git submodule add https://github.com/bobopinna/moodle-enrol_autoenrol.git   enrol/autoenrol
+git submodule add https://github.com/moodlehq/moodle-enrol_groupsync.git    enrol/groupsync
 git submodule add https://github.com/emeneo/moodle-enrol_waitlist.git       enrol/waitlist  
-
 
 #Filters
 git submodule add https://github.com/eberhardt/moodle-filter_collapsible.git        filter/collapsible
@@ -173,6 +176,7 @@ git submodule add https://github.com/gthomas2/moodle-filter_imageopt.git        
 git submodule add https://github.com/geoffrowland/moodle-filter_jmol.git            filter/jmol
 git submodule add https://github.com/frederic-nevers/moodle-filter_multiembed.git   filter/multiembed
 git submodule add https://github.com/JosePFs/moodle-filter_tabs.git                 filter/tabs
+git submodule add https://github.com/justinhunt/moodle-filter_generico.git          filter/generico
 
 #Advanced  Grading methods
 git submodule add  https://github.com/marcusgreen/moodle-gradingform_btec.git       grade/grading/form/btec
@@ -206,8 +210,11 @@ git submodule add https://github.com/maths/moodle-qformat_stack.git         ques
 
 #Question types
 git submodule add https://github.com/jmvedrine/moodle-qtype_algebra.git     question/type/algebra
-git submodule add https://github.com/moodleou/moodle-qtype_combined.git     question/type/combined
 git submodule add https://github.com/trampgeek/moodle-qtype_coderunner.git  question/type/coderunner
+git submodule add https://github.com/moodleou/moodle-qtype_combined.git     question/type/combined
+git submodule add https://github.com/villalon/qtype_conceptmap.git          question/type/conceptmap
+git submodule add https://github.com/cleblond/moodle-qtype_easyofischer     question/type/easyofischer
+git submodule add https://github.com/gbateson/moodle-qtype_essayautograde.git question/type/essayautograde
 git submodule add https://github.com/jmvedrine/moodle-qtype_formulas.git    question/type/formulas
 git submodule add https://github.com/marcusgreen/moodle-qtype_gapfill.git   question/type/gapfill
 git submodule add https://github.com/geogebra/moodle-qtype_geogebra.git     question/type/geogebra

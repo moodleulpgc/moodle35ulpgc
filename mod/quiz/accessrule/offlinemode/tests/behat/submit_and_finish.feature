@@ -26,7 +26,7 @@ Feature: Fault-tolerant mode submit only leaves if the submit works
     And quiz "Quiz fault-tolerant" contains the following questions:
       | Question A | 1 |
     And I log in as "student"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Quiz fault-tolerant"
     And I press "Attempt quiz now"
     And I click on "True" "radio" in the "#q1" "css_element"
@@ -50,4 +50,4 @@ Feature: Fault-tolerant mode submit only leaves if the submit works
     And "Submit all and finish" "button" should be visible
     And "save the responses" "link" should be visible
     # Now successfully navigate away, or the following test will fail.
-    And I click on "Miscellaneous" "link" confirming the dialogue
+    And I click on "C1" "link" confirming the dialogue

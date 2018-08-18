@@ -80,6 +80,11 @@ function subcourse_add_instance(stdClass $subcourse) {
         subcourse_grades_update($subcourse->course, $newid, $subcourse->refcourse, $subcourse->name, true);
     }
 
+    if (!empty($subcourse->completionexpected)) {
+        \core_completion\api::update_completion_date_event($subcourse->coursemodule, 'subcourse', $newid,
+            $subcourse->completionexpected);
+    }
+
     return $newid;
 }
 
@@ -109,14 +114,14 @@ function subcourse_update_instance(stdClass $subcourse) {
 
     $DB->update_record('subcourse', $subcourse);
 
-    $subcourse = $DB->get_record('subcourse', array('id' => $subcourse->id));
-
     if (!empty($subcourse->refcourse)) {
         if (has_capability('mod/subcourse:fetchgrades', context_module::instance($cmid))) {
             subcourse_grades_update($subcourse->course, $subcourse->id, $subcourse->refcourse, $subcourse->name);
             subcourse_update_timefetched($subcourse->id);
         }
     }
+
+    \core_completion\api::update_completion_date_event($cmid, 'subcourse', $subcourse->id, $subcourse->completionexpected);
 
     return true;
 }
@@ -240,8 +245,26 @@ function subcourse_scale_used_anywhere($scaleid) {
  * @return void
  */
 function mod_subcourse_cm_info_view(cm_info $cm) {
-    global $CFG, $USER;
+    global $CFG, $USER, $DB;
     require_once($CFG->libdir.'/gradelib.php');
+
+    $html = '';
+
+    $sql = "SELECT r.*
+              FROM {course} r
+              JOIN {subcourse} s ON s.refcourse = r.id
+             WHERE s.id = :subcourseid";
+
+    $refcourse = $DB->get_record_sql($sql, ['subcourseid' => $cm->instance], IGNORE_MISSING);
+
+    if ($refcourse) {
+        $percentage = \core_completion\progress::get_course_progress_percentage($refcourse);
+        if ($percentage !== null) {
+            $percentage = floor($percentage);
+            $html .= html_writer::tag('div', get_string('currentprogress', 'subcourse', $percentage),
+                ['class' => 'contentafterlink']);
+        }
+    }
 
     $currentgrade = grade_get_grades($cm->course, 'mod', 'subcourse', $cm->instance, $USER->id);
 
@@ -249,10 +272,13 @@ function mod_subcourse_cm_info_view(cm_info $cm) {
         $currentgrade = reset($currentgrade->items[0]->grades);
         if (isset($currentgrade->grade) and !($currentgrade->hidden)) {
             $strgrade = $currentgrade->str_grade;
-            $html = html_writer::tag('div', get_string('currentgrade', 'subcourse', $strgrade),
-                array('class' => 'contentafterlink'));
-            $cm->set_after_link($html);
+            $html .= html_writer::tag('div', get_string('currentgrade', 'subcourse', $strgrade),
+                ['class' => 'contentafterlink']);
         }
+    }
+
+    if ($html !== '') {
+        $cm->set_after_link($html);
     }
 }
 
@@ -285,4 +311,26 @@ function subcourse_get_completion_state($course, $cm, $userid, $type) {
     $coursecompletion = new completion_completion(['userid' => $userid, 'course' => $subcourse->refcourse]);
 
     return $coursecompletion->is_complete();
+}
+
+/**
+ * Return the action associated with the given calendar event, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_subcourse_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
+
+    $cm = get_fast_modinfo($event->courseid)->instances['subcourse'][$event->instance];
+
+    return $factory->create_instance(
+        get_string('view'),
+        new \moodle_url('/mod/subcourse/view.php', ['id' => $cm->id]),
+        1,
+        true
+    );
 }

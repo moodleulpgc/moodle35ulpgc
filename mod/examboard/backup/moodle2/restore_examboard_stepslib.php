@@ -269,4 +269,5 @@ class restore_examboard_activity_structure_step extends restore_activity_structu
         if($examboard->gradeable || $examboard->proposal || $examboard->defense) {
             examboard_synchronize_gradeables($examboard);
         }
+    }
 }

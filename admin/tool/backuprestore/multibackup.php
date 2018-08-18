@@ -339,7 +339,6 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                         $results = $bc->get_results();
                         $file = $results['backup_destination'];
                         $dir = $CFG->dataroot.'/'.$backup_options->backupdir;
-                        //print_object("dir: $dir");
                         if (!file_exists($dir) || !is_dir($dir) || !is_writable($dir)) {
                             $dir = null;
                         }

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #Local plugins
 git submodule add https://github.com/catalyst/moodle-local_csp.git                  local/csp
 git submodule add https://github.com/moodleuulm/moodle-local_boostnavigation.git    local/boostnavigation
@@ -74,7 +73,7 @@ cd mod/vpl && git checkout v3.3.3 && cd ../../
 git submodule add  https://github.com/bostelm/moodle-assignfeedback_solutionsheet.git       mod/assign/feedback/solutionsheet
 git submodule add  https://github.com/geogebra/moodle-assignsubmission_geogebra.git         mod/assign/submission/geogebra
 git submodule add  https://github.com/mouneyrac/moodle-assignsubmission_gradereviews.git    mod/assign/submission/gradereviews
-git submodule add  https://github.com/MaharaProject/moodle-assignsubmission_mahara          mod/assign/submission/mahara
+git submodule add  https://github.com/MaharaProject/moodle-assignsubmission_mahara.git          mod/assign/submission/mahara
 
 #mod Book plugins
 git submodule add  https://github.com/ecampbell/moodle-booktool_wordimport.git          mod/book/tool/wordimport
@@ -87,6 +86,8 @@ git submodule add https://github.com/timhunt/moodle-quizaccess_offlinemode      
 git submodule add https://github.com/catalyst/moodle-quizaccess_passgrade               mod/quiz/accessrule/passgrade
 git submodule add https://github.com/moodleou/moodle-quizaccess_safeexambrowser.git     mod/quiz/accessrule/safeexambrowser  
 git submodule add https://github.com/daveyboond/moodle-quiz_mcq.git                     mod/quiz/report/mcq
+git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
+git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
 #branch master
 cd mod/quiz/report/mcq && git checkout master && cd ../../../../
 
@@ -116,7 +117,6 @@ git submodule add https://github.com/moodleuulm/moodle-atto_styles.git          
 git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git           lib/editor/atto/plugins/wordimport
 git submodule add https://github.com/moodleuulm/moodle-atto_styles.git              lib/editor/atto/plugins/styles
 git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git           lib/editor/atto/plugins/wordimport
-
 
 #Admin tools
 git submodule add https://github.com/unikent/moodle-tool_adhoc.git                      admin/tool/adhoc
@@ -212,8 +212,9 @@ git submodule add https://github.com/maths/moodle-qformat_stack.git         ques
 git submodule add https://github.com/jmvedrine/moodle-qtype_algebra.git     question/type/algebra
 git submodule add https://github.com/trampgeek/moodle-qtype_coderunner.git  question/type/coderunner
 git submodule add https://github.com/moodleou/moodle-qtype_combined.git     question/type/combined
-git submodule add https://github.com/villalon/qtype_conceptmap              question/type/conceptmap
+git submodule add https://github.com/villalon/qtype_conceptmap.git          question/type/conceptmap
 git submodule add https://github.com/cleblond/moodle-qtype_easyofischer     question/type/easyofischer
+git submodule add https://github.com/gbateson/moodle-qtype_essayautograde.git question/type/essayautograde
 git submodule add https://github.com/jmvedrine/moodle-qtype_formulas.git    question/type/formulas
 git submodule add https://github.com/marcusgreen/moodle-qtype_gapfill.git   question/type/gapfill
 git submodule add https://github.com/geogebra/moodle-qtype_geogebra.git     question/type/geogebra

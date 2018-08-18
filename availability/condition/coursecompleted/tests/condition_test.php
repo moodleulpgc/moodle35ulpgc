@@ -33,7 +33,7 @@ use availability_coursecompleted\condition;
  * @copyright 2017 eWallah.net (info@eWallah.net)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class availability_coursecompleted_condition_testcase extends advanced_testcase {
+class testcase extends advanced_testcase {
 
     /**
      * Load required classes.
@@ -183,6 +183,13 @@ class availability_coursecompleted_condition_testcase extends advanced_testcase 
         $this->assertFalse($cond->is_available(true, $info, false, $user->id));
         $this->assertTrue($cond->is_available(false, $info, false, $user->id));
         $this->assertTrue($cond->is_available(false, $info, true, $user->id));
+        // No id.
+        $cond = new condition((object)['type' => 'coursecompleted']);
+        $this->assertFalse($cond->is_available(false, $info, false, $user->id));
+        $this->assertFalse($cond->is_available_for_all());
+        $this->assertFalse($cond->update_dependency_id(null, 1, 2));
+        $this->assertEquals($cond->__toString(), '{coursecompleted:False}');
+        $this->assertEquals($cond->get_standalone_description(true, true, $info), 'Not available unless: ');
     }
 
     /**
