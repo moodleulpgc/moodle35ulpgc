@@ -27,7 +27,7 @@
 $string['supervision:view'] = 'View supervision report';
 $string['supervision:edit'] = 'Edit supervision warnings';
 $string['eventreportviewed'] = 'Informe de Supervisión visto';
-
+$string['privacy:metadata'] = 'El Informe de Supervisión sólo muestra datos almacenados en otros plugins.';
 $string['log:view'] = 'View course supervision report';
 $string['log:viewall'] = 'View all supervision reports';
 $string['page-report-log-x'] = 'Any supervision report';

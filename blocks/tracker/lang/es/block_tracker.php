@@ -3,7 +3,7 @@
 
 $string['blocktitle'] = 'Administración TF';
 $string['pluginname'] = 'Avisos de Administración';
-
+$string['privacy:metadata'] = 'El bloque Avisos de Administración sólo muestrra datos almacenados en otros plugins.';
 $string['status'] = 'Estado';
 $string['configstatus'] = 'El bloque presentará todas las incidencias con estado menor o igual a éste.';
 

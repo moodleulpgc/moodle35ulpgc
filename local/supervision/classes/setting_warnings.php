@@ -22,11 +22,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_supervision;
+
+use core_text, html_writer, html_table, moodle_url;
+ 
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/adminlib.php");
 
-class local_supervision_setting_warnings extends admin_setting {
+class setting_warnings extends \admin_setting {
     /**
      * Calls parent::__construct with specific arguments
      */
@@ -97,7 +101,7 @@ class local_supervision_setting_warnings extends admin_setting {
      * @return string
      */
     public function output_html($data, $query = '') {
-        global $OUTPUT, $PAGE;
+        global $CFG, $OUTPUT, $PAGE;
 
         // Display strings.
         $strup = get_string('up');
@@ -108,8 +112,8 @@ class local_supervision_setting_warnings extends admin_setting {
         $struninstall = get_string('uninstallplugin', 'core_admin');
         $strversion = get_string('version');
 
-        $pluginmanager = core_plugin_manager::instance();
-        $available = \core_plugin_manager::instance()->get_installed_plugins('supervisionwarning'); //\core_component::get_plugin_list_with_class('supervisionwarning', 'supervision\supervisionwarning');
+        $pluginmanager = \core_plugin_manager::instance();
+        $available = $pluginmanager->get_installed_plugins('supervisionwarning'); //\core_component::get_plugin_list_with_class('supervisionwarning', 'supervision\supervisionwarning');
         $enabled = get_config('local_supervision', 'enabled_warnings');
         if (!$enabled) {
             $enabled = array();
@@ -146,6 +150,7 @@ class local_supervision_setting_warnings extends admin_setting {
         $printed = array();
         foreach ($allwarnings as $warning => $unused) {
             $plugininfo = $pluginmanager->get_plugin_info('supervisionwarning_'.$warning);
+            
             $version = get_config('supervisionwarning_'.$warning, 'version');
             if ($version === false) {
                 $version = '';
@@ -160,15 +165,13 @@ class local_supervision_setting_warnings extends admin_setting {
             // Hide/show links.
             if (isset($enabled[$warning])) {
                 $aurl = new moodle_url($url, array('action' => 'disable', 'warning' => $warning));
-                $hideshow = "<a href=\"$aurl\">";
-                $hideshow .= "<img src=\"" . $OUTPUT->pix_url('t/hide') . "\" class=\"iconsmall\" alt=\"$strdisable\" /></a>";
+                $hideshow = html_writer::link($aurl, $OUTPUT->pix_icon('t/hide', $strdisable, 'moodle', array('class'=>'iconsmall', 'title'=>$strdisable))); 
                 $isenabled = true;
                 $displayname = "<span>$name</span>";
             } else {
                 if (isset($available[$warning])) {
                     $aurl = new moodle_url($url, array('action' => 'enable', 'warning' => $warning));
-                    $hideshow = "<a href=\"$aurl\">";
-                    $hideshow .= "<img src=\"" . $OUTPUT->pix_url('t/show') . "\" class=\"iconsmall\" alt=\"$strenable\" /></a>";
+                    $hideshow = html_writer::link($aurl, $OUTPUT->pix_icon('t/show', $strenable, 'moodle', array('class'=>'iconsmall', 'title'=>$strenable))); 
                     $isenabled = false;
                     $displayname = "<span class=\"dimmed_text\">$name</span>";
                 } else {
@@ -188,17 +191,16 @@ class local_supervision_setting_warnings extends admin_setting {
             if ($isenabled) {
                 if ($updowncount > 1) {
                     $aurl = new moodle_url($url, array('action' => 'up', 'warning' => $warning));
-                    $updown .= "<a href=\"$aurl\">";
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('t/up') . "\" alt=\"$strup\" class=\"iconsmall\" /></a>&nbsp;";
+                    $updown .= html_writer::link($aurl, $OUTPUT->pix_icon('t/up', $strup, 'moodle', array('class'=>'iconsmall', 'title'=>$strup))); 
                 } else {
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('spacer') . "\" class=\"iconsmall\" alt=\"\" />&nbsp;";
+                    $updown .= $OUTPUT->pix_icon('spacer', '');
                 }
                 if ($updowncount < $warningcount) {
                     $aurl = new moodle_url($url, array('action' => 'down', 'warning' => $warning));
-                    $updown .= "<a href=\"$aurl\">";
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('t/down') . "\" alt=\"$strdown\" class=\"iconsmall\" /></a>";
+                    $updown .= html_writer::link($aurl, $OUTPUT->pix_icon('t/down', $strdown, 'moodle', array('class'=>'iconsmall', 'title'=>$strdown))); 
                 } else {
-                    $updown .= "<img src=\"" . $OUTPUT->pix_url('spacer') . "\" class=\"iconsmall\" alt=\"\" />";
+
+                    $updown .= $OUTPUT->pix_icon('spacer', '');
                 }
                 ++$updowncount;
             }
@@ -216,7 +218,7 @@ class local_supervision_setting_warnings extends admin_setting {
 
             // Add uninstall info.
             $uninstall = '';
-            if ($uninstallurl = core_plugin_manager::instance()->get_uninstall_url('supervisionwarning_'.$warning, 'manage')) {
+            if ($uninstallurl = $pluginmanager->get_uninstall_url('supervisionwarning_'.$warning, 'manage')) {
                 $uninstall = html_writer::link($uninstallurl, $struninstall);
             }
 

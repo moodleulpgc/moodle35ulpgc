@@ -1,28 +1,29 @@
 <?php
 
 /**
- * Definition of supervisionwarning_ungraded_assign, a subclass supervision warning class
+ * Definition of warning_ungraded_assign, a subclass supervision warning class
  *
- * @package   supervisionwarning_ungraded_assign
+ * @package   warning_ungraded_assign
  * @package   local_supervision
  * @copyright 2012 Enrique Castro at ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_supervision;
+ 
 defined('MOODLE_INTERNAL') || die();
 
-//require_once($CFG->dirroot.'/lib/statslib.php');
 
 /**
- * An object that holds methods and attributes of supervisionwarning_ungraded_assign class
+ * An object that holds methods and attributes of warning_ungraded_assign class
  * Works together with supervision_warnings table
  *
- * @package   supervisionwarning_ungraded_assign
+ * @package   warning_ungraded_assign
  * @package   local_supervision
  * @copyright 2012 Enrique Castro at ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class supervisionwarning_ungraded_assign extends supervisionwarning {
+class warning_ungraded_assign extends warning {
 
     /**
      * Constructor. Optionally attempts to fetch corresponding row from the database
@@ -45,44 +46,20 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
      * @static
      * @abstract
      * @param int $timetocheck starting time for collection
-     * @param int $lastexecution last time this routine was launched by cron
      */
-    public static function collect_stats($timetocheck, $lastexecution) {
+    public static function get_stats($timetocheck) {
         global $DB;
 
         $warningconfig = get_config('supervisionwarning_ungraded_assign');
-        if(!$warningconfig->enabled) {
+        $config = get_config('local_supervision');
+        if(!$config->enablestats || !$warningconfig->enabled) {
             return;
         }
-
-        $blockconfig = get_config('block_supervision');
+        
+        list($excludedwhere, $excludedjoin, $excludedparams) = warning::get_excluded_sql($config);
         $moduleid = $DB->get_field('modules', 'id', array('name'=>'assign'));
 
         /// First we obtain all ungraded assignments for relevant users, categories etc., later test for delay.
-
-        $excludedcategories = '';
-        $catparams = array();
-        if($blockconfig->excludedcats) {
-            list($incatsql, $catparams) = $DB->get_in_or_equal(explode(',', $blockconfig->excludedcats), SQL_PARAMS_NAMED, 'cat', false );
-            $excludedcategories = " AND c.category $incatsql ";
-        }
-
-        $excludecourses = '';
-        if($blockconfig->excludecourses) {
-            $excludecourses = ' AND uc.credits > 0 ';
-        }
-
-        $excludeparams = array();
-        if($blockconfig->excludeshortnames) {
-            if($excluded = explode($blockconfig->excludeshortnames, ',')) {
-                foreach($excluded as $key => $c ) {
-                    $excluded[$key]= trim($c);
-                }
-                list($insql, $excludeparams) = $DB->get_in_or_equal($excluded, SQL_PARAMS_NAMED, 'ex_', false);
-                $excludecourses .= " AND c.shortname $insql ";
-            }
-        }
-
         $instances= '';
         if($warningconfig->enabled == 2 ) {
             $instances= " AND cm.score > '0' ";
@@ -103,26 +80,27 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
         
         // first apply a limit without taking account holidays. Any item closer than threshold without holidays cannot be delayed enough
         $timelimit = strtotime('-'.$warningconfig->threshold.' days', $timetocheck);
+        mtrace("    timelimit: $timelimit;   = ".userdate($timelimit));
 
         // GROUP BY required by unique first column
         // hides open warnings if several useris with the same sub.id (i.e. several teachers in a course, submission ungraded)
         $sql = "SELECT sub.id AS id,  a.id AS assignid, a.course as courseid, a.name,
-                                sub.id as subid, sub.userid,  sub.timemodified, sub.attemptnumber, ag.grader, ag.timemodified as timemarked,
+                                sub.id as subid, sub.userid, sub.timemodified, sub.attemptnumber, ag.grader, ag.timemodified as timemarked,
                                 cm.id AS cmid, cm.score, cm.groupmode, cm.groupingid
                         FROM {assign_submission} sub
                         INNER JOIN (SELECT asub.id, asub.assignment, asub.userid, MAX(asub.attemptnumber) AS lastattempt
                                     FROM {assign_submission} asub
                                     GROUP BY asub.assignment, asub.userid) gsub ON gsub.assignment = sub.assignment AND gsub.userid = sub.userid AND sub.attemptnumber = gsub.lastattempt
-                        LEFT JOIN {assign_grades} ag ON sub.assignment = ag.assignment AND sub.userid = ag.userid AND sub.attemptnumber = ag.attemptnumber AND sub.userid != 0
+                        LEFT JOIN {assign_grades} ag ON sub.assignment = ag.assignment AND sub.userid = ag.userid AND sub.attemptnumber = ag.attemptnumber AND ag.grade >= 0 AND sub.userid != 0
                         JOIN {assign} a ON sub.assignment = a.id $gradedinstances
                         JOIN {course_modules} cm ON cm.instance = a.id AND cm.course = a.course AND cm.module = :module
                         JOIN {course} c ON c.id = a.course AND c.visible = 1
-                        LEFT JOIN {local_ulpgccore_course} uc ON c.id = uc.courseid
+                        $excludedjoin
                     WHERE  (sub.timemodified > ag.timemodified  OR ag.timemodified IS NULL) AND sub.status = 'submitted' AND cm.visible = 1
                             AND a.grade <> 0 
-                            $instances $excludedcategories $excludecourses
+                            $instances $excludedwhere
                             AND  sub.timemodified < :timelimit GROUP BY sub.id" ;
-        $params = $catparams+array('timelimit'=>$timelimit, 'module'=>$moduleid)+$excludeparams;
+        $params = $excludedparams+array('timelimit'=>$timelimit, 'module'=>$moduleid);
         $currentassigns = $DB->get_records_sql($sql, $params);
         if(!$currentassigns) {
             $currentassigns = array();
@@ -135,7 +113,7 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
             foreach ($currentassigns as $stat) {
                 // the max time this assignment should had been graded without warning
                 $stat->timereference = $stat->timemodified;
-                $timelimit = supervisionwarning::threshold_without_holidays($stat->timemodified,$warningconfig->threshold, true, false);
+                $timelimit = warning::threshold_without_holidays($stat->timemodified,$warningconfig->threshold, true, false);
                 if($timelimit >= $timetocheck) {
                     $negatives[] = $stat->id;
                 } else {
@@ -162,7 +140,7 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
             $newfailures = $currentassigns;
             $fixedfailures = array();
         }
-
+        
         if($fixedfailures) {
             foreach($fixedfailures as $fixed) {
                 $sub = $DB->get_records('assign_grades', array('assignment'=>$fixed->instanceid, 'userid'=>$fixed->studentid), 'attemptnumber DESC, timemodified DESC', '*', 0, 1);
@@ -179,7 +157,7 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
 
         if($newfailures) {
             foreach($newfailures as $stat) {
-                $modcontext = context_module::instance($stat->cmid);
+                $modcontext = \context_module::instance($stat->cmid);
                 if(!$stat->courseid ||
                         ($stat->userid && !has_capability('mod/assign:submit', $modcontext, $stat->userid)) ||
                         ($stat->grader && !has_capability('mod/assign:grade', $modcontext, $stat->grader)) ) {
@@ -190,7 +168,7 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
                     continue;
                 }
 
-                $warning = new supervisionwarning_ungraded_assign();
+                $warning = new warning_ungraded_assign();
                 $warning->courseid = $stat->courseid;
                 $warning->cmid = $stat->cmid;
                 $warning->instanceid = $stat->assignid;
@@ -208,7 +186,8 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
                 $warning->groupingid = $stat->groupingid;
 
 
-                $graders = supervisionwarning::get_supervised_users($warning);
+                $graders = warning::get_supervised_users($warning, 'mod/assign:grade');
+                
                 foreach($graders  as $grader) {
                     $warning->id = null;
                     $warning->userid = $grader;
@@ -220,39 +199,6 @@ class supervisionwarning_ungraded_assign extends supervisionwarning {
         }
 
     }
-
-    /**
-     * Returns an appropiate link to an activity item suitable for warnings report
-     *
-     * @abstract
-     * @return string , formatted link
-     */
-    public function report_instancelink() {
-        throw new coding_exception('report_instancelink() method needs to be overridden in each subclass of supervision_warning ');
-    }
-
-    /**
-     * Returns an appropiate info about an activity item that raised a warning
-     *
-     * @abstract
-     * @return string , formatted link
-     */
-    public function report_rowinfo() {
-        throw new coding_exception('report_rowinfo() method needs to be overridden in each subclass of supervision_warning ');
-    }
-
-    /**
-     * Calculates overdue time for this activity warning
-     *
-     * @abstract
-     * @param int $timetocheck time for calculation with respect to timecreated
-     * @return string , formatted link
-     */
-    public function report_overdue($timetocheck) {
-        throw new coding_exception('report_overdue() method needs to be overridden in each subclass of supervision_warning ');
-    }
-
-
 
 }
 

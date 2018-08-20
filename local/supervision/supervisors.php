@@ -15,16 +15,13 @@
     require_once($CFG->libdir.'/tablelib.php');
 
 
-    $cid = required_param('cid', PARAM_INT);
-    $course = $DB->get_record('course', array('id' => $cid), '*', MUST_EXIST);
-    $pagetype = optional_param('type', 'site-index', PARAM_ALPHANUMEXT);
+    $cid = optional_param('cid', SITEID, PARAM_INT);
     $departmentassign = optional_param('department', '0', PARAM_INT);
     $itemid       = optional_param('item', 0, PARAM_INT);
     $page         = optional_param('page', 0, PARAM_INT);                     // which page to show
     $perpage      = optional_param('perpage', 25, PARAM_INT);
 
     $baseparams = array('cid' => $cid,
-                        'type' => $pagetype,
                         'department' => $departmentassign,
                         'item' => $itemid,
                         'page' => $page,
@@ -34,18 +31,14 @@
     $baseurl = new moodle_url('/local/supervision/supervisors.php', $baseparams);
 
     // Force user login in course (SITE or Course)
-    if ($course->id == SITEID) {
+    if ($cid == SITEID) {
         require_login();
     } else {
-        require_login($course);
+        require_login($cid);
     }
-    if ($course->id == SITEID) {
-        $context = context_system::instance();
-    } else {
-        $context = context_course::instance($course->id);
-    }
+    $context = context_system::instance();
 
-    $config = get_config('block_supervision');
+    $config = get_config('local_supervision');
 
     if(!$departmentassign) {
         $title = get_string('bycategory', 'local_supervision');
@@ -292,10 +285,9 @@
             $buttons = array();
             if($canmanage or $USER->id == (int)$supervision->assigner) {
                 $url = new moodle_url($baseurl, $baseparams + array('edit'=>$supervision->id));
-                $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+                $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
                 $url = new moodle_url($baseurl, $baseparams + array('del'=>$supervision->id));
-                $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
-                //$buttons[] = html_writer::link(new moodle_url($returnurl, array('delete'=>$user->id, 'sesskey'=>sesskey())), html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+                $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
                 $action = implode('&nbsp;&nbsp;', $buttons);
             }
             $data[] = $action;
@@ -309,13 +301,10 @@
     }
 
     echo '<br />';
-    if ($course->id == SITEID) {
-        $url = $CFG->wwwroot.'/my';
-        if($pagetype == 'site-index') {
-            $url = $CFG->wwwroot.'/?redirect=0';
-        }
+    if ($cid == SITEID) {
+        $url = $CFG->wwwroot.'/admin/search.php';
     } else {
-        $url = new moodle_url('/course/view.php', array('id' => $course->id));
+        $url = new moodle_url('/course/view.php', array('id' => $cid));
     }
     echo $OUTPUT->continue_button($url);
 

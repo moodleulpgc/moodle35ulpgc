@@ -4,7 +4,7 @@
 $string['pluginname'] = 'Avisos de Exámenes';
 $string['blockname'] = 'Exámenes Teleformación';
 $string['blocktitle'] = 'Exámenes Teleformación';
-
+$string['privacy:metadata'] = 'The Avisos de Exámenes block only shows data stored in other locations.';
 $string['primaryreg'] = 'Registro de Exámenes principal';
 $string['explainprimaryreg'] = 'Registro de Exámenes principal';
 $string['examswarnings:addinstance'] = 'Añadir un bloque Exámenes TF';

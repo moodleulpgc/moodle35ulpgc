@@ -29,7 +29,7 @@
 require_once($CFG->dirroot.'/lib/weblib.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/local/ulpgccore/lib.php');
-require_once($CFG->dirroot . '/blocks/supervision/locallib.php');
+require_once($CFG->dirroot . '/local/supervision/locallib.php');
 
 class block_course_termlist extends block_base {
     /**
@@ -69,12 +69,7 @@ class block_course_termlist extends block_base {
 
         $config = get_config('block_course_termlist');
 
-        $supervisor = get_config('block_supervision');
-        $supervisor = $DB->get_record('block', array('name'=>'supervision'));
-
-        if(($supervisor)) {
-            //include_once($CFG->dirroot.'/blocks/supervision/lib.php');
-        }
+        $supervisor = get_config('local_supervision');
 
         $control_categories = array();
         if($config->showcategorieslink AND $supervisor) {
@@ -181,7 +176,7 @@ class block_course_termlist extends block_base {
                 $content[] = html_writer::link($CFG->wwwroot.'/course/index.php?categoryid='.$catid, format_string($categorylist[$catid]->name), array('class'=>'my-supervisor-category'));
             }
             foreach($control_departments as $id=>$dept) {
-                $content[] = html_writer::link($CFG->wwwroot.'/blocks/supervision/department.php?id='.$id, format_string($dept), array('class'=>'my-supervisor-department'));
+                $content[] = html_writer::link($CFG->wwwroot.'/local/supervision/department.php?id='.$id, format_string($dept), array('class'=>'my-supervisor-department'));
             }
             $content[] = $OUTPUT->container_end();
 

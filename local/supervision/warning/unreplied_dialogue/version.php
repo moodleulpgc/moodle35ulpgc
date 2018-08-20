@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016040500;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2018081803;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2012060100;        // Requires this Moodle version
 $plugin->component = 'supervisionwarning_unreplied_dialogue'; // Full name of the plugin (used for diagnostics)
 $plugin->dependencies = array(

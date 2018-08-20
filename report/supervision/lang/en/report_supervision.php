@@ -27,7 +27,7 @@
 $string['supervision:view'] = 'View supervision report';
 $string['supervision:edit'] = 'Edit supervision warnings';
 $string['eventreportviewed'] = 'Report supervision viewed';
-
+$string['privacy:metadata'] = 'The Supervision report only shows data stored in other locations.';
 $string['log:view'] = 'View course supervision report';
 $string['log:viewall'] = 'View all supervision reports';
 $string['page-report-log-x'] = 'Any supervision report';

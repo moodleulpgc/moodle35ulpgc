@@ -25,13 +25,19 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-/*
+
+$ADMIN->add('localplugins', new admin_category('managesupervisionwarnings', new lang_string('managewarningsettings', 'local_supervision')));
+
+$plugins = core_plugin_manager::instance()->get_plugins_of_type('supervisionwarning');
+
+    $temp = new admin_settingpage('supervisionwarnings', new lang_string('warnings', 'local_supervision'));
+    $temp->add(new \local_supervision\setting_warnings());
+    $ADMIN->add('managesupervisionwarnings', $temp);
+    
     $settings = new admin_settingpage('local_supervision_settings', get_string('supervisionsettings','local_supervision')); 
 
     $settings->add(new admin_setting_configcheckbox('local_supervision/enablestats', get_string('enablestats', 'local_supervision'),
                     get_string('configenablestats', 'local_supervision'), 0, PARAM_INT));
-
-    $settings->add(new admin_setting_configtime('local_supervision/statsruntimestarthour', 'statsruntimestartminute', get_string('statsruntimestart', 'admin'), get_string('configstatsruntimestart', 'admin'), array('h' => 3, 'm' => 0)));
 
     $roles = get_all_roles();
     $options = role_fix_names($roles, null, ROLENAME_ORIGINAL, true);
@@ -72,30 +78,24 @@ if ($hassiteconfig) {
                     get_string('configcoordemail', 'local_supervision'), 0, PARAM_INT));
     $settings->add(new admin_setting_configtext('local_supervision/email', get_string('pendingmail', 'local_supervision'),
                     get_string('configemail', 'local_supervision'), '', PARAM_NOTAGS));
+                    
+    $settings->add(new admin_setting_configcheckbox('local_supervision/synchsupervisors', get_string('synchsupervisors', 'local_supervision'),
+                    get_string('configsynchsupervisors', 'local_supervision'), 0, PARAM_INT));
 
-$ADMIN->add('localplugins', $settings);
 
-*/
-
-$ADMIN->add('localplugins', new admin_category('managesupervisionwarnings', new lang_string('managewarningsettings', 'local_supervision')));
-
-$plugins = core_plugin_manager::instance()->get_plugins_of_type('supervisionwarning');
-
-    $temp = new admin_settingpage('supervisionwarnings', new lang_string('warnings', 'local_supervision'));
-    $temp->add(new local_supervision_setting_warnings());
-
-    $url = new moodle_url('/blocks/supervision/holidays.php', array('cid'=>$PAGE->course->id, 'type'=>$PAGE->pagetype));
-    $ADMIN->add('managesupervisionwarnings', new admin_externalpage('local_supervision_holidays', 
-                    get_string('editholidays', 'local_supervision'),  $url,'local/supervision:manage'));
-    $url = new moodle_url('/blocks/supervision/supervisors.php', array('cid'=>$PAGE->course->id, 'type'=>$PAGE->pagetype));
-    $ADMIN->add('managesupervisionwarnings', new admin_externalpage('local_supervision_supervisors', 
-                    get_string('editpermissions', 'local_supervision'),  $url,'local/supervision:manage'));
-
-    $ADMIN->add('managesupervisionwarnings', $temp);
-    
+    $ADMIN->add('managesupervisionwarnings', $settings);
 
     foreach ($plugins as $plugin) {
         /** @var \local_supervision\plugininfo\managejob $plugin */
         $plugin->load_settings($ADMIN, 'managesupervisionwarnings', $hassiteconfig);
     }
+
+    $url = new moodle_url('/local/supervision/holidays.php', array());
+    $ADMIN->add('managesupervisionwarnings', new admin_externalpage('local_supervision_holidays', 
+                    get_string('editholidays', 'local_supervision'),  $url,'local/supervision:manage'));
+    $url = new moodle_url('/local/supervision/supervisors.php', array());
+    $ADMIN->add('managesupervisionwarnings', new admin_externalpage('local_supervision_supervisors', 
+                    get_string('editpermissions', 'local_supervision'),  $url,'local/supervision:manage'));
+
+
 }

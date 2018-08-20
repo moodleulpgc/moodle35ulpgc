@@ -31,4 +31,5 @@ $string['config_grading'] = 'Checking may be restricted to only graded assigment
 $string['graded'] = 'Graded';
 $string['gradenumeric'] = 'Numeric';
 $string['gradescale'] = 'Scale';
+$string['collectstats'] = 'Collect supervision stats about Ungraded assignments';
 

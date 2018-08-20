@@ -1,28 +1,30 @@
 <?php
 
 /**
- * Definition of supervisionwarning_unreplied_dialogue, a subclass supervision warning class
+ * Definition of warning_unreplied_dialogue, a subclass supervision warning class
  *
- * @package   supervisionwarning_unreplied_dialogue
+ * @package   warning_unreplied_dialogue
  * @package   local_supervision
  * @copyright 2012 Enrique Castro at ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_supervision;
+ 
 defined('MOODLE_INTERNAL') || die();
 
 //require_once($CFG->dirroot.'/lib/statslib.php');
 
 /**
- * An object that holds methods and attributes of supervisionwarning_unreplied_dialogue class
+ * An object that holds methods and attributes of warning_unreplied_dialogue class
  * Works together with supervision_warnings table
  *
- * @package   supervisionwarning_unreplied_dialogue
+ * @package   warning_unreplied_dialogue
  * @package   local_supervision
  * @copyright 2012 Enrique Castro at ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class supervisionwarning_unreplied_dialogue extends supervisionwarning {
+class warning_unreplied_dialogue extends warning {
 
     /**
      * Constructor. Optionally attempts to fetch corresponding row from the database
@@ -45,21 +47,21 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
      * @static
      * @abstract
      * @param int $timetocheck starting time for collection
-     * @param int $lastexecution last time this routine was launched by cron
      */
-    public static function collect_stats($timetocheck, $lastexecution) {
+    public static function get_stats($timetocheck) {
         global $DB;
 
         $warningconfig = get_config('supervisionwarning_unreplied_dialogue');
-        if(!$warningconfig->enabled) {
+        $config = get_config('local_supervision');
+        if(!$config->enablestats || !$warningconfig->enabled) {
             return;
         }
-
-        $blockconfig = get_config('block_supervision');
+        
+        list($excludedwhere, $excludedjoin, $excludedparams) = warning::get_excluded_sql($config);
         $moduleid = $DB->get_field('modules', 'id', array('name'=>'dialogue'));
 
         /// First we obtain all open dialogues for relevant users, categories etc., later test for delay.
-        $checkedroles = explode(',', $blockconfig->checkedroles);
+        $checkedroles = explode(',', $config->checkedroles);
         list($usql, $params) = $DB->get_in_or_equal($checkedroles);
 
         $rolesql = "SELECT rc.roleid, rc.capability
@@ -73,40 +75,15 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
             return false;
         }
 
-        $excludedcategories = '';
-        $catparams = array();
-        if($blockconfig->excludedcats) {
-            list($incatsql, $catparams) = $DB->get_in_or_equal(explode(',', $blockconfig->excludedcats), SQL_PARAMS_NAMED, 'cat', false );
-            $excludedcategories = " AND c.category $incatsql ";
-        }
-
-        $excludecourses = '';
-        if($blockconfig->excludecourses) {
-            $excludecourses = ' AND uc.credits > 0 ';
-        }
-
-        $excludeparams = array();
-        if($blockconfig->excludeshortnames) {
-            if($excluded = explode($blockconfig->excludeshortnames, ',')) {
-                foreach($excluded as $key => $c ) {
-                    $excluded[$key]= trim($c);
-                }
-                list($insql, $excludeparams) = $DB->get_in_or_equal($excluded, SQL_PARAMS_NAMED, 'ex_', false);
-                $excludecourses .= " AND c.shortname $insql ";
-            }
-        }
-
         $instances= '';
         if($warningconfig->enabled == 2 ) {
             $instances= " AND cm.score > 0 ";
         }
 
-
-
         $contextlevel = CONTEXT_COURSE;
         // first apply a limit without taking account holidays. Any item closer than threshold without holidays cannot be delayed enough
         $timelimit = strtotime('-'.$warningconfig->threshold.' days', $timetocheck);
-
+        mtrace("    timelimit: $timelimit;   = ".userdate($timelimit));
         
         // First we obtain all open dialogues, later test for delay.
         $sql = "SELECT  dc.id, dc.course AS courseid, dc.id as conversationid, dc.subject, dc.dialogueid, d.name, cm.id AS cmid,
@@ -122,16 +99,16 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
                 JOIN {dialogue} d ON d.id = dc.dialogueid 
                 JOIN {course_modules} cm ON cm.instance = dc.dialogueid AND cm.course = dc.course AND cm.module = :module 
                 JOIN {course} c ON c.id = d.course AND c.visible = 1
-                LEFT JOIN {local_ulpgccore_course} uc ON c.id = uc.courseid 
                 JOIN {dialogue_messages} dm ON dc.dialogueid = dm.dialogueid AND dm.conversationid = dc.id 
                                             AND dm.conversationindex = (SELECT MAX(dm2.conversationindex) FROM {dialogue_messages} dm2
                                                                         WHERE dm2.dialogueid = dc.dialogueid AND dm2.conversationid = dc.id  )
+                $excludedjoin 
                 WHERE d.alternatemode = 1 AND cm.visible = 1 AND dm.authorid <> dp.userid
                         AND dm.state = :state AND dm.timemodified < :timelimit
-                        $instances $excludedcategories $excludecourses
+                        $instances $excludedwhere
                 
                 ";
-        $params = $roleparams+$catparams+array('timelimit'=>$timelimit, 'contextlevel'=>CONTEXT_COURSE, 'module'=>$moduleid, 'state'=>\mod_dialogue\dialogue::STATE_OPEN);
+        $params = $excludedparams + $roleparams + array('timelimit'=>$timelimit, 'contextlevel'=>CONTEXT_COURSE, 'module'=>$moduleid, 'state'=>\mod_dialogue\dialogue::STATE_OPEN);
         $currentdialogues = $DB->get_records_sql($sql, $params);
 
         /// Now we have open dialogues, check if really delayed, relying on holidays table
@@ -141,7 +118,7 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
             foreach ($currentdialogues as $stat) {
                 // the max time this dialogue should had been replyed without warning
                 $stat->timereference = $stat->timemodified;
-                $timelimit = supervisionwarning::threshold_without_holidays($stat->timemodified,$warningconfig->threshold, true, true);
+                $timelimit = warning::threshold_without_holidays($stat->timemodified,$warningconfig->threshold, true, true);
                 if($timelimit >= $timetocheck) {
                     $negatives[] = $stat->id;
                 } else {
@@ -182,12 +159,12 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
 
         if($newfailures) {
             foreach($newfailures as $stat) {
-                $modcontext = context_module::instance($stat->cmid);
+                $modcontext = \context_module::instance($stat->cmid);
                 if(!$stat->courseid || !has_capability('mod/dialogue:open', $modcontext, $stat->userid) || !has_capability('mod/dialogue:receiveasstaff', $modcontext, $stat->recipientid) ) {
                     // the stat is incorrect because imposible to open/read better close if possible
                     if($stat->conversationid) {
-                        if($message = reset($DB->get_records('dialogue_messages', array('dialogueid'=>$stat->instanceid, 
-                                                                                    'conversationid'=>$stat->itemid, 'authorid'=>$stat->studentid), 
+                        if($message = reset($DB->get_records('dialogue_messages', array('dialogueid'=>$stat->dialogueid, 
+                                                                                    'conversationid'=>$stat->conversationid, 'authorid'=>$stat->userid), 
                                                                                     'conversationindex DESC', 'id, state', 0, 1))) {
                             $message->state = \mod_dialogue\dialoge::STATE_CLOSED;
 //                            $DB->set_field('dialogue_conversations', 'closed', 1, array('id'=>$stat->conversationid));
@@ -197,7 +174,7 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
                     continue;
                 }
 
-                $warning = new supervisionwarning_unreplied_dialogue();
+                $warning = new warning_unreplied_dialogue();
 
                 $warning->courseid = $stat->courseid;
                 $warning->cmid = $stat->cmid;
@@ -218,37 +195,6 @@ class supervisionwarning_unreplied_dialogue extends supervisionwarning {
             mtrace("Adding ".count($newfailures).'  unreplied dialogues warnings');
         }
 
-    }
-
-    /**
-     * Returns an appropiate link to an activity item suitable for warnings report
-     *
-     * @abstract
-     * @return string , formatted link
-     */
-    public function report_instancelink() {
-        throw new coding_exception('report_instancelink() method needs to be overridden in each subclass of supervision_warning ');
-    }
-
-    /**
-     * Returns an appropiate info about an activity item that raised a warning
-     *
-     * @abstract
-     * @return string , formatted link
-     */
-    public function report_rowinfo() {
-        throw new coding_exception('report_rowinfo() method needs to be overridden in each subclass of supervision_warning ');
-    }
-
-    /**
-     * Calculates overdue time for this activity warning
-     *
-     * @abstract
-     * @param int $timetocheck time for calculation with respect to timecreated
-     * @return string , formatted link
-     */
-    public function report_overdue($timetocheck) {
-        throw new coding_exception('report_overdue() method needs to be overridden in each subclass of supervision_warning ');
     }
 
 }

@@ -139,3 +139,7 @@ Este es un mensaje automático que continuará enviándose mientras persista la 
 $string['warningmailsubject'] = '[{$a}]: Aviso de actividad pendiente ';
 $string['warningautomatic'] = 'Monitorización de actividades pendientes';
 $string['emailstudent'] = '  con respecto al estudiante {$a->fullname} con DNI {$a->idnumber} ';
+$string['mailstats'] = 'Mails pending supervision warnings';
+$string['updatesupervisors'] = 'Updates supervisors from sinculpgc';
+$string['synchsupervisors'] = 'Update supervisors';
+$string['configsynchsupervisors'] = 'If enabled, supervisors will be synchronized from sinculpgc units table.';

@@ -4,7 +4,7 @@
 $string['pluginname'] = 'Avisos de Examen';
 $string['blockname'] = 'Avisos de Examen';
 $string['blocktitle'] = 'Avisos de Examen';
-
+$string['privacy:metadata'] = 'El bloque Avisos de Examen sólo muestrra datos almacenados en otros plugins.';
 $string['primaryreg'] = 'Registro de Exámenes principal';
 $string['explainprimaryreg'] = 'Registro de Exámenes principal';
 

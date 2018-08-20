@@ -25,7 +25,7 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/report/supervision/locallib.php');
 require_once($CFG->dirroot.'/report/supervision/editwarningform.php');
-require_once($CFG->dirroot.'/blocks/supervision/locallib.php');
+require_once($CFG->dirroot.'/local/supervision/locallib.php');
 //require_once($CFG->libdir.'/adminlib.php');
 
 $id          = optional_param('id', SITEID, PARAM_INT);// Course ID
@@ -53,7 +53,7 @@ require_login($course);
 
 $context = context_course::instance($course->id);
 
-if(!$canmanage = has_capability('block/supervision:manage', $context)) {
+if(!$canmanage = has_capability('local/supervision:manage', $context)) {
 
     if($scope == 'department') {
         $courseitem = $course->department;

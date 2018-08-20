@@ -26,11 +26,11 @@
 
 $string['pluginname'] = 'Supervisión';
 
-$string['supervision:manage'] = 'GEstionar supervisores y opciones de supervisión';
+$string['supervision:manage'] = 'Gestionar supervisores y opciones de supervisión';
 $string['supervision:editwarnings'] = 'Editar avisos de supervisión';
 $string['supervision:viewwarnings'] = 'Ver avisos de supervisión';
 $string['supervisionsettings'] = 'Ajustes de Supervisión';
-$string['managewarningsettings'] = 'Ajustes de Alertas de supervisión';
+$string['managewarningsettings'] = 'Supervisión';
 $string['warnings'] = 'Gestionar Alertas';
 $string['actwarningshdr'] = 'Alertas de supervisión';
 $string['configsupervisionplugins'] = 'Habilite/Deshabilite y organice las alertas según se precise.';
@@ -103,7 +103,7 @@ $string['itemname'] = 'Item supervisado';
 $string['addpermission'] = 'Agregar permiso de supervisión';
 $string['addusersetting'] = '¿Permitir que este usuario agregue otros supervisores?';
 $string['adduser'] = 'Añadir';
-$string['editpermissions'] = 'Permisos de Supervisión';
+$string['editpermissions'] = 'Supervisores';
 $string['itemscope'] = 'Ámbito de Supervisión';
 $string['itemfilter'] = 'Filtro por Item';
 $string['permissionexists'] = 'Este usario ya dispone de un permiso de supervisión en este Item. < br/>Por favor, actualice los permisos más que añadir nuevos. ';
@@ -137,3 +137,7 @@ Este es un mensaje automático que continuará enviándose mientras persista la 
 $string['warningmailsubject'] = '[{$a}]: Aviso de actividad pendiente ';
 $string['warningautomatic'] = 'Monitorización de actividades pendientes';
 $string['emailstudent'] = '  con respecto al estudiante {$a->fullname} con DNI {$a->idnumber} ';
+$string['mailstats'] = 'Envío de correos de Supervisión de Actividades pendeintes';
+$string['updatesupervisors'] = 'Actualiza supervisores desde sinculpgc';
+$string['synchsupervisors'] = 'Sincronizar supervisores';
+$string['configsynchsupervisors'] = 'Si se activa, los supervisores serán sincronizados desde la tabla sinculpgc units.';

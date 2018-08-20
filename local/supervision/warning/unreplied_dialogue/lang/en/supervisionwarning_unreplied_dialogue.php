@@ -27,4 +27,4 @@ $string['pluginname'] = 'Unreplied dialogues';
 $string['config_pluginname'] = 'Check to activate detection of dialogue conversations that remain unreplied by the teacher after the defined period';
 $string['threshold'] = 'Delay threshold for dialogue conversations';
 $string['config_threshold'] = 'The period without a reply required to flag a dialogue conversation as a supervision warning, in <strong>DAYS</strong>.';
-
+$string['collectstats'] = 'Collect supervision stats about Unreplied dialogues';

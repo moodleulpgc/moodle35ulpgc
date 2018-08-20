@@ -467,5 +467,25 @@ class participants_table extends \table_sql {
             $this->initialbars(true);
         }
     }
+    
+  /**
+    * Added by ecastro to allow setting nameformat from table get_sql_sort
+    * @return type?
+    */
+    function setup() {
+        global $SESSION;
+        
+        parent::setup();
+        if($ulpgc = get_config('local_ulpgccore', 'version')) { // ecastro ULPGC to add user list customizations conditionally )
+            $SESSION->nameformat = 'lastname';
+            if ($sort = $this->get_sql_sort()) {
+                $f = strpos($sort, 'firstname');
+                $l = strpos($sort, 'lastname');
+                if($f !== false && (($f < $l) || ($l === false))) {
+                    $SESSION->nameformat = 'firstname';
+                }
+            }
+        }
+    }
 }
 

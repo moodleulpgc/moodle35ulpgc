@@ -105,9 +105,6 @@ class batchmanage_mod_config_form extends batchmanageform {
             if($key && !$ignored) {
                 $element = $innerform->getElement($key);
                 $type = $element->getType();
-                
-                //print_object("key $key -> type: $type");
-                
                 if($type != 'hidden') {
                     if($type != 'header') {
                         $this->add_grouped_element($element, $key);

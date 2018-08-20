@@ -42,8 +42,6 @@ $selectall    = optional_param('selectall', false, PARAM_BOOL); // When renderin
 $roleid       = optional_param('roleid', 0, PARAM_INT);
 $groupparam   = optional_param('group', 0, PARAM_INT);
 
-$ulpgc = get_config('local_ulpgccore', 'version'); // ecastro ULPGC to add user list customizations conditionally 
-
 $PAGE->set_url('/user/index.php', array(
         'page' => $page,
         'perpage' => $perpage,
@@ -237,25 +235,6 @@ $participanttable = new \core_user\participants_table($course->id, $groupid, $la
     $searchkeywords, $bulkoperations, $selectall);
 $participanttable->define_baseurl($baseurl);
 
-
-if($ulpgc) {
-    $participanttable->setup();
-    if ($participanttable->get_sql_sort()) {
-        $sort = ' ORDER BY '.$participanttable->get_sql_sort();
-    } else {
-        $sort = '';
-    }
-
-    $sortorder = trim(substr(trim($sort), 8)); // ecastro ULPGC to enforce name formatting
-    $p = strpos($sortorder, ' ');
-    $sortorder = trim(substr($sortorder, 0, $p));
-    if ($sortorder == 'firstname' ) {
-        $SESSION->nameformat = 'firstname';
-    } else if ($sortorder == 'lastname' ) {
-        $SESSION->nameformat = 'lastname';
-    }
-}
-
 // Do this so we can get the total number of rows.
 ob_start();
 $participanttable->out($perpage, true);
@@ -343,9 +322,6 @@ if ($bulkoperations) {
                 $displaylist[] = [$name => $pluginoptions];
             }
         }
-    }
-    if($ulpgc) {
-        $displaylist['exportcsv.php'] = get_string('usersexportcsv', 'local_ulpgccore'); // ecastro ULPGC // Kirill Astashov
     }
 
     echo $OUTPUT->help_icon('withselectedusers');

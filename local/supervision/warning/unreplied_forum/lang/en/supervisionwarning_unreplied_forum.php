@@ -26,4 +26,4 @@ $string['pluginname'] = 'Unreplied forum posts';
 $string['config_pluginname'] = 'Check to activate detection of forum posts that remain unreplied by course teachers after the defined period';
 $string['threshold'] = 'Delay threshold for forum posts';
 $string['config_threshold'] = 'The period without replying required to flag a forum post as a supervision warning, in <strong>DAYS</strong>';
-
+$string['collectstats'] = 'Collect supervision stats about Unreplied forum posts';

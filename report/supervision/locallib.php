@@ -32,7 +32,7 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
 
 require_once(__DIR__.'/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/blocks/supervision/locallib.php');
+require_once($CFG->dirroot.'/local/supervision/locallib.php');
 require_once($CFG->dirroot.'/local/ulpgccore/lib.php');
 
 
@@ -112,12 +112,12 @@ function report_supervision_print_selector_form($course, $selscope='category', $
 
     $context = report_supervision_get_context($course, $selscope, $selitem);
     $canview = has_capability('report/supervision:view', $context);
-    $canmanage = has_capability('block/supervision:manage', $context);
+    $canmanage = has_capability('local/supervision:manage', $context);
     $canedit = has_capability('report/supervision:edit', $context);
 
     $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
 
-    $blockconfig = get_config('block_supervision');
+    $config = get_config('local_supervision');
     $itemmenu = array();
     $coursemenu = array();
     $usermenu = array();
@@ -132,7 +132,7 @@ function report_supervision_print_selector_form($course, $selscope='category', $
         }
         
     } else {
-        $checkedroles = explode(',', $blockconfig->checkedroles);
+        $checkedroles = explode(',', $config->checkedroles);
         list($inrolesql, $roleparams) = $DB->get_in_or_equal($checkedroles, SQL_PARAMS_NAMED, 'role' );
         $sql = "SELECT c.id, ra.roleid, c.shortname, c.fullname, c.category, cc.name AS catname
                     FROM {role_assignments} ra
@@ -231,7 +231,7 @@ function report_supervision_print_selector_form($course, $selscope='category', $
         }
         //users those in courses, do here together for managers & supervisor users
 
-        $checkedroles = explode(',', $blockconfig->checkedroles);
+        $checkedroles = explode(',', $config->checkedroles);
         list($inrolesql, $roleparams) = $DB->get_in_or_equal($checkedroles, SQL_PARAMS_NAMED, 'role' );
         list($incoursesql, $courseparams) = $DB->get_in_or_equal(array_keys($courses), SQL_PARAMS_NAMED, 'course' );
         $names = get_all_user_name_fields(true, 'u');
@@ -404,12 +404,12 @@ function report_supervision_lookup_warnings($course, $context, $scope, $itemid, 
     global $DB, $USER;
 
     $canview = has_capability('report/supervision:view', $context);
-    $canmanage = has_capability('block/supervision:manage', $context);
+    $canmanage = has_capability('local/supervision:manage', $context);
     $canedit = has_capability('report/supervision:edit', $context);
 
     $now = time();
     $timetocheck = usergetmidnight($now);
-    $blockconfig = get_config('block_supervision');
+    $config = get_config('local_supervision');
 
     $courses = array();
 
@@ -423,7 +423,7 @@ function report_supervision_lookup_warnings($course, $context, $scope, $itemid, 
                     $courses[$course->id] = $course->id;
                 }
                 // all courses a regular user is assigned with one of the checked roles
-                $checkedroles = explode(',', $blockconfig->checkedroles);
+                $checkedroles = explode(',', $config->checkedroles);
                 list($inrolesql, $roleparams) = $DB->get_in_or_equal($checkedroles, SQL_PARAMS_NAMED, 'role' );
                 $sql = "SELECT c.id, ra.roleid
                             FROM {role_assignments} ra
@@ -472,7 +472,7 @@ function report_supervision_lookup_warnings($course, $context, $scope, $itemid, 
     switch ($fromdate) {
         case 0  :   $params['fromdate'] = 0;
                         break;
-        case -1 :   $params['fromdate'] = strtotime($blockconfig->startdisplay);
+        case -1 :   $params['fromdate'] = strtotime($config->startdisplay);
                         break;
         default :   $params['fromdate'] = $timetocheck - $fromdate;
                         break;
@@ -480,7 +480,7 @@ function report_supervision_lookup_warnings($course, $context, $scope, $itemid, 
     switch ($todate) {
         case 0  :   $params['todate'] = $now;
                         break;
-        case -1 :   $params['todate'] = strftime($blockconfig->startdisplay);
+        case -1 :   $params['todate'] = strftime($config->startdisplay);
                         break;
         default :   $params['todate'] = $timetocheck - $todate;
                         break;
@@ -556,7 +556,7 @@ function report_supervision_print_warnings($course, $scope, $itemid,  $userid, $
 
     $context = report_supervision_get_context($course, $scope, $itemid);
     $canview = has_capability('report/supervision:view', $context);
-    $canmanage = has_capability('block/supervision:manage', $context);
+    $canmanage = has_capability('local/supervision:manage', $context);
     $canedit = has_capability('report/supervision:edit', $context);
     $now = time();
 
@@ -586,9 +586,11 @@ function report_supervision_print_warnings($course, $scope, $itemid,  $userid, $
     $table->define_baseurl($baseurl->out());
 
     $table->sortable(true, 'delay', SORT_DESC);
+    $table->no_sorting('userid');
     $table->no_sorting('studentid');
     $table->no_sorting('activityinfo');
     $table->no_sorting('action');
+    
 
     $table->set_attribute('id', 'supervision-warnings-table');
     $table->set_attribute('cellspacing', '0');
@@ -656,10 +658,7 @@ function report_supervision_print_warnings($course, $scope, $itemid,  $userid, $
             $buttons = array();
             if($canmanage or $canedit) {
                 $url = new moodle_url($baseurl, array('edit'=>$warning->id));
-                $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
-                //$url = new moodle_url($baseurl, $baseparams + array('del'=>$supervision->id));
-                //$buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
-                //$buttons[] = html_writer::link(new moodle_url($returnurl, array('delete'=>$user->id, 'sesskey'=>sesskey())), html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+                $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
                 $action = implode('&nbsp;&nbsp;', $buttons);
             }
             $data[] = $action;
@@ -719,11 +718,9 @@ function report_supervision_print_warnings($course, $scope, $itemid,  $userid, $
 function report_supervision_recalculate_warnings($course, $scope, $itemid,  $userid, $fromdate, $todate, $warningtype, $display) {
     global $CFG, $DB, $OUTPUT, $USER;
 
-    include_once($CFG->dirroot.'/local/supervision/supervisionwarning.php');
-
     $context = context_course::instance($course->id);
 
-    require_capability('block/supervision:manage', $context);
+    require_capability('local/supervision:manage', $context);
 
     $select = "SELECT sw.*, (IF(sw.timefixed = 0, :timenow, ABS(sw.timefixed)) - sw.timecreated) AS delay, c.category, c.shortname ";
     list($sql, $params) = report_supervision_lookup_warnings($course, $context, $scope, $itemid,  $userid, $fromdate, $todate, $warningtype, $display);
@@ -740,11 +737,11 @@ function report_supervision_recalculate_warnings($course, $scope, $itemid,  $use
             }
             
             if(!$warning->timereference) {
-                $warning->timereference = supervisionwarning::threshold_without_holidays($warning->timecreated,$wconfig->threshold-1, false, $weekends);
+                $warning->timereference = \local_supervision\warning::threshold_without_holidays($warning->timecreated,$wconfig->threshold-1, false, $weekends);
                 $DB->set_field('supervision_warnings', 'timereference', $warning->timereference, array('id'=>$warning->id));
             }
             
-            $timelimit = supervisionwarning::threshold_without_holidays($warning->timereference,$wconfig->threshold, true, $weekends);
+            $timelimit = \local_supervision\warning::threshold_without_holidays($warning->timereference,$wconfig->threshold, true, $weekends);
 
             if($warning->timefixed != 0) {
                 $timefixed = abs($warning->timefixed);
@@ -797,11 +794,11 @@ function report_supervision_recalculate_warnings($course, $scope, $itemid,  $use
 function report_supervision_fixall_warnings($timefixed, $course, $scope, $itemid,  $userid, $fromdate, $todate, $warningtype, $display) {
     global $CFG, $DB, $OUTPUT, $USER;
 
-    include_once($CFG->dirroot.'/local/supervision/supervisionwarning.php');
+    //include_once($CFG->dirroot.'/local/supervision/supervisionwarning.php');
 
     $context = context_course::instance($course->id);
 
-    require_capability('block/supervision:manage', $context);
+    require_capability('local/supervision:manage', $context);
 
     $select = "SELECT sw.* ";
     list($sql, $params) = report_supervision_lookup_warnings($course, $context, $scope, $itemid,  $userid, $fromdate, $todate, $warningtype, $display);

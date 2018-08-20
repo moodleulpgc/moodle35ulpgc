@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_supervision;
+ 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/statslib.php');
@@ -20,7 +22,7 @@ require_once($CFG->dirroot.'/lib/statslib.php');
  * @copyright 2012 Enrique Castro at ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class supervisionwarning {
+abstract class warning {
 
     /**
      * Array of required table fields, must start with 'id'.
@@ -140,7 +142,7 @@ abstract class supervisionwarning {
             $warning = $DB->get_record('supervision_warnings', array('id', $warning));
         }
         if(is_object($warning) OR is_array($warning)) {
-            supervisionwarning::set_properties($this, $warning);
+            warning::set_properties($this, $warning);
         }
     }
 
@@ -171,7 +173,7 @@ abstract class supervisionwarning {
     public static function toclass(StdClass $item) {
         $result = false;
         if($item->warningtype) {
-            $classname = 'supervisionwarning_'.$item->warningtype;
+            $classname = 'warning_'.$item->warningtype;
             $result[$key] = new $classname($item);
         }
         return $result;
@@ -191,7 +193,7 @@ abstract class supervisionwarning {
         }
         foreach($items as $key => $item) {
             if($item->warningtype) {
-                $classname = 'supervisionwarning_'.$item->warningtype;
+                $classname = 'warning_'.$item->warningtype;
                 $result[$key] = new $classname($item);
             }
         }
@@ -214,7 +216,7 @@ abstract class supervisionwarning {
      * @return stdClass
      */
     public function get_data() {
-        $data = new stdClass();
+        $data = new \stdClass();
 
         foreach ($this as $var=>$value) {
             if(in_array($var, $this->fields)) {
@@ -264,6 +266,9 @@ abstract class supervisionwarning {
         return $this->id;
     }
 
+    
+    
+    
     /**
      * Looks at supervision_permissions table to search for users with supervision permisions at this instance
      *
@@ -279,7 +284,9 @@ abstract class supervisionwarning {
         }
 
         $course = $DB->get_record('course', array('id'=>$this->courseid), 'id, category');
-        $course = local_ulpgccore_get_course_details($course);
+        if($ulpgc = get_config('local_ulogccore', 'version')) {
+            $course = local_ulpgccore_get_course_details($course);
+        }
 
         $names = get_all_user_name_fields(true, 'u');
         $warninglike = $DB->sql_like('sp.warnings', ':warningtype');
@@ -296,26 +303,78 @@ abstract class supervisionwarning {
             $params['instance'] = $course->category;
         }
 
-        if($type == 'department') {
+        if($ulpgc && $type == 'department') {
             $where = " WHERE sp.scope = :scope AND sp.instance = :instance AND $warninglike ";
             $params['scope'] = 'department';
             $params['instance'] = $course->department;
         }
 
         if($type == 'any') {
-            $where = " WHERE ( (sp.scope = :scope1 AND sp.instance = :instance1)
-                                 OR (sp.scope = :scope2 AND sp.instance = :instance2))
+            $scope2 = '';
+            if($ulpgc) {
+                $scope2 = 'OR (sp.scope = :scope2 AND sp.instance = :instance2)';
+                $params['scope2'] = 'department';
+                $params['instance2'] = $course->department;
+            }
+
+            $where = " WHERE ( (sp.scope = :scope1 AND sp.instance = :instance1) $scope2)
                                  AND $warninglike  ";
             $params['scope1'] = 'category';
             $params['instance1'] = $course->category;
-            $params['scope2'] = 'department';
-            $params['instance2'] = $course->department;
         }
 
         $supervisors = $DB->get_records_sql($selectfrom.$where.$groupby, $params);
         return $supervisors;
     }
 
+
+    /**
+     * If userid not set, tries to determine teacher users by role in course
+     *
+     * @static
+     * @param object $config local_config_plugins record
+     * @return array of user-like objects
+     */
+    public static function get_excluded_sql($config = null) {
+
+        if(empty($config)) {
+            $config = get_config('local_supervision');
+        }
+        $ulpgc = get_config('local_ulpgccore', 'version');
+
+        $excludedcategories = '';
+        $catparams = array();
+        if($config->excludedcats) {
+            list($incatsql, $catparams) = $DB->get_in_or_equal(explode(',', $config->excludedcats), SQL_PARAMS_NAMED, 'cat', false );
+            $excludedcategories = " AND c.category $incatsql ";
+        }
+
+        $excludecourses = '';
+        $excludedjoin = '';
+        if($config->excludecourses && $ulpgc) {
+            if($ulpgc) {
+                $excludecourses .= ' AND uc.credits > 0 ';
+                $excludedjoin = 'LEFT JOIN {local_ulpgccore_course} uc ON c.id = uc.courseid';
+            }
+        }
+
+        $excludeparams = array();
+        if($config->excludeshortnames) {
+            if($excluded = explode($config->excludeshortnames, ',')) {
+                foreach($excluded as $key => $c ) {
+                    $excluded[$key]= trim($c);
+                }
+                list($insql, $excludeparams) = $DB->get_in_or_equal($excluded, SQL_PARAMS_NAMED, 'ex_', false);
+                $excludecourses .= " AND c.shortname $insql ";
+            }
+        }
+
+        $excludedwhere = $excludedcategories.$excludecourses;
+        $excludedparams = $catparams + $excludeparams;
+    
+        return array($excludedwhere, $excludedjoin, $excludedparams);
+    }
+    
     /**
      * If userid not set, tries to determine teacher users by role in course
      *
@@ -323,7 +382,7 @@ abstract class supervisionwarning {
      * @param object a warning_object-like structure to process, rather than this instance
      * @return array of user-like objects
      */
-    public static function get_supervised_users($data) {
+    public static function get_supervised_users($data, $capability = '') {
         global $DB;
 
         $users = array();
@@ -331,6 +390,7 @@ abstract class supervisionwarning {
         $userid = $data->userid;
         $studentid = $data->studentid;
         $courseid = $data->courseid;
+        $cmid = $data->cmid;
         $groupmode = $data->groupmode;
         $groupigid = $data->groupingid;
 
@@ -341,13 +401,22 @@ abstract class supervisionwarning {
 
         // there is no userid, so we need to figure it
         // first get all users with checked roles un the course
-        $context = context_course::instance($courseid);
-        $blockconfig = get_config('block_supervision');
+        $context = \context_module::instance($cmid);
+        $config = get_config('local_supervision');
         $checkedroles= array();
-        if(!empty($blockconfig->checkedroles)) {
-            $checkedroles = explode(',', $blockconfig->checkedroles);
+        if(!empty($config->checkedroles)) {
+            $checkedroles = explode(',', $config->checkedroles);
         }
-        $users = get_role_users($checkedroles, $context, false, 'ra.id AS raid, u.id, u.idnumber, u.lastname, u.firstname');
+        // must be called with ra.id AS raid because multiple roles
+        $users = get_role_users($checkedroles, $context, true, 'ra.id AS raid, u.id, u.idnumber, u.lastname, u.firstname ');
+        if($capability) {
+            $enrolled = get_enrolled_users($context, $capability, 0, 'u.id, u.idnumber', null, 0, 0, true);
+            foreach($users as $key => $user) {
+                if(!array_key_exists($user->id, $enrolled)) {
+                    unset($users[$key]);
+                }
+            }
+        }
 
         $graders = array();
 
@@ -469,19 +538,26 @@ abstract class supervisionwarning {
      * @param bool $weekends consider weekend days as holidays or not
      * @return bool , holiday or not
      */
-    public static function is_holidays($timetocheck, $weekends=true) {
+    public static function is_holidays($holidays, $timetocheck, $weekends=true) {
         global $CFG, $DB;
-
-
-
+        $holiday = false;
+        foreach($holidays as $day) {
+            if(($day->datestart <= $timetocheck) && (($day->datestart + $day->timeduration) > $timetocheck)) {
+                $holiday = true;
+                break;
+            }
+        }
+        
+/*
         $select = ' datestart <= :time1 AND (datestart + timeduration) > :time2 ';
         $params = array('time1'=>$timetocheck, 'time2'=>$timetocheck);
         $holiday = $DB->record_exists_select('supervision_holidays', $select, $params);
+*/      
 
         if($holiday) {
             return true; // no need to check for weeked
         }
-
+        
 
         if($weekends) {
             $day = getdate($timetocheck);
@@ -515,10 +591,13 @@ abstract class supervisionwarning {
             $down = 1;
         }
         
+        $holidays = $DB->get_records('supervision_holidays', null);
+                
+        
         // if now is holidays start counting delays on previous midnight
-        if(supervisionwarning::is_holidays($timetocheck, $weekends)) {
+        if(warning::is_holidays($holidays, $timetocheck, $weekends)) {
             $timetocheck = usergetmidnight($timetocheck);
-            while(supervisionwarning::is_holidays($timetocheck-$down, $weekends)) {
+            while(warning::is_holidays($holidays, $timetocheck-$down, $weekends)) {
                 $timetocheck = strtotime($move, $timetocheck);
             }
         }
@@ -526,7 +605,7 @@ abstract class supervisionwarning {
         $count = 0;
         while($count < $days) {
             $timetocheck = strtotime($move, $timetocheck);
-            while(supervisionwarning::is_holidays($timetocheck, $weekends)) {
+            while(warning::is_holidays($holidays, $timetocheck, $weekends)) {
                 $timetocheck = strtotime($move, $timetocheck);
             }
             $count +=1;
@@ -545,10 +624,9 @@ abstract class supervisionwarning {
      * @static
      * @abstract
      * @param int $timetocheck starting time for collection
-     * @param int $lastexecution last time this routine was launched by cron
      */
-    public static function collect_stats($timetocheck, $lastexecution) {
-        throw new coding_exception('collect_stats() method needs to be overridden in each subclass of supervision_warning ');
+    public static function get_stats($timetocheck) {
+        throw new \coding_exception('collect_stats() method needs to be overridden in each subclass of supervision_warning ');
     }
 
     /**
@@ -558,7 +636,7 @@ abstract class supervisionwarning {
      * @return string , formatted link
      */
     public function report_instancelink() {
-        throw new coding_exception('report_instancelink() method needs to be overridden in each subclass of supervision_warning ');
+        throw new \coding_exception('report_instancelink() method needs to be overridden in each subclass of supervision_warning ');
     }
 
     /**
@@ -568,7 +646,7 @@ abstract class supervisionwarning {
      * @return string , formatted link
      */
     public function report_rowinfo() {
-        throw new coding_exception('report_rowinfo() method needs to be overridden in each subclass of supervision_warning ');
+        throw new \coding_exception('report_rowinfo() method needs to be overridden in each subclass of supervision_warning ');
     }
 
     /**
@@ -579,7 +657,7 @@ abstract class supervisionwarning {
      * @return string , formatted link
      */
     public function report_overdue($timetocheck) {
-        throw new coding_exception('report_overdue() method needs to be overridden in each subclass of supervision_warning ');
+        throw new \coding_exception('report_overdue() method needs to be overridden in each subclass of supervision_warning ');
     }
 
 

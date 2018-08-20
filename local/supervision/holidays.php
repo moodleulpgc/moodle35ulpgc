@@ -12,9 +12,8 @@
     require_once($CFG->dirroot."/local/supervision/locallib.php");
     require_once($CFG->libdir.'/adminlib.php');
 
-    $itemid       = optional_param('item', 0, PARAM_INT);
-
-    $baseparams = array('item' => $itemid);
+    $cid = optional_param('cid', SITEID, PARAM_INT);
+    $baseparams = array('cid' => $cid);
 
     $baseurl = new moodle_url('/local/supervision/holidays.php', $baseparams);
 
@@ -35,7 +34,7 @@
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('holidaystable', 'local_supervision'));
 
-    $config = get_config('block_supervision');
+    $config = get_config('local_supervision');
     $time = strtotime($config->startdisplay);
     $holidays = $DB->get_records_select('supervision_holidays', ' datestart >= :time', array('time'=>$time), ' datestart ASC' );
 
@@ -62,12 +61,21 @@
             $row[] = $vacation->scope;
             $rurl = new moodle_url($url);
             $rurl->param('hid', $vacation->id);
-            $icons = html_writer::link($rurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+            $icons = html_writer::link($rurl, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
             $rurl->param('del', 1);
-            $row[] = $icons.html_writer::link($rurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+            $row[] = $icons.html_writer::link($rurl, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
             $table->data[] = $row;
         }
        echo html_writer::table($table);
     } else {
     }
+    
+    if ($cid == SITEID) {
+        $url = $CFG->wwwroot.'/admin/search.php';
+    } else {
+        $url = new moodle_url('/course/view.php', array('id' => $cid));
+    }
+    echo $OUTPUT->continue_button($url);
+    
+    
     echo $OUTPUT->footer();

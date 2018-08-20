@@ -35,13 +35,10 @@ function xmldb_local_supervision_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2016040500) {
-        
-        if(
+    if ($oldversion < 2018081803) {
         
         
-        
-        upgrade_plugin_savepoint(true, 2016040500, 'local', 'supervision');
+        upgrade_plugin_savepoint(true, 2018081803, 'local', 'supervision');
     }
 
 

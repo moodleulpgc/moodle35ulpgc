@@ -22,10 +22,10 @@
         $names = array();
         if($type) {
             if(is_string($type)) {
-                $names = array($type => '/blocks/supervision/warning/'.$type);
+                $names = array($type => '/local/supervision/warning/'.$type);
             } elseif(is_array($type)) {
                     foreach($type as $t) {
-                        $names = array($t => '/blocks/supervision/warning/'.$t);
+                        $names = array($t => '/local/supervision/warning/'.$t);
                     }
             }
         } else {
@@ -65,8 +65,8 @@
             $select .= ", cc.name AS itemname ";
             $from .= "\n JOIN {course_categories} cc ON sp.instance = cc.id ";
         } elseif($scope == 'department') {
-            $select .= ", dp.departamento AS itemname ";
-            $from .= "\n JOIN {departamentos} dp ON sp.instance = dp.id ";
+            $select .= ", u.name AS itemname ";
+            $from .= "\n JOIN {local_sinculpgc_units} u ON sp.instance = u.id AND u.type = '".SINCULPGC_UNITS_DEPARTMENT."'";
         } else {
             $select .= ", sp.instance AS itemname ";
         }
@@ -260,7 +260,7 @@
         }
 
         if($permission->scope == 'department') {
-            return $DB->get_field('departamentos', 'departamento', array('id'=>$permission->instance));
+            return $DB->get_field('local_sinculpgc_units', 'name', array('id'=>$permission->instance));
         }
 
         return '';

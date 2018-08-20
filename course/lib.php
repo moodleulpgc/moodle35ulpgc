@@ -786,13 +786,15 @@ function make_categories_options() {
     $cats = coursecat::make_categories_list('', 0, ' / ');
     foreach ($cats as $key => $value) {
         // Prefix the value with the number of spaces equal to category depth (number of separators in the value).
-        $cats[$key] = str_repeat('&nbsp;', substr_count($value, ' / ')). $value;
+        $cats[$key] = str_repeat('&#160;', substr_count($value, ' / ')). $value;
     }
 
+    //ecastro ULPGC, replace &nbsp; by &#160;
+    
     foreach($cats as $key =>$cat) {     // ULPGC ecastro to cut short category names in selects
         if($name = strrchr($cat, '/')) {
             $n = substr_count($cat, '/');
-            $cats[$key] = str_repeat('&nbsp;/', $n-1).'&nbsp;'.$name;
+            $cats[$key] = str_repeat('&#160;', $n-1).'&#160;'.$name;
         }
     }
     return $cats;

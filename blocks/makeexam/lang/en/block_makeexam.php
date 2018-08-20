@@ -26,6 +26,6 @@ $string['makeexam:addinstance'] = 'Add a new Make Exam block';
 $string['pluginname'] = 'Make Exam submit helper ';
 $string['title'] = 'Exam submission';
 $string['notmakeexamattempt'] = 'This review is not an Exam version';
-
+$string['privacy:metadata'] = 'The Make Exam block only shows data stored in other locations.';
 
 

@@ -26,6 +26,6 @@ $string['makeexam:addinstance'] = 'Agregar un nuevo bloque Generar Examen';
 $string['pluginname'] = 'Ayudante para Generar Examen ';
 $string['title'] = 'Crear Examen';
 $string['notmakeexamattempt'] = 'Estas preguntas no constituyen una versión de Examen';
-
+$string['privacy:metadata'] = 'El bloque Crear Examen sólo muestrra datos almacenados en otros plugins.';
 
 
