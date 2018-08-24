@@ -120,7 +120,7 @@ class enrol_multicohort_plugin extends enrol_plugin {
         global $CFG, $DB;
 
         foreach(array('customtext1', 'customtext2', 'customtext3') as $field) {
-            if (!empty($fields[$field])) {
+            if (!empty($fields[$field]) && is_array($fields[$field])) {
                 $fields[$field] = implode(',', $fields[$field]);
             } else {
                 $fields[$field] = '';

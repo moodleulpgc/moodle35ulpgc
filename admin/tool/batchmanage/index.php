@@ -51,16 +51,17 @@ $nextstep = '';
 $formdata = '';
 if($action && confirm_sesskey()) {
     $managejob->process_formsdata();
+    
     $mform = $managejob->get_display_form($action);
     if($mform->is_cancelled()) {
         redirect($returnurl); 
     }
-    $formdata = $mform->get_data();
-    //print_object($formdata);
-    $nextstep = $managejob->process_action($action, $formdata);
+    if($formdata = $mform->get_data()) {
+        $nextstep = $managejob->process_action($action, $formdata);
+    } else {
+        redirect($returnurl, get_string('emptyform', 'tool_batchmanage')); 
+    }
 }    
-
-//print_object("nextstep = $nextstep");
 
 /// Output starts here
 echo $OUTPUT->header();

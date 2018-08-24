@@ -573,7 +573,7 @@ function enrol_multicohort_where_sql($instance) {
     global $DB;
     
     $params = array();
-    $anyof = '';
+    $anyof = ' 1 ';
     $allof = '';
     $notin = '';
     

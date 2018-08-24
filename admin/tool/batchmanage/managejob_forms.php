@@ -192,8 +192,7 @@ class batchmanage_courses_selector_form extends batchmanageform {
 
             if($dbmanager->field_exists('local_ulpgccore_course', 'credits')) { 
                 $options = array();
-                $options['-1'] = get_string('all');
-                $options['-2'] = get_string('nonzero', 'tool_batchmanage');
+                $options['-1'] = get_string('notset', 'tool_batchmanage');
                 $sql = "SELECT DISTINCT credits
                                     FROM {local_ulpgccore_course} WHERE credits IS NOT NULL ORDER BY credits ASC";
                 $usedvals = $DB->get_records_sql($sql);
@@ -201,8 +200,9 @@ class batchmanage_courses_selector_form extends batchmanageform {
                     foreach($usedvals as $key=>$value) {
                         $options["{$value->credits}"] = $value->credits;
                     }
-                    $mform->addElement('select', 'credit', get_string('credit', 'tool_batchmanage').': ', $options);
-                    $mform->setDefault('credit', -1);
+                    $select = $mform->addElement('select', 'credit', get_string('credit', 'tool_batchmanage').': ', $options);
+      //              $mform->setDefault('credit', -1);
+                    $select->setMultiple(true);
                 }
             }
 

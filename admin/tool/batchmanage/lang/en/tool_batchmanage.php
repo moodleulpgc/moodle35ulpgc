@@ -111,10 +111,10 @@ Comma separated list of course sections ID values as existing in prefix_cousre_s
 $string['sectioninsection'] = 'Section number within course';
 $string['selectsectionconfig'] = 'Define section config';
 $string['setasmarker'] = 'Set as current section';
-
-
-
-
+$string['emptyform'] = 'Form empty. Need some specified data to operate';
+$string['notset'] = 'Not set';
+$string['referencecourse'] = 'Reference course idnumber';
+$string['configreferencecourse'] = 'IDnumber of an existing course that may be used as reference or template.';
 
 
 /*

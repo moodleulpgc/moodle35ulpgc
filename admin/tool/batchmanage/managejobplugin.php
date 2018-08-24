@@ -319,12 +319,22 @@ abstract class batchmanage_managejob_plugin  {
                 $wherecourse .= " AND cu.term = ? ";
                 $params[] = $formdata->term;
             }
-            if(isset($formdata->credit) &&  $formdata->credit != -1) {
-                if($formdata->credit == -2) {
-                    $wherecourse .= " AND cu.credits > 0 ";
+            if(isset($formdata->credit) &&  $formdata->credit && is_array($formdata->credit)) {
+            
+                $isnull= reset($formdata->credit);
+                if($isnull = -1) { // means null uc course, non uc courses
+                    $isnull = " cu.credits IS NULL  ";
+                    array_shift($formdata->credit); // eliminate from list
                 } else {
-                    $wherecourse .= " AND cu.credits = ? ";
-                    $params[] = $formdata->credit;
+                    $isnull = '';
+                }
+                if($formdata->credit) {
+                    list($insql, $inparams) = $DB->get_in_or_equal($formdata->credit);
+                    $isnull = $isnull ? " OR $isnull " : '';
+                    $wherecourse .= " AND ( cu.credits $insql $isnull) "; 
+                    $params = array_merge($params, $inparams);
+                } elseif($isnull) {
+                    $wherecourse .= " AND $isnull ";
                 }
             }
             if(isset($formdata->department) &&  $formdata->department != -1) {

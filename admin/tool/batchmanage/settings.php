@@ -45,6 +45,10 @@ foreach ($plugins as $plugin) {
 if ($hassiteconfig) {
     $temp = new admin_settingpage('managejobs', new lang_string('managejobs', 'tool_batchmanage'));
     $temp->add(new tool_batchmanage_setting_managejobs());
+
+    $temp->add(new admin_setting_configtext('tool_batchmanage/referencecourse', 
+                        get_string('referencecourse', 'tool_batchmanage'), get_string('configreferencecourse', 'tool_batchmanage'), 'PTF-01'));
+  
     $ADMIN->add('managejobsettings', $temp);
 
     foreach ($plugins as $plugin) {
