@@ -81,6 +81,11 @@ class assign_feedback_historic extends assign_feedback_plugin {
         if(!$current) {
             $current = get_config('assignfeedback_historic', 'annuality');
         }
+        if(!$current) {
+            $current = getdate(time())['year'];
+            $current = $current.(substr($current, -2, 2) + 1);
+        }
+        
         $annuality = $current;
 
         if($next != 0) {

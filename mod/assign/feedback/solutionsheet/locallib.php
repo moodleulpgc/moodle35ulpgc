@@ -404,5 +404,18 @@ class assign_feedback_solutionsheet extends assign_feedback_plugin {
     public function has_user_summary() {
         return false;
     }
+    
+    
+    /**
+     * Has the feedback file been modified?
+     *
+     * @param stdClass $grade Grade object.
+     * @param stdClass $data Form data.
+     * @return boolean True if the file area has been modified, else false.
+     */
+    public function is_feedback_modified(stdClass $grade, stdClass $data) { // ecastro ULPGC
+        global $USER;
+        return false;
+    }
 }
 

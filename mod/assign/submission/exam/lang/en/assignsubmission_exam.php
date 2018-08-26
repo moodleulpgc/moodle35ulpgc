@@ -40,3 +40,4 @@ $string['numexamsforlog'] = 'The number of exam(s) : {$a} exam(s).';
 $string['pluginname'] = 'exam submissions';
 $string['siteuploadlimit'] = 'Site upload limit';
 $string['submissionexamarea'] = 'Uploaded submission exams';
+$string['numfilesforlog'] = 'The number of file(s) : {$a} file(s).';

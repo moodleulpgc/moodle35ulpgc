@@ -1,0 +1,106 @@
+.gradingform_mcq {
+    overflow: auto;
+}
+
+.gradingform_mcq.evaluate.editable {
+    width: 100%
+}
+
+.gradingform_mcq table {
+    width: 100%;
+}
+
+.gradingform_mcq .descriptionreadonly {
+    border-left: solid thin #c0c0c0;
+    width: 30%;
+}
+
+.gradingform_mcq .criterion.even {
+    background: #f0f0f0;
+}
+
+.gradingform_mcq .criteria {
+    height: 100%;
+}
+
+.gradingform_mcq .criterion {
+    border: 1px solid #ddd;
+    overflow: hidden;
+    width: 99%;
+}
+
+.gradingform_mcq .criterion label {
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+.gradingform_mcq .criterion .score {
+    display: inline-block;
+}
+
+.gradingform_mcq .criterion .description.error {
+    background: #fdd;
+}
+
+.gradingform_mcq .criterion .criterionscore {
+    display: inline;
+}
+
+.gradingform_mcq .criteriondescription div.name {
+    display: inline;
+}
+
+.gradingform_mcq .criterion .scorerow {
+    display: table;
+}
+
+.gradingform_mcq .criterion .scorerow label,
+.gradingform_mcq .criterion .scorerow .form-control,
+.gradingform_mcq .criterion .scorerow .score {
+    display: table-cell;
+}
+.gradingform_mcq .criterion .scorerow label {
+    rmin-width: 50%;
+    width: 65%;
+}
+
+.gradingform_mcq-error {
+    color: red;
+    font-weight: bold;
+}
+
+.gradingform_mcq .criterion .criterionname {
+    font-weight: bold;
+}
+
+.gradingform_mcq-regrade {
+    padding: 10px;
+    background: #fdd;
+    border: 1px solid #f00;
+    margin-bottom: 10px;
+}
+
+.gradingform_mcq_editform .status {
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 60%;
+    padding: 0.25em;
+    border: 1px solid #eee;
+}
+
+.gradingform_mcq_editform .status.ready {
+    background-color: #e7f1c3;
+    border-color: #aea;
+}
+
+.gradingform_mcq_editform .status.draft {
+    background-color: #f3f2aa;
+    border-color: #ee2;
+}
+
+.gradingform_mcq-restored {
+    padding: 10px;
+    background: #ffd;
+    border: 1px solid #ff0;
+    margin-bottom: 10px;
+}

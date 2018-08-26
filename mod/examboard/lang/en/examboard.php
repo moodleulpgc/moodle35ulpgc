@@ -45,6 +45,9 @@ $string['examboard:allocate'] = 'Allocate teachers to boards and students to exa
 $string['examboard:manage'] = 'Manage exam boards, allocation and members';
 $string['examboard:notify'] = 'Send notifications to assigned users';
 $string['examboard:tutorize'] = 'Tutorize students in exams';
+
+$string['messageprovider:examboard_notification'] = 'Examboard notification';
+$string['messageprovider:examboard_reminder'] = 'Examboard reminder';
 $string['messageprovider:examboard_notify'] = 'Message';
 $string['modulename'] = 'Exam Board';
 $string['modulenameplural'] = 'Exam Boards';

@@ -201,7 +201,6 @@ class batchmanage_courses_selector_form extends batchmanageform {
                         $options["{$value->credits}"] = $value->credits;
                     }
                     $select = $mform->addElement('select', 'credit', get_string('credit', 'tool_batchmanage').': ', $options);
-      //              $mform->setDefault('credit', -1);
                     $select->setMultiple(true);
                 }
             }
