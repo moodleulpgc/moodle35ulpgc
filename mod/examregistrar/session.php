@@ -673,9 +673,7 @@ if($session) {
             $addcallurl = new moodle_url('/mod/examregistrar/manage/action.php', $baseurl->params() + array('action'=>'addextracall'));
             $iconaddcall = new pix_icon('i/manual_item', $straddcall, 'moodle', array('class'=>'icon', 'title'=>$straddcall));
 
-
-            $buttons[] = html_writer::link($actionurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('i/manual_item'), 'alt'=>$straddcall, 'class'=>'iconsmall')), array('title'=>$straddcall));
-
+            $buttons[] = html_writer::link($actionurl, $OUTPUT->pix_icon('i/manual_item', $straddcall, 'manual', array('class'=>'iconsmall', 'title'=>$straddcall)));
 
             foreach($sessionexams as $exam) {
                 //print_object($exam);

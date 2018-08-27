@@ -13,7 +13,7 @@
         die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
     }
 
-    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+    echo $OUTPUT->box_start('generalbox', null, array('width'=>'100%'));
 ?>
 
 <center>
@@ -42,8 +42,8 @@
 </form>
 
 <?php
-    $OUTPUT->box_end();
-    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+    echo $OUTPUT->box_end();
+    echo $OUTPUT->box_start('generalbox', null, array('width'=>'100%'));
 ?>
 <form name="searchform" action="view.php" method="post" class="mform">
 <input type="hidden" name="what" value="searchforissues" />

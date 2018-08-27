@@ -52,6 +52,22 @@ class warnings_mailing extends scheduled_task {
         $config = get_config('local_supervision') ;
         if($config->enablemail) {
             include_once($CFG->dirroot.'/local/supervision/locallib.php');
+            
+        if($plugins = \core_component::get_plugin_list_with_file('supervisionwarning', 'locallib.php', true)) {
+            ksort($plugins);
+            foreach($plugins as $name => $path ) {
+                if($enabled = get_config('supervisionwarning_'.$name, 'enabled')) {
+                    //$pluginclass = '\local_supervision\warning_' . $name;
+                    //$this->warningplugins[$name] = new $pluginclass();
+                    mtrace("path:   $path");
+                    mtrace("name:   $name");
+                    
+                    include_once($path);
+                }
+            }
+        }
+            
+            
             mtrace('Mailing supervision warnings ...');
             supervision_warnings_mailing($config);
         }

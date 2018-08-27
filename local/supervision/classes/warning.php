@@ -170,11 +170,11 @@ abstract class warning {
      * @param object $ an object from supervision_warnings table
      * @param array An array of warning classes of different
      */
-    public static function toclass(StdClass $item) {
+    public static function toclass(\StdClass $item) {
         $result = false;
         if($item->warningtype) {
-            $classname = 'warning_'.$item->warningtype;
-            $result[$key] = new $classname($item);
+            $classname = '\local_supervision\warning_'.$item->warningtype;
+            $result = new $classname($item);
         }
         return $result;
     }

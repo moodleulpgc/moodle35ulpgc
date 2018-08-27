@@ -13,9 +13,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
 }
 
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
-$OUTPUT->box_end();
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+
+echo $OUTPUT->box_start('generalbox bugreport', null, array('width'=>'100%'));
 
 tracker_loadelementsused($tracker, $used);
 
@@ -34,65 +33,65 @@ $table->align = array('left', 'center', 'center', 'center');
 
 if (!empty($used)) {
     foreach ($used as $element) {
-        $icontype = "<img src=\"".$OUTPUT->pix_url("/types/{$element->type}", 'mod_tracker')."\" />";
+        $icontype = $OUTPUT->pix_icon("/types/{$element->type}", '', 'mod_tracker');
         if ($element->sortorder > 1) {
             $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'raiseelement', 'elementid' => $element->id);
             $url = new moodle_url('/mod/tracker/view.php', $params);
-            $actions = '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/up', 'core').'" /></a>';
+            $actions = '&nbsp;<a href="'.$url.'">'.$OUTPUT->pix_icon('t/up', '').'</a>';
         } else {
-            $actions = '&nbsp;<img src="'.$OUTPUT->pix_url('up_shadow', 'mod_tracker').'" />';
+            $actions = '&nbsp;'.$OUTPUT->pix_icon('up_shadow', '', 'mod_tracker');
         }
         if ($element->sortorder < count($used)) {
             $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'lowerelement', 'elementid' => $element->id);
             $url = new moodle_url('/mod/tracker/view.php', $params);
-            $actions .= '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/down', 'core').'" /></a>';
+            $actions .= '&nbsp;<a href="'.$url.'">'.$OUTPUT->pix_icon('t/down', '').'</a>';
         } else {
-            $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('down_shadow', 'mod_tracker').'" />';
+            $actions .= '&nbsp;'.$OUTPUT->pix_icon('down_shadow', '', 'mod_tracker');
         }
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelement', 'elementid' => $element->id, 'used' => 1, 'type' => $element->type);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/edit', 'core').'" /></a>';
+        $actions .= '&nbsp;<a href="'.$url.'">'.$OUTPUT->pix_icon('t/edit', '').'</a>';
 
         if ($element->type_has_options()) {
             $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
             $url = new moodle_url('/mod/tracker/view.php', $params);
-            $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('editoptions', 'mod_tracker').'"><img src="'.$OUTPUT->pix_url('editoptions', 'mod_tracker').'" /></a>';
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('editoptions', 'mod_tracker').'">'.$OUTPUT->pix_icon('editoptions', '', 'mod_tracker').'</a>';
         }
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'removeelement', 'usedid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/right', 'core').'" /></a>';
+        $actions .= '&nbsp;<a href="'.$url.'">'.$OUTPUT->pix_icon('t/right', '').'</a>';
 
         if ($element->active) {
             if (!$element->mandatory) {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setinactive', 'usedid' => $element->id);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setinactive', 'tracker').'"><img src="'.$OUTPUT->pix_url('/t/hide', 'core').'" /></a>';
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setinactive', 'tracker').'">'.$OUTPUT->pix_icon('t/hide', '').'</a>';
             } else {
-                $actions .= '&nbsp;<img class="dimmed" src="'.$OUTPUT->pix_url('/t/hide', 'core').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('t/hide', '');
             }
         } else {
             $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setactive', 'usedid' => $element->id);
             $url = new moodle_url('/mod/tracker/view.php', $params);
-            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setactive', 'tracker').'"><img src="'.$OUTPUT->pix_url('/t/show', 'core').'" /></a>';
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setactive', 'tracker').'">'.$OUTPUT->pix_icon('t/show', '').'</a>';
         }
 
         if ($element->has_mandatory_option()) {
             if ($element->mandatory) {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setnotmandatory', 'usedid' => $element->id);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setnotmandatory', 'tracker').'"><img src="'.$OUTPUT->pix_url('notempty', 'tracker').'" /></a>';
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setnotmandatory', 'tracker').'">'.$OUTPUT->pix_icon('notempty', '', 'mod_tracker').'</a>';
             } else {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setmandatory', 'usedid' => $element->id);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setmandatory', 'tracker').'"><img src="'.$OUTPUT->pix_url('empty', 'tracker').'" /></a>';
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setmandatory', 'tracker').'">'.$OUTPUT->pix_icon('empty', '', 'mod_tracker').'"</a>';
             }
         } else {
             if ($element->mandatory) {
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('notempty', 'tracker').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('notempty', 'tracker');
             } else {
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('empty', 'tracker').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('empty', 'tracker');
             }
         }
 
@@ -100,21 +99,21 @@ if (!empty($used)) {
             if ($element->private) {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setpublic', 'usedid' => $element->id);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setpublic', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/locked', 'core').'" /></a>';
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setpublic', 'tracker').'">'.$OUTPUT->pix_icon('t/locked', '').'</a>';
             } else {
                 if (!$element->mandatory) {
                     $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setprivate', 'usedid' => $element->id);
                     $url = new moodle_url('/mod/tracker/view.php', $params);
-                    $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setprivate', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/lock', 'core').'" /></a>';
+                    $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setprivate', 'tracker').'">'.$OUTPUT->pix_icon('t/lock', '').'</a>';
                 } else {
-                    $actions .= '&nbsp;<img class="dimmed" src="'.$OUTPUT->pix_url('t/lock', 'core').'" />';
+                    $actions .= '&nbsp;'.$OUTPUT->pix_icon('t/lock', '');
                 }
             }
         } else {
             if ($element->private) {
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('t/locked', 'core').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('t/locked', 'core').'" />';
             } else {
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('t/lock', 'core').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('t/lock', 'core').'" />';
             }
         }
 
@@ -129,5 +128,5 @@ if (!empty($used)) {
     echo '<br/></center>';
 }
 
-$OUTPUT->box_end();
+echo $OUTPUT->box_end();
 

@@ -193,9 +193,9 @@ if($datatypes = $DB->get_records('assignfeedback_historic_type', null)) {
         $action = '';
         $buttons = array();
         $url = new moodle_url($baseurl, array('item'=>$datatype->id));
-        $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+        $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
         $url = new moodle_url($baseurl, array('del'=>$datatype->id));
-        $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+        $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
         $action = implode('&nbsp;&nbsp;', $buttons);
         $data[] = $action;
         $table->add_data($data);

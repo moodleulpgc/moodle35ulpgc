@@ -287,15 +287,15 @@ if (!empty($issues)) {
         $solution = ($hassolution) ? "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/solution.gif\" height=\"15\" alt=\"".tracker_getstring('hassolution','tracker')."\" />" : '' ;
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".tracker_getstring('update')."\" ><img src=\"".$OUTPUT->pix_url('/t/edit')."\" border=\"0\" /></a>";
+            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".tracker_getstring('update')."\" >".$OUTPUT->pix_icon('t/edit', '', 'moodle', array('border'=>0))."</a>";
         }
         if (has_capability('mod/tracker:manage', $context)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".tracker_getstring('delete')."\" ><img src=\"".$OUTPUT->pix_url('/t/delete')."\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".tracker_getstring('delete')."\" >".$OUTPUT->pix_icon('t/delete', '', 'moodle', array('border'=>0))."</a>";
         }
         // Ergo Report I3 2012 => self list displays owned tickets. Already registered
-        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".tracker_getstring('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'tracker')."\" border=\"0\" /></a>";
+        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".tracker_getstring('register', 'tracker')."\" >".$OUTPUT->pix_icon('register', 'tracker')."\" border=\"0\" /></a>";
         if (($issue->resolutionpriority < $maxpriority) && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".tracker_getstring('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'tracker')."\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".tracker_getstring('askraise', 'tracker')."\" >".$OUTPUT->pix_icon('askraise', '', 'mod_tracker', array('border'=>0))."</a>";
         }
         if (!empty($tracker->parent)) {
             $transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '' ;
@@ -305,9 +305,9 @@ if (!empty($issues)) {
         }
         if($ulpgckey !== false) {
             $hascomment = tracker_userlastcomment($issue, $tracker, $context);
-            $lastcomment = ($hascomment) ? "&nbsp;<img src=\"".$OUTPUT->pix_url($hascomment, 'mod_tracker')."\" height=\"15\" alt=\"".tracker_getstring('lastcomment','tracker')."\" />" : '' ;
+            $lastcomment = ($hascomment) ? "&nbsp;".$OUTPUT->pix_icon($hascomment, tracker_getstring('lastcomment','tracker'), 'mod_tracker', array('height'=>16)) : '' ;
             $haslastseen = tracker_userlastseen($issue, $tracker, $context);
-            $lastseen = ($haslastseen) ? "&nbsp;<img src=\"".$OUTPUT->pix_url($haslastseen, 'mod_tracker')."\" height=\"15\" border=\"0\" alt=\"".tracker_getstring('userlastseen','tracker')."\" />" : '' ;
+            $lastseen = ($haslastseen) ? "&nbsp;".$OUTPUT->pix_icon($haslastseen, tracker_getstring('userlastseen','tracker'), 'mod_tracker', array('height'=>16)) : '' ;
             $lastcomment .= $lastseen;
             if ($canviewpriority && !$resolved){
                 $ticketpriority = ($issue->status < RESOLVED || $issue->status == TESTING) ? round(($issue->resolutionpriority / DAYSECS), 2)*100 : '' ;

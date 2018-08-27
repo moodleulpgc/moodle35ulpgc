@@ -244,7 +244,7 @@ class gradingform_mcq_renderer extends plugin_renderer_base {
         
         $criterionfields = array('mcqscore', 'mcqfails');
         if($criterion['nonmcqmaxscore'] > 0) {
-            $criterionfields[] = 'nonmcqmaxscore';
+            $criterionfields[] = 'nonmcqscore';
         }
 
         if ($mode == gradingform_mcq_controller::DISPLAY_EVAL) {

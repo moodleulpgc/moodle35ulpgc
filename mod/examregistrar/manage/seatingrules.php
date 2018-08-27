@@ -350,7 +350,7 @@ foreach($allocatedrooms as $room) {
     $icon = '';
     if($allocatedseats > 0) {
         $allocurl->params(array('action'=>'emptyroom', 'room'=>$room->id));
-        $icon = '&nbsp;&nbsp;'.html_writer::link($allocurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strunallocate, 'class'=>'iconsmall')), array('title'=>$strunallocate));
+        $icon = '&nbsp;&nbsp;'.html_writer::link($allocurl, $OUTPUT->pix_icon('t/delete', $strunallocate, 'moodle', array('class'=>'iconsmall', 'title'=>$strunallocate)));
     }
     $roomname .= $busyalloc.$freealloc.$icon;
 
@@ -368,7 +368,7 @@ foreach($allocatedrooms as $room) {
         $examitems = array();
         foreach ($roomexams as $exam) {
             $allocurl->params(array('action'=>'unallocateexam', 'exam'=>$exam->examid));
-            $icon = html_writer::link($allocurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strunallocate, 'class'=>'iconsmall')), array('title'=>$strunallocate));
+            $icon = html_writer::link($allocurl, $OUTPUT->pix_icon('t/delete', $strunallocate, 'moodle', array('class'=>'iconsmall', 'title'=>$strunallocate)));
             $examitems[] = "({$exam->booked}) {$exam->programme}-{$exam->shortname} $icon";
         }
         echo html_writer::alist($examitems);
@@ -428,7 +428,7 @@ if($unallocatedexams) {
         $icon = '';
         if($exam->allocated) {
             $allocurl->params(array('action'=>'emptyexam', 'exam'=>$exam->examid));
-            $icon = html_writer::link($allocurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strunallocate, 'class'=>'iconsmall')), array('title'=>$strunallocate));
+            $icon = html_writer::link($allocurl, $OUTPUT->pix_icon('t/delete', $strunallocate, 'moodle', array('class'=>'iconsmall', 'title'=>$strunallocate)));
         }
         $checkbox = html_writer::checkbox('exams['.$exam->examid.']', $exam->examid, false);
         $examitems[] = $checkbox."  ({$exam->booked} / {$exam->allocated}) {$exam->programme}-{$exam->shortname}&nbsp;".$icon;

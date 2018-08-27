@@ -48,7 +48,7 @@ class checkboxhorizelement extends trackerelement {
                     echo html_writer::empty_tag('input', array('type' => 'checkbox', 'name' => 'element'.$this->name.$option->id, 'value' => 1));
                 }
                 echo format_string($option->description);
-                echo html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('spacer'), 'width' => 30, 'hight' => 1));
+                echo $OUTPUT->pix_icon('spacer', '', 'moodle', array('width' => 30, 'hight' => 1));
             }
         }
     }

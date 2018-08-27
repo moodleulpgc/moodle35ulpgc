@@ -349,14 +349,14 @@ if($elements) {
         if (!$table->is_downloading()) {
             $buttons = array();
             $url = new moodle_url($manageurl, array('show'=>$visible));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/'.$visicon), 'alt'=>$strvisible, 'class'=>'iconsmall')), array('title'=>$strvisible));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/'.$visicon, $strvisible, 'moodle', array('class'=>'iconsmall', 'title'=>$strvisible)));
             $url = new moodle_url($manageurl, array('item'=>$element->id));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
             $url = new moodle_url($manageurl, array('del'=>$element->id));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
             $actionurl = new moodle_url('/mod/examregistrar/manage/action.php', array('id'=>$cm->id,'edit'=>$edit));
             $actionurl->params(array('action'=>'addextracall', 'exam'=>$element->id));
-            $buttons[] = html_writer::link($actionurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('i/manual_item'), 'alt'=>$straddcall, 'class'=>'iconsmall')), array('title'=>$straddcall));
+            $buttons[] = html_writer::link($actionurl, $OUTPUT->pix_icon('i/manual_item', $straddcall, 'moodle', array('class'=>'iconsmall', 'title'=>$straddcall)));
             $action = implode('&nbsp;&nbsp;', $buttons);
         }
         $data[] = $action;

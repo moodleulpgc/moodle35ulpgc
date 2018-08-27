@@ -13,7 +13,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-echo $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
+//echo $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
+echo $OUTPUT->box_start('generalbox bugreport', null, array('width'=>'100%'));
 
 $summarytable = new html_table();
 $summarytable->head = array('', '');

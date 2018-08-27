@@ -264,23 +264,23 @@ if($elements) {
             $buttons = array();
             /*
             $url = new moodle_url($manageurl, array('show'=>$visible));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/'.$visicon), 'alt'=>$strvisible, 'class'=>'iconsmall')), array('title'=>$strvisible));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/'.$visicon, $strvisible, 'moodle', array('class'=>'iconsmall', 'title'=>$strvisible)));
             */
             $url = new moodle_url('/mod/examregistrar/manage/assignsessionrooms.php',
                                   array('id'=>$cm->id, 'action'=>'sessionrooms', 'edit'=>$edit, 'session'=>$element->examsession, 'room'=>$element->roomid, 'venue'=>$element->bookedsite));
 
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
             $url = new moodle_url($manageurl, array('del'=>$element->id));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
             $buttons[] = '<br />&nbsp;&nbsp;';
             $url = new moodle_url('/mod/examregistrar/manage/assignseats.php',
                                   array('id'=>$cm->id, 'edit'=>'session_rooms', 'session'=>$element->examsession, 'room'=>$element->roomid));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/contextmenu'), 'alt'=>$strseats, 'class'=>'iconsmall')), array('title'=>$strseats));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/contextmenu', $strseats, 'moodle', array('class'=>'iconsmall', 'title'=>$strseats)));
 
             //$buttons[] = '&nbsp;&nbsp;';
             $url = new moodle_url('/mod/examregistrar/manage/assignroomstaffers.php',
                                   array('id'=>$cm->id, 'action'=>'roomstaffers', 'edit'=>$edit, 'session'=>$element->examsession, 'room'=>$element->roomid));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'class'=>'iconsmall')), array('title'=>$strstaffers));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/assignroles', $strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
 
             $action = implode('&nbsp;&nbsp;', $buttons);
         }

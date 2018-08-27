@@ -193,16 +193,16 @@ if($elements) {
             $buttons = array();
             $manageurl->param('edit', 'locations');
             $url = new moodle_url($manageurl, array('show'=>$visible));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/'.$visicon), 'alt'=>$strvisible, 'class'=>'iconsmall')), array('title'=>$strvisible));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/'.$visicon, $strvisible, 'moodle', array('class'=>'iconsmall', 'title'=>$strvisible)));
             $url = new moodle_url($manageurl, array('item'=>$element->id));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/edit'), 'alt'=>$stredit, 'class'=>'iconsmall')), array('title'=>$stredit));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
             $url = new moodle_url($manageurl, array('del'=>$element->id));
-            $buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/delete'), 'alt'=>$strdelete, 'class'=>'iconsmall')), array('title'=>$strdelete));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
             $buttons[] = '&nbsp;&nbsp;';
             //$url = new moodle_url($manageurl, array('staffers'=>$element->id));
             //$buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'class'=>'iconsmall')), array('title'=>$strstaffers));
             $staffurl->param('room', $element->id);
-            $buttons[] = html_writer::link($staffurl, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'class'=>'iconsmall')), array('title'=>$strstaffers));
+            $buttons[] = html_writer::link($staffurl, $OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
             $action = implode('&nbsp;&nbsp;', $buttons);
         }
         $data[] = $action;

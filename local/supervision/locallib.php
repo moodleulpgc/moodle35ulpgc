@@ -274,10 +274,10 @@
      * @param int $lastexecution last time this routine was launched by cron
      * @return a moodle icon object
      */
-    function supervision_warnings_mailing($timetocheck, $lasttime) {
+    function supervision_warnings_mailing($config) {
         global $CFG, $DB, $USER;
 
-        $config = get_config('local_supervision');
+        $timetocheck = time();
 
         /// last step: mail warnings if needed
         /// TODO count of failures for each course, user;  JOIN user and course???
@@ -331,8 +331,7 @@
                 $text = get_string('warningemailtxt',  'local_supervision', $info );
                 $html = ($stat->mailformat == 1) ? get_string('warningemailhtml',  'local_supervision', $info ) : '';
 
-                $classname = 'supervisionwarning_'.$stat->warningtype;
-                $warning = new $classname($stat);
+                $warning = \local_supervision\warning::toclass($stat);
 
                 if(!$stat->userid) {
                     /// TODO debug measure, eliminate

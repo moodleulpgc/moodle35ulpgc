@@ -16,35 +16,7 @@ if (!defined('MOODLE_INTERNAL')) {
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 $a  = optional_param('a', 0, PARAM_INT);  // course ID
 
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
-
-?>
-<form name="addelement" method="post" action="<?php echo $CFG->wwwroot ?>/mod/tracker/view.php">
-<table border="0" width="100%">
-    <tr>
-        <td valign="top">
-            <b><?php print_string('createnewelement', 'tracker') ?>:</b>
-        </td>
-        <td valign="top">
-                <?php
-                    echo '<input type="hidden" name="view" value="admin" />';
-                    echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
-                    echo '<input type="hidden" name="what" value="createelement" />';
-                    $types = tracker_getelementtypes();
-                    foreach ($types as $type) {
-                        $elementtypesmenu[$type] = get_string($type, 'tracker');
-                    }
-
-                    echo html_writer::select($elementtypesmenu, 'type', '', array('' => 'choose'), array('onchange' => 'document.forms[\'addelement\'].submit();'));
-                ?>
-        </td>
-    </tr>
-</table>
-</form>
-
-<?php
-$OUTPUT->box_end();
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+echo $OUTPUT->box_start('generalbox bugreport', null, array('width'=>'100%'));
 
 tracker_loadelements($tracker, $elements);
 
@@ -83,27 +55,27 @@ if (!empty($elements)) {
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'addelement', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions = '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('addtothetracker', 'tracker').'" ><img src="'.$OUTPUT->pix_url('t/moveleft', 'core') .'" /></a>';
+        $actions = '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('addtothetracker', 'tracker').'" >'.$OUTPUT->pix_icon('t/moveleft', '') .'</a>';
 
         if ($element->type_has_options()) {
             $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
             $url = new moodle_url('/mod/tracker/view.php', $params);
-            $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('editoptions', 'tracker').'"><img src="'.$OUTPUT->pix_url('editoptions', 'mod_tracker').'" /></a>';
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('editoptions', 'tracker').'">'.$OUTPUT->pix_icon('editoptions', '', 'mod_tracker').'</a>';
         }
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelement', 'elementid' => $element->id, 'type' => $element->type);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('editproperties', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/edit', 'core') .'" /></a>';
+        $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('editproperties', 'tracker').'">'.$OUTPUT->pix_icon('t/edit', '') .'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelement', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('delete').'"><img src="'.$OUTPUT->pix_url('t/delete', 'core') .'" /></a>';
+        $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('delete').'">'.$OUTPUT->pix_icon('t/delete', '') .'</a>';
 
         $local = '';
         if ($element->course == $COURSE->id) {
-            $local = '<img src="'.$OUTPUT->pix_url('i/course', 'core') .'" />';
+            $local = ''.$OUTPUT->pix_icon('i/course', '');
         }
-        $type = "<img src=\"".$OUTPUT->pix_url("types/{$element->type}", 'mod_tracker')."\" />";
+        $type = $OUTPUT->pix_icon("types/{$element->type}", '', 'mod_tracker');
         $table->data[] = array($actions, $name, $local, $type);
     }
     echo html_writer::table($table);
@@ -112,4 +84,36 @@ if (!empty($elements)) {
     print_string('noelements', 'tracker');
     echo '<br /></center>';
 }
-$OUTPUT->box_end();
+echo $OUTPUT->box_end();
+
+
+echo $OUTPUT->box_start('generalbox bugreport', null, array('width'=>'100%'));
+$elementtypesmenu = array();
+
+?>
+<form name="addelement" method="post" action="<?php echo $CFG->wwwroot ?>/mod/tracker/view.php">
+<table border="0" width="100%">
+    <tr>
+        <td valign="top">
+            <b><?php print_string('createnewelement', 'tracker') ?>:</b>
+        </td>
+        <td valign="top">
+                <?php
+                    echo '<input type="hidden" name="view" value="admin" />';
+                    echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
+                    echo '<input type="hidden" name="what" value="createelement" />';
+                    $types = tracker_getelementtypes();
+                    foreach ($types as $type) {
+                        $elementtypesmenu[$type] = get_string($type, 'tracker');
+                    }
+
+                    echo html_writer::select($elementtypesmenu, 'type', '', array('' => 'choose'), array('onchange' => 'document.forms[\'addelement\'].submit();'));
+                ?>
+        </td>
+    </tr>
+</table>
+</form>
+
+<?php
+echo $OUTPUT->box_end();
+

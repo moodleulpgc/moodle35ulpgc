@@ -8,9 +8,9 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="definitionid"/>
         <FIELD NAME="definitionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the form definition this criterion is part of"/>
-        <FIELD NAME="mcqmaxscore" TYPE="number" LENGTH="10" NOTNULL="true" DECIMALS="5" SEQUENCE="false" COMMENT="Defines the total number of questions/points of type MCQ in the quiz"/>
+        <FIELD NAME="mcqmaxscore" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the total number of questions/points of type MCQ in the quiz"/>
         <FIELD NAME="choices" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Defines the number of choives for each MCQ question"/>
-        <FIELD NAME="nonmcqmaxscore" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" DECIMALS="5" SEQUENCE="false" COMMENT="The optional number of additional points in non-MCQ questions"/>
+        <FIELD NAME="nonmcqmaxscore" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The optional number of additional points in non-MCQ questions"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_definitionid" />
@@ -22,10 +22,10 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="instanceid"/>
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the grading form instance" PREVIOUS="id" NEXT="criterionid"/>
         <FIELD NAME="criterionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the criterion (row) in the mcq" PREVIOUS="instanceid" NEXT="remark"/>
-        <FIELD NAME="mcqscore" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="the number of correct questions of type MCQ in the quiz"/>
+        <FIELD NAME="mcqscore" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="the number of correct questions of type MCQ in the quiz"/>
         <FIELD NAME="mcqfails" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="the number of incorrect questions of type MCQ in the quiz"/>
-        <FIELD NAME="nonmcqscore" TYPE="number" LENGTH="10"  NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="the number of correct questions/points of other types, non-MCQ, in the quiz"/>
-        <FIELD NAME="score" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The score assigned" PREVIOUS="remarkformat"/>
+        <FIELD NAME="nonmcqscore" TYPE="int" LENGTH="4"  NOTNULL="true" SEQUENCE="false" COMMENT="the number of correct questions/points of other types, non-MCQ, in the quiz"/>
+        <FIELD NAME="score" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" DECIMALS="5" SEQUENCE="false" COMMENT="The score assigned" PREVIOUS="remarkformat"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_instanceid"/>
