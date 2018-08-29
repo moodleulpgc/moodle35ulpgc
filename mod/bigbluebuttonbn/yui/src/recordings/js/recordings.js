@@ -213,7 +213,7 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingEditPerform: function(nodeelement) {
         var node = nodeelement.ancestor('div');
-        var text = nodeelement.get('value');
+        var text = nodeelement.get('value').trim();
         // Perform the update.
         nodeelement.setAttribute('data-action', 'edit');
         nodeelement.setAttribute('data-goalstate', text);
@@ -240,6 +240,12 @@ M.mod_bigbluebuttonbn.recordings = {
 
     recordingPlay: function(element) {
         var nodeelement = Y.one(element);
+        if (nodeelement.getAttribute('data-href') === '') {
+            M.mod_bigbluebuttonbn.helpers.alertError(
+                M.util.get_string('view_recording_format_errror_unreachable', 'bigbluebuttonbn')
+              );
+            return;
+        }
         var extras = {
             target: nodeelement.getAttribute('data-target'),
             source: 'published',
@@ -313,15 +319,12 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         if (data.action === 'unpublish') {
             this.recordingUnpublishCompletion(data.recordingid);
+            return;
         }
     },
 
     recordingActionFailover: function(data) {
-        var alert = new M.core.alert({
-            title: M.util.get_string('error', 'moodle'),
-            message: data.message
-        });
-        alert.show();
+        M.mod_bigbluebuttonbn.helpers.alertError(data.message);
         M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
         if (data.action === 'edit') {
             this.recordingEditCompletion(data, true);

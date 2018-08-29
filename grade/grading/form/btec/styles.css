@@ -5,6 +5,7 @@
     margin-bottom: 10px;
 }
 
+
 .gradingform_btec-restored {
     padding: 10px;
     background: #ffd;
@@ -37,6 +38,10 @@
 
 .gradingform_btec {
     overflow: auto;
+}
+/*styles the final grade shown to students*/
+div.btec-grade {
+    display: inherit;
 }
 
 .gradingform_btec.editor .criterion .controls,

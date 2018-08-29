@@ -286,6 +286,7 @@ $string['view_recording_button_return'] = 'Go back';
 $string['view_recording_format_presentation'] = 'presentation';
 $string['view_recording_format_video'] = 'video';
 $string['view_recording_format_statistics'] = 'statistics';
+$string['view_recording_format_errror_unreachable'] = 'The URL for this recording format is unreachable.';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
 $string['view_message_norecordings'] = 'There are no recording to show.';
@@ -395,3 +396,5 @@ $string['view_error_meeting_not_running'] = 'Something went wrong, the meeting i
 $string['view_error_current_state_not_found'] = 'Current state was not found. The recording may have been deleted or the BigBlueButton server is not compatible with the action performed.';
 $string['view_error_action_not_completed'] = 'Action could not be completed';
 $string['view_warning_default_server'] = 'This Moodle server is making use of the BigBlueButton testing server that comes pre-configured by default. It should be replaced for production.';
+
+$string['view_room'] = 'View room';
