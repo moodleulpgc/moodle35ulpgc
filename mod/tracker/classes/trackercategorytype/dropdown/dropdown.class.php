@@ -33,21 +33,30 @@ class dropdownelement extends trackerelement {
     public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
         $this->setoptionsfromdb();
+        // ecastro ULPGC
+        $this->multiple = 0;
+        if(isset($this->paramint1)) {
+            $this->multiple = $this->paramint1;
+        }
     }
 
     public function view($issueid = 0) {
         $this->getvalue($issueid); // Loads $this->value with current value for this issue.
+        
+        $values = explode(',', $this->value);
+        
         if (isset($this->options)) {
             $optionstrs = array();
-            foreach ($this->options as $option) {
-                if ($this->value != null) {
-                    if ($this->value == $option->id) {
-                        $optionstrs[] = format_string($option->description);
+            foreach($values as $value) {
+                foreach ($this->options as $option) {
+                    if ($value != null) {
+                        if ($value == $option->id) {
+                            $optionstrs[] = format_string($option->description);
+                        }
                     }
                 }
             }
-
-            return implode(', ', $optionstrs);
+            return implode(',<br />', $optionstrs);
         }
         return '';
     }
@@ -74,7 +83,7 @@ class dropdownelement extends trackerelement {
 
         $mform->addElement('header', "head{$this->name}", format_string($this->description));
         $mform->setExpanded("head{$this->name}");
-        $optionsmenu = array(''=>tracker_getstring('choose')); // ecastro ULPGC
+        $optionsmenu = $this->multiple ? array() : array(''=>tracker_getstring('choose')); // ecastro ULPGC
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
@@ -83,7 +92,9 @@ class dropdownelement extends trackerelement {
             $select = $mform->addElement('select', 'element'.$this->name, format_string($this->description), $optionsmenu);
             if (!empty($this->mandatory)) {
                 $mform->addRule('element'.$this->name, null, 'required', null, 'client');
-                $mform->addRule('element'.$this->name, null, 'nonzero', null, 'client');
+                if(!$this->multiple) {
+                    $mform->addRule('element'.$this->name, null, 'nonzero', null, 'client');
+                }
             }
 			if($this->multiple){
                 $select->setMultiple(true); // ecastro ULPGC

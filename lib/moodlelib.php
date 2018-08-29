@@ -5772,6 +5772,18 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         return false;
     }
 
+    // ecastro ULPGC to allow mail CC to other secondary emails addressess
+    // First, use it if available when main email is empty
+    $profilefields = profile_user_record($user->id);
+    if(isset($profilefields->ccedmails) && $profilefields->ccemails) {
+        $user->ccdemails = explode(',', $profilefields->ccemails);
+        if (empty($user->email)) {
+            if($user->ccdemails) {
+                $user->email = trim(array_shift($user->ccdemails));
+            }
+        }
+    }
+    
     if (empty($user->email)) {
         debugging('Can not send email to user without email: '.$user->id, DEBUG_DEVELOPER);
         return false;
@@ -6077,6 +6089,17 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
     foreach ($tempreplyto as $values) {
         $mail->addReplyTo($values[0], $values[1]);
+    }
+    
+    // ecastro ULPGC to allow mail CC to other secondary emails addressess
+    // second, add CC fields if existing
+    $value = reset($temprecipients);
+    if(isset($user->ccdemails) && $user->ccdemails) {
+        foreach($user->ccdemails as $email) {
+            if(validate_email(trim($email))) {
+                $mail->addCC($email, $value[1]);
+            }
+        }
     }
 
     if ($mail->send()) {

@@ -249,6 +249,7 @@ $string['managenetwork'] = 'Cascade and network setup';
 $string['manager'] = 'Manager';
 $string['mandatory'] = 'Mandatory answer';
 $string['me'] = 'My profile';
+$string['menumultiple'] = 'Set as multi-select';
 $string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
 $string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
 $string['message_ticketting'] = 'We have registered your query. I has been assigned to {$a}.';

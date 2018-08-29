@@ -55,8 +55,8 @@ class mod_examregistrar_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'examregistrarname', 'examregistrar');
 
-        // Adding the standard "intro" and "introformat" fields
-        $this->add_intro_editor();
+        // Adding the standard "intro" and "introformat" fields.
+        $this->standard_intro_elements();
 
         $examregistrarsmenu = array('' => get_string('thisisprimary', 'examregistrar'));
         $examregistrarsmenu = $examregistrarsmenu + examregistrar_get_primary_registrars();

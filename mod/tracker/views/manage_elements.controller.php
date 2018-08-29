@@ -54,6 +54,12 @@ elseif ($action == 'doaddelement') {
         $element->name = $form->name;
         $element->description = str_replace("'", "''", $form->description);
         $form->type = $element->type = $form->type;
+        foreach(array('paramint1', 'paramint2', 'paramchar1', 'paramchar2') as $field) {
+            if($optional = optional_param($field, '', PARAM_ALPHANUMEXT)) {
+                $element->$field = $optional;
+            }
+        }
+
         $element->course = ($form->shared) ? 0 : $COURSE->id;
         if (!$form->elementid = $DB->insert_record('tracker_element', $element)) {
             print_error('errorcannotcreateelement', 'tracker');
@@ -115,6 +121,11 @@ if ($action == 'doupdateelement') {
         $element->type = $form->type;
         $element->description = $form->description;
         $element->format = $form->format;
+        foreach(array('paramint1', 'paramint2', 'paramchar1', 'paramchar2') as $field) {
+            if($optional = optional_param($field, '', PARAM_ALPHANUMEXT)) {
+                $element->$field = $optional;
+            }
+        }
         $element->course = ($form->shared) ? 0 : $COURSE->id ;
         $DB->update_record('tracker_element', $element);
     } else {

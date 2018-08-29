@@ -132,6 +132,7 @@ $string['manageelements'] = 'Gestionar campos';
 $string['managenetwork'] = 'Configuración de red y transferencias';
 $string['manager'] = 'Gestor';
 $string['me'] = 'Mi perfil';
+$string['menumultiple'] = 'Permitir selección múltiple';
 $string['message_bugtracker'] = 'Gracias por su contribución y ayuda en mejorar este servicio.';
 $string['message_taskspread'] = 'Acaba de definir una Tarea. Por favor, no olvide asignarla a algún participantes en las siguientes pantallas para distribuirla.';
 $string['message_ticketting'] = 'Se ha registrado su incidencia. Se ha asignado a {$a}.';

@@ -85,7 +85,7 @@ if (!empty($used)) {
             } else {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setmandatory', 'usedid' => $element->id);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setmandatory', 'tracker').'">'.$OUTPUT->pix_icon('empty', '', 'mod_tracker').'"</a>';
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setmandatory', 'tracker').'">'.$OUTPUT->pix_icon('empty', '', 'mod_tracker').'</a>';
             }
         } else {
             if ($element->mandatory) {

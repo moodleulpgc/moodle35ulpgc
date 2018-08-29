@@ -68,6 +68,13 @@ abstract class trackerelement {
             $this->description = $elmrec->description;
             $this->course = $elmrec->course;
             $this->type = $elmrec->type;
+            // ecastro ULPGC
+            $this->paramint1 = $elmrec->paramint1;
+            $this->paramint2 = $elmrec->paramint2;
+            $this->paramchar2 = $elmrec->paramchar2;
+            $this->paramchar2 = $elmrec->paramchar2;
+            
+            
         }
 
         $this->options = null;

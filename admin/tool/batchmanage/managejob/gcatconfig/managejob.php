@@ -164,7 +164,7 @@ class batchmanage_managejob_gcatconfig extends batchmanage_managejob_plugin {
         $data = json_decode($this->formsdata['gcat_config']);
         
         foreach($data as $key => $value) {
-            if(is_object($value) && ((strpos($key, 'time') !== false) || (strpos($key, 'until') !== false)) {
+            if(is_object($value) && ((strpos($key, 'time') !== false) || (strpos($key, 'until') !== false))) {
                 if(isset($value->enabled) && !$value->enabled) {
                     // if a date is not enabled, just skip it, delete from formdata
                     unset($data->$key);

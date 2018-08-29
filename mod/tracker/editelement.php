@@ -91,6 +91,12 @@ if ($data = $form->get_data()) {
     $element->name = $data->name;
     $element->description = $data->description;
     $element->type = $data->type;
+    foreach(array('paramint1', 'paramint2', 'paramchar1', 'paramchar2') as $field) {
+        if(isset($data->$field)) {
+            $element->$field = $data->$field;
+        }
+    }
+    
     $element->course = (@$data->shared) ? 0 : $COURSE->id;
     if (!$data->elementid) {
         $element->id = $DB->insert_record('tracker_element', $element);

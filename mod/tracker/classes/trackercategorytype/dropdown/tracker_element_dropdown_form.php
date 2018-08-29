@@ -28,6 +28,10 @@ class tracker_element_dropdown_form extends tracker_moodle_form {
 
     function definition() {
         $this->start_form();
+        
+        $mform = $this->_form;
+        $mform->addElement('advcheckbox', 'paramint1', get_string('menumultiple', 'tracker'));
+        
         $this->end_form();
     }
 

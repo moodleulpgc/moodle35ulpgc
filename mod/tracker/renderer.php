@@ -388,10 +388,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $COURSE->id));
             if ($CFG->messaging) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="" onclick="this.target=\'message\'; return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\', \'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);" ><img src="'.$OUTPUT->pix_url('t/email').'"></a>';
+                $str .= '&nbsp;<a href="" onclick="this.target=\'message\'; return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\', \'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);" >'.$OUTPUT->pix_icon('t/email', '').'</a>';
             } elseif (!$user->emailstop && $user->maildisplay) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$OUTPUT->pix_url('t/mail', 'core').'"></a>';
+                $str .= '&nbsp;<a href="mailto:'.$user->email.'">'.$OUTPUT->pix_icon('t/mail', '').'</a>';
             } else {
                 $str .= '&nbsp;'.fullname($user);
             }
@@ -426,7 +426,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
             if (has_capability('mod/tracker:managewatches', context_module::instance($cm->id))) {
                 $params = array('id' => $cm->id, 'view' => 'view', 'what' => 'unregister', 'issueid' => $issue->id, 'ccid' => $cc->userid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.tracker_getstring('delete').'"><img src="'.$OUTPUT->pix_url('t/delete', 'core').'" /></a>';
+                $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.tracker_getstring('delete').'">'.$OUTPUT->pix_icon('t/delete', '').'</a>';
             }
             $str .= '</td>';
             $str .= '</tr>';

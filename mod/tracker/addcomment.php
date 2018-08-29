@@ -66,7 +66,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
+//$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 $PAGE->navbar->add(tracker_getstring('addacomment', 'tracker'), null); // ecastro ULPGC
 
 $form = new AddCommentForm(new moodle_url('/mod/tracker/addcomment.php'), array('tracker' => $tracker, 'issue' => $issue, 'cmid' => $id));
