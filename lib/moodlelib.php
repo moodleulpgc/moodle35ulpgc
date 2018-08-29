@@ -5775,11 +5775,11 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     // ecastro ULPGC to allow mail CC to other secondary emails addressess
     // First, use it if available when main email is empty
     $profilefields = profile_user_record($user->id);
-    if(isset($profilefields->ccedmails) && $profilefields->ccemails) {
-        $user->ccdemails = explode(',', $profilefields->ccemails);
+    if(isset($profilefields->ccedmails) && $profilefields->ccedmails) {
+        $user->ccedmails = explode(',', $profilefields->ccedmails);
         if (empty($user->email)) {
-            if($user->ccdemails) {
-                $user->email = trim(array_shift($user->ccdemails));
+            if($user->ccedmails) {
+                $user->email = trim(array_shift($user->ccedmails));
             }
         }
     }
@@ -6094,8 +6094,8 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     // ecastro ULPGC to allow mail CC to other secondary emails addressess
     // second, add CC fields if existing
     $value = reset($temprecipients);
-    if(isset($user->ccdemails) && $user->ccdemails) {
-        foreach($user->ccdemails as $email) {
+    if(isset($user->ccedmails) && $user->ccedmails) {
+        foreach($user->ccedmails as $email) {
             if(validate_email(trim($email))) {
                 $mail->addCC($email, $value[1]);
             }
