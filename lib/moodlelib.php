@@ -5765,7 +5765,7 @@ function generate_email_messageid($localpart = null) {
 function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', $attachment = '', $attachname = '',
                        $usetrueaddress = true, $replyto = '', $replytoname = '', $wordwrapwidth = 79) {
 
-    global $CFG, $PAGE, $SITE;
+    global $CFG, $PAGE, $SITE, $DB;
 
     if (empty($user) or empty($user->id)) {
         debugging('Can not send email to null user', DEBUG_DEVELOPER);
@@ -5774,9 +5774,15 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
 
     // ecastro ULPGC to allow mail CC to other secondary emails addressess
     // First, use it if available when main email is empty
-    $profilefields = profile_user_record($user->id);
-    if(isset($profilefields->ccedmails) && $profilefields->ccedmails) {
-        $user->ccedmails = explode(',', $profilefields->ccedmails);
+    $sql = "SELECT  uind.data
+            FROM {user_info_field} uif  
+            LEFT JOIN {user_info_data} uind ON uif.id = uind.fieldid AND uind.userid = :userid 
+            WHERE uif.shortname = :field ";
+    if($ccedmails = $DB->get_field_sql($sql, array('userid' => $user->id, 'field' => 'ccedmails'))) {
+        $user->ccedmails = explode(',', $ccedmails);
+    }
+
+    if(isset($user->ccedmails) && $user->ccedmails) {
         if (empty($user->email)) {
             if($user->ccedmails) {
                 $user->email = trim(array_shift($user->ccedmails));
@@ -6096,7 +6102,8 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     $value = reset($temprecipients);
     if(isset($user->ccedmails) && $user->ccedmails) {
         foreach($user->ccedmails as $email) {
-            if(validate_email(trim($email))) {
+            $email = trim($email);
+            if($email && validate_email($email)) {
                 $mail->addCC($email, $value[1]);
             }
         }
