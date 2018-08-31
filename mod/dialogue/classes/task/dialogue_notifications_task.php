@@ -38,6 +38,7 @@ class dialogue_notifications_task extends \core\task\scheduled_task {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/mod/dialogue/lib.php');
+        require_once($CFG->dirroot . '/mod/dialogue/locallib.php');
 
         if (isset($CFG->dialoguecrondisabled)) {
             mtrace('Dialogue task cron is disabled in config!');
