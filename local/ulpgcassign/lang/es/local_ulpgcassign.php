@@ -40,7 +40,9 @@ $string['gradenewui'] = 'Calificar en nuevo panel';
 $string['updategradenewui'] = 'Actualizar en nuevo panel';
 $string['allownewui'] = 'Utiliza panel de corrección';
 $string['configallownewui'] = 'Permite definir qué tipo de entregas usarán el nuevo (3.1) interfaz con panel de corrección'; 
-
+$string['hidegradingpanel'] = 'Desactivar calificación en panel en-línea';
+$string['hidegradingpanel_help'] = 'Permite ocultar los enlaces y botones que dan acceso al panel de calificación en-línea.
+Esta opción, como las otras aquí, se aplica a todas las tareas del curso.'; 
 // assignfeedback_offline
 $string['gradeignore'] = 'Calificación no reconocida - {$a->grade} - para {$a->student} '; 
 $string['onlineassess'] = 'Corregir en web'; 

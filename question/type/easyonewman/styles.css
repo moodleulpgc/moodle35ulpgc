@@ -1,0 +1,86 @@
+.que.easyonewman .answer {
+    padding: 0.3em;
+    width: auto;
+    display: inline;
+}
+.que.easyonewman .answer input {
+    width: 65%;
+}
+.que.easyonewman.applet {
+	width:520px;
+}
+.que.easyonewman.author {
+		float: right;
+		font-style: italic ;
+		font-size: 10px;
+}
+#page-question-type-easyonewman .mform .textareamonospace {
+    white-space: pre;
+    font-family: Andale Mono, Monaco, Courier New, DejaVu Sans Mono, monospace;
+}
+
+
+.que.easyonewman span.answerlabel {
+    vertical-align: top;
+}
+
+
+#newman_template {
+overflow: hidden; padding: 10px;
+}
+
+.dragdiv {
+position: absolute;
+cursor: move;
+z-index: 2;
+}
+
+/*  this is for staggered */
+
+
+br.cleared {
+clear: left;
+}
+
+#div1 {width:95px;height:47px;padding:10px;border:1px solid #aaaaaa;}
+
+#divnew {width:220px;height:240px;padding:10px;border:1px solid #aaaaaa; background-image: url([[pix:qtype_easyonewman|stag]]); float: left}
+#divnew {background-color:#ffffff;}
+#divneweclip {width:220px;height:240px;padding:10px;border:1px solid #aaaaaa; background-image: url([[pix:qtype_easyonewman|eclip]]);float: left}
+#divneweclip {background-color:#ffffff;}
+
+
+
+div[id*='dme'] {background-image: url([[pix:qtype_easyonewman|me]]);}
+
+
+div[id*='pos0'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:40px; left:1px;}
+div[id*='pos1'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-30px; left:82px;}
+div[id*='pos2'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-25px; left:160px;}
+div[id*='pos3'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:42px; left:160px;}
+div[id*='pos4'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:48px; left:82px;}
+div[id*='pos5'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-22px; left:1px;}
+
+
+div[id*='epos0'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:20px; left:110px;}
+div[id*='epos1'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-12px; left:65px;}
+div[id*='epos2'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:105px; left:160px;}
+div[id*='epos3'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:39px; left:160px;}
+div[id*='epos4'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-8px; left:0px;}
+div[id*='epos5'] {width:40px;height:30px;padding:0px;border:1px solid #aaaaaa; position:relative; top:-5px; left:0px;}
+
+
+
+
+
+div.flipable img.flip
+ {
+    transform: scale(-1, 1);
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -khtml-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+}
+
+/* end staggered */

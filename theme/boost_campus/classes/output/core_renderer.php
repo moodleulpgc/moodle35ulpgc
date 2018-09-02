@@ -159,10 +159,13 @@ class core_renderer extends \theme_boost\output\core_renderer {
         
         $header->hasnavbar = empty($PAGE->layout_options['nonavbar']); // ecastro ULPGC
         $items = $this->page->navbar->get_items();
+        $ulpgcshorten = get_config('local_ulpgccore','shortennavbar');
         foreach($items as $item) {
             if($item->type == 20) {
                 $item->text = html_writer::span($item->text, 'course');
-                break;
+            } elseif(($item->type == 10 || $item->type == 11 || $item->type == 60) &&        
+                ($ulpgcshorten)) { // ecastro ULPGC, to make breadcrumb easier
+                $item->text = local_ulpgccore_shorten_titles($item->text);
             }
         }
         $header->navbar = $this->navbar();
@@ -514,18 +517,21 @@ class core_renderer extends \theme_boost\output\core_renderer {
   
     
     public function region_main_settings_menu() {
-    
-        if ($this->page->context->contextlevel == CONTEXT_MODULE) {
- 
-               $this->page->navigation->initialise();
-               $node = $this->page->navigation->find_active_node();
-    
+
+        $this->page->navigation->initialise();
+        $node = $this->page->navigation->find_active_node();
+        
+        if ($this->page->context->contextlevel == CONTEXT_COURSE) {
+            if(empty($node) || $node->type == navigation_node::TYPE_CONTAINER) {
+                return false;
+            }
+        } elseif($this->page->context->contextlevel == CONTEXT_MODULE) {
             if (!empty($node) && ($node->type == navigation_node::TYPE_ACTIVITY ||
                                     $node->type == navigation_node::TYPE_RESOURCE)) {
                 $this->page->force_settings_menu(true);
             }
         }
-   
+
         return parent::region_main_settings_menu();
    }
    

@@ -74,8 +74,8 @@ $string['savemcqdraft'] = 'Guardar como borrador';
 $string['err_scoreinvalid'] = 'La puntuación introducida en \'{$a->criterianame}\' no es válida, el máximo es: {$a->maxscore}';
 $string['err_scoreisnegative'] = 'La puntuación introducida en \'{$a->criterianame}\' no es válida, no se permiten valores negativos o vacíos';
 $string['err_failsinvalid'] = 'La puntuación introducida en \'{$a->criterianame}\' no es válida. La suma de correctas e incorrectas no puede superar el total: {$a->maxscore}';
-$string['fullmcqformula'] = '  Puntuación = Correctas - (Incorrectas / (Opciones - 1 )) + NO-test';
-$string['mcqformula'] = '  Puntuación = Correctas - (Incorrectas / (Opciones - 1 ))';
+$string['fullmcqformula'] = '  Puntuación =  <br /> Correctas - (Incorrectas / (Opciones - 1 )) + NO-test';
+$string['mcqformula'] = 'Puntuación = <br /> Correctas - (Incorrectas / (Opciones - 1 ))';
 $string['needregrademessage'] = 'La definición de la fórmula Test con negativos fue cambiada posteriormente a que este alumno fuera calificado. 
 El alumno no verá la puntuación de este Test con negativos hasta que usted valide la fórmula y actualice la calificación.';
 $string['regrademessage1'] = 'Está a punto de guardar cambios en una fórmula Test con negativos que ya ha sido utilizada para calificar. 

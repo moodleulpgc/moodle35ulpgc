@@ -104,3 +104,8 @@
     border: 1px solid #ff0;
     margin-bottom: 10px;
 }
+
+.gradingform_mcq .descriptionreadonly .criteriondescription, 
+.gradingform_mcq .descriptionreadonly .descriptionmarkers {
+    margin-left: 1.0rem;
+}

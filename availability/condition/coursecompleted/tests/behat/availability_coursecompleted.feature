@@ -29,7 +29,7 @@ Feature: availability_coursecompleted
     # Basic setup.
     Given I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
-    And I navigate to "Course completion" node in "Course administration"
+    And I navigate to "Course completion" in current page administration
     And I expand all fieldsets
     And I set the field "Teacher" to "1"
     And I press "Save changes"
@@ -104,15 +104,16 @@ Feature: availability_coursecompleted
 
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Course completion" node in "Course administration > Reports"
+    And I navigate to "Reports > Course completion" in current page administration
     Then I should see "Student First"
     And I follow "Click to mark user complete"
     # Running completion task just after clicking sometimes fail, as record
     # should be created before the task runs.
     And I wait "1" seconds
     And I run the scheduled task "core\task\completion_regular_task"
+    And I run all adhoc tasks
     And I am on "Course 1" course homepage
-    And I navigate to "Course completion" node in "Course administration > Reports"
+    And I navigate to "Reports > Course completion" in current page administration
     And I log out
 
     When I log in as "student1"

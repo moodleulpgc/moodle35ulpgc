@@ -199,3 +199,4 @@ $string['privacy:metadata'] = 'The Boost Campus theme does not store any persona
 $string['region-toprow'] = 'Top row, above content ';
 $string['region-side-side'] = 'Content lateral side';
 $string['region-bottomrow'] = 'Bottom row, below content';
+$string['emailaccess'] = 'Access to ULPGC email system';

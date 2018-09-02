@@ -24,7 +24,7 @@
  */
 
 $string['currentsection'] = 'Este tema';
-$string['pluginname'] = 'Temas en pestañas';
+$string['pluginname'] = 'Temas en Pestañas';
 $string['sectionname'] = 'Tema';
 $string['page-course-view-topics'] = 'Alguna página principal de curso en formato onetopic';
 $string['page-course-view-topics-x'] = 'Alguna página de curso en formato onetopic';

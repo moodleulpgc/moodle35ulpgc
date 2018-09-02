@@ -6,9 +6,9 @@
 }
 
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
     /*your rules for chrome*/
-    #bloque_dch_cabecera ul.enlaces_cabecera li.ultimo  { 
+    #bloque_dch_cabecera ul.enlaces_cabecera li.ultimo {
         margin-top: -21px;
     }
 }
@@ -34,12 +34,12 @@
 }
 
 #bloque_dch_cabecera ul.enlaces_cabecera li a {
-    font-family: "Helvetica Neue","Helvetica", "Arial";
+    font-family: "Helvetica Neue", "Helvetica", "Arial";
     display: block;
     color: #ffffff;
     font-size: 0.875em;
     text-decoration: none;
-} 
+}
 
 #bloque_dch_cabecera ul.enlaces_cabecera li a:hover {
     color: #ff9a00;
@@ -104,7 +104,7 @@
 }
 
 
-@media(min-width: 768px) {
+@media (min-width: 768px) {
     .usermenu span.userbutton span.usertext {
         display: inline-block;
         max-width: 17vw;
@@ -115,25 +115,25 @@
     }
 }
 
-@media(min-width: 1032px) {
+@media (min-width: 1032px) {
     .usermenu span.userbutton span.usertext {
         max-width: 20vw;
     }
 }
 
-@media(min-width: 1128px) {
+@media (min-width: 1128px) {
     .usermenu span.userbutton span.usertext {
         max-width: 30vw;
     }
 }
 
-.navbar-light .navbar-nav .show > .nav-link  {
+.navbar-light .navbar-nav .show > .nav-link {
     color: #fff;
 }
 
 .navbar a.dropdown-toggle:hover, 
 .navbar .navbar-nav .nav-link .icon:hover,
-.navbar a.dropdown-toggle .usertext:hover, 
+.navbar a.dropdown-toggle .usertext:hover,
 .navbar .usermenu .dropdown a:hover {
     color: #ff9a00 !important;
 }
@@ -160,6 +160,11 @@ h4, .h4 {
     font-size: 1.25rem;
 }
 
+.path-course hr,
+.path-mod hr {
+  border-top: 2px solid rgba(0, 0, 0, 0.4); 
+  width: 95%;
+}
 
 button[data-action=toggle-drawer] {    
     padding: .375rem .75rem;

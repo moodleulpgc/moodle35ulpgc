@@ -90,6 +90,9 @@ $navdrawerfullwidth = get_config('theme_boost_campus', 'navdrawerfullwidth');
 
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
+    'ulpgc' => get_string('backto', 'moodle', 'ULPGC'),
+    'email' => get_string('emailaccess', 'theme_boost_campus'),
+    'logout' => get_string('logout'),
     'output' => $OUTPUT,
     'sidepreblocks' => $blockshtml,
     'hasblocks' => $hasblocks,

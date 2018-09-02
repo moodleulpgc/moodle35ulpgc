@@ -214,6 +214,7 @@ git submodule add https://github.com/trampgeek/moodle-qtype_coderunner.git  ques
 git submodule add https://github.com/moodleou/moodle-qtype_combined.git     question/type/combined
 git submodule add https://github.com/villalon/qtype_conceptmap.git          question/type/conceptmap
 git submodule add https://github.com/cleblond/moodle-qtype_easyofischer     question/type/easyofischer
+git submodule add https://github.com/cleblond/moodle-qtype_easyonewman.git  question/type/easyonewman
 git submodule add https://github.com/gbateson/moodle-qtype_essayautograde.git question/type/essayautograde
 git submodule add https://github.com/jmvedrine/moodle-qtype_formulas.git    question/type/formulas
 git submodule add https://github.com/marcusgreen/moodle-qtype_gapfill.git   question/type/gapfill

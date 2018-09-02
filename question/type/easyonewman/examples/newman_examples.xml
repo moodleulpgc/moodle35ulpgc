@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 18889  -->
+  <question type="easyonewman">
+    <name>
+      <text>Draw (R)-2-butanol up c2-c3 bond</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Construct (R)-2-butanol looking up the C2-C3 bond?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answers><![CDATA[Array]]></answers>
+    <conformimportant>0</conformimportant>
+    <orientimportant>1</orientimportant>
+    <stagoreclip>0</stagoreclip>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>h6-me6-me6-h6-h6-oh6</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 33107  -->
+  <question type="easyonewman">
+    <name>
+      <text>Draw anti butane (copy)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Draw butane in its <em><strong>anti</strong></em> conformation?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answers><![CDATA[Array]]></answers>
+    <conformimportant>1</conformimportant>
+    <orientimportant>0</orientimportant>
+    <stagoreclip>0</stagoreclip>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>h6-me6-h6-h6-me6-h6</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 33106  -->
+  <question type="easyonewman">
+    <name>
+      <text>Draw gauche butane</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Construct butane in its <em><strong>gauche</strong></em> conformation?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answers><![CDATA[Array]]></answers>
+    <conformimportant>1</conformimportant>
+    <orientimportant>0</orientimportant>
+    <stagoreclip>0</stagoreclip>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>h6-me6-me6-h6-h6-h6</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 33113  -->
+  <question type="easyonewman">
+    <name>
+      <text>Draw pentane up c2-c3 (copy)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Construct pentane looking up its C2-C3 bond?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answers><![CDATA[Array]]></answers>
+    <conformimportant>0</conformimportant>
+    <orientimportant>1</orientimportant>
+    <stagoreclip>0</stagoreclip>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>h6-me6-et6-h6-h6-h6</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+  </question>
+
+</quiz>

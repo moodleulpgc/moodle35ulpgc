@@ -219,6 +219,50 @@ $string['errorheaderssent'] = 'Errors on output, the file cannot be generated.';
 $string['shortennavbar'] = 'Shorter navbar strings';
 $string['explainshortennavbar'] = 'Makes abbreviations and shortens breadcrumb & navbar strings';
 $string['shortenitems'] = '
+Escuela de Arquitectura,EA
+Escuela de Ingeniería Informática,EII
+Escuela de Ingenierias Industriales y Civiles,EIIC
+Escuela de Ingeniería de Telecomunicación y Electrónica,EITE
+Facultad de Ciencias de la Actividad Física y el Deporte,FCAFD
+Facultad de Ciencias de la Educación,FCCE
+Facultad de Ciencias de La Salud,FCCS
+Facultad de Ciencias de la Salud - Sección Fuerteventura,FCCS-FV
+Facultad de Ciencias de la Salud - Sección Lanzarote,FCCS-LZ
+Facultad de Ciencias del Mar,FCM
+Facultad de Ciencias Jurídicas,FCCJJ
+Facultad de Economia, Empresa y Turismo,FEET
+Facultad de Filología,FF
+Facultad de Geografía e Historia,FGH
+Facultad de Traducción e Interpretación,FTI
+Facultad de Veterinaria,FVet
+Escuela Universitaria Adscrita de Turismo de Lanzarote,EUTL
+Escuela de Doctorado,ED
+Instituto Universitario de Sistemas Inteligentes y Aplicaciones Numéricas en Ingeniería,SIANI
+Instituto Universitario de Microelectrónica Aplicada,IUMA
+Instituto Universitario de Sanidad Animal y Seguridad Alimentaria,IUSA
+Instituto Universitario de Turismo y Desarrollo Económico Sostenible,TIDES
+Instituto Universitario para el Desarrollo Tecnológico y la Innovación en Comunicaciones,IDETIC
+Cursos Armonización de Conocimientos,CAC
+Escuela de,E.
+Escuela Universitaria,E.U.
+Experto Universitario en,E.U.
+Facultad de,F.
+Formación Universitaria Especializada de,FUE
+Instituto Universitario de,I.U.
+Programa de doble titulación:,Doble
+Programa de Doctorado en,P.D.
+Programas Formativos Especiales,PFE
+Maestrias y Expertos,MyE
+Diploma De Estudios,D.E.
+Diploma de Estudios,D.E.
+Máster Universitario en,M.U.
+Grado en,G.
+Universidad de las Palmas de Gran Canaria,ULPGC
+Universidad,U.
+Por ,por 
+De ,de  
+Peritia Et Doctrina,PeD
+Peritia et Doctrina,PeD
 ';
 $string['enableadvchooser'] = 'Enable advanced chooser';
 $string['explainenableadvchooser'] = 'If enabled, the javascript mod chooser will sho modules grouped and ordered in categories ';

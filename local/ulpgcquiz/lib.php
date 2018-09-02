@@ -36,14 +36,7 @@ function local_ulpgcquiz_extend_settings_navigation(settings_navigation $nav, co
                             new moodle_url('/local/ulpgcquiz/export.php', array('cmid'=>$PAGE->cm->id)),
                             navigation_node::TYPE_SETTING, null, 'mod_quiz_export',
                             new pix_icon('t/print', ''));
-                    /*        
-                    $key = 'mod_quiz_preview';
-                    if(!in_array($key, $settingsnode->get_children_key_list())) {
-                        $key = null;
-                    }
-                    */
-                    $key = '';
-                    $settingsnode->add_node($node, $key);
+                    $settingsnode->add_node($node);
                 }
             }
         }

@@ -35,7 +35,7 @@
                 ">
             {{# output.should_display_navbar_logo }}
                 <span class="logo d-none d-sm-inline">
-                    <img src="{{output.get_compact_logo_url}}" alt="{{sitename}}">
+                    <img src="{{output.get_compact_logo_url}}" alt="{{ulpgc}}"  title="{{ulpgc}}">
                 </span>
             {{/ output.should_display_navbar_logo }}
         </a>
@@ -52,7 +52,7 @@
             {{{ output.search_box }}}
             </div>
             <div id="correo_ulpgc" class="d-none d-lg-block">
-                <a href="https://correo.ulpgc.es/"><span class="ico_correo"></span></a>
+                <a href="https://correo.ulpgc.es/"><span class="ico_correo"  title="{{email}}"></span></a>
             </div>
 
             <!-- language_menu -->
@@ -71,7 +71,7 @@
         <div id="bloque_dch_cabecera" class="d-none d-sm-inline">
             <div class="fila_enlaces" id="enlaces_ulpgc">
 				<ul class="enlaces_cabecera">
-                    <li class="ultimo"><a href="{{{ output.logout }}}" class="desconectar"><span class="ico_desconectar"></span></a></li>
+                    <li class="ultimo"><a href="{{{ output.logout }}}" class="desconectar"><span class="ico_desconectar" title="{{logout}}" ></span></a></li>
                     <li class="boton_ulpgc"><a href="https://www2.ulpgc.es/index.php?pagina=miulpgc&ver=miulpgc" class="miulpgc"><span class="ico_miulpgc"></span>MiULPGC</a></li>
 				</ul>
 				<div class="clearer"></div>	
