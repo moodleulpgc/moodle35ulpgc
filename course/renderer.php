@@ -64,10 +64,16 @@ class core_course_renderer extends plugin_renderer_base {
      * @param string $target
      */
     public function __construct(moodle_page $page, $target) {
+        global $CFG;
+        
         $this->strings = new stdClass;
         parent::__construct($page, $target);
         $this->adminmods = get_config('local_ulpgccore','enabledadminmods'); // ecastro ULPGC enforce admin mods
         $this->recentactivity = get_config('local_ulpgccore','enabledrecentactivity'); // ecastro ULPGC enforce recent activity
+        
+        if($this->adminmods) {
+            include_once($CFG->dirroot.'/local/ulpgccore/lib.php');
+        }
     }
 
     /**
@@ -322,8 +328,6 @@ class core_course_renderer extends plugin_renderer_base {
                     !(($section <> 0) || has_capability('local/ulpgccore:managesection0', context_course::instance($course->id)))) { // ULPGC ecastro disable managing section 0
             return;
         }
-
-
 
         // Retrieve all modules with associated metadata
         $modules = get_module_metadata($course, $modnames, $sectionreturn);

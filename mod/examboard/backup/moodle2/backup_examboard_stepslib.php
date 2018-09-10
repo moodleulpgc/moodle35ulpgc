@@ -43,7 +43,8 @@ class backup_examboard_activity_structure_step extends backup_activity_structure
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
         // To know if we are including groups and groupings.
-        $groupinfo = $this->get_setting_value('groups');
+        
+        $groupinfo = $this->setting_exists('groups') ? $this->get_setting_value('groups') : '';
 
         // Define each element separately.
         $examboard = new backup_nested_element('examboard',  array('id'),
@@ -208,7 +209,7 @@ class backup_examboard_activity_structure_step extends backup_activity_structure
         }
         
         // Define id annotations.
-        $board>annotate_ids('group', 'groupid');
+        $board->annotate_ids('group', 'groupid');
         $member->annotate_ids('user', 'userid');
         $examinee->annotate_ids('user', 'userid');
         $tutor->annotate_ids('user', 'userid');

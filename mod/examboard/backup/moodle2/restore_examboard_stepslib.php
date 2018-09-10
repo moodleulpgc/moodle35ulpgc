@@ -42,7 +42,7 @@ class restore_examboard_activity_structure_step extends restore_activity_structu
     protected function define_structure() {
         $paths = array();
         $userinfo = $this->get_setting_value('userinfo');
-        $groupinfo = $this->get_setting_value('groupinfo');
+        $groupinfo = $this->setting_exists('groups') ? $this->get_setting_value('groups') : '';
 
         $paths[] = new restore_path_element('examboard', '/activity/examboard');
         
