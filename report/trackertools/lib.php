@@ -45,52 +45,56 @@ function report_trackertools_extend_navigation_module($navigation, $cm) {
     if ($cm->modname == 'tracker') {
         $context = context_module::instance($cm->id);
         $url = new moodle_url('/report/trackertools/index.php', array('id'=>$cm->id));
-        //$node = $navigation->add(get_string('pluginname', 'report_trackertools'), $url, navigation_node::TYPE_CONTAINER, null, 'trackertools');
+        $node = $navigation->add(get_string('pluginname', 'report_trackertools'), $url, navigation_node::TYPE_CONTAINER, null, 'trackertools');
         
         if(has_capability('report/trackertools:report', $context)) {
             $url->param('a','comply');
-            $navigation->add(get_string('comply', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsreport', new pix_icon('i/completion-manual-enabled', ''));
+            $node->add(get_string('comply', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsreport', new pix_icon('i/completion-manual-enabled', ''));
+            
+            $url->param('a','fieldcomply');
+            $node->add(get_string('fieldcomply', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsfieldcomply', new pix_icon('i/completion-manual-enabled', ''));
+            
+            $url->param('a','usercomply');
+            $node->add(get_string('usercomply', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsusercomply', new pix_icon('i/completion-manual-enabled', ''));
         }
-
+        
         if(has_capability('report/trackertools:warning', $context)) {
             $url->param('a', 'warning');
-            $navigation->add(get_string('warning', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolswarning', new pix_icon('i/info', ''));
+            $node->add(get_string('warning', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolswarning', new pix_icon('i/info', ''));
         }
         
         if(has_capability('report/trackertools:import', $context)) {
             $url->param('a', 'create');
-            $navigation->add(get_string('create', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolssend', new pix_icon('i/cohort', ''));
+            $node->add(get_string('create', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolssend', new pix_icon('i/cohort', ''));
             
             $url->param('a', 'import');
-            $navigation->add(get_string('import', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsimport', new pix_icon('i/import', ''));
+            $node->add(get_string('import', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsimport', new pix_icon('i/import', ''));
         }
         
         if(has_capability('report/trackertools:export', $context)) {
             $url->param('a', 'export');
-            $navigation->add(get_string('export', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsexport', new pix_icon('i/export', ''));
-        
-        
+            $node->add(get_string('export', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsexport', new pix_icon('i/export', ''));
         }
         
         if(has_capability('report/trackertools:download', $context)) {
             $url->param('a', 'download');
-            $navigation->add(get_string('download', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsdownload', new pix_icon('t/download', ''));
+            $node->add(get_string('download', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsdownload', new pix_icon('t/download', ''));
         }
         
         if(has_capability('report/trackertools:manage', $context)) {
             $url->param('a', 'assigntasktable');
-            $navigation->add(get_string('assigntasktable', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsassigntasktable', new pix_icon('t/assignroles', ''));
+            $node->add(get_string('assigntasktable', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsassigntasktable', new pix_icon('t/assignroles', ''));
         
             $url->param('a', 'mailoptions');
-            $navigation->add(get_string('mailoptions', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsmailoptions', new pix_icon('t/email', ''));
+            $node->add(get_string('mailoptions', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsmailoptions', new pix_icon('t/email', ''));
         
             $url->param('a', 'setfield');
-            $navigation->add(get_string('setfield', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolssetfield', new pix_icon('t/editstring', ''));
+            $node->add(get_string('setfield', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolssetfield', new pix_icon('t/editstring', ''));
             
             $rurl = new moodle_url(me());
             if(($rurl->get_param('view') == 'admin') && ($eid = $rurl->get_param('elementid'))  && ($rurl->get_param('what') == 'viewelementoptions')) {
                 $rurl = new moodle_url('/report/trackertools/loadfield.php', array('id'=>$cm->id, 'eid'=>$eid));
-                $navigation->add(get_string('loadoptions', 'report_trackertools'), $rurl, navigation_node::TYPE_SETTING, null, 'trackertoolsloadfield', new pix_icon('i/withsubcat', ''));
+                $node->add(get_string('loadoptions', 'report_trackertools'), $rurl, navigation_node::TYPE_SETTING, null, 'trackertoolsloadfield', new pix_icon('i/withsubcat', ''));
             }
         }
     }

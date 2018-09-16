@@ -306,3 +306,16 @@ $string['confirmsearch_help'] = 'A parameter to confirm the issues the changes w
 $string['confirmsearcherror'] = 'The issues to apply changes to must be coincident';
 $string['taskassigned'] = 'Created an automated developer assignation';
 $string['taskdeleted'] = 'Removed an automated developer assignation';
+
+$string['checkcompliance'] = 'Check compliance';
+$string['checkedfield'] = 'Checked field';
+$string['fieldcompliance'] = 'Field compliance';
+$string['fieldcomply'] = 'Check Options filled';
+$string['fieldcomply_help'] = '
+Checks if there are entries submitted corresponding (or not) to every option in a menu field.
+';
+$string['fillstatus'] = 'Check absence';
+$string['fillstatusexplain'] = 'If checked, the toll will find those options that DO NOT have an issue';
+$string['usercomply'] = 'Check user compliance';
+
+

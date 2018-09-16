@@ -629,6 +629,96 @@ class report_trackertools_comply_form extends report_trackertools_form {
     }
 }
 
+
+/**
+ * Issues check field menu options filled
+ *
+ * @package    report_trackertools
+ * @copyright  2017 Enrique Castro @ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class report_trackertools_fieldcomply_form extends report_trackertools_form {
+
+    /**
+     * Form definition
+     */
+    function definition() {
+        $mform =& $this->_form;
+        
+        list($cmid, $tracker, $elements) = $this->get_form_parameters();
+        
+        print_object($elements);
+        
+        
+        $this->add_issue_search();
+        
+        $mform->addElement('header', 'fieldcompliance', get_string('fieldcompliance', 'report_trackertools'));
+        
+        
+        $fieldmenu = array();
+        foreach($elements as $key => $element) {
+            if(($element->type  == 'dropdown') && !empty($element->options) && !$element->private) {
+                $fieldmenu[$element->id] = $element->description;
+            }
+        }        
+        
+        $mform->addElement('select', 'checkedfield', get_string('checkedfield', 'report_trackertools'), $fieldmenu);
+
+        $mform->addElement('advcheckbox', 'fillstatus', get_string('fillstatus', 'report_trackertools'), get_string('fillstatusexplain', 'report_trackertools'));
+        $mform->setDefault('fillstatus', 1);
+        
+        /*
+        $usertypemenu = array(REPORT_TRACKERTOOLS_FILES_ALL => get_string('any', 'report_trackertools'),
+                            REPORT_TRACKERTOOLS_FILES_USER  => tracker_getstring('reportedby', 'tracker'),
+                            REPORT_TRACKERTOOLS_FILES_DEV   => tracker_getstring('assignedto', 'tracker'),
+                            //REPORT_TRACKERTOOLS_FILES_BOTH  => tracker_getstring('bothusers', 'tracker'),
+                            );
+        
+        $commentsgroup = array();
+
+        $commentsmenu = array(REPORT_TRACKERTOOLS_ANY   => get_string('indifferent', 'report_trackertools'),
+                            REPORT_TRACKERTOOLS_NOEMPTY => get_string('noempty', 'report_trackertools'),
+                            REPORT_TRACKERTOOLS_EMPTY   => get_string('empty', 'report_trackertools'),
+                            REPORT_TRACKERTOOLS_LAST    =>get_string('last', 'report_trackertools'),);
+        $commentsgroup[] =& $mform->createElement('select', 'hascomments', '', $commentsmenu);
+        $commentsgroup[] =& $mform->createElement('select', 'commentsby', '', $usertypemenu);
+        
+        $group = $mform->createElement('group', 'hascommentsgroup', get_string('hascomments', 'report_trackertools'), 
+                                        $commentsgroup, ' &nbsp; '.get_string('commentsby', 'report_trackertools').' &nbsp; ', false);
+        $mform->addElement($group);
+        $mform->disabledIf('commentsby', 'hascomments', 'eq', '');        
+        
+        
+        $filesgroup = array();
+        $options = array(REPORT_TRACKERTOOLS_ANY    => get_string('indifferent', 'report_trackertools'),
+                        REPORT_TRACKERTOOLS_NOEMPTY => get_string('noempty', 'report_trackertools'),
+                        REPORT_TRACKERTOOLS_EMPTY   => get_string('empty', 'report_trackertools'),);
+        
+        $filesgroup[] =& $mform->createElement('select', 'hasfiles', get_string('hasfiles', 'report_trackertools'), $options);
+        $filesgroup[] =& $mform->createElement('select', 'filesby', get_string('filesby', 'report_trackertools'), $usertypemenu);
+        $group = $mform->createElement('group', 'hasfilesgroup', get_string('hasfiles', 'report_trackertools'), 
+                                        $filesgroup, ' &nbsp; '.get_string('filesby', 'report_trackertools').' &nbsp; ', false);
+        $mform->addElement($group);
+        $mform->disabledIf('filesby', 'hasfiles', 'eq', '');        
+
+        $options = array(REPORT_TRACKERTOOLS_ANY    => get_string('indifferent', 'report_trackertools'),
+                        REPORT_TRACKERTOOLS_NOEMPTY => get_string('noempty', 'report_trackertools'),
+                        REPORT_TRACKERTOOLS_EMPTY   => get_string('empty', 'report_trackertools'),);
+        $mform->addElement('select', 'hasresolution', get_string('hasresolution', 'report_trackertools'), $options);
+
+        */
+
+        $this->add_hidden_elements($cmid, 'comply');
+
+        $this->add_action_buttons(true, get_string('checkcompliance', 'report_trackertools')); 
+    }
+}
+
+
+
+
+
+
 /**
  * Issues after checking compliance form class
  *

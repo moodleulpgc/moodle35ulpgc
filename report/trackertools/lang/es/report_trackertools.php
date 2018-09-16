@@ -334,3 +334,18 @@ Debe tener el mismo valor que el menú inicial para   .';
 $string['confirmsearcherror'] = 'Las entradas a considerar deben ser las mismas en ambos parámetros';
 $string['taskassigned'] = 'Creada una asignación automática de gestor';
 $string['taskdeleted'] = 'Eliminada una asignación automática de gestor';
+
+$string['checkcompliance'] = 'Comprobar';
+$string['checkedfield'] = 'Campo a comprobar';
+$string['fieldcompliance'] = 'Comprobación de opciones';
+$string['fieldcomply'] = 'Comprobar opciones completadas';
+$string['fieldcomply_help'] = '
+Comprueba si existen (o no) entradas correspondientes a todas y cada una de la sopciones de un menú.
+
+Por ejemplo, si uno delos campos es un menú de asignaturas, indica si existen entradas para todas las asignaturas, 
+o bien hay alguna asignatura para la cual NO se ha creado ninguna entrada. 
+';
+$string['fillstatus'] = 'Comprobar ausencia';
+$string['fillstatusexplain'] = 'Si está marcado, la herramienta indicará aquellas opciones del menu que 
+NO están utilizadas en ninguna entrada de las indicads';
+$string['usercomply'] = 'Comprobar confirmación por usuarios';

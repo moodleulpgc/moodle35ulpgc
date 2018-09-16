@@ -103,8 +103,11 @@
     display: inline !important;
 }
 
-
 @media (min-width: 768px) {
+    li.nav-item .usermenu  {
+        width: 17vw;
+        margin-right: 2.6rem;
+    }
     .usermenu span.userbutton span.usertext {
         display: inline-block;
         max-width: 17vw;
@@ -341,6 +344,11 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
     float: left;
 }
 
+div.userlist table#participants th.header.c1{min-width: 12rem;}
+
+.mform .form-inline  textarea.form-control{width: 100%;}
+.box.generalbox  td .mediaplugin{width:auto;}
+
 .btn-group input.btn.btn-secondary {
     margin: 0 2px;
 }
@@ -386,4 +394,8 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 #page-mod-studentquiz-view .toggle:checked + span, #page-mod-studentquiz-view .toggle:checked + label span {
     color: darkgreen;
     font-weight: 600;
+}
+
+.block_online_users .content .list li.listentry .user {
+    width: 89%;
 }

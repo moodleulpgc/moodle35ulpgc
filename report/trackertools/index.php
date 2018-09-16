@@ -54,17 +54,19 @@ $PAGE->set_title(format_string($straction.': '.$tracker->name));
 // Security.
 require_course_login($course->id, true, $cm);
 
-
-
-
-
-
-
 $capability = '';
 switch($action) {
     case 'comply' :
                     $capability = 'report/trackertools:report';
                     $actionform = 'report_trackertools_comply_form';
+                    break;
+    case 'fieldcomply' :
+                    $capability = 'report/trackertools:report';
+                    $actionform = 'report_trackertools_fieldcomply_form';
+                    break;
+    case 'usercomply' :
+                    $capability = 'report/trackertools:report';
+                    $actionform = 'report_trackertools_usercomply_form';
                     break;
     case 'checked' :
                     $capability = 'report/trackertools:report';
@@ -130,6 +132,13 @@ if ($mform->is_cancelled()) {
         $records = report_trackertools_compliance_list($tracker, $fromform);
         $mform = new report_trackertools_checked_form(null, array('cmid'=>$id, 'tracker'=>$tracker, 'issues'=>$records));
 
+    } elseif($action == 'fieldcomply') {
+        $records = report_trackertools_field_compliance_list($tracker, $fromform);
+        $mform = new report_trackertools_checked_form(null, array('cmid'=>$id, 'tracker'=>$tracker, 'issues'=>$records));
+        
+    } elseif($action == 'usercomply') {        
+        
+        
     } elseif($action == 'checked') {
         $message = '';
         if($fromform->mailtouser || $fromform->mailtodev) {

@@ -1403,6 +1403,47 @@ function report_trackertools_compliance_list($tracker, $fromform) {
     return $DB->get_records_sql($sql, $params);
 }
 
+
+/**
+ * Checks compliance of existing records with defined criteria
+ *
+ * 
+ * @param stdClass $tracker module record on database
+ * @param stdClass $fromform object with data from user input form
+ * @return array records that fullfill criteria
+ */
+function report_trackertools_field_compliance_list($tracker, $fromform) {
+    global $DB;
+
+    list($issuewhere, $params) = report_trackertools_issue_where_sql($tracker->id, $fromform);
+
+    $elements = array();
+    tracker_loadelementsused($tracker, $elements);
+    
+    $element = $elements[$fromform->checkedfield];
+    
+    $absent = array();
+    
+    foreach($element->options as $id => $option) {
+        $sql = "SELECT 1    
+                FROM {tracker_issue} i 
+                JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND ia.issueid = i.id
+                WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid = :option ";
+        $params['elementid'] = $element->id;
+        $params['option'] = $option->id;
+        
+        if(!$DB->record_exists_sql($sql, $params)) {
+            $absent[$option->id] = $option;
+        }
+    }
+    
+
+    
+    
+    return 
+}
+
+
 /**
  * Assign a query to a developer
  *

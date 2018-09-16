@@ -2646,9 +2646,9 @@ body.path-mod-dialogue #region-main .drop-down-arrow {
   height: 0;
   vertical-align: bottom;
   cursor: pointer;
-  border-top: 4px solid black;
-  border-right: 4px solid transparent;
-  border-left: 4px solid transparent;
+  border-top: 12px solid black;         /* ecastro ULPGC */
+  border-right: 6px solid transparent;  /* ecastro ULPGC */
+  border-left: 6px solid transparent;   /* ecastro ULPGC */
   content: "";
 }
 
