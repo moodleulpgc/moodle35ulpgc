@@ -92,8 +92,8 @@
     font-weight: bold;
 }
 
-.path-mod-scheduler div.commandbar .moodle-actionmenu {
-    display: inline;
+.path-mod-scheduler div.commandbar .moodle-actionmenu.d-inline {
+    display: inline-block !important; /* ecastro ULPGC */
 }
 
 .path-mod-scheduler div.commandbar .moodle-actionmenu .menubar {

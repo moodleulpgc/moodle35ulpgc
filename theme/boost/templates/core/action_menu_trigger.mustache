@@ -95,7 +95,7 @@
         <div class="dropdown-menu dropdown-menu-right {{classes}}"{{#attributes}} {{name}}="{{value}}"{{/attributes}}>
             {{#items}}
                 {{#actionmenulink}}
-                    <a href="{{url}}" class="dropdown-item {{classes}}" {{#attributes}}{{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}{{#showtext}}aria-labelledby="actionmenuaction-{{instance}}"{{/showtext}}>
+                    <a href="{{url}}" class="dropdown-item {{classes}}"  {{#id}}id="{{id}}"{{/id}}  {{#attributes}}{{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}{{#showtext}}aria-labelledby="actionmenuaction-{{instance}}"{{/showtext}}>
                         {{#icon}}
                             {{#pix}}{{key}},{{component}},{{title}}{{/pix}}
                         {{/icon}}
