@@ -395,11 +395,13 @@ class assign_feedback_archive extends assign_feedback_plugin {
             $maxattemptsreached = !empty($submission) &&
                               $submission->attemptnumber >= ($instance->maxattempts - 1) &&
                               $instance->maxattempts != ASSIGN_UNLIMITED_ATTEMPTS;
+                              
             if($instance->attemptreopenmethod == ASSIGN_ATTEMPT_REOPEN_METHOD_NONE) {
                 $text = get_string('noarchiveallowed', 'assignfeedback_archive');
             } elseif($maxattemptsreached) {
                 $text = get_string('maxattemptsreached', 'assignfeedback_archive');
-            } else {
+                
+            } elseif($grade->grade !== null && $grade->grade >= 0) {
                 $thisurl = new moodle_url('/mod/assign/view.php', array('action'=>'viewpluginpage',
                                                                      'pluginsubtype'=>'assignfeedback',
                                                                      'plugin'=>'archive',
@@ -409,8 +411,11 @@ class assign_feedback_archive extends assign_feedback_plugin {
                 $button = new single_button($thisurl, get_string('reopen', 'assignfeedback_archive'));
                 $button->add_confirm_action(get_string('reopenconfirm', 'assignfeedback_archive'));
                 $text = $output->render($button);
-                $text .= html_writer::span(get_string('reopen_help', 'assignfeedback_archive'), 'text-info');
+                $text .= html_writer::div(get_string('reopen_help', 'assignfeedback_archive'), 'text-info');
+            } else {
+                $text = get_string('waitgrading',  'assignfeedback_archive');
             }
+            
             return $text;
     }
 

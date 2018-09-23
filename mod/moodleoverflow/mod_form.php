@@ -156,4 +156,100 @@ class mod_moodleoverflow_mod_form extends moodleform_mod {
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
     }
+    
+    
+    
+    function data_preprocessing(&$default_values) {
+        parent::data_preprocessing($default_values);
+
+        // Set up the completion checkboxes which aren't part of standard data.
+        // We also make the default value (if you turn on the checkbox) for those
+        // numbers to be 1, this will not apply unless checkbox is ticked.
+        $default_values['completiondiscussionsenabled']=
+            !empty($default_values['completiondiscussions']) ? 1 : 0;
+        if (empty($default_values['completiondiscussions'])) {
+            $default_values['completiondiscussions']=1;
+        }
+        $default_values['completionanswersenabled']=
+            !empty($default_values['completionanswers']) ? 1 : 0;
+        if (empty($default_values['completionanswers'])) {
+            $default_values['completionanswers']=1;
+        }
+        // Tick by default if Add mode or if completion posts settings is set to 1 or more.
+        if (empty($this->_instance) || !empty($default_values['completioncomments'])) {
+            $default_values['completioncommentsenabled'] = 1;
+        } else {
+            $default_values['completioncommentsenabled'] = 0;
+        }
+        if (empty($default_values['completioncomments'])) {
+            $default_values['completioncomments']=1;
+        }
+    }
+
+    /**
+     * Add custom completion rules.
+     *
+     * @return array Array of string IDs of added items, empty array if none
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $group=array();
+        $group[] =& $mform->createElement('checkbox', 'completionanswersenabled', '', get_string('completionanswers','moodleoverflow'));
+        $group[] =& $mform->createElement('text', 'completionanswers', '', array('size'=>3));
+        $mform->setType('completionanswers',PARAM_INT);
+        $mform->addGroup($group, 'completionanswersgroup', get_string('completionanswersgroup','moodleoverflow'), array(' '), false);
+        $mform->disabledIf('completionanswers','completionanswersenabled','notchecked');
+
+        $group=array();
+        $group[] =& $mform->createElement('checkbox', 'completiondiscussionsenabled', '', get_string('completiondiscussions','moodleoverflow'));
+        $group[] =& $mform->createElement('text', 'completiondiscussions', '', array('size'=>3));
+        $mform->setType('completiondiscussions',PARAM_INT);
+        $mform->addGroup($group, 'completiondiscussionsgroup', get_string('completiondiscussionsgroup','moodleoverflow'), array(' '), false);
+        $mform->disabledIf('completiondiscussions','completiondiscussionsenabled','notchecked');
+
+        $group=array();
+        $group[] =& $mform->createElement('checkbox', 'completioncommentsenabled', '', get_string('completioncomments','moodleoverflow'));
+        $group[] =& $mform->createElement('text', 'completioncomments', '', array('size'=>3));
+        $mform->setType('completioncomments',PARAM_INT);
+        $mform->addGroup($group, 'completioncommentsgroup', get_string('completioncommentsgroup','moodleoverflow'), array(' '), false);
+        $mform->disabledIf('completioncomments','completioncommentsenabled','notchecked');
+
+        
+        return array('completiondiscussionsgroup','completionanswersgroup','completioncommentsgroup');
+    }
+
+    function completion_rule_enabled($data) {
+        return (!empty($data['completiondiscussionsenabled']) && $data['completiondiscussions']!=0) ||
+            (!empty($data['completionanswersenabled']) && $data['completionanswers']!=0) ||
+            (!empty($data['completioncommentsenabled']) && $data['completioncomments']!=0);
+    }
+
+    /**
+     * Allows module to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data the form data to be modified.
+     */
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+        // Turn off completion settings if the checkboxes aren't ticked
+        if (!empty($data->completionunlocked)) {
+            $autocompletion = !empty($data->completion) && $data->completion==COMPLETION_TRACKING_AUTOMATIC;
+            if (empty($data->completiondiscussionsenabled) || !$autocompletion) {
+                $data->completiondiscussions = 0;
+            }
+            if (empty($data->completionanswersenabled) || !$autocompletion) {
+                $data->completionanswers = 0;
+            }
+            if (empty($data->completioncommentsenabled) || !$autocompletion) {
+                $data->completioncomments = 0;
+            }
+        }
+    }
+    
+    
+    
 }

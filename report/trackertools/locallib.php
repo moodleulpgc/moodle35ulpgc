@@ -1440,7 +1440,7 @@ function report_trackertools_field_compliance_list($tracker, $fromform) {
 
     
     
-    return 
+    return; 
 }
 
 

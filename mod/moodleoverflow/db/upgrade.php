@@ -39,7 +39,9 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function xmldb_moodleoverflow_upgrade($oldversion) {
-    global $CFG;
+    global $CFG, $DB;
+
+    $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
     if ($oldversion < 2017110713) {
         // Migrate config.
@@ -81,5 +83,24 @@ function xmldb_moodleoverflow_upgrade($oldversion) {
         // Opencast savepoint reached.
         upgrade_mod_savepoint(true, 2017110713, 'moodleoverflow');
     }
+    
+    // ecastro ULPGC, completion
+    if ($oldversion < 2018052501) {
+    
+        // Define field lockdiscussionafter to be added to forum.
+        $table = new xmldb_table('moodleoverflow');
+        
+        foreach(array('completiondiscussions', 'completionanswers', 'completioncomments') as $name) {
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, '0');
+
+            // Conditionally launch add field lockdiscussionafter.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+    
+        upgrade_mod_savepoint(true, 2018052501, 'moodleoverflow');
+    }
+    
     return true;
 }

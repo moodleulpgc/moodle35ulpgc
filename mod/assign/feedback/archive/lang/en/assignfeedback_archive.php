@@ -44,3 +44,4 @@ $string['updategraded'] = 'Automatic submit upon grading';
 $string['crontask'] = 'Draft closing after duedate job';
 $string['eventsubmissionarchived'] = 'Submission archived';
 $string['noarchiveallowed'] = 'No more attempts allowed';
+$string['waitgrading'] = 'Submission must be graded for archiving.';

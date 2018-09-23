@@ -382,7 +382,19 @@ $string['privacy:discussionsubscriptionpreference'] = 'You have chosen the follo
 $string['privacy:readtrackingdisabled'] = 'You have chosen to not track which posts that you have read within this forum.';
 $string['privacy:postwasread'] = 'This post was first read on {$a->firstread} and most recently read on {$a->lastread}';
 
-
+// Completion
+$string['completiondiscussions'] = 'Student must create discussions:';
+$string['completiondiscussionsdesc'] = 'Student must create at least {$a} discussion(s)';
+$string['completiondiscussionsgroup'] = 'Require discussions';
+$string['completiondiscussionshelp'] = 'requiring discussions to complete';
+$string['completioncomments'] = 'Student must post comments:';
+$string['completioncommentsdesc'] = 'Student must post at least {$a} comments to other messages';
+$string['completioncommentsgroup'] = 'Require comments';
+$string['completioncommentshelp'] = 'requiring comments to complete';
+$string['completionanswers'] = 'Student must post answers:';
+$string['completionanswersdesc'] = 'Student must post at least {$a} answers';
+$string['completionanswersgroup'] = 'Require answers';
+$string['completionanswershelp'] = 'requiring answers to complete';
 
 
 

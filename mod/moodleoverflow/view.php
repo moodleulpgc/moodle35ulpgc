@@ -80,6 +80,14 @@ $event = \mod_moodleoverflow\event\course_module_viewed::create(array(
 ));
 $event->trigger();
 
+// ecastro ULPGC completion
+// Completion.
+require_once($CFG->libdir.'/completionlib.php');
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
+
+
 // Print the page header.
 $PAGE->set_url('/mod/moodleoverflow/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moodleoverflow->name));

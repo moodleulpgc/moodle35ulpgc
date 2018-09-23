@@ -92,10 +92,75 @@ function moodleoverflow_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
+            // ecastro ULPGC implement completion
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+        case FEATURE_COMPLETION_HAS_RULES:    return true;
+
+            
         default:
             return null;
     }
 }
+
+/**
+ * Obtains the automatic completion state for this moodleoverflow based on any conditions
+ * in moodleoverflow settings.
+ *
+ * @global object
+ * @global object
+ * @param object $course Course
+ * @param object $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not. (If no conditions, then return
+ *   value depends on comparison type)
+ */
+function moodleoverflow_get_completion_state($course,$cm,$userid,$type) {
+    global $CFG,$DB;
+
+    // Get moodleoverflow details
+    if (!($moodleoverflow=$DB->get_record('moodleoverflow',array('id'=>$cm->instance)))) {
+        throw new Exception("Can't find moodleoverflow {$cm->instance}");
+    }
+
+    $result=$type; // Default return value
+
+    $postcountparams=array('userid'=>$userid,'moodleoverflowid'=>$moodleoverflow->id);
+    $postcountsql="SELECT COUNT(1)
+                    FROM {moodleoverflow_posts} fp
+                    INNER JOIN {moodleoverflow_discussions} fd ON fp.discussion=fd.id
+                    WHERE fp.userid=:userid AND fd.moodleoverflow=:moodleoverflowid";
+
+    if ($moodleoverflow->completiondiscussions) {
+        $value = $moodleoverflow->completiondiscussions <=
+                 $DB->count_records('moodleoverflow_discussions',array('moodleoverflow'=>$moodleoverflow->id,'userid'=>$userid));
+        if ($type == COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+    if ($moodleoverflow->completionanswers) {
+        $value = $moodleoverflow->completionanswers <=
+                 $DB->get_field_sql( $postcountsql.' AND fp.parent = fd.firstpost',$postcountparams);
+        if ($type==COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+    if ($moodleoverflow->completioncomments) {
+        $value = $moodleoverflow->completioncomments <= $DB->get_field_sql($postcountsql.' AND (fp.parent <> fd.firstpost AND fp.parent <> 0)', $postcountparams);
+        if ($type == COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+
+    return $result;
+}
+
 
 /**
  * Saves a new instance of the moodleoverflow into the database
@@ -120,6 +185,11 @@ function moodleoverflow_add_instance(stdClass $moodleoverflow, mod_moodleoverflo
 
     $moodleoverflow->id = $DB->insert_record('moodleoverflow', $moodleoverflow);
 
+    // ecastro ULPGC implement completion
+    $completiontimeexpected = !empty($forum->completionexpected) ? $forum->completionexpected : null;
+    \core_completion\api::update_completion_date_event($forum->coursemodule, 'forum', $forum->id, $completiontimeexpected);
+
+    
     return $moodleoverflow->id;
 }
 
@@ -258,6 +328,9 @@ function moodleoverflow_delete_instance($id) {
     $fs = get_file_storage();
     $fs->delete_area_files($context->id);
 
+    // ecastro ULPGC implement completion
+    \core_completion\api::update_completion_date_event($cm->id, 'moodleoverflow', $moodleoverflow->id, null);
+    
     // Delete the subscription elements.
     $DB->delete_records('moodleoverflow_subscriptions', array('moodleoverflow' => $moodleoverflow->id));
     $DB->delete_records('moodleoverflow_discuss_subs', array('moodleoverflow' => $moodleoverflow->id));
@@ -750,7 +823,7 @@ function moodleoverflow_send_mails() {
                 $coursemodules[$moodleoverflowid]->cache->caps = array();
                 unset($coursemodules[$moodleoverflowid]->uservisible);
             }
-
+            
             // Loop through all posts of this users.
             foreach ($posts as $postid => $post) {
 
@@ -759,6 +832,7 @@ function moodleoverflow_send_mails() {
                 $moodleoverflow = $moodleoverflows[$discussion->moodleoverflow];
                 $course         = $courses[$moodleoverflow->course];
                 $cm             =& $coursemodules[$moodleoverflow->id];
+
 
                 // Check whether the user is subscribed.
                 if (!isset($subscribedusers[$moodleoverflow->id][$userto->id])) {
@@ -1099,3 +1173,85 @@ function moodleoverflow_can_create_attachment($moodleoverflow, $context) {
 
     return true;
 }
+
+/// ecastro ULPGC Completion implementation
+
+/**
+ * Add a get_coursemodule_info function in case any moodleoverflow type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function moodleoverflow_get_coursemodule_info($coursemodule) {
+    global $DB;
+
+    $dbparams = ['id' => $coursemodule->instance];
+    $fields = 'id, name, intro, introformat, completiondiscussions, completionanswers, completioncomments';
+    if (!$moodleoverflow = $DB->get_record('moodleoverflow', $dbparams, $fields)) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $moodleoverflow->name;
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $result->content = format_module_intro('moodleoverflow', $moodleoverflow, $coursemodule->id, false);
+    }
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completiondiscussions'] = $moodleoverflow->completiondiscussions;
+        $result->customdata['customcompletionrules']['completionanswers'] = $moodleoverflow->completionanswers;
+        $result->customdata['customcompletionrules']['completioncomments'] = $moodleoverflow->completioncomments;
+    }
+
+    return $result;
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_moodleoverflow_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completiondiscussions':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completiondiscussionsdesc', 'moodleoverflow', $val);
+                break;
+            case 'completionanswers':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completionanswersdesc', 'moodleoverflow', $val);
+                break;
+            case 'completioncomments':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completioncommentsdesc', 'moodleoverflow', $val);
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
+}
+

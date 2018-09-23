@@ -649,9 +649,11 @@ if ($fromform = $mformpost->get_data()) {
             $discussion = new \stdClass();
             $discussion->id = $fromform->discussion;
             $discussion->moodleoverflow = $moodleoverflow->id;
-            \mod_moodleoverflow\subscriptions::moodleoverflow_post_subscription($fromform,
-                $moodleoverflow, $discussion, $modulecontext);
-
+            if($USER->autosubscribe) { // ecastro ULPGC avoid auto subscription, like regular forum
+                \mod_moodleoverflow\subscriptions::moodleoverflow_post_subscription($fromform,
+                    $moodleoverflow, $discussion, $modulecontext);
+            }
+                
             // Print a success-message.
             $message .= '<p>' . get_string("postaddedsuccess", "moodleoverflow") . '</p>';
             $message .= '<p>' . get_string("postaddedtimeleft", "moodleoverflow",
@@ -725,8 +727,10 @@ if ($fromform = $mformpost->get_data()) {
             $event->trigger();
             // Subscribe to this thread.
             $discussion->moodleoverflow = $moodleoverflow->id;
-            \mod_moodleoverflow\subscriptions::moodleoverflow_post_subscription($fromform,
-                $moodleoverflow, $discussion, $modulecontext);
+            if($USER->autosubscribe) { // ecastro ULPGC avoid auto subscription, like regular forum
+                \mod_moodleoverflow\subscriptions::moodleoverflow_post_subscription($fromform,
+                    $moodleoverflow, $discussion, $modulecontext);
+            }
         }
 
         // Redirect back to te discussion.

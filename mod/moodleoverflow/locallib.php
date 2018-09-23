@@ -454,7 +454,7 @@ function moodleoverflow_get_discussions_unread($cm) {
 
 /**
  * Gets a post with all info ready for moodleoverflow_print_post.
- * Most of these joins are just to get the forum id.
+ * Most of these joins are just to get the moodleoverflow id.
  *
  * @param int $postid
  *
@@ -790,7 +790,7 @@ function moodleoverflow_print_discussion($course, $cm, $moodleoverflow, $discuss
     // Fetch the modulecontext.
     $modulecontext = context_module::instance($cm->id);
 
-    // Is the forum tracked?
+    // Is the moodleoverflow tracked?
     $istracked = \mod_moodleoverflow\readtracking::moodleoverflow_is_tracked($moodleoverflow);
 
     // Retrieve all posts of the discussion.
@@ -1286,7 +1286,7 @@ function moodleoverflow_print_post($post, $discussion, $moodleoverflow, $cm, $co
     // Print a footer if requested.
     $mustachedata->footer = $footer;
 
-    // Mark the forum post as read.
+    // Mark the moodleoverflow post as read.
     if ($istracked AND !$postisread) {
         \mod_moodleoverflow\readtracking::moodleoverflow_mark_post_read($USER->id, $post);
     }
@@ -1434,13 +1434,13 @@ function get_attachments($post, $cm) {
 /**
  * If successful, this function returns the name of the file
  *
- * @param object $post is a full post record, including course and forum
- * @param object $forum
+ * @param object $post is a full post record, including course and moodleoverflow
+ * @param object $moodleoverflow
  * @param object $cm
  *
  * @return bool
  */
-function moodleoverflow_add_attachment($post, $forum, $cm) {
+function moodleoverflow_add_attachment($post, $moodleoverflow, $cm) {
     global $DB;
 
     if (empty($post->attachments)) {
@@ -1452,7 +1452,7 @@ function moodleoverflow_add_attachment($post, $forum, $cm) {
     $info = file_get_draft_area_info($post->attachments);
     $present = ($info['filecount'] > 0) ? '1' : '';
     file_save_draft_area_files($post->attachments, $context->id, 'mod_moodleoverflow', 'attachment', $post->id,
-        mod_moodleoverflow_post_form::attachment_options($forum));
+        mod_moodleoverflow_post_form::attachment_options($moodleoverflow));
 
     $DB->set_field('moodleoverflow_posts', 'attachment', $present, array('id' => $post->id));
 
@@ -1605,7 +1605,7 @@ function moodleoverflow_count_replies($post, $recursive = null) {
  * @return bool Whether the deletion was successful.
  */
 function moodleoverflow_delete_discussion($discussion, $course, $cm, $moodleoverflow) {
-    global $DB;
+    global $CFG, $DB;
 
     // Initiate a pointer.
     $result = true;
@@ -1634,6 +1634,17 @@ function moodleoverflow_delete_discussion($discussion, $course, $cm, $moodleover
         $result = false;
     }
 
+    // ecastro ULPGC completion
+    if($result) {
+        require_once($CFG->libdir.'/completionlib.php');
+        // Update completion state if we are tracking completion based on number of posts
+        $completion = new completion_info($course);
+        if ($completion->is_enabled($cm) == COMPLETION_TRACKING_AUTOMATIC &&
+        ($moodleoverflow->completiondiscussions || $moodleoverflow->completionanswers || $moodleoverflow->completioncomments)) {
+            $completion->update_state($cm, COMPLETION_INCOMPLETE, $discussion->userid);
+        }
+    }
+    
     // Return if there deletion was successful.
     return $result;
 }
@@ -1646,18 +1657,23 @@ function moodleoverflow_delete_discussion($discussion, $course, $cm, $moodleover
  * @param object $course         The course object.
  * @param object $cm             The course module
  * @param int    $moodleoverflow The moodleoverflow ID
+ * @param bool $skipcompletion True to skip updating completion state if it
+ *   would otherwise be updated, i.e. when deleting entire moodleoverflow anyway.
  *
  * @return bool Whether the deletion was successful
  */
-function moodleoverflow_delete_post($post, $children, $course, $cm, $moodleoverflow) {
-    global $DB, $USER;
+function moodleoverflow_delete_post($post, $children, $course, $cm, $moodleoverflow, $skipcompletion=false) {
+    global $CFG, $DB, $USER;
+    
+    // ecastro ULPGC completion
+    require_once($CFG->libdir.'/completionlib.php');
 
     // Iterate through all children and delete them.
     $childposts = $DB->get_records('moodleoverflow_posts', array('parent' => $post->id));
     if (($children !== 'ignore') AND $childposts) {
         if ($children) {
             foreach ($childposts as $childpost) {
-                moodleoverflow_delete_post($childpost, true, $course, $cm, $moodleoverflow);
+                moodleoverflow_delete_post($childpost, true, $course, $cm, $moodleoverflow, $skipcompletion);
             }
 
         } else {
@@ -1695,6 +1711,16 @@ function moodleoverflow_delete_post($post, $children, $course, $cm, $moodleoverf
             }
             $event = \mod_moodleoverflow\event\post_deleted::create($params);
             $event->trigger();
+            
+            // ecastro ULPGC completion
+            if (!$skipcompletion) {
+                // Update completion state if we are tracking completion based on number of posts
+                $completion = new completion_info($course);
+                if ($completion->is_enabled($cm) == COMPLETION_TRACKING_AUTOMATIC &&
+                ($moodleoverflow->completiondiscussions || $moodleoverflow->completionanswers || $moodleoverflow->completioncomments)) {
+                    $completion->update_state($cm, COMPLETION_INCOMPLETE, $post->userid);
+                }
+            }
 
             // The post has been deleted.
             return true;

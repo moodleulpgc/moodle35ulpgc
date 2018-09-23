@@ -42,3 +42,4 @@ $string['updategraded_help'] = 'Si se habilita, entonces en aquellos casos en lo
 $string['crontask'] = 'Enviar borradores después de plazo de entrega';
 $string['eventsubmissionarchived'] = 'Entrega archivada';
 $string['noarchiveallowed'] = 'No se permiten más re-entregas.';
+$string['waitgrading'] = 'La entrega debe estar calificada para poder ser archivada.';

@@ -49,7 +49,8 @@ class backup_moodleoverflow_activity_structure_step extends backup_activity_stru
         $moodleoverflow = new backup_nested_element('moodleoverflow', array('id'), array(
             'name', 'intro', 'introformat', 'maxbytes', 'maxattachments',
             'forcesubscribe', 'trackingtype', 'timecreated', 'timemodified',
-            'ratingpreference', 'coursewidereputation', 'allownegativereputation'));
+            'ratingpreference', 'coursewidereputation', 'allownegativereputation', 
+            'completiondiscussions', 'completionanswers', 'completioncomments')); // ecastro ULPGC completion
 
         // Define each element separated.
         $discussions = new backup_nested_element('discussions');
