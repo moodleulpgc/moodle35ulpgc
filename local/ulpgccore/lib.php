@@ -1098,7 +1098,7 @@ function local_ulpgccore_mod_recent_activity($cm, $timestart=0) {
                             s.timemodified IS NOT NULL AND
                             s.status = :submitted AND
                             s.userid $insql AND
-                            (s.timemodified > g.timemodified OR g.timemodified IS NULL OR g.grade IS NULL)";
+                            (s.timemodified > g.timemodified OR g.timemodified IS NULL OR g.grade IS NULL OR g.grade < 0)";
             $news = $DB->count_records_sql($sql, $params);
             if($news) {
                 $linktext = get_string('ungradedactivity', 'local_ulpgccore', $news);
