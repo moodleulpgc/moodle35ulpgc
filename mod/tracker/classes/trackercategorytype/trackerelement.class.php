@@ -71,7 +71,7 @@ abstract class trackerelement {
             // ecastro ULPGC
             $this->paramint1 = $elmrec->paramint1;
             $this->paramint2 = $elmrec->paramint2;
-            $this->paramchar2 = $elmrec->paramchar2;
+            $this->paramchar1 = $elmrec->paramchar1;
             $this->paramchar2 = $elmrec->paramchar2;
             
             
@@ -342,6 +342,10 @@ abstract class trackerelement {
         
             $results = array();
             foreach($values as $value) {
+                if(!isset($this->options[$value])) {
+                    // not int values means is not an autoresponse field
+                    continue;
+                }
                 $option = $this->options[$value];
                 if($option->autoresponse) {
                     $result = new stdClass;
@@ -359,4 +363,210 @@ abstract class trackerelement {
         return false;
     }
 
+    /**
+    * ULPGC ecastro to use autofill fields
+    *
+    */
+    function autofill_options(){
+        global $CFG, $DB;
+        
+        $this->setoptionsfromdb();
+        $currentmap = array();
+        foreach($this->options as $oid => $option) {
+            $currentmap[$oid] = $option->name;
+        }
+        
+        // get updated items, get only new items, not existing ones
+        $newoptions = array();
+        //list($insql, $params) = $DB->get_in_or_equal($currentmap, SQL_PARAMS_NAMED, 'op', false);
+        $ufields = 'u.id, u.idnumber, u.firstname, u.lastname, '.get_all_user_name_fields(true, 'u');
+        $sortorder = 'u.lastname ASC, u.firstname ASC';
+        $params = array();
+        $records = array();
+        $users = array();
+        
+        if($this->paramchar1 == 'courses') {
+            $sql = "SELECT c.shortname, CONCAT(c.shortname, '-', c.fullname) 
+                    FROM {course} c
+                    JOIN {course_categories} cc ON c.category = cc.id 
+                    WHERE c.category <> 0  ";
+            if($this->paramchar2) {
+                $sql .= 'AND cc.idnumber = :idnumber ';
+                $params['idnumber'] = $this->paramchar2;
+            }
+            $sql .= ' ORDER BY c.shortname ASC, c.fullname ASC ';    
+            $records = $DB->get_records_sql_menu($sql, $params);
+            
+        } elseif($this->paramchar1 == 'categories') {
+            $sql = "SELECT c.idnumber, c.name 
+                    FROM {course_category} c
+                    JOIN {course_categories} cc ON c.parent = cc.id 
+                    WHERE c.id > 0 ";
+            if($this->paramchar2) {
+                $sql .= ' AND cc.idnumber = :idnumber ';
+                $params['idnumber'] = $this->paramchar2;
+            } else {
+                $sql .= ' AND c.parent = 0 ';            
+
+            }
+            $sql .= ' ORDER BY c.name ASC';
+            $records = $DB->get_records_sql_menu($sql, $params);
+        
+        } elseif($this->paramchar1 == 'users_role') {
+            if($this->paramchar2) {
+                $roleid = $DB->get_field('role', 'id', array('shortname'=>$this->paramchar2));
+            }
+            if($roleid) {
+                $users = get_role_users($roleid, $this->context, false, $ufields, $sortorder, false);
+            } else {
+                $users = get_enrolled_users($this->context, '', null, $ufields, $sortorder);
+            }
+        
+        } elseif($this->paramchar1 == 'users_group') {
+            $groupid = 0;
+            if($this->paramchar2) {
+                $groupid = $DB->get_field('groups', 'id', array('courseid'=>$this->course, 'idnumber'=>$this->paramchar2));
+            }
+            if(!$groupid) {
+                $groupid = 0;
+            } 
+            $users = get_enrolled_users($this->context, '', $groupid, $ufields, $sortorder);
+        
+        } elseif($this->paramchar1 == 'users_grouping') {
+            $groupingid = 0;
+            if($this->paramchar2) {
+                $groupingid = $DB->get_field('groupings', 'id', array('courseid'=>$this->course, 'idnumber'=>$this->paramchar2));
+            }
+            if(!$groupingid) {
+                $groupingid = 0;
+            } 
+            $users = groups_get_grouping_members($groupingid, $ufields, $sortorder); 
+        
+        }
+        
+        if($users && !$records) {
+            foreach($users as $user) {
+                $records[$user->idnumber] = fullname($user);
+            }
+            unset($users);
+        }
+        
+        if($records) {
+            foreach($records as $idnumber => $name) {
+                $key = array_search($idnumber, $currentmap);
+                if($key === false) {
+                    $newoptions[$idnumber] = $name;
+                } else {
+                    unset($currentmap[$key]);
+                }
+            }
+        } 
+        
+        $deleting = $currentmap;
+        unset($records);
+
+        // check if options used and delete if not used, multiple options use x,y,z in DB  
+        $usedoptions = $DB->get_records_menu('tracker_issueattribute', array('trackerid' => $this->tracker->id , 'elementid'=> $this->id), '', 'id, elementitemid');
+        $usedoptions = array_unique(explode(',',implode(',', $usedoptions)));
+        list($insql, $params) = $DB->get_in_or_equal($usedoptions, SQL_PARAMS_NAMED, 'op');
+        $select = "elementid = :eid AND id $insql";
+        $params['eid'] = $this->id;
+        $usedoptions = $DB->get_records_select_menu('tracker_elementitem', $select, $params, '', 'id,name');
+        $delete = array();
+        foreach($deleting as $name => $desc) {
+            $key = array_search($name, $usedoptions);
+            if($key !== false) {
+                // OK, option is not used in any issue, can be deleted
+                $delete[] = $key;
+            }
+        }
+        unset($usedoptions);
+        unset($deleting);
+        
+        
+        if($DB->delete_records_list('tracker_elementitem', 'id', $delete)) {
+            $this->options = array_diff_key($this->options, array_flip($delete));
+        }
+        unset($delete);
+        
+        // Now insert new options
+        $countoptions = count($this->options);
+        $option = new StdClass;
+    	$option->autoresponse = '';
+        $option->elementid = $this->id;
+        $option->sortorder = $countoptions;
+
+        foreach($newoptions as $name => $desc) {
+            if($name && $desc) {
+                $option->name = $name;
+                $option->description = $desc;
+                $option->sortorder += 1;
+                $oid = $DB->insert_record('tracker_elementitem', $option);
+                $this->options[$oid] = clone($option);
+                $this->options[$oid]->id = $oid;
+            }
+        }
+        
+        // reorder options
+        foreach($this->options as $oid => $option) {
+            $currentmap[$oid] = $option->description;
+        }
+        $first = reset($this->options);
+        $sortorder = $first->sortorder;
+        asort($currentmap, SORT_NATURAL);
+        foreach($currentmap as $oid => $name) {
+            $option = $this->options[$oid];
+            if($option->sortorder != $sortorder) {
+                $option->sortorder = $sortorder;
+                if($DB->set_field('tracker_elementitem', 'sortorder', $sortorder, array('id'=>$oid, 'elementid'=>$this->id))) {
+                    $this->options[$oid] = $option;
+                }
+            }
+            $sortorder +=1;
+        }
+
+        return $this->options;
+    }
+    
+    /**
+    * ULPGC ecastro to use autofill fields
+    *
+    */
+    function add_autowatches() {
+        global $CFG, $DB;
+
+        // check is applicable
+        if(!$this->paramint2 || (substr($this->paramchar1, 0, 5) != 'users'))  {
+            return;
+        }
+
+        $sql = "SELECT i.*, ia.elementitemid
+                FROM {tracker_issue} i 
+                JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND i.id = ia.issueid
+                WHERE i.trackerid = :tid AND ia.elementid = :eid ";
+        $params = array('tid'=>$this->tracker->id, 'eid'=>$this->id);
+        
+        if($issues = $DB->get_records_sql($sql, $params)) {
+            $this->setoptionsfromdb();
+            foreach($issues as $issue) {
+                $options = explode(',', $issue->elementitemid);
+                list($insql, $params) = $DB->get_in_or_equal($options, SQL_PARAMS_NAMED, 'op');
+                $sql = "SELECT u.id
+                        FROM {tracker_elementitem} ei 
+                        JOIN {user} u ON ei.name = u.idnumber
+                        WHERE ei.id $insql AND ei.elementid = :eid AND NOT EXISTS (SELECT 1 FROM {tracker_issuecc} ic 
+                                                                                    WHERE ic.trackerid = :tid AND 
+                                                                                            ic.issueid = :iid AND  ic.userid = u.id ) ";
+                $params['eid'] = $this->id;
+                $params['iid'] = $issue->id;
+                $params['tid'] = $this->tracker->id;
+                
+                if($users = $DB->get_records_sql($sql, $params)) {
+                    foreach($users as $user) {
+                        tracker_register_cc($this->tracker, $issue, $user->id);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -41,6 +41,10 @@ define('REPORT_TRACKERTOOLS_ISSUES_SEARCH',  1);
 define('REPORT_TRACKERTOOLS_ISSUES_OPEN',    2);
 define('REPORT_TRACKERTOOLS_ISSUES_CLOSED',  3);
 
+define('REPORT_TRACKERTOOLS_MENUTYPE_OTHER',  0);
+define('REPORT_TRACKERTOOLS_MENUTYPE_USER',  1);
+define('REPORT_TRACKERTOOLS_MENUTYPE_COURSE',  2);
+
 define('REPORT_TRACKERTOOLS_ANY',       0);
 define('REPORT_TRACKERTOOLS_NOEMPTY',   1);
 define('REPORT_TRACKERTOOLS_EMPTY',     2);
@@ -1421,28 +1425,133 @@ function report_trackertools_field_compliance_list($tracker, $fromform) {
     tracker_loadelementsused($tracker, $elements);
     
     $element = $elements[$fromform->checkedfield];
+    $params['elementid'] = $element->id;
     
-    $absent = array();
+    $names = get_all_user_name_fields(true, 'u');
+    $otherjoins = '';
+    
+    if($fromform->fillstatus) {
+        // means check absence
+        $equal = false;
+        if($fromform->menutype == REPORT_TRACKERTOOLS_MENUTYPE_USER) {
+            $fields = "ei.id,  u.username, u.idnumber, $names, u.id AS userid";
+            $otherjoins = ' JOIN {user} u ON u.idnumber = ei.name '; 
+        } elseif($fromform->menutype == REPORT_TRACKERTOOLS_MENUTYPE_COURSE) {
+            $fields =  "c.id, c.shortname, CONCAT(c.shortname, '-',c.shortname) AS name, 
+                        u.username, u.idnumber, $names, u.id AS userid";
+            $otherjoins = ' JOIN {course} u ON c.shortname = ei.name  
+                            JOIN {enrol} e ON c.id = e.courseid
+                            LEFT JOIN {user_enrolments} ue ON ue.enrol = e.id AND ue.roleid = :role
+                            LEFT JOIN {user} u ON ue.userid = u.id ' ; 
+            $params['role'] = get_config('report_trackertools', 'coord_role'); 
+        } else {
+            $fields = "ei.*";
+        }
+        $fields .= ", {$fromform->menutype} AS menutype ";
+        
+    } else {
+        //check presence 
+        $equal = true;
+        $fields = ' i.* '; 
+    }
+    list($insql, $inparams) = $DB->get_in_or_equal(array_keys($element->options),SQL_PARAMS_NAMED, 'op', $equal);
+    
+    print_object($params);
+    print_object($inparams);
+    
+    $params = array_merge($params, $inparams);
+    
+    $sql = "SELECT $fields     
+            FROM {tracker_elementitem} ei
+            LEFT JOIN {tracker_issueattribute} ia ON ia.elementid = ei.elementid
+            LEFT JOIN {tracker_issue} i ON ia.trackerid = i.trackerid AND ia.issueid = i.id
+            $otherjoins
+            WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid $insql  ";
+
+    
+    print_object($sql);
+    
+    /*
     
     foreach($element->options as $id => $option) {
-        $sql = "SELECT 1    
+    
+        $sql = "SELECT i.*,      
                 FROM {tracker_issue} i 
-                JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND ia.issueid = i.id
-                WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid = :option ";
+                LEFT JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND ia.issueid = i.id
+                WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid  ";
+                
+                
+                
         $params['elementid'] = $element->id;
         $params['option'] = $option->id;
         
         if(!$DB->record_exists_sql($sql, $params)) {
-            $absent[$option->id] = $option;
+            $absent[$option->name] = $option;
         }
     }
+    */
+    $records = array();
     
-
+    $records = $DB->get_records_sql($sql, $params);
     
+/*    
     
-    return; 
+    if($fromform->fieldtype == 'user') {
+        list($insql, $params) = $DB->get_in_or_equal(array_keys($absent),SQL_PARAMS_NAMED, 'idn');
+        $names = get_all_user_name_fields();
+        $sql = "SELECT id, username, idnumber, $names, id AS userid, 'user' AS fieldtype 
+                FROM {user} 
+                WHERE idnumber $insql ";
+                
+        $records = $DB->get_records_sql($sql, $params);
+        
+    } elseif($fromform->fieldtype == 'course') {
+        list($insql, $params) = $DB->get_in_or_equal(array_keys($absent),SQL_PARAMS_NAMED, 'c');
+        $names = get_all_user_name_fields(true, 'u');
+        $sql = "SELECT c.id, c.shortname, CONCAT(c.shortname, '-',c.shortname) AS name, u.username, u.idnumber, $names, u.id AS userid, 'course' AS fieldtype 
+                FROM {course} c 
+                JOIN {enrol} e ON c.id = e.courseid
+                LEFT JOIN {user_enrolments} ue ON ue.enrol = e.id
+                LEFT JOIN {user} u ON ue.userid = u.id
+                WHERE c.shortname $insql AND (ue.id IS NULL OR ue.roleid = :role) ";
+                
+        $params['role'] = get_config('report_trackertools', 'coord_role'); 
+        $records = $DB->get_records_sql($sql, $params);
+    } else {
+        $records = $absent;
+    }
+  */  
+    return $records; 
 }
 
+/**
+ * Checks compliance of existing records with defined criteria
+ *
+ * 
+ * @param stdClass $tracker module record on database
+ * @param stdClass $fromform object with data from user input form
+ * @return array records that fullfill criteria
+ */
+function report_trackertools_user_compliance_list($tracker, $fromform) {
+    global $DB;
+
+    list($issuewhere, $params) = report_trackertools_issue_where_sql($tracker->id, $fromform);
+
+    $elements = array();
+    tracker_loadelementsused($tracker, $elements);
+    $element = $elements[$fromform->checkedfield];
+    $params['elementid'] = $element->id;
+    list($insql, $inparams) = $DB->get_in_or_equal(array_keys($element->options),SQL_PARAMS_NAMED, 'op');
+    
+    $sql = "SELECT i.*,      
+            FROM {tracker_issue} i 
+            JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND ia.issueid = i.id
+            WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid <> '' ";
+    
+
+    
+    
+}
 
 /**
  * Assign a query to a developer

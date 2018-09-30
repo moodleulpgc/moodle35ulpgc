@@ -84,6 +84,15 @@ class toolbox {
         }
     }
 
+    /**
+     * Gets the setting moodle_url for the given setting value if it exists.
+     */
+    static public function get_setting_moodle_url($setting) {
+        $us = self::check_corerenderer();
+
+        return $us->get_setting_moodle_url($setting);
+    }
+
     static public function setting_file_url($setting, $filearea) {
         $us = self::check_corerenderer();
 
@@ -114,7 +123,9 @@ class toolbox {
             $inspectorscourerdata = array('data' => array('theme' => $essentialsearch->out(false)));
             $PAGE->requires->js_call_amd('theme_essential/inspector_scourer', 'init', $inspectorscourerdata);
 
-            \user_preference_allow_ajax_update('theme_essential_courseitemsearchtype', PARAM_INT);
+            if (self::get_setting('searchallcoursecontentenable')) {
+                \user_preference_allow_ajax_update('theme_essential_courseitemsearchtype', PARAM_INT);
+            }
 
             $canwe = true;
         }

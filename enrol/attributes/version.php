@@ -17,17 +17,15 @@
 /**
  * @package    enrol_attributes
  * @author     Nicolas Dunand <Nicolas.Dunand@unil.ch>
- * @copyright  2012-2015 Université de Lausanne (@link http://www.unil.ch}
+ * @copyright  2012-2018 Université de Lausanne (@link http://www.unil.ch}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018080300;
+$plugin->version = 2018092300;
 $plugin->requires = 2014051200; // Moodle 2.7
 $plugin->component = 'enrol_attributes';
-$plugin->release = '2.6 for Moodle 2.7-3.5 (build 2018080300)';
+$plugin->release = '2.8 for Moodle 2.7-3.5 (build 2018092300)';
 $plugin->maturity = MATURITY_STABLE;
-
-$plugin->cron = 3600 * 6; // every 6 hours
 

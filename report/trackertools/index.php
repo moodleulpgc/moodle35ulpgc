@@ -134,10 +134,16 @@ if ($mform->is_cancelled()) {
 
     } elseif($action == 'fieldcomply') {
         $records = report_trackertools_field_compliance_list($tracker, $fromform);
-        $mform = new report_trackertools_checked_form(null, array('cmid'=>$id, 'tracker'=>$tracker, 'issues'=>$records));
+        
+        print_object($records);
+        
+        $complianceform = $fromform->fillstatus ? 'report_trackertools_noncompliant_form' : 'report_trackertools_checked_form';
+        $mform = new $complianceform(null, array('cmid'=>$id, 'tracker'=>$tracker, 'issues'=>$records));
         
     } elseif($action == 'usercomply') {        
-        
+        $records = report_trackertools_user_compliance_list($tracker, $fromform);
+        $complianceform = $fromform->fillstatus ? 'report_trackertools_noncompliant_form' : 'report_trackertools_checked_form';
+        $mform = new $complianceform(null, array('cmid'=>$id, 'tracker'=>$tracker, 'issues'=>$records));
         
     } elseif($action == 'checked') {
         $message = '';

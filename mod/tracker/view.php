@@ -195,7 +195,11 @@ if ($view == 'view') {
                 break;
             case 'mywork':
                 $resolved = 0;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
+                if(tracker_has_assigned($tracker, false)) {
+                    include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
+                }  else {
+                    include($CFG->dirroot.'/mod/tracker/views/viewmyccedticketslist.php');
+                }
                 break;
             case 'browse':
                 if (!has_capability('mod/tracker:viewallissues', $context)) {

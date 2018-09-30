@@ -32,6 +32,30 @@ class tracker_element_dropdown_form extends tracker_moodle_form {
         $mform = $this->_form;
         $mform->addElement('advcheckbox', 'paramint1', get_string('menumultiple', 'tracker'));
         
+        $autofills = array('' => get_string('none'),
+                            'courses' => get_string('courses'),
+                            'categories' => get_string('categories'),
+                            'users_role' => get_string('autofillusersrole', 'tracker'),
+                            'users_group' => get_string('autofillusersgroup', 'tracker'),
+                            'users_grouping' => get_string('autofillusersgrouping', 'tracker'),
+                            );
+        $mform->addElement('select', 'paramchar1', get_string('autofilltype', 'tracker'), $autofills);
+        $mform->addHelpButton('paramchar1', 'autofilltype', 'tracker');
+        $mform->setDefault('paramchar1', '');
+        
+        $mform->addElement('text', 'paramchar2', get_string('autofillidnumber', 'tracker'));
+        $mform->addHelpButton('paramchar2', 'autofillidnumber', 'tracker');
+        $mform->setType('paramchar2', PARAM_ALPHANUMEXT);
+        $mform->disabledIf('paramchar2', 'paramchar1', 'eq', '');
+        
+        $mform->addElement('advcheckbox', 'paramint2', get_string('adduserwatch', 'tracker'));
+        //$mform->addHelpButton('paramchar2', 'autofillidnumber', 'tracker');
+        $mform->disabledIf('paramint2', 'paramchar1', 'eq', '');
+        $mform->disabledIf('paramint2', 'paramchar1', 'eq', 'courses');
+        $mform->disabledIf('paramint2', 'paramchar1', 'eq', 'categories');
+        
+        
+        
         $this->end_form();
     }
 

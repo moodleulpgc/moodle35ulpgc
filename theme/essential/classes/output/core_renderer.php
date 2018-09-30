@@ -380,16 +380,21 @@ class core_renderer extends \core_renderer {
                 $content .= '<div><p>'.get_string('findcoursecontent', 'theme_essential').'</p></div>';
                 $content .= '<div id="courseitemsearchresults">';
                 $content .= '<input type="text" name="courseitemsearch" id="courseitemsearch" disabled="disabled">';
-                $content .= '<input type="checkbox" name="courseitemsearchtype" id="courseitemsearchtype" disabled="disabled"';
-                $searchallcoursecontentdefault = 0;
-                if ($this->get_setting('searchallcoursecontentdefault')) {
-                    $searchallcoursecontentdefault = 1;
+                if ($this->get_setting('searchallcoursecontentenable')) {
+                    $content .= '<span id="courseitemsearchtally" class="searchallcoursecontentenable"></span>';
+                    $content .= '<input type="checkbox" name="courseitemsearchtype" id="courseitemsearchtype" disabled="disabled"';
+                    $searchallcoursecontentdefault = 0;
+                    if ($this->get_setting('searchallcoursecontentdefault')) {
+                        $searchallcoursecontentdefault = 1;
+                    }
+                    $courseitemsearchtype = get_user_preferences('theme_essential_courseitemsearchtype', $searchallcoursecontentdefault);
+                    if ($courseitemsearchtype) {
+                        $content .= ' checked';
+                    }
+                    $content .= '><label for="courseitemsearchtype">'.get_string('searchallcoursecontent', 'theme_essential').'</label>';
+                } else {
+                    $content .= '<span id="courseitemsearchtally" class="searchallcoursecontentdisable"></span>';
                 }
-                $courseitemsearchtype = get_user_preferences('theme_essential_courseitemsearchtype', $searchallcoursecontentdefault);
-                if ($courseitemsearchtype) {
-                    $content .= ' checked';
-                }
-                $content .= '><label for="courseitemsearchtype">'.get_string('searchallcoursecontent', 'theme_essential').'</label>';
                 $content .= '</div></div>';
             }
         }
@@ -506,6 +511,15 @@ class core_renderer extends \core_renderer {
         } else {
             return '';
         }
+    }
+
+    /**
+     * Returns standard navigation between activities in a course.
+     *
+     * @return string the navigation HTML.
+     */
+    public function activity_navigation() {
+        return html_writer::tag('div', parent::activity_navigation(), array('id' => 'activitynavigation'));
     }
 
     /**
@@ -1510,27 +1524,7 @@ class core_renderer extends \core_renderer {
         } else {
             $course = $this->page->course;
             $context = context_course::instance($course->id);
-
-            // Output Profile link.
-            $rolemenuitem = null;
-            $rolename = null;
-            if (\is_role_switched($course->id)) { // Has switched roles.
-                if ($role = $DB->get_record('role', array('id' => $USER->access['rsw'][$context->path]))) {
-                    $branchlabel = '<em>'.$this->getfontawesomemarkup('user').get_string('switchrolereturn').'</em>';
-                    $branchurl = new moodle_url('/course/switchrole.php', array('id' => $course->id, 'sesskey' => sesskey(),
-                        'switchrole' => 0, 'returnurl' => $this->page->url->out_as_local_url(false)));
-                    $rolemenuitem = html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-                    $rolename = ' - '.role_get_name($role, $context);
-                }
-            } else {
-                $roles = \get_switchable_roles($context);
-                if (is_array($roles) && (count($roles) > 0)) {
-                    $branchlabel = '<em>'.$this->getfontawesomemarkup('users').get_string('switchroleto').'</em>';
-                    $branchurl = new moodle_url('/course/switchrole.php', array('id' => $course->id,
-                        'switchrole' => -1, 'returnurl' => $this->page->url->out_as_local_url(false)));
-                    $rolemenuitem = html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-                }
-            }
+            $menuitemsepcount = 0;
 
             $username = parent::user_picture($USER, array('link' => false, 'size' => 64));
             if (!empty($USER->alternatename)) {
@@ -1546,103 +1540,176 @@ class core_renderer extends \core_renderer {
             $classes = 'dropdown-menu pull-right';
             $usermenu .= html_writer::start_tag('ul', array('class' => $classes));
 
-            if (\core\session\manager::is_loggedinas()) {
-                $realuser = \core\session\manager::get_realuser();
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('key').fullname($realuser, true).
-                    get_string('loggedinas', 'theme_essential').fullname($USER, true).'</em>';
-            } else {
-                $username = fullname($USER, true);
-                if ($rolename) {
-                    $username .= $rolename;
+            // Output profile link.
+            $rolemenuitem = null;
+            $rolename = null;
+            $switchrolemi = \theme_essential\toolbox::get_setting('switchrolemi');
+            if (\is_role_switched($course->id)) { // Has switched roles.
+                if ($role = $DB->get_record('role', array('id' => $USER->access['rsw'][$context->path]))) {
+                    if ($switchrolemi) {
+                        $branchlabel = '<em>'.$this->getfontawesomemarkup('user').get_string('switchrolereturn').'</em>';
+                        $branchurl = new moodle_url('/course/switchrole.php', array('id' => $course->id, 'sesskey' => sesskey(),
+                           'switchrole' => 0, 'returnurl' => $this->page->url->out_as_local_url(false)));
+                        $rolemenuitem = html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    }
+                    $rolename = ' - '.role_get_name($role, $context);
                 }
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('user').$username.'</em>';
+            } else if ($switchrolemi) {
+                $roles = \get_switchable_roles($context);
+                if (is_array($roles) && (count($roles) > 0)) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('users').get_string('switchroleto').'</em>';
+                    $branchurl = new moodle_url('/course/switchrole.php', array('id' => $course->id,
+                        'switchrole' => -1, 'returnurl' => $this->page->url->out_as_local_url(false)));
+                    $rolemenuitem = html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                }
             }
-            $branchurl = new moodle_url('/user/profile.php', array('id' => $USER->id));
-            $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
 
-            if (is_mnet_remote_user($USER) && $idprovider = $DB->get_record('mnet_host', array('id' => $USER->mnethostid))) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('users').get_string('loggedinfrom', 'theme_essential').
-                    $idprovider->name.'</em>';
-                $branchurl = new moodle_url($idprovider->wwwroot);
+            if (\theme_essential\toolbox::get_setting('profilelinkmi')) {
+                if (\core\session\manager::is_loggedinas()) {
+                    $realuser = \core\session\manager::get_realuser();
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('key').fullname($realuser, true).
+                        get_string('loggedinas', 'theme_essential').fullname($USER, true).'</em>';
+                } else {
+                    $username = fullname($USER, true);
+                    if ($rolename) {
+                        $username .= $rolename;
+                    }
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('user').$username.'</em>';
+                }
+                $branchurl = new moodle_url('/user/profile.php', array('id' => $USER->id));
                 $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                $menuitemsepcount++;
+            }
+
+            if (\theme_essential\toolbox::get_setting('loggedinfrommi')) {
+                if (is_mnet_remote_user($USER) && $idprovider = $DB->get_record('mnet_host', array('id' => $USER->mnethostid))) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('users').get_string('loggedinfrom', 'theme_essential').
+                        $idprovider->name.'</em>';
+                    $branchurl = new moodle_url($idprovider->wwwroot);
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
             }
 
             if ($rolemenuitem) {
                 $usermenu .= $rolemenuitem;
+                $menuitemsepcount++;
             }
 
-            // Add preferences submenu.
-            $usermenu .= $this->theme_essential_render_preferences($context);
-
-            $usermenu .= html_writer::empty_tag('hr', array('class' => 'sep'));
-
-            // Output Calendar link if user is allowed to edit own calendar entries.
-            if (has_capability('moodle/calendar:manageownentries', $context)) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('calendar').
-                    get_string('pluginname', 'block_calendar_month').'</em>';
-                $branchurl = new moodle_url('/calendar/view.php');
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+            if (\theme_essential\toolbox::get_setting('preferencesmi')) {
+                // Add preferences submenu.
+                $usermenu .= $this->theme_essential_render_preferences($context);
+                $menuitemsepcount++;
             }
 
-            // Check if messaging is enabled.
-            if (!empty($CFG->messaging)) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('envelope').get_string('messages', 'message').'</em>';
-                $branchurl = new moodle_url('/message/index.php');
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-            }
-
-            // Check if user is allowed to manage files.
-            if (has_capability('moodle/user:manageownfiles', $context)) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('file').get_string('privatefiles', 'block_private_files').'</em>';
-                $branchurl = new moodle_url('/user/files.php');
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-            }
-
-            // Check if user is allowed to view discussions.
-            if (has_capability('mod/forum:viewdiscussion', $context)) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').get_string('forumposts', 'mod_forum').'</em>';
-                $branchurl = new moodle_url('/mod/forum/user.php', array('id' => $USER->id));
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('list').get_string('discussions', 'mod_forum').'</em>';
-                $branchurl = new moodle_url('/mod/forum/user.php', array('id' => $USER->id, 'mode' => 'discussions'));
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-
+            if ($menuitemsepcount > 0) {
                 $usermenu .= html_writer::empty_tag('hr', array('class' => 'sep'));
             }
+            $menuitemsepcount = 0;
 
+            if (\theme_essential\toolbox::get_setting('calendarmi')) {
+                // Output Calendar link if user is allowed to edit own calendar entries.
+                if (has_capability('moodle/calendar:manageownentries', $context)) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('calendar').
+                        get_string('pluginname', 'block_calendar_month').'</em>';
+                    $branchurl = new moodle_url('/calendar/view.php');
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
+            }
+
+            if (\theme_essential\toolbox::get_setting('messagesmi')) {
+                // Check if messaging is enabled.
+                if (!empty($CFG->messaging)) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('envelope').get_string('messages', 'message').'</em>';
+                    $branchurl = new moodle_url('/message/index.php');
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
+            }
+
+            if (\theme_essential\toolbox::get_setting('privatefilesmi')) {
+                // Check if user is allowed to manage private files.
+                if (has_capability('moodle/user:manageownfiles', $context)) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('file').get_string('privatefiles', 'block_private_files').'</em>';
+                    $branchurl = new moodle_url('/user/files.php');
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
+            }
+
+            $forumpostsmi = \theme_essential\toolbox::get_setting('forumpostsmi');
+            $forumdiscussionsmi = \theme_essential\toolbox::get_setting('forumdiscussionsmi');
+            // Check if user is allowed to view discussions.
+            if ((($forumpostsmi) || ($forumdiscussionsmi)) && (has_capability('mod/forum:viewdiscussion', $context))) {
+                if ($forumpostsmi) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').get_string('forumposts', 'mod_forum').'</em>';
+                    $branchurl = new moodle_url('/mod/forum/user.php', array('id' => $USER->id));
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
+
+                if ($forumdiscussionsmi) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('list').get_string('discussions', 'mod_forum').'</em>';
+                    $branchurl = new moodle_url('/mod/forum/user.php', array('id' => $USER->id, 'mode' => 'discussions'));
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
+            }
+
+            if ($menuitemsepcount > 0) {
+                $usermenu .= html_writer::empty_tag('hr', array('class' => 'sep'));
+            }
+            $menuitemsepcount = 0;
+
+            $mygradesmi = \theme_essential\toolbox::get_setting('mygradesmi');
             // Output user grade links, course sensitive where appropriate.
             if ($course->id == SITEID) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').get_string('mygrades', 'theme_essential').'</em>';
-                $branchurl = new moodle_url('/grade/report/overview/index.php', array('userid' => $USER->id));
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
-            } else {
-                if (has_capability('gradereport/overview:view', $context)) {
+                if ($mygradesmi) {
                     $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').get_string('mygrades', 'theme_essential').'</em>';
-                    $params = array('userid' => $USER->id);
-                    if ($course->showgrades) {
-                        $params['id'] = $course->id;
+                    $branchurl = new moodle_url('/grade/report/overview/index.php', array('userid' => $USER->id));
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
+            } else {
+                if ($mygradesmi) {
+                    if (has_capability('gradereport/overview:view', $context)) {
+                        $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').get_string('mygrades', 'theme_essential').'</em>';
+                        $params = array('userid' => $USER->id);
+                        if ($course->showgrades) {
+                            $params['id'] = $course->id;
+                        }
+                        $branchurl = new moodle_url('/grade/report/overview/index.php', $params);
+                        $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                        $menuitemsepcount++;
                     }
-                    $branchurl = new moodle_url('/grade/report/overview/index.php', $params);
-                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
                 }
 
-                if (has_capability('gradereport/user:view', $context) && $course->showgrades) {
-                    // In Course also output Course grade links.
-                    $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').
-                        get_string('coursegrades', 'theme_essential').'</em>';
-                    $branchurl = new moodle_url('/grade/report/user/index.php', array('id' => $course->id, 'userid' => $USER->id));
-                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                if (\theme_essential\toolbox::get_setting('coursegradesmi')) {
+                    if (has_capability('gradereport/user:view', $context) && $course->showgrades) {
+                        // In Course also output Course grade links.
+                        $branchlabel = '<em>'.$this->getfontawesomemarkup('list-alt').
+                            get_string('coursegrades', 'theme_essential').'</em>';
+                        $branchurl = new moodle_url('/grade/report/user/index.php', array('id' => $course->id, 'userid' => $USER->id));
+                        $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                        $menuitemsepcount++;
+                    }
                 }
             }
 
-            // Check if badges are enabled.
-            if (!empty($CFG->enablebadges) && has_capability('moodle/badges:manageownbadges', $context)) {
-                $branchlabel = '<em>'.$this->getfontawesomemarkup('certificate').get_string('badges').'</em>';
-                $branchurl = new moodle_url('/badges/mybadges.php');
-                $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+            if (\theme_essential\toolbox::get_setting('badgesmi')) {
+                // Check if badges are enabled.
+                if (!empty($CFG->enablebadges) && has_capability('moodle/badges:manageownbadges', $context)) {
+                    $branchlabel = '<em>'.$this->getfontawesomemarkup('certificate').get_string('badges').'</em>';
+                    $branchurl = new moodle_url('/badges/mybadges.php');
+                    $usermenu .= html_writer::tag('li', html_writer::link($branchurl, $branchlabel));
+                    $menuitemsepcount++;
+                }
             }
-            $usermenu .= html_writer::empty_tag('hr', array('class' => 'sep'));
+
+            if ($menuitemsepcount > 0) {
+                $usermenu .= html_writer::empty_tag('hr', array('class' => 'sep'));
+            }
 
             // Render direct logout link.
             $branchlabel = '<em>'.$this->getfontawesomemarkup('sign-out').get_string('logout').'</em>';
@@ -1673,7 +1740,7 @@ class core_renderer extends \core_renderer {
     protected function theme_essential_render_helplink() {
         global $USER, $CFG;
         if (!\theme_essential\toolbox::get_setting('helplinktype')) {
-            return false;
+            return '';
         }
         $branchlabel = '<em>'.$this->getfontawesomemarkup('question-circle').get_string('help').'</em>';
         $branchurl = '';
@@ -1711,7 +1778,7 @@ class core_renderer extends \core_renderer {
         }
 
         if (empty($branchurl)) {
-            return false;
+            return '';
         }
         return html_writer::tag('li', html_writer::link($branchurl, $branchlabel, array('target' => $target)));
     }
@@ -2570,7 +2637,12 @@ class core_renderer extends \core_renderer {
      * Returns the url of the custom favicon.
      */
     public function favicon() {
-        $favicon = \theme_essential\toolbox::get_setting('favicon', 'format_file_url');
+        /* See: https://moodle.org/mod/forum/discuss.php?d=371252#p1516474 and change if theme_config::setting_file_url
+           changes.
+           Need to do: $url = preg_replace('|^https?://|i', '//', $url->out(false)); separately as the tool_provider of
+           the LTI tool does this in a different way.
+        */
+        $favicon = \theme_essential\toolbox::get_setting_moodle_url('favicon');
 
         if (empty($favicon)) {
             return $this->page->theme->image_url('favicon', 'theme');

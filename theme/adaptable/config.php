@@ -59,7 +59,8 @@ $frontlayoutregions = array('side-post',
         'frnt-market-r',
         'frnt-market-s',
         'frnt-market-t',
-        'news-slider-a');
+        'news-slider-a',
+        'course-section-a');
 
 $courselayoutregions = array('side-post',
         'middle',
@@ -72,7 +73,8 @@ $courselayoutregions = array('side-post',
         'course-bottom-a',
         'course-bottom-b',
         'course-bottom-c',
-        'course-bottom-d');
+        'course-bottom-d',
+        'course-section-a');
 
 $standardregions = array('side-post');
 
@@ -167,7 +169,7 @@ $THEME->layouts = array(
         'file' => 'columns2.php',
         'regions' => array('side-post'),
         'defaultregion' => 'side-post',
-        'options' => array('nonavbar' => true),
+        'options' => array('nonavbar' => false),
     ),
     // My dashboard page.
     'mydashboard' => array(
@@ -180,8 +182,7 @@ $THEME->layouts = array(
     'mypublic' => array(
         'file' => 'columns2.php',
         'regions' => array('side-post'),
-        'defaultregion' => 'side-post',
-        'options' => array('nonavbar' => true),
+        'defaultregion' => 'side-post'
     ),
     // Login page.
     'login' => array(

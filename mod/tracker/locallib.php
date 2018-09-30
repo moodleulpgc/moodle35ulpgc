@@ -2839,6 +2839,35 @@ function tracker_has_assigned($tracker, $resolved = false) {
 }
 
 /**
+ *
+ *
+ */
+function tracker_has_cced($tracker, $resolved = false) {
+    global $DB, $USER;
+    
+    $sql = "SELECT COUNT(i.id) 
+            FROM {tracker_issue} i 
+            JOIN {tracker_issuecc} ic ON ic.issueid = i.id AND i.trackerid = ic.trackerid
+            WHERE i.trackerid = ? AND ic.userid = ?  
+            ";
+
+    if ($resolved) {
+        $sql .= '
+            AND
+            status IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
+        ';
+    } else {
+        $sql .= '
+            AND
+            status NOT IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
+        ';
+    }
+
+    return $DB->count_records_sql($sql, array($tracker->id, $USER->id));
+}
+
+
+/**
  * TODO : revert to standard JQuery requirements calls
  */
 function tracker_check_jquery() {

@@ -66,6 +66,17 @@ $setting = new admin_setting_configcheckbox($name, $title, $description, false);
 $setting->set_updatedcallback('theme_reset_all_caches');
 $temp->add($setting);
 
+// Activity end block region.
+$temp->add(new admin_setting_heading('theme_adaptable_activity_bottom_heading',
+    get_string('coursepageactivitybottomblockregionheading', 'theme_adaptable'),
+    format_text(get_string('coursepageactivitybottomblockregionheadingdesc', 'theme_adaptable'), FORMAT_MARKDOWN)));
+$name = 'theme_adaptable/coursepageblockactivitybottomenabled';
+$title = get_string('coursepageblockactivitybottomenabled', 'theme_adaptable');
+$description = get_string('coursepageblockactivitybottomenableddesc', 'theme_adaptable');
+$setting = new admin_setting_configcheckbox($name, $title, $description, false);
+$setting->set_updatedcallback('theme_reset_all_caches');
+$temp->add($setting);
+
 // Course block layout settings.
 get_string('coursepageblockregionsettings', 'theme_adaptable');
 

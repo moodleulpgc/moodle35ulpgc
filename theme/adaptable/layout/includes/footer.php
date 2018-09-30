@@ -110,6 +110,53 @@ if ($PAGE->theme->settings->moodledocs) {
 
 </div>
 <?php echo $PAGE->theme->settings->jssection; ?>
+
+<?php
+
+
+// Conditional javascript based on a user profile field.
+if (!empty($PAGE->theme->settings->jssectionrestrictedprofilefield)) {
+    // Get custom profile field setting. (e.g. faculty=fbl).
+    $fields = explode('=', $PAGE->theme->settings->jssectionrestrictedprofilefield);
+    $ftype = $fields[0];
+    $setvalue = $fields[1];
+
+    // Get user profile field (if it exists).
+    require_once($CFG->dirroot.'/user/profile/lib.php');
+    require_once($CFG->dirroot.'/user/lib.php');
+    profile_load_data($USER);
+    $ftype = "profile_field_$ftype";
+    if (isset($USER->$ftype)) {
+        if ($USER->$ftype == $setvalue) {
+            // Match between user profile field value and value in setting.
+
+            if (!empty($PAGE->theme->settings->jssectionrestricteddashboardonly)) {
+
+                // If this is set to restrict to dashboard only, check if we are on dashboard page.
+                if ($PAGE->has_set_url()) {
+                    $url = $PAGE->url;
+                } else if ($ME !== null) {
+                    $url = new moodle_url(str_ireplace('/my/', '/', $ME));
+                }
+
+                // In practice, $url should always be valid.
+                if ($url !== null) {
+                    // Check if this is the dashboard page.
+                    if (strstr ($url->raw_out(), '/my/')) {
+                        echo $PAGE->theme->settings->jssectionrestricted;
+                    }
+                }
+            } else {
+                echo $PAGE->theme->settings->jssectionrestricted;
+            }
+
+        }
+    }
+
+}
+
+?>
+
 <?php echo $OUTPUT->get_all_tracking_methods(); ?>
 </body>
 </html>

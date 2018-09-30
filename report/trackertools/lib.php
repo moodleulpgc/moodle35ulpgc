@@ -44,6 +44,12 @@ function report_trackertools_extend_navigation_course($navigation, $course, $con
 function report_trackertools_extend_navigation_module($navigation, $cm) {
     if ($cm->modname == 'tracker') {
         $context = context_module::instance($cm->id);
+        
+        // Do not add anything if not allowed to
+        if(!has_any_capability(array('mod/tracker:manage', 'mod/tracker:configure'), $context)) {
+            return;
+        }
+        
         $url = new moodle_url('/report/trackertools/index.php', array('id'=>$cm->id));
         $node = $navigation->add(get_string('pluginname', 'report_trackertools'), $url, navigation_node::TYPE_CONTAINER, null, 'trackertools');
         

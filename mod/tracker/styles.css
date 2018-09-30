@@ -1,3 +1,7 @@
+.path-mod-tracker table.flexible td {
+    padding: 0.3rem;
+}
+
 .path-mod-tracker .issuelist{
     width: 100%;
 }
@@ -8,6 +12,7 @@
     font-size : 0.9em;
     color: #808080;
     width: 15%;
+    max-width: 10rem;
 }
 
 .path-mod-tracker .formerror{
@@ -121,8 +126,8 @@
     text-align: left ;
     vertical-align: bottom;
     font-size: 0.9em;
-    width: 40%;
-    padding: 2px;
+    max-width: 40%;
+    min-width: 20%;
 }
 
 .path-mod-tracker .list_reportedby{
@@ -131,6 +136,7 @@
     font-size: 0.9em ;
     color: #4D4D4D;
     width:10%;
+    min-width: 8rem;
 }
 
 .path-mod-tracker .list_assignedto{
@@ -139,6 +145,7 @@
     font-size: 0.9em;
     color: #4D4D4D;
     width: 10%;
+    min-width: 9rem;
 }
 
 .path-mod-tracker .list_watches{
@@ -151,6 +158,7 @@
     text-align: center;
     vertical-align: bottom;
     width: 5%;
+    min-width: 7rem;
 }
 
 .path-mod-tracker .list_transfered{

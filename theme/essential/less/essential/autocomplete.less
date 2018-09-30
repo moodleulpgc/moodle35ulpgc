@@ -55,13 +55,25 @@
     input {
         margin-bottom: 4px;
     }
+    #courseitemsearch,
     #courseitemsearchresults {
         position: relative;
     }
-    .ui-autocomplete {
+    #courseitemsearchtally {
+        .muted;
         position: absolute;
         top: 0;
+        &.searchallcoursecontentenable {
+            right: 200px;
+        }
+        &.searchallcoursecontentdisable {
+            right: 10px;
+        }
+    }
+    .ui-autocomplete {
         left: 0;
+        position: absolute;
+        top: 0;
     }
     #courseitemsearchtype {
         margin-bottom: 0;

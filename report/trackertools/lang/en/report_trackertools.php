@@ -317,5 +317,11 @@ Checks if there are entries submitted corresponding (or not) to every option in 
 $string['fillstatus'] = 'Check absence';
 $string['fillstatusexplain'] = 'If checked, the toll will find those options that DO NOT have an issue';
 $string['usercomply'] = 'Check user compliance';
+$string['menutype'] = 'Menu type';
+$string['menutype_help'] = 'The type of data holded in teh dropdown menu. May be either:
 
+ * Users: each line in the menu is a user, a participant (usually identified internally by ID or IDnumber).
+ * Course: each line in the menu is a course (usually identified by shortname, even wehn fullname displayed).
+ * Other: Other type of data without special meaning.
+';
 

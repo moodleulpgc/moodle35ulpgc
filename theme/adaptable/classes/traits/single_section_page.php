@@ -77,7 +77,7 @@ trait single_section_page {
      */
     protected function print_single_section_page_content($course, $sections, $mods, $modnames, $modnamesused, $displaysection,
             $showsectionzero = 1) {
-        global $PAGE;
+        global $PAGE, $OUTPUT;
 
         // Build, on the fly, 'numsections' property (see Moodle's Tracker issue MDL-57769 for details).
         global $DB;
@@ -153,6 +153,12 @@ trait single_section_page {
 
         echo $this->courserenderer->course_section_cm_list($course, $thissection, $displaysection);
         echo $this->courserenderer->course_section_add_cm_control($course, $displaysection, $displaysection);
+
+        // Display course page block activity bottom region if this is a course section.
+        if (!empty($PAGE->theme->settings->coursepageblockactivitybottomenabled)) {
+            echo $OUTPUT->get_block_regions('customrowsetting', 'course-section-', '12-0-0-0');
+        }
+
         echo $this->section_footer();
         echo $this->end_section_list();
 

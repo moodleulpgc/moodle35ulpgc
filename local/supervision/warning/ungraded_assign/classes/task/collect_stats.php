@@ -50,6 +50,8 @@ class collect_stats extends scheduled_task {
         global $CFG, $DB;
         
         $timetocheck = time();
+        
+        include_once($CFG->dirroot.'/local/supervision/warning/ungraded_assign/locallib.php');
 
         \local_supervision\warning_ungraded_assign::get_stats($timetocheck);
     }

@@ -76,7 +76,8 @@ class mod_attendance_update_form extends moodleform {
             'absenteereport' => $sess->absenteereport,
             'automarkcompleted' => 0,
             'preventsharedip' => $sess->preventsharedip,
-            'preventsharediptime' => $sess->preventsharediptime
+            'preventsharediptime' => $sess->preventsharediptime,
+            'includeqrcode' => $sess->includeqrcode
         );
         if ($sess->subnet == $attendancesubnet) {
             $data['usedefaultsubnet'] = 1;
@@ -102,12 +103,11 @@ class mod_attendance_update_form extends moodleform {
         // Show which status set is in use.
         $maxstatusset = attendance_get_max_statusset($this->_customdata['att']->id);
         if ($maxstatusset > 0) {
-            $mform->addElement('static', 'statusset', get_string('usestatusset', 'mod_attendance'),
+            $mform->addElement('static', 'statussetstring', get_string('usestatusset', 'mod_attendance'),
                 attendance_get_setname($this->_customdata['att']->id, $sess->statusset));
-        } else {
-            $mform->addElement('hidden', 'statusset', $maxstatusset);
-            $mform->setType('statusset', PARAM_INT);
         }
+        $mform->addElement('hidden', 'statusset', $sess->statusset);
+        $mform->setType('statusset', PARAM_INT);
 
         $mform->addElement('editor', 'sdescription', get_string('description', 'attendance'),
                            array('rows' => 1, 'columns' => 80), $defopts);
@@ -148,6 +148,8 @@ class mod_attendance_update_form extends moodleform {
             $mform->hideif('studentpassword', 'studentscanmark', 'notchecked');
             $mform->hideif('studentpassword', 'automark', 'eq', ATTENDANCE_AUTOMARK_ALL);
             $mform->hideif('randompassword', 'automark', 'eq', ATTENDANCE_AUTOMARK_ALL);
+            $mform->addElement('checkbox', 'includeqrcode', '', get_string('includeqrcode', 'attendance'));
+            $mform->hideif('includeqrcode', 'studentscanmark', 'notchecked');
             $mform->addElement('checkbox', 'autoassignstatus', '', get_string('autoassignstatus', 'attendance'));
             $mform->addHelpButton('autoassignstatus', 'autoassignstatus', 'attendance');
             $mform->hideif('autoassignstatus', 'studentscanmark', 'notchecked');

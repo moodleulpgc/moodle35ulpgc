@@ -33,6 +33,7 @@ $string['bigbluebuttonbn:addinstance'] = 'Add a new bigbluebuttonbn room/activit
 $string['bigbluebuttonbn:join'] = 'Join a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:record'] = 'Record a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:room'] = 'Create a bigbluebuttonbn live meeting';
+$string['bigbluebuttonbn:view'] = 'View a room/activity';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 

@@ -7,7 +7,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Herramientas Tracker';
+$string['pluginname'] = 'Herramientas de Comprobación';
 $string['trackertools:report'] = 'Comprobar incidencias';
 $string['trackertools:exportport'] = 'Exportar incidencias';
 $string['trackertools:import'] = 'Importar incidencias';
@@ -265,13 +265,13 @@ Los mensajes incluyen automáticamente un enlace a la entrada relevante para cad
  ';
 $string['messagesubject'] = 'Asunto';
 $string['messagebody'] = 'Cuerpo del mensaje';
-$string['defaultsubject'] = 'Aviso de actividad en Tracker';
-$string['defaultbody'] = 'Este mensaje se refiere a algunas actividades requeridas en un módulo Tracker.';
+$string['defaultsubject'] = 'Aviso de actividad en Gestor de Incidencias';
+$string['defaultbody'] = 'Este mensaje se refiere a algunas actividades requeridas en un módulo Gestor de Incidencias.';
 $string['mailerror'] = 'erro en email';
 $string['aboutissue'] = ' Este mesaje se refiere a la entrada {$a}';
 $string['warnedissues'] = 'Enviadas {$a} notificaciones por e-mail a usuarios';
-$string['controlemailsubject'] = 'Notificaciones emitidas en Tracker';
-$string['controlemailbody'] = 'Los siguientes usuarios han sido notificados por e-mail acerca de la actividad en el módulo Tracker. ';
+$string['controlemailsubject'] = 'Notificaciones emitidas en gestor de Incidencias';
+$string['controlemailbody'] = 'Los siguientes usuarios han sido notificados por e-mail acerca de la actividad en el módulo Gestor de Incidencias. ';
 $string['complyissues'] = 'Entradas concordantes';
 $string['noissues'] = 'Ninguna entrada';
 $string['sendalert'] = 'Enviar notificación';
@@ -349,3 +349,10 @@ $string['fillstatus'] = 'Comprobar ausencia';
 $string['fillstatusexplain'] = 'Si está marcado, la herramienta indicará aquellas opciones del menu que 
 NO están utilizadas en ninguna entrada de las indicads';
 $string['usercomply'] = 'Comprobar confirmación por usuarios';
+$string['menutype'] = 'Tipo de datos';
+$string['menutype_help'] = 'El tipo de datos existentes en el menú. Puede ser uno de:
+
+ * Usuarios: cada línea en el menú es un nombre de usuario, usualmente identificado internamente por su DNI.
+ * Cursos: cada línea en el menú es una asignatura, identificada internamente por su código, aunque se muestre el nombre completo.
+ * Otros: Otro tipo cualqiera de datos sin vinculación especial.
+';

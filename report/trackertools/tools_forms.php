@@ -647,9 +647,6 @@ class report_trackertools_fieldcomply_form extends report_trackertools_form {
         
         list($cmid, $tracker, $elements) = $this->get_form_parameters();
         
-        print_object($elements);
-        
-        
         $this->add_issue_search();
         
         $mform->addElement('header', 'fieldcompliance', get_string('fieldcompliance', 'report_trackertools'));
@@ -667,55 +664,19 @@ class report_trackertools_fieldcomply_form extends report_trackertools_form {
         $mform->addElement('advcheckbox', 'fillstatus', get_string('fillstatus', 'report_trackertools'), get_string('fillstatusexplain', 'report_trackertools'));
         $mform->setDefault('fillstatus', 1);
         
-        /*
-        $usertypemenu = array(REPORT_TRACKERTOOLS_FILES_ALL => get_string('any', 'report_trackertools'),
-                            REPORT_TRACKERTOOLS_FILES_USER  => tracker_getstring('reportedby', 'tracker'),
-                            REPORT_TRACKERTOOLS_FILES_DEV   => tracker_getstring('assignedto', 'tracker'),
-                            //REPORT_TRACKERTOOLS_FILES_BOTH  => tracker_getstring('bothusers', 'tracker'),
-                            );
         
-        $commentsgroup = array();
+        $options = array(   REPORT_TRACKERTOOLS_MENUTYPE_OTHER => get_string('other'), 
+                            REPORT_TRACKERTOOLS_MENUTYPE_USER => get_string('users'),
+                            REPORT_TRACKERTOOLS_MENUTYPE_COURSE => get_string('courses'));
+        $mform->addElement('select', 'menutype', get_string('menutype', 'report_trackertools'), $options);
+        $mform->setDefault('menutype', REPORT_TRACKERTOOLS_MENUTYPE_COURSE);
+        $mform->addHelpButton('menutype', 'menutype', 'report_trackertools');
 
-        $commentsmenu = array(REPORT_TRACKERTOOLS_ANY   => get_string('indifferent', 'report_trackertools'),
-                            REPORT_TRACKERTOOLS_NOEMPTY => get_string('noempty', 'report_trackertools'),
-                            REPORT_TRACKERTOOLS_EMPTY   => get_string('empty', 'report_trackertools'),
-                            REPORT_TRACKERTOOLS_LAST    =>get_string('last', 'report_trackertools'),);
-        $commentsgroup[] =& $mform->createElement('select', 'hascomments', '', $commentsmenu);
-        $commentsgroup[] =& $mform->createElement('select', 'commentsby', '', $usertypemenu);
-        
-        $group = $mform->createElement('group', 'hascommentsgroup', get_string('hascomments', 'report_trackertools'), 
-                                        $commentsgroup, ' &nbsp; '.get_string('commentsby', 'report_trackertools').' &nbsp; ', false);
-        $mform->addElement($group);
-        $mform->disabledIf('commentsby', 'hascomments', 'eq', '');        
-        
-        
-        $filesgroup = array();
-        $options = array(REPORT_TRACKERTOOLS_ANY    => get_string('indifferent', 'report_trackertools'),
-                        REPORT_TRACKERTOOLS_NOEMPTY => get_string('noempty', 'report_trackertools'),
-                        REPORT_TRACKERTOOLS_EMPTY   => get_string('empty', 'report_trackertools'),);
-        
-        $filesgroup[] =& $mform->createElement('select', 'hasfiles', get_string('hasfiles', 'report_trackertools'), $options);
-        $filesgroup[] =& $mform->createElement('select', 'filesby', get_string('filesby', 'report_trackertools'), $usertypemenu);
-        $group = $mform->createElement('group', 'hasfilesgroup', get_string('hasfiles', 'report_trackertools'), 
-                                        $filesgroup, ' &nbsp; '.get_string('filesby', 'report_trackertools').' &nbsp; ', false);
-        $mform->addElement($group);
-        $mform->disabledIf('filesby', 'hasfiles', 'eq', '');        
-
-        $options = array(REPORT_TRACKERTOOLS_ANY    => get_string('indifferent', 'report_trackertools'),
-                        REPORT_TRACKERTOOLS_NOEMPTY => get_string('noempty', 'report_trackertools'),
-                        REPORT_TRACKERTOOLS_EMPTY   => get_string('empty', 'report_trackertools'),);
-        $mform->addElement('select', 'hasresolution', get_string('hasresolution', 'report_trackertools'), $options);
-
-        */
-
-        $this->add_hidden_elements($cmid, 'comply');
+        $this->add_hidden_elements($cmid, 'fieldcomply');
 
         $this->add_action_buttons(true, get_string('checkcompliance', 'report_trackertools')); 
     }
 }
-
-
-
 
 
 
@@ -787,6 +748,75 @@ class report_trackertools_checked_form extends report_trackertools_form {
         
     }
 }
+
+
+/**
+ * Issues after checking compliance form class
+ *
+ * @package    report_trackertools
+ * @copyright  2017 Enrique Castro @ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class report_trackertools_noncompliant_form extends report_trackertools_form {
+    /**
+     * Form definition
+     */
+    function definition() {
+        $mform =& $this->_form;
+        
+        list($cmid, $tracker, $elements) = $this->get_form_parameters();
+        
+        $mform->addElement('header', 'checked', get_string('noncompliant', 'report_trackertools'));
+
+        if(isset($this->_customdata['issues'])) {
+            if($this->_customdata['issues']) {
+                $i = 0;
+                $userurl = new moodle_url('/user/index.php');
+                $courseurl = new moodle_url('/course/view.php');
+                foreach($this->_customdata['issues'] as $iid => $issue) {
+                    $username = '';
+                    if(isset($issue->userid) && $issue->userid) {
+                        $userurl->param('id', $issue->userid);
+                        $username = html_writer::link($userurl, fullname($issue));
+                    }
+                    if($issue->menutype == REPORT_TRACKERTOOLS_MENUTYPE_USER) {
+                        $text = $username;
+                        
+                    } else {
+                        $text = $issue->name;
+                        if($issue->courseid) {
+                            $courseurl->param('id', $issue->courseid);
+                            $text = html_writer::link($courseurl, $issue->name);
+                        }
+                        if($username) {
+                            $text .= get_string('userin', 'report_trackertools', $username);
+                        }
+                    }
+                    
+                    $mform->addElement('advcheckbox', "issues[$iid]", '', $text, array('group' => 1));
+                    $i++;
+                }
+                $this->add_checkbox_controller(1);
+            } else {
+                $mform->addElement('static', 'records', '', get_string('noissues', 'report_trackertools'));
+            }
+        }
+        
+        $mform->addElement('header', 'warnings', get_string('warningoptions', 'report_trackertools'));
+        
+        //$this->add_user_staff_options('mailto', 'warningmailto');
+        
+        $this->add_mail_fields();
+        
+        $this->add_hidden_elements($cmid, 'checked');
+
+        $this->add_action_buttons(true, get_string('sendalert', 'report_trackertools')); 
+        
+    }
+}
+
+
+
 
 
 /**

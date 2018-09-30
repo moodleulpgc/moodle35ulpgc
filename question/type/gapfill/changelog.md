@@ -1,3 +1,11 @@
+### Version 1.974 of the Moodle Gapfill question type Sep 2018
+Spurious debugger statement found in mobile js code
+
+### Version 1.973 of the Moodle Gapfill question type Sep 2018
+Support for the new Moodle 3.5 mobile app. Huge thanks to Dani Palou from Moodle HQ, 
+without his help I would not have been able to add this capability. Thanks to Elton LaClare
+for help with testing.
+
 ### Version 1.972 of the Moodle Gapfill question type May 2018
 Fixed a bug where correct answers were shown even thought it was turned off in the quiz settings checkbox.
 Thanks to Matthias Giger and contributors to the Moodle German language for reporting this. Fixed

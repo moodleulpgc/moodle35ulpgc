@@ -217,7 +217,7 @@ $string['mycoursesorderiddes'] = 'Descending';
 $string['mycoursesmax'] = 'Max courses';
 $string['mycoursesmaxdesc'] = 'State up to how many courses should be listed between {$a->lower} and {$a->upper} where \'{$a->lower}\' represents all.';
 $string['mycoursesorderenrolbackcolour'] = 'Enrolled and not accessed course background colour';
-$string['mycoursesorderenrolbackcolourdesc'] = 'The background colour for enrolled but not accessed courses.  For ehen \'mycoursesorder\' is set to \'Last accessed...\'.';
+$string['mycoursesorderenrolbackcolourdesc'] = 'The background colour for enrolled but not accessed courses.  For when \'mycoursesorder\' is set to \'Last accessed...\'.';
 
 $string['mycoursetitle'] = 'Terminology';
 $string['mycoursetitledesc'] = 'Change the terminology for the "My courses" menu title.  When \'mycoursesorder\' is set to \'Last accessed...\' then the word \'latest\' will be added.';
@@ -238,21 +238,49 @@ $string['thiscourse'] = 'This course';
 $string['people'] = 'People';
 
 // User menu.
-$string['usermenuuserimageborderradius'] = 'User menu picture border radius';
-$string['usermenuuserimageborderradiusdesc'] = 'Specify the border radius between {$a->lower} and {$a->upper} pixels of the user picture on the user menu.';
-$string['helplinktype'] = 'Enable help link in menu';
-$string['helplinktypedesc'] = 'Choose whether you want to enable a help option in the user menu, you can choose to either provide an URL that will be opened in a new window or an email address.';
-$string['helplink'] = 'Help link';
-$string['helplinkdesc'] = 'If you chose URL above fill in the complete URL to your help site (must include http:// or https://). If you chose Email address fill in your email address.';
-
 $string['usermenu'] = 'User menu';
 $string['usermenudesc'] = 'The menu for the user.';
+
+$string['helplink'] = 'Help link';
+$string['helplinkdesc'] = 'If you chose URL above fill in the complete URL to your help site (must include http:// or https://). If you chose Email address fill in your email address.';
+$string['helplinktype'] = 'Enable help link in menu';
+$string['helplinktypedesc'] = 'Choose whether you want to enable a help option in the user menu, you can choose to either provide an URL that will be opened in a new window or an email address.';
+
 $string['loggedinas'] = ' logged in as ';
 $string['loggedinfrom'] = 'Logged in from ';
+
+$string['profilelinkmi'] = 'Profile link';
+$string['profilelinkmidesc'] = 'Show the profile link menu item.';
+$string['loggedinfrommi'] = 'Logged in from';
+$string['loggedinfrommidesc'] = 'Show the logged in from menu item if the user is an MNET remote user.';
+$string['switchrolemi'] = 'Switch role';
+$string['switchrolemidesc'] = 'Show the switch role menu item if the user can switch roles.';
+$string['preferencesmi'] = 'Preferences';
+$string['preferencesmidesc'] = 'Show the preferences menu item.';
+$string['calendarmi'] = 'Calendar';
+$string['calendarmidesc'] = 'Show the calendar menu item if the user has the \'moodle/calendar:manageownentries\' capability.';
+$string['messagesmi'] = 'Messages';
+$string['messagesmidesc'] = 'Show the messages menu item if messaging is enabled.';
+$string['privatefilesmi'] = 'Private files';
+$string['privatefilesmidesc'] = 'Show the private files menu item if the user has the \'moodle/user:manageownfiles\' capability.';
+$string['forumpostsmi'] = 'Forum posts';
+$string['forumpostsmidesc'] = 'Show the forum posts menu item if the user has the \'mod/forum:viewdiscussion\' capability.';
+$string['forumdiscussionsmi'] = 'Discussions';
+$string['forumdiscussionsmidesc'] = 'Show the discussions (forum) menu item if the user has the \'mod/forum:viewdiscussion\' capability.';
+$string['mygradesmi'] = 'My grades';
+$string['mygradesmidesc'] = 'Show the my grades menu item if the user has the \'gradereport/overview:view\' capability in a course.  Not checked at the site level.';
+$string['coursegradesmi'] = 'Course grades';
+$string['coursegradesmidesc'] = 'Show the course grades menu item if the user has the \'gradereport/user:view\' capability and the course \'showgrades\' setting is set in a course.';
+$string['badgesmi'] = 'Badges';
+$string['badgesmidesc'] = 'Show the badges menu item if the user has the \'moodle/badges:manageownbadges\' capability and badges are enabled at a site level.';
+
+$string['usermenuuserimageborderradius'] = 'User menu picture border radius';
+$string['usermenuuserimageborderradiusdesc'] = 'Specify the border radius between {$a->lower} and {$a->upper} pixels of the user picture on the user menu.';
 
 $string['mygrades'] = 'My grades';
 $string['coursegrades'] = 'Course grades';
 
+// Misc.
 $string['gotobottom'] = 'Go to the bottom of the page';
 
 // Breadcrumb Style.
@@ -284,10 +312,13 @@ $string['floatingsubmitbuttonsdesc'] = 'Have a \'floating\' area that contains t
 $string['layout'] = 'Use a standard course layout';
 $string['layoutdesc'] = 'This theme is designed to put both block columns on the side.  If you prefer the standard Moodle course layout you can check this box and be returned to the old three column layout.';
 
-$string['coursetitleposition'] = 'Course title postition';
+$string['coursetitleposition'] = 'Course title position';
 $string['coursetitlepositiondesc'] = 'Choose between \'Above\' and \'Within\' for the course.  Where \'Above\' is above the side-pre, page-top and course-content regions and \'Within\' is within the course-content region as it was before this setting was introduced.';
 $string['above'] = 'Above';
 $string['within'] = 'Within';
+$string['activitynavigationposition'] = 'Activity navigation position';
+$string['activitynavigationpositiondesc'] = 'Choose between \'Above\' and \'Below\' for the activity navigaton.  Where \'Above\' is above the activity and \'Below\' is below it.  If you wish to use custom CSS then use the selector \'#activitynavigation\'.';
+$string['below'] = 'Below';
 
 $string['categoryincoursebreadcrumbfeature'] = 'Categories in the course breadcrumb';
 $string['categoryincoursebreadcrumbfeaturedesc'] = 'Show the category links in the breadcrumb of the course.';
@@ -303,7 +334,7 @@ $string['loginbackgrounddesc'] = 'Upload your own login background image.  Selec
 $string['loginbackgroundstyle'] = 'Login background style';
 $string['loginbackgroundstyledesc'] = 'Select the style for the uploaded image.';
 $string['loginbackgroundopacity'] = 'Login box background opacity when there is a background image';
-$string['loginbackgroundopacitydesc'] = 'Lofin background opacity for the login box when there is a background image.';
+$string['loginbackgroundopacitydesc'] = 'Login background opacity for the login box when there is a background image.';
 
 // Colours.
 $string['colorheading'] = 'Colour';
@@ -936,8 +967,12 @@ $string['returntosection'] = 'Return to: {$a->section}';
 // Course fullname and course content search.
 $string['findcoursecontent'] = 'Course search: ';
 $string['searchallcoursecontent'] = 'Search all course content';
+$string['searchallcoursecontentenable'] = 'Enable search all course content';
+$string['searchallcoursecontentenabledesc'] = 'Allow the user to decide if they want to search all course content.  If disabled then the value of \'searchallcoursecontentdefault\' will be applied for the course search.';
 $string['searchallcoursecontentdefault'] = 'Default search all course content';
 $string['searchallcoursecontentdefaultdesc'] = 'Sets the value of the \'Search all course content\' checkbox on the course content search.  If \'Search all course content\' is unticked, then only the course fullname is searched for a match.';
+$string['tallyinoftotal'] = '{$a->rtally} in {$a->ctally} of {$a->ctotal}';
+$string['tallyoftotal'] = '{$a->tally} of {$a->total}';
 
 // essential_admin_setting_configinteger.
 $string['asconfigintlower'] = '{$a->value} is less than the lower range limit of {$a->lower}';

@@ -645,3 +645,33 @@ $string['lastcomment'] = 'Last comment';
 $string['forcedlang'] = 'Forced language';
 $string['allopen'] = 'All open';
 $string['allclosed'] = 'All closed';
+$string['autofilltype'] = 'Auto fill options';
+$string['autofilltype_help'] = 'Sets the field for autofilling the possible options dynamically. 
+The available filling ways are:
+
+ * Courses: Options will be course names in a given course category (defined below).
+ * Categories: Options will be course category names within a given parent category (defined below). 
+ * Users by role: Options will be the names of users enrolled in the course with a given role (defined below).
+ * Users by group: Options will be the names of users enrolled in the course with a given group membership (defined below).
+ * Users by grouping: Options will be the names of users enrolled in the course with a given grouping membership (defined below). 
+
+In all cases option keys are the shortname/idnumber values, and displayed names the item display name.
+';
+$string['autofillusersrole'] = 'Users by role';
+$string['autofillusersgroup'] = 'Users by group';
+$string['autofillusersgrouping'] = 'Users by grouping';
+$string['autofillidnumber'] = 'Auto fill idnumber';
+$string['autofillidnumber_help'] = 'If auto filling on the field options is enabled, this parameter defines which items to search to include as options. 
+It is readed as the idnumber of the target course category, group or grouping.
+
+You must introduce the idnumber value of the target course category, group or grouping that holds the desired users or courses. 
+
+Leave empty to mean all posible items (users or courses in all groups, groupings or categories)';
+$string['autofilltask'] = 'Add options in automatic menu fields';
+$string['autowatchestask'] = 'Add watches for selected users in menu';
+$string['mycced'] = 'Issues observed';
+
+
+
+
+

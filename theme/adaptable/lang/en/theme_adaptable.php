@@ -108,6 +108,8 @@ $string['region-course-top-d'] = 'Course page top region 4';
 
 $string['region-news-slider-a'] = 'Course page slider region';
 
+$string['region-course-section-a'] = 'Course page activity end bottom region';
+
 $string['region-course-bottom-a'] = 'Course page bottom region 5';
 $string['region-course-bottom-b'] = 'Course page bottom region 6';
 $string['region-course-bottom-c'] = 'Course page bottom region 7';
@@ -324,6 +326,12 @@ $string['coursepagenewssliderblockregionheadingdesc'] = 'A custom block region d
 
 $string['coursepageblocksliderenabled'] = 'Enable custom slider block region on Course page';
 $string['coursepageblocksliderenableddesc'] = 'Enable this region on all course pages.';
+
+$string['coursepageactivitybottomblockregionheading'] = 'Custom course activity bottom block region';
+$string['coursepageactivitybottomblockregionheadingdesc'] = 'A custom block region that appears after the end of activities.';
+
+$string['coursepageblockactivitybottomenabled'] = 'Enable course activity bottom block region on course page';
+$string['coursepageblockactivitybottomenableddesc'] = 'Enable this region on all course pages.';
 
 $string['coursepagesidebarinfooterenabled'] = 'Move sidebar to footer on Course page';
 $string['coursepagesidebarinfooterenableddesc'] = 'Wide course page layout by moving sidebar to footer.';
@@ -1549,7 +1557,7 @@ $string['piwiktrackadmin'] = 'Tracking Admins';
 $string['piwiktrackadmindesc'] = 'Enable tracking of Admin users (not recommended)';
 
 
-// Custom CSS ********************************.
+// Custom CSS and Javascript ********************************.
 $string['customcss'] = 'Custom CSS';
 $string['customcssdesc'] = 'Whatever CSS rules you add to this textarea will be reflected in every page, making for easier customization of this theme.';
 
@@ -1559,6 +1567,15 @@ $string['genericsettingsdescription'] = 'Here you can find various settings to a
 
 $string['jssection'] = 'Javascript Section';
 $string['jssectiondesc'] = 'Add javascript code to the site.';
+
+$string['jssectionrestricted'] = 'Conditional Javascript Section';
+$string['jssectionrestricteddesc'] = 'Add javascript code to the site conditionally based on a custom profile field. This javascript will only appear if this condition is met.';
+
+$string['jssectionrestrictedprofilefield'] = 'Javascript Section custom profile field';
+$string['jssectionrestrictedprofilefielddesc'] = 'Show the javascript above ONLY when user matches this custom profile field value, eg: faculty=fbl.';
+
+$string['jssectionrestricteddashboardonly'] = 'Include Javascript only on dashboard page';
+$string['jssectionrestricteddashboardonlydesc'] = 'Show the javascript only on the dashboard page. Otherwise this displays sitewide.';
 
 // Cache definitions.
 $string['cachedef_userdata'] = 'A session cache used to store user specific data.';

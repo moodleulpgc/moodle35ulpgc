@@ -417,6 +417,8 @@ if ($action == 'addelement'){
         $used->elementid = $elementid;
         $used->trackerid = $tracker->id;
         $used->canbemodifiedby = $USER->id;
+        $used->private = 0; // ecastro ULPGC //
+        
         // Get last sort order.
         $select = "trackerid = ? GROUP BY trackerid";
         $params = array($tracker->id);

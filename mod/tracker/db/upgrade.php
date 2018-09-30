@@ -440,6 +440,39 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2015111100, 'tracker');
     }
 
+    if ($result && $oldversion < 2015111110) {
+    $table = new xmldb_table('tracker_elementused');
+        $field = new xmldb_field('private', XMLDB_TYPE_INTEGER, 1, null, null, null, 0);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_default($table, $field);
+        }
+    
+        $langs = array('info'); 
+        foreach($langs as $lang) {
+            $dir = '/lang/es_'.$lang;
+            $filename = 'tracker.php';
+            $source = $CFG->dirroot.'/mod/tracker'.$dir.'/'.$filename;
+            $langconfig = $source = $CFG->dirroot.'/mod/tracker'.$dir.'/langconfig.php';
+           
+            
+            $dir = $CFG->dataroot.$dir;
+            make_writable_directory($dir);
+            if(file_exists($source)) {
+                copy($source, $dir.'/'.$filename);
+                if(file_exists($langconfig)) {
+                    copy($langconfig, $dir.'/langconfig.php');
+                }
+                $dir .= '_local';
+                make_writable_directory($dir);
+                copy($source, $dir.'/'.$filename);
+            }
+        }
+    
+    
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015111110, 'tracker');
+    }
+    
     return $result;
 }
 

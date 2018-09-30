@@ -51,6 +51,8 @@ class collect_stats extends scheduled_task {
         global $CFG, $DB;
         
         $timetocheck = time();
+        
+        include_once($CFG->dirroot.'/local/supervision/warning/lowslots_scheduler/locallib.php');
 
         \local_supervision\warning_lowslots_scheduler::get_stats($timetocheck);
     }

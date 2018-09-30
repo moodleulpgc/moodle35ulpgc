@@ -395,8 +395,7 @@ $string['issuedeleteconfirm'] = 'Ha solicitado borrar la entrada con ID {$a} <br
 ¿Está seguro de que desea contionuar con el borrado permanente de esta entrada?';
 $string['forcedlang'] = 'Lenguaje local'; 
 $string['staffupdated'] = 'Modificado por gestor';
-$string['lastcomment'] = 'Last comment';
-$string['forcedlang'] = 'Forced language';
+$string['lastcomment'] = 'último comentario';
 $string['allopen'] = 'Estados abiertos';
 $string['allclosed'] = 'Estados cerrados';
 $string['trackerissuereported'] = '{$a->shortname}: Creada y asignada una entrada en gestor "{$a->name}".';

@@ -22,7 +22,7 @@
  * @subpackage checklist
  * @author     Sam Chaffee
  * @copyright  2011 David Mudrak <david@moodle.com>
- * @copyright  2012 Blackboard Inc. (http://www.moodlerooms.com)
+ * @copyright  2012 Blackboard Inc. (http://www.blackboard.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,6 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component  = 'gradingform_checklist';
 $plugin->version    = 2018080800;
-$plugin->requires   = 2017111300;
-$plugin->release    = '3.4.3';
+$plugin->requires   = 2018051700;
+$plugin->release    = '3.5.2';
 $plugin->maturity   = MATURITY_STABLE;

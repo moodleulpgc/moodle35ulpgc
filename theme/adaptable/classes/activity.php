@@ -174,6 +174,7 @@ class activity {
                         'itemtype' => 'mod',
                         'itemmodule' => $mod->modname,
                         'iteminstance' => $mod->instance,
+                        'outcomeid' => NULL
                 ));
 
                 $grade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $USER->id));
@@ -469,13 +470,16 @@ class activity {
                 'gradetypetext' => GRADE_TYPE_TEXT,
         );
 
+        // Fix #932.  When a grade AND outcome exists for an assignment, duplicate value error
+        // comes from the Data API in Moodle due to multiple iteminstances.  Added check for outcomeid is null.
         $sql = 'SELECT iteminstance
                 FROM {grade_items}
                 WHERE courseid = ?
                 AND itemtype = ?
                 AND itemmodule = ?
                 AND gradetype <> ?
-                AND gradetype <> ?';
+                AND gradetype <> ?
+                AND outcomeid IS NULL';
 
         $hasgrades = $DB->get_records_sql($sql, $params);
 
@@ -988,6 +992,7 @@ class activity {
              AND gi.itemtype = 'mod'
              AND gi.itemmodule = :modname
              AND gi.courseid = :courseid1
+             AND gi.outcomeid IS NULL
 
             JOIN {grade_grades} gg
               ON gi.id = gg.itemid

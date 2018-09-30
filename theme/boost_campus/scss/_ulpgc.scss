@@ -130,6 +130,12 @@
     }
 }
 
+@media (max-width: 358px) {
+    a.navbar-brand.has-logo, 
+    .usermenu {display:none;}    
+    .navbar .popover-region {margin-right:2px;}
+}
+
 .navbar-light .navbar-nav .show > .nav-link {
     color: #fff;
 }

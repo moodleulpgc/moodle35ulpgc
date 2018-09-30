@@ -1816,7 +1816,8 @@ EOT;
             if ($access && !$this->hideinforum()) {
                 $branchtitle = get_string('helptitle', 'theme_adaptable');
                 $branchlabel = $helpicon . $branchtitle;
-                $branchurl = new moodle_url($PAGE->theme->settings->enablehelp, array('helptarget' => $PAGE->theme->settings->helptarget));
+                $branchurl = new moodle_url($PAGE->theme->settings->enablehelp,
+                                            array('helptarget' => $PAGE->theme->settings->helptarget));
 
                 $branchsort  = 10003;
                 $branch = $menu->add($branchlabel, $branchurl, '', $branchsort);
@@ -1837,7 +1838,8 @@ EOT;
             if ($access && !$this->hideinforum()) {
                 $branchtitle = get_string('helptitle2', 'theme_adaptable');
                 $branchlabel = $helpicon . $branchtitle;
-                $branchurl   = new moodle_url($PAGE->theme->settings->enablehelp2, array('helptarget' => $PAGE->theme->settings->helptarget));
+                $branchurl   = new moodle_url($PAGE->theme->settings->enablehelp2,
+                                              array('helptarget' => $PAGE->theme->settings->helptarget));
                 $branchsort  = 10003;
                 $branch = $menu->add($branchlabel, $branchurl, '', $branchsort);
             }

@@ -42,6 +42,9 @@ require_once(dirname(__FILE__) . '/lib.php');
  */
 class block_news_slider extends block_base {
 
+    /** @var string The name of the block */
+    public $blockname = null;
+
     /** @var int Display Mode all news */
     const DISPLAY_MODE_ALL_NEWS = 1;
     /** @var int Display Mode Site news only */
@@ -81,7 +84,8 @@ class block_news_slider extends block_base {
      * Adds title to block instance.
      */
     public function init() {
-        $this->title = get_string('blocktitle', 'block_news_slider');
+        $this->blockname = get_class($this);
+        $this->title = get_string('pluginname', $this->blockname);
     }
 
     /**
@@ -90,7 +94,7 @@ class block_news_slider extends block_base {
     public function get_content() {
         global $COURSE, $USER, $OUTPUT, $PAGE, $ME;
 
-        $config = get_config("block_news_slider");
+        $config = get_config($this->blockname);
         if ($this->content !== null) {
             return $this->content;
         }
@@ -151,7 +155,7 @@ class block_news_slider extends block_base {
 
         // Check if caching is being used.  Caching doesn't apply to course page slider.
         if ( (!empty ($config->usecaching) && ($COURSE->id <= 1) ) ) {
-            $cache = cache::make('block_news_slider', self::CACHENAME_SLIDER);
+            $cache = cache::make($this->blockname, self::CACHENAME_SLIDER);
 
             $returnedcachedata = $cache->get(self::CACHENAME_SLIDER_KEY);
 
@@ -194,9 +198,11 @@ class block_news_slider extends block_base {
         } else {
             $showdots = false;
         }
+
         if(!$PAGE->user_is_editing()) { // ecastro ULPGC
-            $PAGE->requires->js_call_amd('block_news_slider/slider', 'init', array($showdots));
+            $PAGE->requires->js_call_amd($this->blockname . '/slider', 'init', array($showdots));
         }
+        
         $this->content->text = html_writer::tag('div', $newscontent);
 
         return $this->content;
@@ -233,7 +239,7 @@ class block_news_slider extends block_base {
             $newscontentjson->slidercontainerstyles = '';
         }
 
-        $newscontentfinal = $OUTPUT->render_from_template('block_news_slider/slider', $newscontentjson);
+        $newscontentfinal = $OUTPUT->render_from_template($this->blockname . '/slider', $newscontentjson);
         return $newscontentfinal;
     }
 
@@ -363,7 +369,7 @@ class block_news_slider extends block_base {
     private function format_course_news_items($course, $newsitems, &$returnedcoursenews) {
         global $SITE;
 
-        $config = get_config("block_news_slider");
+        $config = get_config($this->blockname);
         $excerptlength = $config->excerptlength;
         $subjectmaxlength = $config->subjectmaxlength;
 
@@ -386,6 +392,11 @@ class block_news_slider extends block_base {
                     array('class' => 'news_sliderNewsHeadline'));
 
             $readmorelink = '';
+
+            // Replace p and <br> tags with a '' or space.  Fixes #33 with text being put together from html p and <br> tags.
+            $news['message'] = str_replace('<p>', '', $news['message']);
+            $news['message'] = str_replace(',</p>', ', ' , $news['message']);
+            $news['message'] = str_replace('</p>', ' ' , $news['message']);
 
             if ( (!empty($excerptlength)) && ($excerptlength == 0) ) {
                 $newsmessage = '<a href="' . $newslink . '">' . strip_tags($news['message']) . '</a>';

@@ -26,10 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'UNEDTrivial';
 $string['modulenameplural'] = 'UNEDTrivials'; 
-$string['modulename_help'] = 'UNEDTrivial es una actividad de preguntas y respuestas para mejorar el engagement en clase';
-$string['newmodule:addinstance'] = 'Añadir nuevo UNEDTrivial';
-$string['newmodule:submit'] = 'Insertar UNEDTrivial';
-$string['newmodule:view'] = 'Ver UNEDTrivial';
+$string['modulename_help'] = 'UNEDTrivial es una actividad de preguntas y respuestas para mejorar el enganche en clase';
+$string['unedtrivial:addinstance'] = 'Añadir nuevo UNEDTrivial';
+$string['unedtrivial:submit'] = 'Insertar o entregar en UNEDTrivial';
+$string['unedtrivial:view'] = 'Ver UNEDTrivial';
 $string['newmodulefieldset'] = 'Ejemplo de campo personalizado';
 $string['newmodulename'] = 'Nueva actividad UNEDTrivial';
 $string['newmodulename_help'] = '';

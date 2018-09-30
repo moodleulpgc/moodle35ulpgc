@@ -29,7 +29,10 @@ if ($ADMIN->fulltree) {
     require_once(dirname(__FILE__).'/locallib.php');
 
     $tabmenu = attendance_print_settings_tabs();
+
     $settings->add(new admin_setting_heading('attendance_header', '', $tabmenu));
+
+    $plugininfos = core_plugin_manager::instance()->get_plugins_of_type('local');
 
     // Paging options.
     $options = array(
@@ -121,6 +124,9 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox('attendance/randompassword_default',
         get_string('randompassword', 'attendance'), '', 0));
+
+    $settings->add(new admin_setting_configcheckbox('attendance/includeqrcode_default',
+        get_string('includeqrcode', 'attendance'), '', 0));
 
     $settings->add(new admin_setting_configcheckbox('attendance/autoassignstatus',
         get_string('autoassignstatus', 'attendance'), '', 0));

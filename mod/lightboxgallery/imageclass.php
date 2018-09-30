@@ -280,7 +280,7 @@ class lightboxgallery_image {
         $flipped = imagecreatetruecolor($this->width, $this->height);
         $w = $this->width;
         $h = $this->height;
-        if ($direction == 'horizontal') {
+        if ($direction == 'vertical') {
             for ($x = 0; $x < $w; $x++) {
                 for ($y = 0; $y < $h; $y++) {
                     imagecopy($flipped, $image, $x, $h - $y - 1, $x, $y, 1, 1);

@@ -89,9 +89,7 @@ if (isset($searchqueries)) {
         FROM
             {tracker_issue} i
         LEFT JOIN
-            {tracker_issuecc} ic
-        ON
-            ic.issueid = i.id
+            {tracker_issuecc} ic ON ic.issueid = i.id AND i.trackerid = ic.trackerid
         WHERE
             i.reportedby = {$USER->id} AND
             i.trackerid = {$tracker->id}
@@ -110,11 +108,15 @@ if (isset($searchqueries)) {
             COUNT(*)
         FROM
             {tracker_issue} i
+        LEFT JOIN
+            {tracker_issuecc} ic ON ic.issueid = i.id AND i.trackerid = ic.trackerid
+
         WHERE
             i.reportedby = {$USER->id} AND
             i.trackerid = {$tracker->id}
             $resolvedclause
     ";
+    //(i.reportedby = {$USER->id}  OR  ic.userid = {$USER->id}) AND
     $numrecords = $DB->count_records_sql($sqlcount);
 }
 

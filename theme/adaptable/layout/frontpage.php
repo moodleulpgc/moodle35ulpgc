@@ -124,6 +124,10 @@ if (is_siteadmin()) {
         if (!empty($PAGE->theme->settings->coursepageblocksliderenabled) ) {
             echo $OUTPUT->get_block_regions('customrowsetting', 'news-slider-', '12-0-0-0');
         }
+
+        if (!empty($PAGE->theme->settings->coursepageblockactivitybottomenabled)) {
+            echo $OUTPUT->get_block_regions('customrowsetting', 'course-section-', '12-0-0-0');
+        }
         ?>
 
           <h3><?php echo get_string('frnt-footer', 'theme_adaptable') ?></h3>

@@ -48,4 +48,26 @@ defined('MOODLE_INTERNAL') || die;
     $setting = new admin_setting_configtextarea($name, $title, $description, $default);
     $temp->add($setting);
 
+    // Section for custom javascript, restricted by profile field
+    $name = 'theme_adaptable/jssectionrestricted';
+    $title = get_string('jssectionrestricted', 'theme_adaptable');
+    $description = get_string('jssectionrestricteddesc', 'theme_adaptable');
+    $default = '';
+    $setting = new admin_setting_configtextarea($name, $title, $description, $default);
+    $temp->add($setting);
+
+    $name = 'theme_adaptable/jssectionrestrictedprofilefield';
+    $title = get_string('jssectionrestrictedprofilefield', 'theme_adaptable');
+    $description = get_string('jssectionrestrictedprofilefielddesc', 'theme_adaptable');
+    $setting = new admin_setting_configtext($name, $title, $description, '', PARAM_RAW);
+    $temp->add($setting);
+
+    $name = 'theme_adaptable/jssectionrestricteddashboardonly';
+    $title = get_string('jssectionrestricteddashboardonly', 'theme_adaptable');
+    $description = get_string('jssectionrestricteddashboardonlydesc', 'theme_adaptable');
+    $default = true;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
+    $setting->set_updatedcallback('theme_reset_all_caches');
+    $temp->add($setting);
+
     $ADMIN->add('theme_adaptable', $temp);

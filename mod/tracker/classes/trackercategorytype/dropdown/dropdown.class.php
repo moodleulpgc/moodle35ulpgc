@@ -96,8 +96,15 @@ class dropdownelement extends trackerelement {
                     $mform->addRule('element'.$this->name, null, 'nonzero', null, 'client');
                 }
             }
-			if($this->multiple){
-                $select->setMultiple(true); // ecastro ULPGC
+            
+			if($this->multiple){ // ecastro ULPGC
+                $select->setMultiple(true); 
+                $size = count($this->options);
+                if($size > 15) {
+                    $size = 16;
+                }
+                
+                $select->setSize($size);  
             }
         }
     }
@@ -169,6 +176,9 @@ class dropdownelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+        
+        $this->add_autowatches(); // ecastro ULPGC
+        
     }
 
     public function type_has_options() {

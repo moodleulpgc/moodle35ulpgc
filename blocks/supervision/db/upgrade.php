@@ -18,8 +18,17 @@ function xmldb_block_supervision_upgrade($oldversion, $block) {
 
     if ($oldversion < 2012081700) {
 
-        upgrade_block_savepoint(true, 2012081700, 'block_supervision');
+        upgrade_block_savepoint(true, 2012081700, 'supervision');
     }
 
+    if ($oldversion < 2018081806) {
+        
+        $fields = array('block/supervision:manage', 'block/supervision:viewwarnings', 'block/supervision:editwarnings');
+        $DB->delete_records_list('capabilities', 'name', $fields);
+    
+        upgrade_block_savepoint(true, 2018081806, 'supervision');
+    }
+
+    
     return true;
 }
