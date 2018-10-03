@@ -1425,6 +1425,7 @@ function report_trackertools_field_compliance_list($tracker, $fromform) {
     tracker_loadelementsused($tracker, $elements);
     
     $element = $elements[$fromform->checkedfield];
+    $params['trackerid'] = $tracker->id;
     $params['elementid'] = $element->id;
     
     $names = get_all_user_name_fields(true, 'u');
@@ -1432,96 +1433,56 @@ function report_trackertools_field_compliance_list($tracker, $fromform) {
     
     if($fromform->fillstatus) {
         // means check absence
-        $equal = false;
+        $presence = ' AND ia.id IS NULL';
+        $fields = 'ei.id, ei.name AS itemname, '; 
         if($fromform->menutype == REPORT_TRACKERTOOLS_MENUTYPE_USER) {
-            $fields = "ei.id,  u.username, u.idnumber, $names, u.id AS userid";
-            $otherjoins = ' JOIN {user} u ON u.idnumber = ei.name '; 
+            
+            $fields .= "u.username, u.idnumber, $names, u.id AS userid";
+            $otherjoins =  ' JOIN {user} u ON u.idnumber = ei.name '; 
         } elseif($fromform->menutype == REPORT_TRACKERTOOLS_MENUTYPE_COURSE) {
-            $fields =  "c.id, c.shortname, CONCAT(c.shortname, '-',c.shortname) AS name, 
+            $fields .= "c.id as courseid, c.shortname, CONCAT(c.shortname, '-',c.fullname) AS name, 
                         u.username, u.idnumber, $names, u.id AS userid";
-            $otherjoins = ' JOIN {course} u ON c.shortname = ei.name  
-                            JOIN {enrol} e ON c.id = e.courseid
-                            LEFT JOIN {user_enrolments} ue ON ue.enrol = e.id AND ue.roleid = :role
-                            LEFT JOIN {user} u ON ue.userid = u.id ' ; 
-            $params['role'] = get_config('report_trackertools', 'coord_role'); 
+            $otherjoins = ' JOIN {course} c ON c.shortname = ei.name  
+                            JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :ctxcourse
+                            LEFT JOIN {role_assignments} ra  ON ra.userid = (SELECT userid FROM {role_assignments} 
+                                                        WHERE contextid = ctx.id  AND roleid = :role 
+                                                        ORDER BY id LIMIT 1) 
+                            LEFT JOIN {user} u ON ra.userid = u.id ' ; 
+            $params['role'] = $fromform->userrole; 
+            $params['ctxcourse'] = CONTEXT_COURSE; 
         } else {
             $fields = "ei.*";
         }
         $fields .= ", {$fromform->menutype} AS menutype ";
         
     } else {
-        //check presence 
-        $equal = true;
-        $fields = ' i.* '; 
+        $presence = ' AND ia.id IS NOT NULL ';
+        $fields = ' i.*,  ei.id AS itemid, ei.name AS itemname '; 
+        $otherjoins = 'LEFT JOIN {user} tu ON tu.id = i.assignedto 
+                       LEFT JOIN {user} su ON su.id = i.reportedby ';
+        
+        $studentuserfields = 'su.id AS suid, su.idnumber AS suidnumber, '.
+                                    get_all_user_name_fields(true, 'su', '', 'su');
+        $tutoruserfields = 'tu.id AS tuid, tu.idnumber AS tuidnumber, '.
+                                    get_all_user_name_fields(true, 'tu', '', 'tu');
+        
+        $fields .= ', '. $studentuserfields .', '. $tutoruserfields;
+        
     }
-    list($insql, $inparams) = $DB->get_in_or_equal(array_keys($element->options),SQL_PARAMS_NAMED, 'op', $equal);
-    
-    print_object($params);
-    print_object($inparams);
+    list($insql, $inparams) = $DB->get_in_or_equal(array_keys($element->options),SQL_PARAMS_NAMED, 'op');
     
     $params = array_merge($params, $inparams);
     
     $sql = "SELECT $fields     
             FROM {tracker_elementitem} ei
-            LEFT JOIN {tracker_issueattribute} ia ON ia.elementid = ei.elementid
-            LEFT JOIN {tracker_issue} i ON ia.trackerid = i.trackerid AND ia.issueid = i.id
+            JOIN {tracker_elementused} eu ON ei.elementid = eu.elementid AND eu.trackerid = :trackerid
+            LEFT JOIN {tracker_issueattribute} ia ON ia.elementid = ei.elementid AND ia.elementitemid = ei.id AND ia.trackerid = eu.trackerid
+            LEFT JOIN {tracker_issue} i ON ia.trackerid = i.trackerid AND ia.issueid = i.id AND $issuewhere
             $otherjoins
-            WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid $insql  ";
-
-    
-    print_object($sql);
-    
-    /*
-    
-    foreach($element->options as $id => $option) {
-    
-        $sql = "SELECT i.*,      
-                FROM {tracker_issue} i 
-                LEFT JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND ia.issueid = i.id
-                WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid  ";
-                
-                
-                
-        $params['elementid'] = $element->id;
-        $params['option'] = $option->id;
-        
-        if(!$DB->record_exists_sql($sql, $params)) {
-            $absent[$option->name] = $option;
-        }
-    }
-    */
-    $records = array();
-    
-    $records = $DB->get_records_sql($sql, $params);
-    
-/*    
-    
-    if($fromform->fieldtype == 'user') {
-        list($insql, $params) = $DB->get_in_or_equal(array_keys($absent),SQL_PARAMS_NAMED, 'idn');
-        $names = get_all_user_name_fields();
-        $sql = "SELECT id, username, idnumber, $names, id AS userid, 'user' AS fieldtype 
-                FROM {user} 
-                WHERE idnumber $insql ";
-                
-        $records = $DB->get_records_sql($sql, $params);
-        
-    } elseif($fromform->fieldtype == 'course') {
-        list($insql, $params) = $DB->get_in_or_equal(array_keys($absent),SQL_PARAMS_NAMED, 'c');
-        $names = get_all_user_name_fields(true, 'u');
-        $sql = "SELECT c.id, c.shortname, CONCAT(c.shortname, '-',c.shortname) AS name, u.username, u.idnumber, $names, u.id AS userid, 'course' AS fieldtype 
-                FROM {course} c 
-                JOIN {enrol} e ON c.id = e.courseid
-                LEFT JOIN {user_enrolments} ue ON ue.enrol = e.id
-                LEFT JOIN {user} u ON ue.userid = u.id
-                WHERE c.shortname $insql AND (ue.id IS NULL OR ue.roleid = :role) ";
-                
-        $params['role'] = get_config('report_trackertools', 'coord_role'); 
-        $records = $DB->get_records_sql($sql, $params);
-    } else {
-        $records = $absent;
-    }
-  */  
-    return $records; 
+            WHERE ei.elementid = :elementid AND ei.id $insql $presence  
+            GROUP BY ei.id ";
+            
+    return $DB->get_records_sql($sql, $params);
 }
 
 /**
@@ -1541,14 +1502,36 @@ function report_trackertools_user_compliance_list($tracker, $fromform) {
     tracker_loadelementsused($tracker, $elements);
     $element = $elements[$fromform->checkedfield];
     $params['elementid'] = $element->id;
+    $params['trackerid'] = $tracker->id;
     list($insql, $inparams) = $DB->get_in_or_equal(array_keys($element->options),SQL_PARAMS_NAMED, 'op');
     
-    $sql = "SELECT i.*,      
+    $sql = "SELECT i.*, ia.elementitemid     
             FROM {tracker_issue} i 
             JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND ia.issueid = i.id
-            WHERE $issuewhere AND ia.elementid = :elementid AND ia.elementitemid <> '' ";
+            WHERE $issuewhere AND i.trackerid = :trackerid AND ia.elementid = :elementid 
+                    AND (ia.elementitemid IS NOT NULL AND ia.elementitemid <> '') ";
     
-
+    $issues = $DB->get_records_sql($sql, $params); 
+    
+    
+    $params = array(
+    foreach($issues as $iid => $issue) {
+    
+        //search elememtitems , join comments
+        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($element->options),SQL_PARAMS_NAMED, 'op');
+        $sql = "SELECT ei.id, ei.name, u.id AS userid 
+                FROM {tracker_elementitem} ei
+                JOIN {tracker_elementused} eu ON ei.elementid = eu.elementid AND eu.trackerid = :trackerid
+                JOIN {user} u  ON u.idnumber = ei.name
+                LEFT JOIN {tracker_issuecomment} c ON eu.trackerid = c.trackerid AND c.issueid = :issueid AND u.id = c.userid
+                
+                WHERE ei.elementid = :elementid AND ei.id $insql 
+                
+                ":
+        $users = $DB->get_records-sql($sql);
+    
+    
+    }
     
     
 }

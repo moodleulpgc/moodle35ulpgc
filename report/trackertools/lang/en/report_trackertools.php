@@ -324,4 +324,11 @@ $string['menutype_help'] = 'The type of data holded in teh dropdown menu. May be
  * Course: each line in the menu is a course (usually identified by shortname, even wehn fullname displayed).
  * Other: Other type of data without special meaning.
 ';
+$string['userrole'] = 'Course teacher role';
+$string['userrole_help'] = 'The tool will try to find a teacher responsible for the selected courses. 
+This setting defines the role in course that will be user in searching teachers. Only the first assigned will be listed.';
+$string['userin'] = ' ({$a})';
+$string['noncompliant'] = 'Non filled options';
+
+
 

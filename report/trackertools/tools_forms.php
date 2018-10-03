@@ -671,7 +671,15 @@ class report_trackertools_fieldcomply_form extends report_trackertools_form {
         $mform->addElement('select', 'menutype', get_string('menutype', 'report_trackertools'), $options);
         $mform->setDefault('menutype', REPORT_TRACKERTOOLS_MENUTYPE_COURSE);
         $mform->addHelpButton('menutype', 'menutype', 'report_trackertools');
-
+        
+        
+        $options = role_get_names(null, ROLENAME_ALIAS, true);
+        $mform->addElement('select', 'userrole', get_string('userrole', 'report_trackertools'), $options);
+        $mform->setDefault('userrole', REPORT_TRACKERTOOLS_MENUTYPE_COURSE);
+        $mform->addHelpButton('userrole', 'userrole', 'report_trackertools');
+        $mform->disabledIf('userrole','menutype', 'neq', REPORT_TRACKERTOOLS_MENUTYPE_COURSE);
+        $mform->disabledIf('userrole','fillstatus', 'neq', 1);
+        
         $this->add_hidden_elements($cmid, 'fieldcomply');
 
         $this->add_action_buttons(true, get_string('checkcompliance', 'report_trackertools')); 
@@ -714,10 +722,17 @@ class report_trackertools_checked_form extends report_trackertools_form {
         $mform->addElement('header', 'checked', get_string('complyissues', 'report_trackertools'));
 
         if(isset($this->_customdata['issues'])) {
+        
+        
             if($this->_customdata['issues']) {
                 $i = 0;
+                http://localhost/moodle35ulpgc/mod/tracker/view.php?id=3999&view=view&screen=viewanissue&issueid=28
+                $url = new moodle_url('/mod/tracker/view.php?', array('id'=>$cmid,'view'=>'view', 'screen'=>'viewanissue'));
                 foreach($this->_customdata['issues'] as $iid => $issue) {
-                    $text =     $tracker->ticketprefix.$issue->id.' - '. $issue->summary.' ';
+                    $url->param('issueid', $iid);
+                    $text = $tracker->ticketprefix.$issue->id.' - '. $issue->summary.' ';
+                    $text = html_writer::link($url, $text);
+                    
                     if($issue->reportedby) {
                         $text .= '; '.tracker_getstring('reportedby', 'tracker').': '. 
                                     $this->add_user_name($issue, $tracker->course, 'su');
@@ -771,7 +786,7 @@ class report_trackertools_noncompliant_form extends report_trackertools_form {
         if(isset($this->_customdata['issues'])) {
             if($this->_customdata['issues']) {
                 $i = 0;
-                $userurl = new moodle_url('/user/index.php');
+                $userurl = new moodle_url('/user/profile.php');
                 $courseurl = new moodle_url('/course/view.php');
                 foreach($this->_customdata['issues'] as $iid => $issue) {
                     $username = '';
@@ -789,11 +804,15 @@ class report_trackertools_noncompliant_form extends report_trackertools_form {
                             $text = html_writer::link($courseurl, $issue->name);
                         }
                         if($username) {
-                            $text .= get_string('userin', 'report_trackertools', $username);
+                            $text .= ' '.get_string('userin', 'report_trackertools', $username);
                         }
                     }
                     
-                    $mform->addElement('advcheckbox', "issues[$iid]", '', $text, array('group' => 1));
+                    $mform->addElement('advcheckbox', "issues[{$issue->userid}]", '', $text, array('group' => 1));
+                    if(!$username) {
+                        $mform->freeze("issues[{$issue->userid}]");
+                    }
+                    
                     $i++;
                 }
                 $this->add_checkbox_controller(1);
@@ -808,15 +827,12 @@ class report_trackertools_noncompliant_form extends report_trackertools_form {
         
         $this->add_mail_fields();
         
-        $this->add_hidden_elements($cmid, 'checked');
+        $this->add_hidden_elements($cmid, 'checkedusers');
 
         $this->add_action_buttons(true, get_string('sendalert', 'report_trackertools')); 
         
     }
 }
-
-
-
 
 
 /**

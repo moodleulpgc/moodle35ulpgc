@@ -645,6 +645,7 @@ $string['lastcomment'] = 'Last comment';
 $string['forcedlang'] = 'Forced language';
 $string['allopen'] = 'All open';
 $string['allclosed'] = 'All closed';
+$string['adduserwatch'] = 'Add users as observers in issues where selected.';
 $string['autofilltype'] = 'Auto fill options';
 $string['autofilltype_help'] = 'Sets the field for autofilling the possible options dynamically. 
 The available filling ways are:

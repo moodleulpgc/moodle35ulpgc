@@ -399,7 +399,7 @@ abstract class trackerelement {
             
         } elseif($this->paramchar1 == 'categories') {
             $sql = "SELECT c.idnumber, c.name 
-                    FROM {course_category} c
+                    FROM {course_categories} c
                     JOIN {course_categories} cc ON c.parent = cc.id 
                     WHERE c.id > 0 ";
             if($this->paramchar2) {
@@ -446,7 +446,7 @@ abstract class trackerelement {
         
         if($users && !$records) {
             foreach($users as $user) {
-                $records[$user->idnumber] = fullname($user);
+                $records[$user->idnumber] = fullname($user, false, 'lastname');
             }
             unset($users);
         }

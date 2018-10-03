@@ -400,4 +400,25 @@ $string['allopen'] = 'Estados abiertos';
 $string['allclosed'] = 'Estados cerrados';
 $string['trackerissuereported'] = '{$a->shortname}: Creada y asignada una entrada en gestor "{$a->name}".';
 $string['trackerissuecommented'] = '{$a->shortname}: Añadido comentario a una entrada en Gestor "{$a->name}".';
+$string['adduserwatch'] = 'Agregar usuariso como observadores en las entradas en las que son seleccionados.';
+$string['autofilltype'] = 'Auto rellenado de opciones';
+$string['autofilltype_help'] = 'Establece un tipo de auto-rellenado dinámico de opciones del campo. Las posibilidades de genera opciones son:
 
+ * Cursos: Las opciones serán nombres de cursos en una categoría especificada (abajo).
+ * Categorías: Las opciones serán nombres de categorías de cursosdentro de una categoría padre especificada (abajo). 
+ * Usuarios por rol: Las opciones serán nombres de usuarios matriculados con un rol especificado (abajo).
+ * Usuarios por grupo: Las opciones serán nombres de usuarios matriculados y pertenecientes a un grupo dado (abajo).
+ * Usuarios por agrupamiento: Las opciones serán nombres de usuarios matriculados y pertenecientes a un agrupamiento dado (abajo). 
+
+En todos los casos los nobres internos son los códigos/DNI de las asignaturas o usuarios, y sus descripciones, los nombres visibles.
+';
+$string['autofillusersrole'] = 'Usuarios por rol';
+$string['autofillusersgroup'] = 'Usuarios por grupo';
+$string['autofillusersgrouping'] = 'Usuarios por agrupamiento';
+$string['autofillidnumber'] = 'Identificador de auto-rellenado';
+$string['autofillidnumber_help'] = 'Si se habilita la opción de auto-rellenado, este parámetro define qué ítems serán seleccionados para incluirse como opciones del campo. 
+Se interpreta como el "idnumber" de la categoría, curso o usuario diana.
+
+Debe introducir el valor de "idnumber" de la categorái de curso, el grupo o agrupamiento o el DNI del usuario. 
+
+Deje el camp en blanco para indicar que todos los valores (usuarios, cursos) sean incluidos. ';
