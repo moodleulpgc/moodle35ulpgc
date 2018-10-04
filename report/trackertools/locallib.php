@@ -1514,7 +1514,7 @@ function report_trackertools_user_compliance_list($tracker, $fromform) {
     $issues = $DB->get_records_sql($sql, $params); 
     
     
-    $params = array(
+    $params = array('elementid' => $element->id, 'elementid' => $element->id);
     foreach($issues as $iid => $issue) {
     
         //search elememtitems , join comments
@@ -1527,8 +1527,10 @@ function report_trackertools_user_compliance_list($tracker, $fromform) {
                 
                 WHERE ei.elementid = :elementid AND ei.id $insql 
                 
-                ":
-        $users = $DB->get_records-sql($sql);
+                ";
+        $params = array_merge($params, $inparams);  
+        $params['issueid'] = $iid;
+        $users = $DB->get_records-sql($sql, $params);
     
     
     }
