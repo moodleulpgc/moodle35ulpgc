@@ -15,16 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'supervisionwarning_unreplied_forum', language 'en'
+ * Defines message providers (types of message sent) for the local supervision plugin.
  *
- * @package   supervisionwarning_unreplied_forum
- * @copyright  2012 Enrique Castro at ULPGC
+ * @package   local_supervision
+ * @copyright 2018 Enrieuqe Castro ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Unreplied forum posts';
-$string['config_pluginname'] = 'Check to activate detection of forum posts that remain unreplied by course teachers after the defined period';
-$string['threshold'] = 'Delay threshold for forum posts';
-$string['config_threshold'] = 'The period without replying required to flag a forum post as a supervision warning, in <strong>DAYS</strong>';
-$string['collectstats'] = 'Collect supervision stats about Unreplied forum posts';
-$string['countwarnings'] = '{$a->num} Unreplied forum posts in {$a->coursename}';
+defined('MOODLE_INTERNAL') || die();
+
+$messageproviders = array(
+    // Notify teacher that a warning has been created.
+    'supervision_warning' => array(
+        'capability' => 'local/supervision:viewwarnings'
+    ),
+
+);

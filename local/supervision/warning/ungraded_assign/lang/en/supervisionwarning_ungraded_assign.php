@@ -32,4 +32,5 @@ $string['graded'] = 'Graded';
 $string['gradenumeric'] = 'Numeric';
 $string['gradescale'] = 'Scale';
 $string['collectstats'] = 'Collect supervision stats about Ungraded assignments';
+$string['countwarnings'] = '{$a->num} Ungraded assignments in {$a->coursename}';
 

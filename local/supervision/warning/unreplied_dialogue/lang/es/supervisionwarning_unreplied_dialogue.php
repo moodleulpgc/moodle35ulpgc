@@ -27,4 +27,4 @@ $string['pluginname'] = 'Diálogos no respondidos';
 $string['config_pluginname'] = 'Marcar para activar la detección de conversaciones en Diálogos que permanecen sin respuesta después del periodo definido.';
 $string['threshold'] = 'Umbral de retraso';
 $string['config_threshold'] = 'El periodo sin respuesta requerido para marcar una conversación como una incidencia de supervisión, en <strong>DÍAS</strong>.';
-
+$string['countwarnings'] = '{$a->num} Diálogos pendientes en {$a->coursename}';

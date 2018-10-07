@@ -76,6 +76,10 @@ $plugins = core_plugin_manager::instance()->get_plugins_of_type('supervisionwarn
 
     $settings->add(new admin_setting_configcheckbox('local_supervision/coordemail', get_string('enablecoordmail', 'local_supervision'),
                     get_string('configcoordemail', 'local_supervision'), 0, PARAM_INT));
+
+    $settings->add(new admin_setting_configcheckbox('local_supervision/maildebug', get_string('maildebug', 'local_supervision'),
+                    get_string('configmaildebug', 'local_supervision'), 0, PARAM_INT));
+
     $settings->add(new admin_setting_configtext('local_supervision/email', get_string('pendingmail', 'local_supervision'),
                     get_string('configemail', 'local_supervision'), '', PARAM_NOTAGS));
                     

@@ -27,4 +27,5 @@ $string['config_pluginname'] = 'Check to activate detection of Schedulers with n
 $string['threshold'] = 'Hour threshold for scheduler slots';
 $string['config_threshold'] = 'The minimun period that should be offered weekly in schedulers slots. If the sum of hours in slots in a week is lower, then the scheduler will be flagged as a supervision warning. The setting represents <strong>HOURS</strong> in a week.';
 $string['collectstats'] = 'Collect supervision stats about Low nº scheduler slots';
+$string['countwarnings'] = '{$a->num} Insufficent slots in {$a->coursename}';
 

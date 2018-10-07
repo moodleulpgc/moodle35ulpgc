@@ -293,17 +293,21 @@
             mtrace('no pending stats mailing');
             return true;
         }
+        
+        $warnings = supervision_load_plugins(null, true);
 
-        $names = get_all_user_name_fields(true, 'u');
+        $names1 = get_all_user_name_fields(true, 'u');
+        $names2 = get_all_user_name_fields(true, 'st', null, 'st');
         $sql = "SELECT sw.*, c.fullname, c.shortname, c.category,
-                        u.email, u.emailstop, u.mailformat, u.maildisplay, $names
+                        u.idnumber, u.email, u.emailstop, u.mailformat, u.maildisplay, $names1,
+                        st.idnumber, st.email, st.emailstop, st.mailformat, st.maildisplay, $names2
                     FROM {supervision_warnings} sw
                     JOIN {course} c ON sw.courseid = c.id
                     JOIN {user} u ON u.id = sw.userid
+                    JOIN {user} st ON st.id = sw.studentid
                     WHERE (timefixed = 0)   AND (timemailed < :maillimit) ";
         $params = array('maillimit'=>$maillimit);
         if ($rs = $DB->get_recordset_sql($sql, $params)) {
-            $from = get_string('warningautomatic',  'local_supervision');
             $supportuser = '';
             if(isset($config->email) && $config->email) {
                 $supportuser = core_user::get_support_user();
@@ -311,49 +315,152 @@
                 $supportuser->mailformat = 1;
                 $supportuser->id = 1;
             }
-
+            
+            // Prepare the message class.
+            $msgdata = new \core\message\message();
+            $msgdata->component         = 'local_supervision';
+            $msgdata->name              = 'supervision_warning';
+            $msgdata->notification      = 1;
+            $msgdata->userfrom = core_user::get_noreply_user(); 
+            $user = core_user::get_noreply_user();
+            $student = core_user::get_noreply_user();
+            
+            $error = array();
+            $sent = array();
+            $success = array();
+            $failure = array();
+            
             $names = get_all_user_name_fields(true, '');
             foreach ($rs as $stat) {
+                if(!$stat->userid) {
+                    // TODO debug measure, eliminate
+                    // no user ID means we cannot send notification, this stat is a failure
+                    if($supportuser) {
+                        $error[] = $stat->id;
+                    }
+                    continue;
+                }
+            
                 $info = new StdClass;
-                $info->coursename = $stat->shortname.' - '.format_string($stat->fullname);
-                $info->reporturl = $CFG->wwwroot.'/blocks/supervision/report.php?course='.$stat->courseid;
+                $info->coursename = $stat->shortname.' - '.$stat->fullname;
+                //http://localhost/moodle35ulpgc/report/supervision/index.php?id=1&warning=ungraded_assign&logformat=showashtml&chooselog=1
+                $info->reporturl = $CFG->wwwroot.'/report/supervision/index.php?id='.$stat->courseid.'&amp;warning='.$stat->warningtype;
                 $info->courseurl = $CFG->wwwroot.'/course/view.php?id='.$stat->courseid;
                 $info->activity = $stat->info;
                 $info->itemlink = $CFG->wwwroot.$stat->url;
                 $info->student = '';
                 if($stat->studentid) {
-                    $st = $DB->get_record('user', array('id'=>$stat->studentid), 'id, username, idnumber, email, '.$names);
-                    $st->fullname = fullname($st);
-                    $info->student = get_string('emailstudent',  'local_supervision', $st );
+                    //$st = $DB->get_record('user', array('id'=>$stat->studentid), 'id, username, idnumber, email, '.$names);
+                    $student = username_load_fields_from_object($student, $stat, 'st', array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                    $student->fullname = fullname($student);
+                    $info->student = get_string('emailstudent',  'local_supervision', $student);
                 }
 
-                $subject = get_string('warningmailsubject', 'local_supervision', $stat->shortname);
-                $text = get_string('warningemailtxt',  'local_supervision', $info );
-                $html = ($stat->mailformat == 1) ? get_string('warningemailhtml',  'local_supervision', $info ) : '';
-
+                $msgdata->courseid = $stat->courseid;
+                $msgdata->subject = get_string('warningmailsubject', 'local_supervision', $stat->shortname);
+                $msgdata->fullmessage = get_string('warningemailtxt',  'local_supervision', $info );
+                $msgdata->fullmessagehtml = get_string('warningemailhtml',  'local_supervision', $info);
+                $msgdata->smallmessage = get_string('warningsmalltxt',  'local_supervision', $info);
+                $msgdata->fullmessageformat = FORMAT_HTML;
+                
+                $user = username_load_fields_from_object($user, $stat, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                $user->id = $stat->userid;
+                $user->emailstop = 0;
+                
+                $msgdata->userto = $user;
+                
                 $warning = \local_supervision\warning::toclass($stat);
-
-                if(!$stat->userid) {
-                    /// TODO debug measure, eliminate
-                    if($supportuser) {
-                        email_to_user($supportuser, $from, "[Error userid=0] ".$subject, $text, $html);
+                
+                if(message_send($msgdata)) {
+                    if(!isset($sent[$stat->courseid][$stat->warningtype][$stat->userid])) {
+                        $name = new StdClass();
+                        $name->name = fullname($user, false, 'lastname');
+                        $name->coursename = $stat->shortname;
+                        $name->num = 1;
+                        $sent[$stat->courseid][$stat->warningtype][$stat->userid] = $name;
+                    } else {
+                        $sent[$stat->courseid][$stat->warningtype][$stat->userid]->num++;
                     }
-                } elseif(email_to_user($stat, $from, $subject, $text, $html)) {
-                    $DB->set_field('supervision_warnings', 'timemailed', $timetocheck, array('id'=>$stat->id));
-                    if($supportuser) {
-                        email_to_user($supportuser, $from, $subject, $text, $html);
+                    $success[] = $stat->id;
+                    if($supportuser && $config->maildebug) {
+                        $msgdata = $supportuser;
+                        message_send($msgdata);
                     }
-                    if(!empty($config->coordemail)) {
+                } elseif($supportuser) {
+                    $failure[] = $stat->id;
+                }
+            }
+            $rs->close();
+            
+            if($success) {
+                // set record  as sent
+                list($insql, $params) = $DB->get_in_or_equal($success); 
+                $DB->set_field_select('supervision_warnings', 'timemailed', $timetocheck, "id $insql", $params);
+                mtrace('   .... sent '.count($success).' notifications');
+            }
+            unset($success);
+            
+            if($sent && !empty($config->coordemail)) {
+                $contentlist = array();
+                $coordslist = array();
+                $stat = new stdclass();
+                foreach($sent as $courseid => $items) {
+                    $stat->courseid = $courseid;
+                    foreach($items as $type => $item) {
+                        $stat->warningtype = $type;
+                        $warning = \local_supervision\warning::toclass($stat);
                         $coords = $warning->get_supervisors();
                         if($coords) {
                             foreach($coords as $coorduser) {
-                                email_to_user($coorduser, $from, $subject, $text, $html);
+                                if(!isset($coordslist[$coorduser->id])) {
+                                    $coordslist[$coorduser->id] = $coorduser;
+                                }
+                                foreach($item as $userid => $count) {
+                                    $contentlist[$coorduser->id][$count->name][] = get_string('countwarnings', 'supervisionwarning_'.$type, $count); 
+                                }
                             }
                         }
                     }
                 }
+                unset($sent);
+                if($coordslist) {
+                    mtrace('    sending digest to coordinators '); 
+                    $msgdata->courseid = 1;
+                    $msgdata->subject = get_string('warningdigestsubject',  'local_supervision');
+                    $msgdata->smallmessage = '';
+                    foreach($coordslist as $coorduser) {
+                        $msgdata->userto = $coorduser;
+                        foreach($contentlist[$coorduser->id] as $name => $list) {
+                            $contentlist[$coorduser->id][$name] =  $name. ': '.implode('; ', $list);
+                        }
+                        natcasesort($contentlist[$coorduser->id]);
+                        if($contentlist[$coorduser->id]) {
+                            $text = get_string('warningdigesttxt',  'local_supervision');
+                            $msgdata->fullmessage = $text."\n".implode(" \n",$contentlist[$coorduser->id]);
+                            $msgdata->fullmessagehtml = "<p>$text</p>".html_writer::alist($contentlist[$coorduser->id]);
+                            message_send($msgdata);
+                            mtrace('    ... sent digest to coordinator '.fullname($coorduser)); 
+                        }
+                    }
+                    unset($contentlist);
+                    unset($coordlist);
+                }
             }
-            $rs->close();
+            
+            if($supportuser) {
+                $msgdata->userto = $supportuser;
+                $msgdata->fullmessageformat = FORMAT_PLAIN;
+                foreach(array('error', 'failure') as $type) {
+                    if($$type) {
+                        $msgdata->subject = get_string($type.'subject',  'local_supervision');
+                        $msgdata->fullmessage = implode(',', $$type);
+                        $msgdata->fullmessagehtml = $msgdata->fullmessage;
+                        message_send($msgdata);
+                        $unset($$type);
+                    }
+                }
+            }
+            
         }
     }
 

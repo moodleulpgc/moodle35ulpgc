@@ -26,4 +26,4 @@ $string['pluginname'] = 'Foros sin respuesta';
 $string['config_pluginname'] = 'Check to activate detection of forum posts that remain unreplied by course teachers after the defined period';
 $string['threshold'] = 'Umbral de retraso';
 $string['config_threshold'] = 'The period without replying required to flag a forum post as a supervision warning, in <strong>DAYS</strong>';
-
+$string['countwarnings'] = '{$a->num} Mensajes pendientes en {$a->coursename}';

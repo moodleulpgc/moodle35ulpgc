@@ -134,10 +134,18 @@ Puede ver más detalles en el <a href="{$a->reporturl}">Informe de Supervisión 
 Por favor, recuerde los plazos establecidos. <br />
 Este es un mensaje automático que continuará enviándose mientras persista la situación. No responda este mensaje.
 ';
+$string['warningsmalltxt'] = 'Actividad pendiente en {$a->shortname}';
 $string['warningmailsubject'] = '[{$a}]: Aviso de actividad pendiente ';
 $string['warningautomatic'] = 'Monitorización de actividades pendientes';
 $string['emailstudent'] = '  con respecto al estudiante {$a->fullname} con DNI {$a->idnumber} ';
-$string['mailstats'] = 'Envío de correos de Supervisión de Actividades pendeintes';
+$string['mailstats'] = 'Envío de correos de Supervisión de Actividades pendientes';
 $string['updatesupervisors'] = 'Actualiza supervisores desde sinculpgc';
 $string['synchsupervisors'] = 'Sincronizar supervisores';
 $string['configsynchsupervisors'] = 'Si se activa, los supervisores serán sincronizados desde la tabla sinculpgc units.';
+$string['maildebug'] = 'Copia de control';
+$string['configmaildebug'] = 'Cuando se habilita, las dirección de email de abajo recibirá copia de todos los mensajes de notificación.';
+$string['warningdigestsubject'] = 'Resumen de Monitorización de actividades pendientes';
+$string['warningdigesttxt'] = 'Notificaciones remitidas por usuario / asignatura.';
+$string['errorsubject'] = 'Errores en Monitorización de actividades pendientes';
+$string['failuresubject'] = 'Fallos en envío de Notificaciones de actividades pendientes.';
+$string['messageprovider:supervision_warning'] = 'Recordatorios de Supervisión de actividades pendientes';

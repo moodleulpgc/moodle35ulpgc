@@ -55,24 +55,24 @@ class add_autowatches extends \core\task\scheduled_task {
         
                 WHERE e.paramchar1 LIKE 'user\_%' AND e.paramint2 = 1
                 GROUP BY e.id ";
-        $autofills = $DB->get_records_sql_menu($sql, null);
+        $autowatches = $DB->get_records_sql_menu($sql, null);
         
-        if($autofills) {
+        if($autowatches) {
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
         }
         
         
-        mtrace("... Running tracker autofills ");
-        foreach($autofills as $eid => $tid) {
+        mtrace("... Running tracker autowatches ");
+        foreach($autowatches as $eid => $tid) {
             try {
                 $tracker = $DB->get_record('tracker', array('id' => $tid));
                 list ($course, $cm) = get_course_and_cm_from_instance($tid, 'tracker'); 
-                $elementobj = trackerelement::find_instance_by_id($tracker, $eid);
-                mtrace("    autofill {$elementobj->name}");
-                $elementobj->setcontext(context_module::instance($cm->id));
+                $elementobj = \trackerelement::find_instance_by_id($tracker, $eid);
+                mtrace("    autowatch {$elementobj->name}");
+                $elementobj->setcontext(\context_module::instance($cm->id));
                 $elementobj->add_autowatches();
             } catch (\Exception $e) {
-                mtrace("    autofill FAILED " . $e->getMessage());
+                mtrace("    autowatch FAILED " . $e->getMessage());
             }        
         }
     }

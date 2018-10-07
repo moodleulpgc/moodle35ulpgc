@@ -31,3 +31,4 @@ $string['config_grading'] = 'La comprobación se puede limitar a sólo las Tarea
 $string['graded'] = 'Calificada';
 $string['gradenumeric'] = 'Calificación numérica';
 $string['gradescale'] = 'Escala de calificación';
+$string['countwarnings'] = '{$a->num} Tareas pendientes en {$a->coursename}';

@@ -127,15 +127,16 @@ Por favor, recuerde los plazos establecidos.
 Este es un mensaje automático que continuará enviándose mientras persista la situación. No responda este mensaje.
 ';
 $string['warningemailhtml'] = 'Estimado profesor: <br />
-Se ha detectado uun aviso de incidencia en el curso <a href=\"{$a->courseurl}\">{$a->coursename}</a><br /><br />
+Se ha detectado un aviso de incidencia en el curso <a href="{$a->courseurl}">{$a->coursename}</a><br /><br />
 
-Este aviso ha sido generado en la actividad <a href=\"{$a->itemlink}\">{$a->activity}</a> {$a->student} <br />
+Este aviso ha sido generado en la actividad <a href="{$a->itemlink}">{$a->activity}</a> {$a->student} <br />
 
-Puede ver más detalles en el <a href=\"{$a->reporturl}\">Informe de Supervisión de actividades pendientes</a><br /><br />
+Puede ver más detalles en el <a href="{$a->reporturl}">Informe de Supervisión de actividades pendientes</a><br /><br />
 
 Por favor, recuerde los plazos establecidos. <br />
 Este es un mensaje automático que continuará enviándose mientras persista la situación. No responda este mensaje.
 ';
+$string['warningsmalltxt'] = 'Supervision alerts on {$a->shortname}';
 $string['warningmailsubject'] = '[{$a}]: Aviso de actividad pendiente ';
 $string['warningautomatic'] = 'Monitorización de actividades pendientes';
 $string['emailstudent'] = '  con respecto al estudiante {$a->fullname} con DNI {$a->idnumber} ';
@@ -143,3 +144,10 @@ $string['mailstats'] = 'Mails pending supervision warnings';
 $string['updatesupervisors'] = 'Updates supervisors from sinculpgc';
 $string['synchsupervisors'] = 'Update supervisors';
 $string['configsynchsupervisors'] = 'If enabled, supervisors will be synchronized from sinculpgc units table.';
+$string['maildebug'] = 'Mail debug copy';
+$string['configmaildebug'] = 'When enabled, the email below will receive a copy of all messages.';
+$string['warningdigestsubject'] = 'Resumen de Monitorización de actividades pendientes';
+$string['warningdigesttxt'] = 'Notificaciones remitidas por usuario / asignatura.';
+$string['errorsubject'] = 'Errores en Monitorización de actividades pendientes';
+$string['failuresubject'] = 'Fallos en envío de Notificaciones de actividades pendientes.';
+$string['messageprovider:supervision_warning'] = 'Recordatorios de Supervisión de actividades pendientes';

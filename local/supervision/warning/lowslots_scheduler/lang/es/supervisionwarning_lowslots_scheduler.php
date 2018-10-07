@@ -26,4 +26,4 @@ $string['pluginname'] = 'Tutorías insuficientes';
 $string['config_pluginname'] = 'Marcar para activar la detección de Reuniones con horas de tutoría insuficientes según lo especificado en el módulo Reunión.';
 $string['threshold'] = 'Umbral semanal';
 $string['config_threshold'] = 'El nº de horas mínimo que debe ser ofertado semanalmente en franjas de Reuniones. Si la suma de horas entre las diferentes franjas ofertadas en la semana actual es inferior, se creará un avisos de supervisión. El ajuste representa <strong>HORAS</strong> semanales.';
-
+$string['countwarnings'] = '{$a->num} Franjas necesarias en {$a->coursename}';

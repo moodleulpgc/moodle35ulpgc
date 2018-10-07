@@ -148,8 +148,9 @@ class warning_unreplied_dialogue extends warning {
             foreach($fixedfailures as $fixed) {
                 if($fixed->timefixed >= 0) {
                     $params = array('dialogueid'=>$fixed->instanceid, 'conversationid'=>$fixed->itemid, 'authorid'=>$fixed->studentid);
-                    $message = reset($DB->get_records('dialogue_messages', $params,
-                                                      'conversationindex DESC', 'id, timemodified', 0, 1));
+                    $message = $DB->get_records('dialogue_messages', $params,
+                                                      'conversationindex DESC', 'id, timemodified', 0, 1);
+                    $message = reset($message);
                     $fixed->timefixed = $message->timemodified;
                     $DB->update_record('supervision_warnings', $fixed);
                 }

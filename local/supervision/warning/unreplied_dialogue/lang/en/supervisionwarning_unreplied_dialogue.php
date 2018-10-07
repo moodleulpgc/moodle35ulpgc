@@ -28,3 +28,4 @@ $string['config_pluginname'] = 'Check to activate detection of dialogue conversa
 $string['threshold'] = 'Delay threshold for dialogue conversations';
 $string['config_threshold'] = 'The period without a reply required to flag a dialogue conversation as a supervision warning, in <strong>DAYS</strong>.';
 $string['collectstats'] = 'Collect supervision stats about Unreplied dialogues';
+$string['countwarnings'] = '{$a->num} Unreplied dialogues in {$a->coursename}';

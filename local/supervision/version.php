@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Default batchmanage manager.
+ * Central routines tu moninorize and supervise pending activities 
+ * and issue warnings when needed.
+ *
+ * Works in conjunction with block_supervision & report_supervision
  *
  * @package    local_supervision
  * @copyright  2016 Enrique Castro
@@ -24,6 +27,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018081804; // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version = 2018081805; // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires = 2015050500; // Requires this Moodle version.
 $plugin->component = 'local_supervision'; // Full name of the plugin (used for diagnostics).

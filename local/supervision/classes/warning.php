@@ -284,7 +284,7 @@ abstract class warning {
         }
 
         $course = $DB->get_record('course', array('id'=>$this->courseid), 'id, category');
-        if($ulpgc = get_config('local_ulogccore', 'version')) {
+        if($ulpgc = get_config('local_ulpgccore', 'version')) {
             $course = local_ulpgccore_get_course_details($course);
         }
 
@@ -292,7 +292,8 @@ abstract class warning {
         $warninglike = $DB->sql_like('sp.warnings', ':warningtype');
         $warningtype = ($this->warningtype) ? '%'.$this->warningtype.'%' : '';
         $params = array('warningtype'=>$warningtype);
-        $selectfrom = "SELECT sp.userid, u.id, u.idnumber, u.email, u.emailstop, u.mailformat, u.maildisplay, $names
+        $selectfrom = "SELECT sp.userid, u.id, u.idnumber, u.auth, u.deleted, u.suspended,
+                                u.email, u.emailstop, u.mailformat, u.maildisplay, $names
                             FROM {supervision_permissions} sp
                             JOIN {user} u ON u.id = sp.userid ";
         $groupby= ' GROUP BY sp.userid ';

@@ -67,9 +67,9 @@ class field_autofill extends \core\task\scheduled_task {
             try {
                 $tracker = $DB->get_record('tracker', array('id' => $tid));
                 list ($course, $cm) = get_course_and_cm_from_instance($tid, 'tracker'); 
-                $elementobj = trackerelement::find_instance_by_id($tracker, $eid);
+                $elementobj = \trackerelement::find_instance_by_id($tracker, $eid);
                 mtrace("    autofill {$elementobj->name}");
-                $elementobj->setcontext(context_module::instance($cm->id));
+                $elementobj->setcontext(\context_module::instance($cm->id));
                 $elementobj->autofill_options();
             } catch (\Exception $e) {
                 mtrace("    autofill FAILED " . $e->getMessage());
