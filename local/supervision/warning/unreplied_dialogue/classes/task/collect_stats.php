@@ -51,6 +51,7 @@ class collect_stats extends scheduled_task {
         
         $timetocheck = time();
         include_once($CFG->dirroot.'/local/supervision/warning/unreplied_dialogue/locallib.php');
+        include_once($CFG->dirroot.'/mod/dialogue/classes/dialogue.php');
 
         \local_supervision\warning_unreplied_dialogue::get_stats($timetocheck);
     }

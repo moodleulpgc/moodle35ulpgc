@@ -337,7 +337,8 @@ abstract class warning {
      * @return array of user-like objects
      */
     public static function get_excluded_sql($config = null) {
-
+        global $DB;
+        
         if(empty($config)) {
             $config = get_config('local_supervision');
         }
