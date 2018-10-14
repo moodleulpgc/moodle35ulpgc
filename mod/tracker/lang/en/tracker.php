@@ -671,6 +671,7 @@ Leave empty to mean all posible items (users or courses in all groups, groupings
 $string['autofilltask'] = 'Add options in automatic menu fields';
 $string['autowatchestask'] = 'Add watches for selected users in menu';
 $string['mycced'] = 'Issues observed';
+$string['review'] = 'Summary';
 
 
 

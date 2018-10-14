@@ -142,6 +142,17 @@ $capabilities = array(
         )
     ),
 
+    'mod/tracker:otherscomments' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetype' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+    
     'mod/tracker:configure' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

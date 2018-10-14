@@ -329,7 +329,7 @@ $string['youneedanaccount'] = 'Necesita una cuenta autorizada para registrar una
 $string['mode_tutoring'] = 'Seguimiento de tutorización';
 $string['mode_usersupport'] = 'Soporte a usuarios';
 $string['mode_boardreview'] = 'Revisión por Junta';
-$string['message_tutoring'] = 'Se ha creado una entrada para el seguimienti y revisión de sus planes de tutorización.';
+$string['message_tutoring'] = 'Se ha creado una entrada para el seguimiento y revisión de sus planes de tutorización.';
 $string['message_usersupport'] = 'Se ha registrado su incidencia. Se atenderá lo antes posible. <br />
 Por favor, no abra otras incidencias sobre el mismo tema. En su caso, añada comentarios a ésta.';
 $string['message_boardreview'] = 'Su envío ha quedado registrado. Por favor, aguarde a la revisión por la Junta.';
@@ -422,3 +422,7 @@ Se interpreta como el "idnumber" de la categoría, curso o usuario diana.
 Debe introducir el valor de "idnumber" de la categorái de curso, el grupo o agrupamiento o el DNI del usuario. 
 
 Deje el camp en blanco para indicar que todos los valores (usuarios, cursos) sean incluidos. ';
+$string['autofilltask'] = 'Agregar opciones en campos de menú auto-rellenado';
+$string['autowatchestask'] = 'Agregar observadores en menús de usuarios';
+$string['mycced'] = 'Entradas que observo';
+$string['review'] = 'Resumen';

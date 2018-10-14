@@ -109,7 +109,7 @@ echo $OUTPUT->box_start('generalbox', 'bugreport');
 </script>
 <?php
 
-if (tracker_can_workon($tracker, $context, $issue)) {
+if (($tracker->supportmode != 'tutoring') && tracker_can_workon($tracker, $context, $issue)) {
     // If I can resolve and I have seen, the bug is open
     if ($issue->status < OPEN) {
         $oldstatus = $issue->status;

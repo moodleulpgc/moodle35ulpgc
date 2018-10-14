@@ -110,7 +110,7 @@ function tracker_getstring($identifier, $component = '', $a = null, $lazyload = 
     global $DB, $SESSION, $STATUSCODES;
 
     $string = '';
-    $lang = null;
+    $lang = $lazyload ? $lazyload : null;
     if(isset($SESSION->tracker_current_id) && $SESSION->tracker_current_id && $component == 'tracker') {
         $tid = $SESSION->tracker_current_id;
         if(!isset($SESSION->tracker_current_translation[$tid])) {
@@ -132,6 +132,7 @@ function tracker_getstring($identifier, $component = '', $a = null, $lazyload = 
                                     break;
                 case 'description' : $string = $translation->descriptionword;
                                     break;
+                                    
                 case 'posted':
                 case 'open':
                 case 'resolving': case 'waiting': case 'resolved': case 'abandonned':
@@ -173,7 +174,7 @@ function tracker_getstring($identifier, $component = '', $a = null, $lazyload = 
             }
         }
     }
-
+    
     return get_string_manager()->get_string($identifier, $component, $a, $lang);
     
     //return get_string($identifier, $component, $a, $lazyload);

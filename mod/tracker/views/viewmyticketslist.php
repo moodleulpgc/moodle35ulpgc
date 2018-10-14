@@ -347,6 +347,9 @@ if (!empty($issues)) {
     echo '<br/>';
     echo '<br/>';
     echo $OUTPUT->notification(tracker_getstring('notickets', 'tracker'), 'box generalbox', 'notice');
+    if (has_capability('mod/tracker:report', $context)) {
+        echo $OUTPUT->box(format_text($tracker->intro, $tracker->introformat), 'box generalbox', 'intro'); // ecastro ULPGC
+    }
 }
 
 echo '</form>';

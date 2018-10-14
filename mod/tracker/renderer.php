@@ -306,13 +306,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
      * @param int $issueid
      */
     function comments($issueid, $contextid = 0) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
 
         $str = '';
 
-        $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issueid), 'datecreated');
-        
-        $fs = get_file_storage(); // ecastro ULPGC
         if(!$contextid) {
             if(is_numeric($issueid)) {
                 $issue = $DB->get_record('tracker_issue', array('id'=>$issueid), '*', MUST_EXIST);
@@ -320,7 +317,20 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $cm =  get_coursemodule_from_instance('tracker', $issue->trackerid);
             $context = context_module::instance($cm->id);
             $contextid = $context->id;
+        } else {
+            $context = context::instance_by_id($contextid);
         }
+
+        $params = array('issueid' => $issueid);
+        if(!has_capability('mod/tracker:otherscomments', $context)) {
+            $params['userid'] = $USER->id;
+        }
+        
+        $comments = $DB->get_records('tracker_issuecomment', $params, 'datecreated');
+        
+        $fs = get_file_storage(); // ecastro ULPGC
+
+        
         $fileinfo = array(
                 'contextid' => $contextid, // ID of context
                 'component' => 'mod_tracker',     // usually = table name
@@ -670,7 +680,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
             break;
             case 'admin':
                 if (!preg_match("/summary|manageelements|managefiles|managewords|managenetwork/", $screen)) $screen = 'summary';
-                $rows[1][] = new tabobject('summary', "view.php?id={$cm->id}&amp;view=admin&amp;screen=summary", tracker_getstring('summary', 'tracker'));
+                $rows[1][] = new tabobject('summary', "view.php?id={$cm->id}&amp;view=admin&amp;screen=summary", tracker_getstring('review', 'tracker'));
                 $rows[1][] = new tabobject('manageelements', "view.php?id={$cm->id}&amp;view=admin&amp;screen=manageelements", tracker_getstring('manageelements', 'tracker'));
                 if($canmanage) {
                     $rows[1][] = new tabobject('managefiles', "view.php?id={$cm->id}&amp;view=admin&amp;screen=managefiles", tracker_getstring('managefiles', 'tracker'));

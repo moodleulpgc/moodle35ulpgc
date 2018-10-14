@@ -839,17 +839,20 @@ class examregistrar_exam_attemptsreview implements renderable {
 
     // checks tracker issue state associated to this exam
     public function get_review($examfile) {
-        global $CFG, $DB, $STATUSCODES;
+        global $CFG, $DB;    
         include_once($CFG->dirroot.'/mod/tracker/lib.php');
+        include_once($CFG->dirroot.'/mod/tracker/locallib.php');
+        global $STATUSCODES;
         $review = '';
         if($examfile->reviewid) {
             if($issue = $DB->get_record('tracker_issue', array('id'=>$examfile->reviewid))) {
                 $moduleid = $DB->get_field('modules', 'id', array('name'=>'tracker'), MUST_EXIST);
                 $courseid = $DB->get_field('tracker', 'course', array('id'=>$issue->trackerid), MUST_EXIST);
+                $lang = $DB->get_field('tracker_translation', 'forcedlang', array('trackerid'=>$issue->trackerid));
                 $tcm = $DB->get_record('course_modules', array('course'=>$courseid, 'module'=>$moduleid, 'instance'=>$issue->trackerid), '*', MUST_EXIST);
-                $status = $issue->status;
+                $status = $STATUSCODES[$issue->status] ;
 
-                $statusmsg = html_writer::tag('span', '&nbsp;'.get_string('status_'.$STATUSCODES[$status], 'registry').'&nbsp;', array('class'=>'status_'.$STATUSCODES[$status]));
+                $statusmsg = html_writer::tag('span', '&nbsp;'.tracker_getstring($status, 'tracker', null, $lang).'&nbsp;', array('class'=>'status_'.$status));
 
                 $trackerurl = new moodle_url('/mod/tracker/view.php', array('id'=>$tcm->id, 'issueid'=>$examfile->reviewid, 'view'=>'view', 'screen'=>'viewanissue'));
                 $review = html_writer::link($trackerurl, $statusmsg);

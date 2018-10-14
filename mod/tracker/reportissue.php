@@ -119,6 +119,8 @@ echo $OUTPUT->header();
 $view = 'reportanissue';
 include_once($CFG->dirroot.'/mod/tracker/menus.php');
 
+echo $OUTPUT->box(format_text($tracker->intro, $tracker->introformat), 'box generalbox', 'intro'); // ecastro ULPGC
+
 $form->display();
 
 echo $OUTPUT->footer();

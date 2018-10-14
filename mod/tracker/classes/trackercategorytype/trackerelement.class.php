@@ -513,7 +513,7 @@ abstract class trackerelement {
         }
         $first = reset($this->options);
         $sortorder = $first->sortorder;
-        asort($currentmap, SORT_NATURAL);
+        core_collator::asort($currentmap);
         foreach($currentmap as $oid => $name) {
             $option = $this->options[$oid];
             if($option->sortorder != $sortorder) {
