@@ -50,6 +50,26 @@ abstract class qtype_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Generate the HTML export snippet of the formulation part of the question.
+     *
+     * @copyright  2013 Enrique Castro @ ULPGC
+     * @param question_attempt $qa the question attempt to display.
+     * @param question_display_options $options controls what should and should not be displayed.
+     * @return string HTML fragment.
+     */
+    public function formulation_export(question_attempt $qa, question_display_options $options) { // ecastro ULPGC
+
+        $questionobj = $qa->get_question();
+        $question = $questionobj->format_questiontext($qa);
+        $rightanswer = '';
+        if($options->rightanswer && $questionobj->get_correct_response()) {
+            $rightanswer = $questionobj->get_right_answer_summary();
+        }
+        $answer = '<div class="rightanswer">'.get_string('answer', 'question').': '.$rightanswer.'</div>';
+        return $question.$answer;
+    }
+
+    /**
      * In the question output there are some class="accesshide" headers to help
      * screen-readers. This method returns the text to use for the heading above
      * the formulation_and_controls section.
