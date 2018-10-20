@@ -70,17 +70,22 @@ class send_staff_reminders extends \core\task\scheduled_task {
             list($inrolesql, $inparams) = $DB->get_in_or_equal($checkedroles, SQL_PARAMS_NAMED, 'role');
             $params = array_merge($params, $inparams);
 
-            $sql = "SELECT s.id as sid, l.*, e.name AS name, e.idnumber AS idnumber
+            $sql = "SELECT s.id as sid, l.*, e.name AS name, e.idnumber AS idnumber, r.course AS courseid
                     FROM {examregistrar_staffers} s
                     JOIN {examregistrar_locations} l ON l.id = s.locationid
                     JOIN {examregistrar_elements} e ON e.examregid = l.examregid AND e.type='locationitem' AND e.id = l.location
                     JOIN {examregistrar_session_rooms} sr ON sr.examsession = s.examsession AND sr.roomid = s.locationid AND sr.available = 1
+                    JOIN {examregistrar} r ON e.examregid = = r.id
                     WHERE  s.userid > 0 AND s.examsession = :session AND s.visible = 1
                             AND s.role $inrolesql
                             AND EXISTS (SELECT 1 FROM {examregistrar_session_seats} ss WHERE ss.examsession = s.examsession AND ss.roomid = s.locationid )
                     GROUP BY s.locationid ";
 
             if($rooms = $DB->get_records_sql($sql, $params)) {
+            
+                // Prepare the message class.
+                $msgdata = examswarnings_prepare_message('exam_staff_reminders');
+                $staff = core_user::get_noreply_user();
                 $sent = array();
                 foreach($rooms as $room) {
 
@@ -99,7 +104,7 @@ class send_staff_reminders extends \core\task\scheduled_task {
                     $names = get_all_user_name_fields(true, 'u');
                     
                     $sql = "SELECT s.id AS sid, s.info, s.role, e.name AS rolename, e.idnumber AS roleidnumber,
-                                            u.id, u.email, u.mailformat, u.username, $names
+                                            u.id, u.email, u.mailformat, u.username, u.maildisplay, $names
                                 FROM {examregistrar_staffers} s
                                 JOIN {user} u ON u.id = s.userid
                                 JOIN {examregistrar_elements} e ON e.type = 'roleitem' AND e.id = s.role
@@ -109,9 +114,7 @@ class send_staff_reminders extends \core\task\scheduled_task {
                     $users = $DB->get_records_sql($sql, array('session'=>$session->id, 'room'=>$room->id));
                     if($users) {
                         mtrace("...Entrando en users.");
-                        $from = get_string('examreminderfrom',  'block_examswarnings');
                         foreach($users as $user) {
-                            $subject = get_string('roomcallsubject', 'block_examswarnings', $room->idnumber);
                             $message = $config->roomcallmessage;
                             $replaces = array('%%roomname%%' => $room->name, '%%roomidnumber%%' => $room->idnumber,
                                                 '%%rolename%%' => $user->rolename, '%%roleidnumber%%' => $user->roleidnumber,
@@ -121,11 +124,20 @@ class send_staff_reminders extends \core\task\scheduled_task {
                             foreach($replaces as $search => $replace) {
                                 $message = str_replace($search, $replace, $message);
                             }
-                            $text = html_to_text($message, 75, false);
-                            $html = ($user->mailformat == 1) ? format_text($message, FORMAT_HTML) : '';
+                            
+                            $staff = username_load_fields_from_object($staff, $user, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                            $staff->emailstop = 0;
+                            
+                            $msgdata->userto = $staff;
+                            $msgdata->courseid = $room->courseid;
+                            $msgdata->subject = get_string('roomcallsubject', 'block_examswarnings', $room->idnumber);
+                            $msgdata->fullmessagehtml = $message;
+                            $msgdata->fullmessage = html_to_text($message, 75, false);
+                            $msgdata->fullmessageformat = FORMAT_HTML;
+                            
                             $flag = '';
                             if(!$config->noemail) {
-                                if(!email_to_user($user, $from, $subject, $text, $html)) {
+                                if(!message_send($msgdata)) {
                                     $flag = ' - '.get_string('remindersenderror', 'block_examswarnings');
                                 }
                             }
@@ -134,6 +146,7 @@ class send_staff_reminders extends \core\task\scheduled_task {
                     }
                 }
                 if($controluser = examswarnings_get_controlemail($config)) {
+                    $from = get_string('examreminderfrom',  'block_examswarnings');
                     $info = new \stdClass;
                     $info->num = count($sent);
                     $info->date = userdate($session->examdate, '%A %d de %B de %Y');

@@ -8,10 +8,12 @@
  */
 
 $string['pluginname'] = 'Herramientas de Comprobación';
+$string['contenttools'] = 'Contenido (Importar/Exportar)';
+$string['checktools'] = 'Herramientas de Comprobación';
 $string['trackertools:report'] = 'Comprobar incidencias';
 $string['trackertools:exportport'] = 'Exportar incidencias';
 $string['trackertools:import'] = 'Importar incidencias';
-$string['trackertools:download'] = 'Exportar incidencias';
+$string['trackertools:download'] = 'Exportar ficheros';
 $string['trackertools:manage'] = 'Gestionar campos ';
 $string['trackertools:warning'] = 'Realizar advertencias';
 

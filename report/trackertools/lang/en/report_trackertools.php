@@ -8,6 +8,8 @@
  */
 
 $string['pluginname'] = 'Tracker tools';
+$string['contenttools'] = 'Content Import/Export';
+$string['checktools'] = 'Checking tools';
 $string['trackertools:report'] = 'Check issues';
 $string['trackertools:import'] = 'Upload issues';
 $string['trackertools:export'] = 'Export issues';

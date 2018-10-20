@@ -7,7 +7,13 @@ $string['blocktitle'] = 'Avisos de Examen';
 $string['privacy:metadata'] = 'El bloque Avisos de Examen sólo muestrra datos almacenados en otros plugins.';
 $string['primaryreg'] = 'Registro de Exámenes principal';
 $string['explainprimaryreg'] = 'Registro de Exámenes principal';
+$string['messageprovider:exam_staff_reminders'] = 'Recordatorios de examen paraa personal';
+$string['messageprovider:exam_student_reminders'] = 'Recordatorios de examen para estudiantes';
+$string['messageprovider:exam_student_warnings'] = 'Alertas de examen no reservado para estudiantes';
+$string['messageprovider:exam_teacher_reminders'] = 'Recordatorios de examen para profesores';
 
+$string['examidnumber'] = 'Identificador del Examen';
+$string['explainexamidnumber'] = 'Código ID de calificación de la actividad que contiene la calificación del examen.';
 $string['examlocations'] = 'Lugares';
 $string['examcalls'] = 'Convocatorias';
 $string['examdates'] = 'Fechas';

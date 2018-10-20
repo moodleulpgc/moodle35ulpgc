@@ -131,6 +131,28 @@ class core_renderer extends \theme_boost\output\core_renderer {
     }
 
 
+    /*
+     * This renders the navbar.
+     * Uses bootstrap compatible html.
+     */
+    public function navbar() {
+    
+        $items = $this->page->navbar->get_items();
+        
+        $ulpgcshorten = get_config('local_ulpgccore','shortennavbar');
+        foreach($items as $item) {
+            if($item->type == 20) {
+                $item->text = html_writer::span($item->text, 'course');
+            } elseif(($item->type == 10 || $item->type == 11 || $item->type == 60) &&        
+                ($ulpgcshorten)) { // ecastro ULPGC, to make breadcrumb easier
+                $item->text = local_ulpgccore_shorten_titles($item->text);
+            }
+        }    
+    
+        return $this->render_from_template('theme_boost_campus/breadcrumb', $this->page->navbar);
+    }
+    
+    
     /**
      * Override to display switched role information beneath the course header instead of the user menu.
      * We change this because the switch role function is course related and therefore it should be placed in the course context.
@@ -158,16 +180,6 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $header->contextheader = $this->context_course_header();
         
         $header->hasnavbar = empty($PAGE->layout_options['nonavbar']); // ecastro ULPGC
-        $items = $this->page->navbar->get_items();
-        $ulpgcshorten = get_config('local_ulpgccore','shortennavbar');
-        foreach($items as $item) {
-            if($item->type == 20) {
-                $item->text = html_writer::span($item->text, 'course');
-            } elseif(($item->type == 10 || $item->type == 11 || $item->type == 60) &&        
-                ($ulpgcshorten)) { // ecastro ULPGC, to make breadcrumb easier
-                $item->text = local_ulpgccore_shorten_titles($item->text);
-            }
-        }
         $header->navbar = $this->navbar();
         // MODIFICATION START.
         // Show the page heading button on all pages except for the profile page.
