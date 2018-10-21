@@ -94,9 +94,11 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // Add block 'Preuploads'.
         $this->bigbluebuttonbn_mform_add_block_preuploads($mform, $cfg);
         // Add block 'Participant List'.
-        $this->bigbluebuttonbn_mform_add_block_participants($mform, $cfg, $participantlist);
+        $this->bigbluebuttonbn_mform_add_block_participants($mform, $participantlist);
         // Add block 'Schedule'.
         $this->bigbluebuttonbn_mform_add_block_schedule($mform, $this->current);
+        // Add block 'client Type'.
+        $this->bigbluebuttonbn_mform_add_block_clienttype($mform, $cfg);
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
         // Add standard buttons, common to all modules.
@@ -348,11 +350,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      * Function for showing the block for setting participant roles.
      *
      * @param object $mform
-     * @param array $cfg
      * @param string $participantlist
      * @return void
      */
-    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $cfg, $participantlist) {
+    private function bigbluebuttonbn_mform_add_block_participants(&$mform, $participantlist) {
         $participantselection = bigbluebuttonbn_get_participant_selection_data();
         $mform->addElement('header', 'permissions', get_string('mod_form_block_participants', 'bigbluebuttonbn'));
         $mform->setExpanded('permissions');
@@ -388,6 +389,41 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $mform->addElement('static', 'static_participant_list',
             get_string('mod_form_field_participant_list', 'bigbluebuttonbn'), $htmlparticipantlist);
         $mform->addElement('html', "\n\n");
+    }
+
+    /**
+     * Function for showing the client type
+     *
+     * @param object $mform
+     * @param object $cfg
+     * @return void
+     */
+    private function bigbluebuttonbn_mform_add_block_clienttype(&$mform, &$cfg) {
+        // Validates if clienttype capability is enabled.
+        if (!$cfg['clienttype_enabled']) {
+            return;
+        }
+        // Validates if the html5client is supported by the BigBlueButton Server.
+        if (!bigbluebuttonbn_has_html5_client()) {
+            return;
+        }
+        $field = ['type' => 'hidden', 'name' => 'clienttype', 'data_type' => PARAM_INT,
+            'description_key' => null];
+        if ($cfg['clienttype_editable']) {
+            $field['type'] = 'select';
+            $field['data_type'] = PARAM_TEXT;
+            $field['description_key'] = 'mod_form_field_block_clienttype';
+
+            $choices = array(BIGBLUEBUTTON_CLIENTTYPE_FLASH => get_string('mod_form_block_clienttype_flash', 'bigbluebuttonbn'),
+                             BIGBLUEBUTTON_CLIENTTYPE_HTML5 => get_string('mod_form_block_clienttype_html5', 'bigbluebuttonbn'));
+
+            $mform->addElement('header', 'clienttypeselection', get_string('mod_form_block_clienttype', 'bigbluebuttonbn'));
+            $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                                    $field['description_key'], $cfg['clienttype_default'], $choices);
+            return;
+        }
+        $this->bigbluebuttonbn_mform_add_element($mform, $field['type'], $field['name'], $field['data_type'],
+                                null, $cfg['clienttype_default']);
     }
 
     /**

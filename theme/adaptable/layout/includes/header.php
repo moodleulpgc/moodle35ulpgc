@@ -50,7 +50,6 @@ $setzoom = theme_adaptable_get_zoom();
 theme_adaptable_initialise_full($PAGE);
 $setfull = theme_adaptable_get_full();
 
-
 // Navbar.
 if (isset($PAGE->theme->settings->stickynavbar) && $PAGE->theme->settings->stickynavbar == 1
     && $PAGE->pagetype != "grade-report-grader-index" && $PAGE->bodyid != "page-grade-report-grader-index") {
@@ -60,7 +59,6 @@ if (isset($PAGE->theme->settings->stickynavbar) && $PAGE->theme->settings->stick
 }
 
 $PAGE->requires->js_call_amd('theme_adaptable/bsoptions', 'init', array($fixedheader));
-
 
 // Layout.
 $left = (!right_to_left());  // To know if to add 'pull-right' and 'desktop-first-column' classes in the layout for LTR.
@@ -146,6 +144,7 @@ echo $OUTPUT->doctype();
 ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
+
     <title><?php echo $OUTPUT->page_title(); ?></title>
     <link rel="icon" href="<?php echo $OUTPUT->favicon(); ?>" />
 
@@ -349,7 +348,7 @@ if ( (!$hidesitetitle) && ($PAGE->theme->settings->socialorsearch == 'search') )
                                         name="search"
                                         id="search-1"
                                         autocomplete="off">
-                    <button title="<?php echo get_string("searchcourses", "theme_adaptable")?>" 
+                    <button title="<?php echo get_string("searchcourses", "theme_adaptable")?>"
                             type="submit" class="no-border bg-white pas search-box__button">
                         <abbr class="fa fa-search" title="<?php echo get_string("searchcourses", "theme_adaptable"); ?>"></abbr>
                     </button>
@@ -403,13 +402,13 @@ if ($PAGE->theme->settings->enabletoolsmenus) {
 if (isloggedin()) {
     if ($PAGE->theme->settings->enableshowhideblocks) { ?>
            <li class="hbl">
-               <a href="#" class="moodlezoom" title="<?php echo get_string('hideblocks', 'theme_adaptable') ?>">
+               <a href="javascript:void(0);" class="moodlezoom" title="<?php echo get_string('hideblocks', 'theme_adaptable') ?>">
                    <i class="fa fa-indent fa-lg"></i>
                <span class="zoomdesc"><?php echo get_string('hideblocks', 'theme_adaptable') ?></span>
            </a>
        </li>
        <li class="sbl">
-               <a href="#" class="moodlezoom" title="<?php echo get_string('showblocks', 'theme_adaptable') ?>">
+               <a href="javascript:void(0);" class="moodlezoom" title="<?php echo get_string('showblocks', 'theme_adaptable') ?>">
                <i class="fa fa-outdent fa-lg"></i>
                <span class="zoomdesc"><?php echo get_string('showblocks', 'theme_adaptable') ?></span>
            </a>
@@ -419,13 +418,13 @@ if (isloggedin()) {
 
     if ($PAGE->theme->settings->enablezoom) { ?>
             <li class="hbll">
-                <a href="#" class="moodlewidth" title="<?php echo get_string('fullscreen', 'theme_adaptable') ?>">
+                <a href="javascript:void(0);" class="moodlewidth" title="<?php echo get_string('fullscreen', 'theme_adaptable') ?>">
                 <i class="fa fa-expand fa-lg"></i>
                 <span class="zoomdesc"><?php echo get_string('fullscreen', 'theme_adaptable') ?></span>
             </a>
         </li>
         <li class="sbll">
-                <a href="#" class="moodlewidth" title="<?php echo get_string('standardview', 'theme_adaptable') ?>">
+                <a href="javascript:void(0);" class="moodlewidth" title="<?php echo get_string('standardview', 'theme_adaptable') ?>">
                     <i class="fa fa-compress fa-lg"></i>
                 <span class="zoomdesc"><?php echo get_string('standardview', 'theme_adaptable') ?></span>
             </a>

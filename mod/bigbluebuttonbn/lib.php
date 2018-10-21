@@ -87,7 +87,8 @@ const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 const BIGBLUEBUTTONBN_LOG_EVENT_IMPORT = 'Import';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_DELETE string of event delete for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
-
+/** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
+const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
 /**
  * Indicates API features that the forum supports.
  *
@@ -142,6 +143,7 @@ function bigbluebuttonbn_add_instance($data) {
     bigbluebuttonbn_process_pre_save($data);
     
     // Pre-set initial values.
+    $data->meetingid = 0;
     $data->presentation = bigbluebuttonbn_get_media_file($data);
     // Insert a record.
     $data->id = $DB->insert_record('bigbluebuttonbn', $data);
