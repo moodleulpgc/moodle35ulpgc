@@ -13,7 +13,13 @@ $string['examswarnings:manage'] = 'Gestionar Exámenes Teleformación';
 $string['examswarnings:view'] = 'Ver Exámenes Teleformación';
 $string['examswarnings:select'] = 'Seleccionar una fecha de examen';
 $string['examswarnings:supervise'] = 'Supervisar exámenes';
+$string['messageprovider:exam_staff_reminders'] = 'Exam reminders for room staff';
+$string['messageprovider:exam_student_reminders'] = 'Exam reminders for students';
+$string['messageprovider:exam_student_warnings'] = 'Non-booked exam warnings for students';
+$string['messageprovider:exam_teacher_reminders'] = 'Exam reminders for teachers';
 
+$string['examidnumber'] = 'Exam idnumber';
+$string['explainexamidnumber'] = 'Grade item idnumber for an activity holding Exam grade.';
 $string['examlocations'] = 'Lugares';
 $string['examcall'] = 'Convocatoria';
 $string['examcalls'] = 'Convocatorias';

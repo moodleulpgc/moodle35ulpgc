@@ -76,7 +76,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function allow_manage(stdClass $instance) {
-        return false;
+        return true;
     }
 
     /**
@@ -102,8 +102,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return moodle_url or NULL if self unenrolment not supported
      */
     public function get_unenrolself_link($instance) {
-        if ($instance->customint1 > 0) {
-            // Don't offer unenrolself if we are going to re-enrol them on login.
+        if (($instance->customint1 > 0) || ($instance->customint6 == 0)) {
+            // Don't offer unenrolself if we are going to re-enrol them on login or if not permitted.
             return null;
         }
         return parent::get_unenrolself_link($instance);
@@ -121,7 +121,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool|int false means not enrolled, integer means timeend
      * @throws coding_exception
      */
-    
+
     public function try_autoenrol(stdClass $instance) {
         global $USER, $CFG;
 
@@ -446,8 +446,44 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
-                    // If rule is not verified unenrol the user.
-                    $this->unenrol_user($instance, $user->id);
+                    if (!$context = context_course::instance($instance->courseid, IGNORE_MISSING)) {
+                        // Very weird.
+                        continue;
+                    }
+
+                    // Deal with enrolments of users that no more match the rule.
+                    $unenrolaction = $this->get_config('autounenrolaction');
+                    if ($unenrolaction === false) {
+                        $unenrolaction = ENROL_EXT_REMOVED_UNENROL;
+                    }
+                    if ($unenrolaction == ENROL_EXT_REMOVED_UNENROL) {
+                        $this->unenrol_user($instance, $user->id);
+
+                    } else if ($unenrolaction == ENROL_EXT_REMOVED_KEEP) {
+                        // Keep - only adding enrolments.
+
+                    } else if ($unenrolaction == ENROL_EXT_REMOVED_SUSPEND || $unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
+                        // Suspend users.
+                        foreach ($userenrolments as $userenrolment) {
+                            if ($userenrolment->enrolid == $instance->id) {
+                                if ($userenrolment->status != ENROL_USER_SUSPENDED) {
+                                    $this->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
+                                }
+                            }
+                        }
+                        if ($unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
+                            if (!empty($roleassigns[$instance->courseid])) {
+                                // We want this "other user" to keep their roles.
+                                continue;
+                            }
+                            role_unassign_all(array(
+                                    'contextid' => $context->id,
+                                    'userid' => $user->id,
+                                    'component' => 'enrol_autoenrol',
+                                    'itemid' =>$instance->id
+                            ));
+                        }
+                    }
                 } else {
                     // If rule is verified update user group enrolments.
                     $this->process_group($instance, $user);
@@ -473,6 +509,24 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         // Multiple instances supported.
         return new moodle_url('/enrol/autoenrol/edit.php', array('courseid' => $courseid));
+    }
+
+    /**
+     * The autoenrol plugin has several bulk operations that can be performed.
+     * @param course_enrolment_manager $manager
+     * @return array
+     */
+    public function get_bulk_operations(course_enrolment_manager $manager) {
+        $context = $manager->get_context();
+
+        $bulkoperations = array();
+        if (has_capability("enrol/autoenrol:manage", $context)) {
+            $bulkoperations['editselectedusers'] = new enrol_autoenrol_editselectedusers_operation($manager, $this);
+        }
+        if (has_capability("enrol/autoenrol:unenrol", $context)) {
+            $bulkoperations['deleteselectedusers'] = new enrol_autoenrol_deleteselectedusers_operation($manager, $this);
+        }
+        return $bulkoperations;
     }
 
     /**

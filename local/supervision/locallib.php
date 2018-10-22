@@ -383,7 +383,7 @@
                     }
                     $success[] = $stat->id;
                     if($supportuser && $config->maildebug) {
-                        $msgdata = $supportuser;
+                        $msgdata->userto = $supportuser;
                         message_send($msgdata);
                     }
                 } elseif($supportuser) {

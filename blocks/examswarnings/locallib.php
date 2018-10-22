@@ -20,6 +20,11 @@ function examswarnings_get_sessiondata($config) {
     $examregistrar = $DB->get_record('examregistrar', array('id'=> $config->primaryreg));
     $periods = examregistrar_current_periods($examregistrar);
     $period = reset($periods);
+    
+    if(!$period) {
+        return array();
+    }
+    
     $extra = examregistrar_is_extra_period($examregistrar, $period);
 
     $now = time();
@@ -98,14 +103,16 @@ function examswarnings_notappointedexams($period, $session, $extra, $userid = 0,
     $params['user1'] = $userid;
     $params['user2'] = $userid;
     $params['user3'] = $userid;
+    $params['user4'] = $userid;
     $params['period'] = $period->id;
     $params['session'] = $session->id;
+    $params['examassign'] = get_config('block_examswarnings', 'examidnumber');
     $extrawhere = '';
     if($extra) {
         $extrawhere = " AND NOT EXISTS (SELECT b3.id FROM {examregistrar_bookings} b3
                                                         JOIN {examregistrar_exams} e2 ON b3.examid = e2.id AND e2.period = :period2
-                                                        WHERE b3.booked = 1 AND b3.userid = :user4 AND e2.courseid = e.courseid )";
-        $params['user4'] = $userid;
+                                                        WHERE b3.booked = 1 AND b3.userid = :user5 AND e2.courseid = e.courseid )";
+        $params['user5'] = $userid;
         $params['period2'] = $period->id;
     }
     $sql = "SELECT e.id, e.programme, e.courseid, c.shortname, c.category, b.booked
@@ -113,12 +120,15 @@ function examswarnings_notappointedexams($period, $session, $extra, $userid = 0,
                 JOIN {course} c ON e.courseid = c.id
                 JOIN {grade_items} gi ON c.id = gi.courseid AND gi.itemtype = 'course'
                 LEFT JOIN {grade_grades} gg ON gi.id = gg.itemid AND gg.userid = :user1
-                LEFT JOIN {examregistrar_bookings} b ON e.id = b.examid AND b.userid = :user2
+                LEFT JOIN {grade_items} ge ON c.id = ge.courseid AND  ge.idnumber LIKE :examassign
+                LEFT JOIN {grade_grades} gge ON ge.id = gge.itemid AND gge.userid = :user2
+                LEFT JOIN {examregistrar_bookings} b ON e.id = b.examid AND b.userid = :user3
                 WHERE e.period = :period AND e.examsession = :session AND e.visible = 1 AND e.callnum > 0
                     AND c.id $incourses AND (b.id IS NULL $strictwhere)
-                    AND NOT EXISTS (SELECT b2.id FROM {examregistrar_bookings} b2 WHERE e.id = b2.examid AND b2.userid = :user3 AND b2.booked = 1)
+                    AND NOT EXISTS (SELECT b2.id FROM {examregistrar_bookings} b2 WHERE e.id = b2.examid AND b2.userid = :user4 AND b2.booked = 1)
                     $extrawhere
-                    AND (gg.finalgrade < gi.gradepass OR gg.finalgrade IS NULL)
+                    AND NOT ((gg.finalgrade >= gi.gradepass AND gg.finalgrade IS NOT NULL) OR 
+                                (gge.finalgrade >= ge.gradepass AND gge.finalgrade IS NOT NULL))
                 GROUP BY e.id
                 ORDER BY c.shortname ";
     $exams = $DB->get_records_sql($sql, $params);
@@ -239,4 +249,19 @@ function examswarnings_roomcall_upcomingexams($period, $session, $userid = 0) {
     $rooms = $DB->get_records_sql($sql, $params);
 
     return $rooms;
+}
+
+/**
+ * creates a message class instance fro mailing notifications
+ *
+ * @param string $name name of the notification type
+ * @return class a message class instance
+ */
+function examswarnings_prepare_message($name) {
+    $msgdata = new \core\message\message();
+    $msgdata->component         = 'block_examswarnings';
+    $msgdata->name              = $name;
+    $msgdata->notification      = 1;
+    $msgdata->userfrom = core_user::get_noreply_user(); 
+    $msgdata->userfrom->lastname = get_string('examreminderfrom',  'block_examswarnings');
 }

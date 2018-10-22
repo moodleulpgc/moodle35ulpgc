@@ -17,5 +17,3 @@ defined('MOODLE_INTERNAL') || die;
 $settings = new admin_settingpage('report_trackertools_settings', get_string('settings','report_trackertools')); 
 
 $settings->add(new admin_setting_configcheckbox('report_trackertools/enabledtrackertools', get_string('enabled','report_trackertools'), get_string('explainenabled','report_trackertools'), 0));
-
-

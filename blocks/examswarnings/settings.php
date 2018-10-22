@@ -74,6 +74,9 @@ if ($ADMIN->fulltree) {
             get_string('configwarningdays', 'block_examswarnings'), 1, $days));
     $settings->add(new admin_setting_configselect('block_examswarnings/examconfirmdays', get_string('examconfirmdays', 'block_examswarnings'),
             get_string('configexamconfirmdays', 'block_examswarnings'), 1, $days));
+
+    $settings->add(new admin_setting_configtext('block_examswarnings/examidnumber', get_string('examidnumber','block_examswarnings'), get_string('explainexamidnumber','block_examswarnings'), 'EXAMORD'));
+            
     $settings->add(new admin_setting_confightmleditor('block_examswarnings/warningmessage', get_string('warningmessage','block_examswarnings'),
                                                       get_string('configwarningmessage','block_examswarnings'), ''));
     $settings->add(new admin_setting_confightmleditor('block_examswarnings/confirmmessage', get_string('confirmmessage','block_examswarnings'),

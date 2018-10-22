@@ -150,7 +150,8 @@
     padding: 0 20px;
 }
 
-.course-content .current  .content .sectionname {
+/* Current Section */
+#page .course-content ul li.section.main.current {
     background: [[setting:currentcolor]];
 }
 

@@ -28,6 +28,8 @@ $string['pluginname'] = 'Auto Enrol ';
 $string['pluginname_desc'] = 'The automatic enrolment module allows an option for logged in users to be automatically granted entry to a course and enrolled. This is similar to allowing guest access but the students will be permanently enrolled and therefore able to participate in forum and activities within the area.';
 
 $string['config'] = 'Configuration';
+$string['autounenrolaction'] = 'Auto unenrol action';
+$string['autounenrolaction_help'] = 'Select the action to carry out when the user filtering rule is no more matched. Please note that some user data and settings are purged from course during course unenrolment.';
 $string['customwelcomemessage'] = 'Custom welcome message';
 $string['customwelcomemessage_help'] = 'A custom welcome message may be added as plain text or Moodle-auto format, including HTML tags and multi-lang tags.
 
@@ -71,6 +73,9 @@ $string['countlimit_help'] = 'This instance will count the number of enrolments 
 $string['alwaysenrol'] = 'Always Enrol';
 $string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol users, even if they already have access to the course through another method.';
 
+$string['selfunenrol'] = 'Enable self unenrol';
+$string['selfunenrol_help'] = 'When set to Yes the users can unenrol by themself.';
+
 $string['softmatch'] = 'Soft Match';
 $string['softmatch_help'] = 'When enabled AutoEnrol will enrol a user when they partially match the "Allow Only" value instead of requiring an exact match. Soft matches are also case-insensitive. The value of "Filter By" will be used for the group name.';
 
@@ -105,3 +110,7 @@ $string['enrolenddate'] = 'End date';
 $string['enrolenddate_help'] = 'If enabled, users will be enrolled until this date only.';
 $string['cannotenrol'] = 'You can\'t enrol to this course using auto enrol.';
 $string['privacy:metadata:core_group'] = 'Autoenrol plugin can create new groups or use existing groups to add participants that match the Autoenrol filter.';
+$string['deleteselectedusers'] = 'Delete selected user enrolments';
+$string['editselectedusers'] = 'Edit selected user enrolments';
+$string['unenrolusers'] = 'Unenrol users';
+$string['confirmbulkdeleteenrolment'] = 'Are you sure you want to delete these user enrolments?';

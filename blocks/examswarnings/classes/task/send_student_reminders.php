@@ -67,7 +67,7 @@ class send_student_reminders extends \core\task\scheduled_task {
             $names = get_all_user_name_fields(true, 'u');
             
             $sql = "SELECT b.id AS bid, b.userid, b.booked, MIN(b.bookedsite) AS bookedsite, e.courseid, c.fullname, c.shortname, 
-                            u.id, u.username, u.email, u.mailformat, u.idnumber, $names
+                            u.id, u.username, u.email, u.mailformat, u.idnumber, u.maildisplay, $names
                     FROM {examregistrar_bookings} b
                     JOIN {examregistrar_exams} e ON b.examid = e.id
                     JOIN {course} c ON e.courseid = c.id AND c.visible = 1
@@ -78,12 +78,14 @@ class send_student_reminders extends \core\task\scheduled_task {
             if($users = $DB->get_records_sql($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
                 mtrace("    ... doing reserved exam reminders.");
                 
+                // Prepare the message class.
+                $msgdata = examswarnings_prepare_message('exam_student_reminders');
+                $student = core_user::get_noreply_user();
                 $sent = array();
-                $from = get_string('examreminderfrom',  'block_examswarnings');
+                
                 $yesno = array(0=>get_string('no'), 1=>get_string('yes'));
                 $examdate = userdate($session->examdate, '%A %d de %B de %Y');
                 foreach($users as $user) {
-                    $subject = get_string('confirmsubject', 'block_examswarnings', $user->shortname);
                     $message = $config->confirmmessage;
                     list($name, $idnumber) = examregistrar_get_namecodefromid($user->bookedsite, 'locations');
                     $replaces = array('%%course%%' => $user->shortname.'-'.$user->fullname,
@@ -94,17 +96,27 @@ class send_student_reminders extends \core\task\scheduled_task {
                     foreach($replaces as $search => $replace) {
                         $message = str_replace($search, $replace, $message);
                     }
-                    $text = html_to_text($message, 75, false);
-                    $html = ($user->mailformat == 1) ? format_text($message, FORMAT_HTML) : '';
+                    
+                    $student = username_load_fields_from_object($student, $user, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                    $student->emailstop = 0;
+                    
+                    $msgdata->userto = $student;
+                    $msgdata->courseid = $user->courseid;
+                    $msgdata->subject = get_string('confirmsubject', 'block_examswarnings', $user->shortname);
+                    $msgdata->fullmessagehtml = $message;
+                    $msgdata->fullmessage = html_to_text($message, 75, false);
+                    $msgdata->fullmessageformat = FORMAT_HTML;
+                    
                     $flag = '';
                     if(!$config->noemail) {
-                        if(!email_to_user($user, $from, $subject, $text, $html)) {
+                        if(!message_send($msgdata)) {
                             $flag = ' - '.get_string('remindersenderror', 'block_examswarnings');
                         }
                     }
                     $sent[] = $user->shortname.': '.fullname($user).$flag;
                 }
                 if($controluser = examswarnings_get_controlemail($config)) {
+                    $from = get_string('examreminderfrom',  'block_examswarnings');
                     $info = new \stdClass;
                     $info->num = count($sent);
                     $info->date = userdate($session->examdate, '%A %d de %B de %Y');

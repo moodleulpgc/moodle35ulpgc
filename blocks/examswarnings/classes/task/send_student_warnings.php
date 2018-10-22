@@ -93,28 +93,36 @@ class send_student_warnings extends \core\task\scheduled_task {
 
                 $names = get_all_user_name_fields(true, 'u');
                 
-                $sql = "SELECT DISTINCT ra.id as rid, c.shortname, c.fullname, u.id, u.email, u.mailformat, u.username, u.idnumber, $names
+                $sql = "SELECT DISTINCT ra.id as rid, c.id AS courseid, c.shortname, c.fullname, u.id, u.email, u.mailformat, u.username, u.idnumber, u.maildisplay, $names
                         FROM {user} u
                             JOIN {role_assignments} ra ON u.id = ra.userid
                             JOIN {context} ctx ON ra.contextid = ctx.id
                             JOIN {course} c ON ctx.instanceid = c.id AND c.visible = 1 AND c.id $incoursesql
                             JOIN {grade_items} gi ON c.id = gi.courseid AND gi.itemtype = 'course'
                             LEFT JOIN {grade_grades} gg ON gi.id = gg.itemid AND u.id = gg.userid
+                            LEFT JOIN {grade_items} ge ON c.id = ge.courseid AND  ge.idnumber LIKE :examassign
+                            LEFT JOIN {grade_grades} gge ON ge.id = gge.itemid AND u.id = gge.userid
                             JOIN {examregistrar_exams} e ON e.courseid = c.id AND e.examsession = :session AND e.examregid = :examregid AND e.callnum > 0
-                        WHERE ra.roleid $inrolesql AND (gg.finalgrade < gi.gradepass OR gg.finalgrade IS NULL)
+                        WHERE ra.roleid $inrolesql AND NOT ( (gg.finalgrade >= gi.gradepass AND gg.finalgrade IS NOT NULL) OR 
+                                                             (gge.finalgrade >= ge.gradepass AND gge.finalgrade IS NOT NULL))
                             AND NOT EXISTS (SELECT 1 FROM {examregistrar_bookings} b WHERE b.userid = u.id AND b.examid = e.id)
                             $extrawhere
                         GROUP BY u.id, e.id";
                 $params['examregid'] = $config->primaryreg;
                 $params['session'] = $session->id;
+                $params['examassign'] = $config->examidnumber;
 
                 $users = $DB->get_records_sql($sql, $params);
                 if($users) {
                     mtrace("    ... doing NON-reserved exam warnings.");
+                    
+                    // Prepare the message class.
+                    $msgdata = examswarnings_prepare_message('exam_student_warnings');
+                    $student = core_user::get_noreply_user();
+
                     $sent = array();
-                    $from = get_string('examreminderfrom',  'block_examswarnings');
+                    
                     foreach($users as $user) {
-                        $subject = get_string('warningsubject', 'block_examswarnings', $user->shortname);
                         $message = $config->warningmessage;
                         $replaces = array('%%course%%' => $user->shortname.'-'.$user->fullname,
                                         '%%date%%' => $examdate,
@@ -122,17 +130,27 @@ class send_student_warnings extends \core\task\scheduled_task {
                         foreach($replaces as $search => $replace) {
                             $message = str_replace($search, $replace, $message);
                         }
-                        $text = html_to_text($message, 75, false);
-                        $html = ($user->mailformat == 1) ? format_text($message, FORMAT_HTML) : '';
+                        
+                        $student = username_load_fields_from_object($student, $user, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                        $student->emailstop = 0;
+                        
+                        $msgdata->userto = $student;
+                        $msgdata->courseid = $user->courseid;
+                        $msgdata->subject = get_string('warningsubject', 'block_examswarnings', $user->shortname);
+                        $msgdata->fullmessagehtml = $message;
+                        $msgdata->fullmessage = html_to_text($message, 75, false);
+                        $msgdata->fullmessageformat = FORMAT_HTML;
+                        
                         $flag = '';
                         if(!$config->noemail) {
-                            if(!email_to_user($user, $from, $subject, $text, $html)) {
+                            if(!message_send($msgdata)) {
                                 $flag = ' - '.get_string('remindersenderror', 'block_examswarnings');
                             }
                         }
                         $sent[] = $user->shortname.': '.fullname($user).$flag;
                     }
                     if($controluser = examswarnings_get_controlemail($config)) {
+                        $from = get_string('examreminderfrom',  'block_examswarnings');
                         $info = new \stdClass;
                         $info->num = count($sent);
                         $info->date = $examdate;

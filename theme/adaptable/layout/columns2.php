@@ -50,6 +50,22 @@ $regions = theme_adaptable_grid($left, $hassidepost);
             echo $OUTPUT->get_course_alerts();
             echo $OUTPUT->course_content_header();
             echo $OUTPUT->main_content();
+
+            if ($PAGE->has_set_url()) {
+                $currenturl = $PAGE->url;
+            } else {
+                $currenturl = $_SERVER["REQUEST_URI"];
+            }
+
+            // Display course page block activity bottom region if this is a mod page of type where you're viewing
+            // a section, page or book (chapter).
+            if (!empty($PAGE->theme->settings->coursepageblockactivitybottomenabled)) {
+                if ( stristr ($currenturl, "mod/page/view") ||
+                     stristr ($currenturl, "mod/book/view") ) {
+                    echo $OUTPUT->get_block_regions('customrowsetting', 'course-section-', '12-0-0-0');
+                }
+            }
+
             echo $OUTPUT->course_content_footer();
             ?>
         </section>
