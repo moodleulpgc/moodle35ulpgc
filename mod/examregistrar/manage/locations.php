@@ -202,7 +202,7 @@ if($elements) {
             //$url = new moodle_url($manageurl, array('staffers'=>$element->id));
             //$buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'class'=>'iconsmall')), array('title'=>$strstaffers));
             $staffurl->param('room', $element->id);
-            $buttons[] = html_writer::link($staffurl, $OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
+            $buttons[] = html_writer::link($staffurl, $OUTPUT->pix_icon('t/assignroles', $strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
             $action = implode('&nbsp;&nbsp;', $buttons);
         }
         $data[] = $action;
