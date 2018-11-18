@@ -45,7 +45,8 @@ input#id_submitbutton,
 input#id_submitbutton2,
 .path-admin .buttons input[type="submit"],
 td.submit input {
-    font-family: [[setting:fontname]], sans-serif !important;
+    font-family: [[setting:fontname]];
+    font-family: [[setting:customfontname]], sans-serif;
     background-image: none;
     background-color: [[setting:buttoncolor]];
     background-size: 100% 200%;
@@ -216,9 +217,9 @@ td.submit input[disabled] {
 .cancel a,
 #id_cancel,
 input[name="addcancel"],
-button[name="resetbutton"]
-{
-    font-family: [[setting:fontname]], sans-serif !important;
+button[name="resetbutton"] {
+    font-family: [[setting:fontname]];
+    font-family: [[setting:customfontname]], sans-serif;
     font-size: 14px;
     line-height: 20px;
     height: 36px;

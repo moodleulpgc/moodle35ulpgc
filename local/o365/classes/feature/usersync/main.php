@@ -197,6 +197,10 @@ class main {
         }
         $result = false;
         $apiclient = $this->construct_outlook_api($muserid, true);
+        if (empty($user)) {
+            $o365user = \local_o365\obj\o365user::instance_from_muserid($muserid);
+            $user = $o365user->upn;
+        }
         $size = $apiclient->get_photo_metadata($user);
         $muser = $DB->get_record('user', array('id' => $muserid), 'id, picture', MUST_EXIST);
         $context = \context_user::instance($muserid, MUST_EXIST);
@@ -383,6 +387,7 @@ class main {
         if (empty($restriction['remotefield']) || empty($restriction['value'])) {
             return true;
         }
+        $useregex = (!empty($restriction['useregex'])) ? true : false;
 
         if ($restriction['remotefield'] === 'o365group') {
             if (\local_o365\rest\unified::is_configured() !== true) {
@@ -422,9 +427,18 @@ class main {
             if (!isset($aaddata[$restriction['remotefield']])) {
                 return false;
             }
+            $fieldval = $aaddata[$restriction['remotefield']];
+            $restrictionval = $restriction['value'];
 
-            if ($aaddata[$restriction['remotefield']] === $restriction['value']) {
-                return true;
+            if ($useregex === true) {
+                $count = @preg_match('/'.$restrictionval.'/', $fieldval, $matches);
+                if (!empty($count)) {
+                    return true;
+                }
+            } else {
+                if ($fieldval === $restrictionval) {
+                    return true;
+                }
             }
         }
         return false;
@@ -651,7 +665,7 @@ class main {
                        assign.photoupdated photoupdated,
                        obj.id AS objrecid
                   FROM {user} u
-             LEFT JOIN {auth_oidc_token} tok ON tok.username = u.username
+             LEFT JOIN {auth_oidc_token} tok ON tok.userid = u.id
              LEFT JOIN {local_o365_connections} conn ON conn.muserid = u.id
              LEFT JOIN {local_o365_appassign} assign ON assign.muserid = u.id
              LEFT JOIN {local_o365_objects} obj ON obj.type = ? AND obj.moodleid = u.id
@@ -674,7 +688,7 @@ class main {
                        assign.photoupdated photoupdated,
                        obj.id AS objrecid
                   FROM {user} u
-             LEFT JOIN {auth_oidc_token} tok ON tok.username = u.username
+             LEFT JOIN {auth_oidc_token} tok ON tok.userid = u.id
              LEFT JOIN {local_o365_connections} conn ON conn.muserid = u.id
              LEFT JOIN {local_o365_appassign} assign ON assign.muserid = u.id
              LEFT JOIN {local_o365_objects} obj ON obj.type = ? AND obj.moodleid = u.id
@@ -699,8 +713,8 @@ class main {
                     // Check for synced user.
                     $sql = 'SELECT u.*
                               FROM {user} u
-                              JOIN {local_o365_objects} obj ON obj.type = "user" AND obj.moodleid = u.id
-                              JOIN {auth_oidc_token} tok ON tok.username = u.username
+                              JOIN {local_o365_objects} obj ON obj.type = \'user\' AND obj.moodleid = u.id
+                              JOIN {auth_oidc_token} tok ON tok.userid = u.id
                              WHERE u.username = ?
                                    AND u.mnethostid = ?
                                    AND u.deleted = ?

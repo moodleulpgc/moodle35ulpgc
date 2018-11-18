@@ -191,7 +191,7 @@ if($elements) {
                                   array('id'=>$cm->id, 'action'=>'sessionrooms', 'edit'=>$edit, 'session'=>$element->id));
 
 //            $url = new moodle_url($manageurl, array('edit'=>'session_rooms', 'ssession'=>$element->id));
-            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/contextmenu', $strrooms, 'moodle', array('class'=>'iconsmall', 'title'=>$strrooms)));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('contextmenu', $strrooms, 'mod_examregistrar', array('class'=>'iconsmall', 'title'=>$strrooms)));
 
             $action = implode('&nbsp;&nbsp;', $buttons);
         }

@@ -22,10 +22,10 @@ function examswarnings_get_sessiondata($config) {
     $period = reset($periods);
     
     if(!$period) {
-        return array();
+        //return array(0,0,0,0,0);
     }
     
-    $extra = examregistrar_is_extra_period($examregistrar, $period);
+    $extra = $period ? examregistrar_is_extra_period($examregistrar, $period) : 0;
 
     $now = time();
     $days = $extra ? $config->warningdaysextra : $config->warningdays;

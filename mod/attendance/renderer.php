@@ -415,7 +415,8 @@ class mod_attendance_renderer extends plugin_renderer_base {
             $table .= $this->render_attendance_take_grid($takedata);
         }
         $table .= html_writer::input_hidden_params($takedata->url(array('sesskey' => sesskey(),
-                                                                        'page' => $takedata->pageparams->page)));
+                                                                        'page' => $takedata->pageparams->page,
+                                                                        'perpage' => $takedata->pageparams->perpage)));
         $table .= html_writer::end_div();
         $params = array(
                 'type'  => 'submit',
@@ -432,7 +433,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
         $sessionstats[] = array();
         foreach ($takedata->sessionlog as $userlog) {
             foreach ($takedata->statuses as $status) {
-                if ($userlog->statusid == $status->id) {
+                if ($userlog->statusid == $status->id && in_array($userlog->studentid, array_keys($takedata->users))) {
                     $sessionstats[$status->id]++;
                 }
             }
@@ -568,7 +569,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
             $controls .= $this->output->render($select);
         }
 
-        if (count($takedata->sessions4copy) > 0) {
+        if (isset($takedata->sessions4copy) && count($takedata->sessions4copy) > 0) {
             $controls .= html_writer::empty_tag('br');
             $controls .= html_writer::empty_tag('br');
 
@@ -1111,7 +1112,8 @@ class mod_attendance_renderer extends plugin_renderer_base {
                 $cell->colspan = 3;
                 $row->cells[] = $cell;
             } else {
-                if (attendance_can_student_mark($sess)) {
+                list($canmark, $reason) = attendance_can_student_mark($sess, false);
+                if ($canmark) {
                     // Student can mark their own attendance.
                     // URL to the page that lets the student modify their attendance.
 
@@ -1150,7 +1152,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
      * @return string
      */
     private function construct_time($datetime, $duration) {
-        $time = html_writer::tag('nobr', construct_session_time($datetime, $duration));
+        $time = html_writer::tag('nobr', attendance_construct_session_time($datetime, $duration));
 
         return $time;
     }

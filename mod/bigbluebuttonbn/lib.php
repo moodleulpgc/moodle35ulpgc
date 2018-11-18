@@ -35,7 +35,6 @@ require_once($CFG->dirroot.'/tag/lib.php');
 require_once($CFG->libdir.'/accesslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/datalib.php');
-require_once($CFG->libdir.'/coursecatlib.php');
 require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->libdir.'/formslib.php');
@@ -148,7 +147,7 @@ function bigbluebuttonbn_add_instance($data) {
     // Insert a record.
     $data->id = $DB->insert_record('bigbluebuttonbn', $data);
     // Encode meetingid.
-    $data->meetingid = bigbluebuttonbn_encode_meetingid($data->id);
+    $data->meetingid = bigbluebuttonbn_unique_meetingid_seed();
     // Set the meetingid column in the bigbluebuttonbn table.
     $DB->set_field('bigbluebuttonbn', 'meetingid', $data->meetingid, array('id' => $data->id));
     // Log insert action.
@@ -512,7 +511,9 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
     $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
-    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    if (defined('CALENDAR_EVENT_TYPE_ACTION')) {
+        $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    }
     $event->name = $bigbluebuttonbn->name . ' (' . get_string('starts_at', 'bigbluebuttonbn') . ')';
     $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
     $event->courseid = $bigbluebuttonbn->course;

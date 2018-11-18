@@ -1,5 +1,25 @@
 # CHANGE HISTORY
 
+### 18 November 2018. 3.5.3+
+
+ * Bug fix: answerbox preloads of greater than ~1k generated debugging error
+   messages (if developer-level messages were enabled). Thanks Tim Hunt.
+ * Bug fix: Twig-all was not being applied to the question's General Feedback.
+ * Improve handling of a failed unserialise of a legacy question attempt, which
+   can (rarely) occur if a complete course, including student activity attempts,
+   is moved between sites with different Moodle versions or database charsets.
+ * Improve handling of Twig errors when editing questions that use TwigAll in
+   conjunction with ValidateOnSave.
+
+### 29 October 2018. 3.5.3
+
+ * Bug fix: installing CodeRunner on Moodle 3.5 with error debug messages
+   enabled resulted in messages "Error: mdb->get_record() found more than one record!"
+   when browsing the question bank. Alternatively, if CodeRunner was
+   installed on a freshly built Moodle 3.5, the CR_PROTOTYPES category
+   became a proxy for the Top category in the system category and its name
+   was hidden.
+
 ### 18 October 2018. 3.5.2+
 
 * Fix broken PHP question type and add test cases for it.

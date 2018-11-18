@@ -295,7 +295,9 @@ function examregistrar_get_primaryid($examregistrar) {
     global $DB;
 
     $exregid = false;
-    if($examregistrar->primaryreg) {
+    if(!$examregistrar) {
+        $exregid = false;
+    } elseif($examregistrar->primaryreg) {
         if($exreg = $DB->get_record('examregistrar', array('primaryidnumber'=>$examregistrar->primaryreg))) {
             $exregid = $exreg->id;
         } else {
@@ -343,7 +345,7 @@ function examregistrar_get_annuality($examregistrar) {
 
     $exregid = examregistrar_get_primaryid($examregistrar);
     $annuality = '';
-    if($examregistrar->annuality) {
+    if($examregistrar && $examregistrar->annuality) {
         $annuality = $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$exregid, 'idnumber'=>$examregistrar->annuality));
     }
     return $annuality;
@@ -1141,6 +1143,8 @@ function examregistrar_extend_navigation(navigation_node $navref, stdclass $cour
 function examregistrar_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $examregistrarnode=null) {
     global $PAGE, $DB;
 
+    
+/*
     if (empty($PAGE->cm->context)) {
         $PAGE->cm->context = context_module::instance($PAGE->cm->instance);
     }
@@ -1172,7 +1176,7 @@ function examregistrar_extend_settings_navigation(settings_navigation $settingsn
         $linkname = get_string('editelements', 'examregistrar');
         $node = $periods->add($linkname, $link, navigation_node::TYPE_SETTING);
     }
-
+*/
 
 }
 

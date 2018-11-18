@@ -19,7 +19,7 @@
  *
  * @package    theme_adaptable
  * @copyright  2015-2016 Jeremy Hopkins (Coventry University)
- * @copyright  2015-2016 Fernando Acedo (3-bits.com)
+ * @copyright  2015-2018 Fernando Acedo (3-bits.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
@@ -189,8 +189,11 @@ function theme_adaptable_process_css($css, $theme) {
         '[[setting:fonttitlename]]' => 'Roboto Condensed',
         '[[setting:fonttitleweight]]' => '400',
         '[[setting:fonttitlesize]]' => '48px',
-        '[[setting:fonttitlecolor]]' => '#FFFFFF',
-        '[[setting:fonttitlecolorcourse]]' => '#FFFFFF',
+        '[[setting:fonttitlecolor]]' => '#ffffff',
+        '[[setting:fonttitlecolorcourse]]' => '#ffffff',
+        '[[setting:customfontname]]' => '',
+        '[[setting:customfontheadername]]' => '',
+        '[[setting:customfonttitlename]]' => '',
         '[[setting:sitetitlepaddingtop]]' => '0px',
         '[[setting:sitetitlepaddingleft]]' => '0px',
         '[[setting:coursetitlepaddingtop]]' => '0px',

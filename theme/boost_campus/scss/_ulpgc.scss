@@ -6,13 +6,6 @@
 }
 
 
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-    /*your rules for chrome*/
-    #bloque_dch_cabecera ul.enlaces_cabecera li.ultimo {
-        margin-top: -21px;
-    }
-}
-
 #bloque_dch_cabecera ul.enlaces_cabecera {
     padding: 0;
     margin: 0;
@@ -76,6 +69,16 @@
     background-size: 904px;
 }
 
+
+#bloque_dch_cabecera ul.enlaces_cabecera li.ultimo {
+    margin-top: -21px;
+}
+	
+@-moz-document url-prefix() {
+    #bloque_dch_cabecera ul.enlaces_cabecera li.ultimo {
+        margin-top: 0;
+    }
+}
 
 #correo_ulpgc {
     padding-top: 8px;
@@ -397,6 +400,12 @@ div.userlist table#participants th.header.c1{min-width: 12rem;}
     bottom: -1px;
 }
 
+
+.que.multichoice .answer div.r0 .fa-check-square,
+.que.multichoice .answer div.r1 .fa-check-square {
+    text-indent: 0;
+    color: $success;
+}
 
 #page-mod-studentquiz-view input[type="checkbox"].toggle + span, 
 #page-mod-studentquiz-view input[type="checkbox"].toggle + label span {

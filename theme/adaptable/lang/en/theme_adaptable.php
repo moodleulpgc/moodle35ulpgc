@@ -20,6 +20,7 @@
  * @package    theme_adaptable
  * @copyright  2015-2018 Jeremy Hopkins (Coventry University)
  * @copyright  2015-2018 Fernando Acedo (3-bits.com)
+ * @copyright  2017-2018 Manoj Solanki (Coventry University)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
@@ -845,11 +846,17 @@ $string['fontdesc'] = 'You can select the <a href="https://www.google.com/fonts"
 $string['fontname'] = 'Main font';
 $string['fontnamedesc'] = 'Select the default font or <a href="https://www.google.com/fonts" target="_blank">Google Fonts</a> used in the site.';
 
+$string['customfontname'] = 'Custom Main font';
+$string['customfontnamedesc'] = 'Enter the name of the custom Main Font only if you selected &apos;Custom&apos; in the Main Font dropdown.';
+
 $string['fontsize'] = 'Main font size';
 $string['fontsizedesc'] = 'Select the default font size (in percentage) used in the whole site.';
 
 $string['fontheadername'] = 'Headers font';
 $string['fontheadernamedesc'] = 'Select the default font or <a href="https://www.google.com/fonts" target="_blank">Google Fonts</a> used in the text and blocks headers.';
+
+$string['customfontheadername'] = 'Custom Header font';
+$string['customfontheadernamedesc'] = 'Enter the name of the custom Header font only if you selected &apos;Custom&apos; in the Header Font dropdown.';
 
 $string['fontcolor'] = 'Main font colour';
 $string['fontcolordesc'] = 'Set the colour of the font in the theme, use html hex code.';
@@ -865,6 +872,9 @@ $string['fontheaderweightdesc'] = 'Headers font weight used in the site. Select 
 
 $string['fonttitlename'] = 'Site / Course title font';
 $string['fonttitlenamedesc'] = 'Select the default font or <a href="https://www.google.com/fonts" target="_blank">Google Fonts</a> used in title site and course titles.';
+
+$string['customfonttitlename'] = 'Custom Title font';
+$string['customfonttitlenamedesc'] = 'Enter the name of the custom Title Font only if you selected &apos;Custom&apos; in the Title Font dropdown.';
 
 $string['fonttitlecolor'] = 'Site / Course title font colour';
 $string['fonttitlecolordesc'] = 'Set the colour of the site title and course title font in the theme, use html hex code.';

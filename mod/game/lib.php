@@ -422,7 +422,8 @@ function game_update_grades($game=null, $userid=0, $nullifnone=true) {
     }
 
     if ($game != null) {
-        if ($grades = game_get_user_grades($game, $userid)) {
+        $grades = game_get_user_grades($game, $userid);
+        if ( $grades != null) {
             game_grade_item_update($game, $grades);
 
         } else if ($userid and $nullifnone) {
@@ -438,7 +439,7 @@ function game_update_grades($game=null, $userid=0, $nullifnone=true) {
     } else {
         $sql = "SELECT a.*, cm.idnumber as cmidnumber, a.course as courseid
                   FROM {game} a, {course_modules} cm, {modules} m
-                 WHERE m.name='game' AND m.id=cm.module AND cm.instance=a.id";
+                 WHERE m.name='game' AND m.id=cm.module AND cm.instance=a.id";echo $sql;
         if ($rs = $DB->get_recordset_sql( $sql)) {
             while ($game = $DB->rs_fetch_next_record( $rs)) {
                 if ($game->grade != 0) {

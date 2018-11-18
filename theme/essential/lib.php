@@ -77,12 +77,60 @@ function theme_essential_pluginfile($course, $cm, $context, $filearea, $args, $f
             return $theme->setting_file_serve('ipadretinaicon', $args, $forcedownload, $options);
         } else if ($filearea === 'loginbackground') {
             return $theme->setting_file_serve('loginbackground', $args, $forcedownload, $options);
+        } else if ($filearea === 'hvp') {
+            theme_essential_serve_hvp_css($args[1]);
         } else {
             send_file_not_found();
         }
     } else {
         send_file_not_found();
     }
+}
+
+/**
+ * Serves the H5P Custom CSS.
+ *
+ * @param type $filename The filename.
+ */
+function theme_essential_serve_hvp_css($filename) {
+    global $CFG;
+    require_once($CFG->dirroot.'/lib/configonlylib.php'); // For min_enable_zlib_compression().
+
+    $content = \theme_essential\toolbox::get_setting('hvpcustomcss');
+    $md5content = md5($content);
+    $md5stored = get_config('theme_essential', 'hvpccssmd5');
+    if ((empty($md5stored)) || ($md5stored != $md5content)) {
+        // Content changed, so the last modified time needs to change.
+        set_config('hvpccssmd5', $md5content, 'theme_essential');
+        $lastmodified = time();
+        set_config('hvpccsslm', $lastmodified, 'theme_essential');
+    } else {
+        $lastmodified = get_config('theme_essential', 'hvpccsslm');
+        if (empty($lastmodified)) {
+            $lastmodified = time();
+        }
+    }
+
+    // Sixty days only - the revision may get incremented quite often.
+    $lifetime = 60 * 60 * 24 * 60;
+
+    header('HTTP/1.1 200 OK');
+
+    header('Etag: "'.$md5content.'"');
+    header('Content-Disposition: inline; filename="'.$filename.'"');
+    header('Last-Modified: '.gmdate('D, d M Y H:i:s', $lastmodified).' GMT');
+    header('Expires: '.gmdate('D, d M Y H:i:s', time() + $lifetime).' GMT');
+    header('Pragma: ');
+    header('Cache-Control: public, max-age='.$lifetime);
+    header('Accept-Ranges: none');
+    header('Content-Type: text/css; charset=utf-8');
+    if (!min_enable_zlib_compression()) {
+        header('Content-Length: '.strlen($content));
+    }
+
+    echo $content;
+
+    die;
 }
 
 function theme_essential_serve_css($filename) {

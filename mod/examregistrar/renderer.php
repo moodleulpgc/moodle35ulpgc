@@ -1103,13 +1103,14 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
                     // status icons
                     $icon = '';
                     switch($attempt->status) {
-                        case EXAM_STATUS_SENT       : //completion-manual-n
-                        case EXAM_STATUS_WAITING    : $icon = $this->pix_icon('i/risk_spam', $strsent, 'moodle', array('class'=>'icon', 'title'=>$strsent));
+                        case EXAM_STATUS_SENT       : $icon = $this->pix_icon('sent', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
                                                         break;
-                        case EXAM_STATUS_REJECTED   : $icon = $this->pix_icon('t/stop', $strrejected, 'moodle', array('class'=>'icon', 'title'=>$strrejected));
+                        case EXAM_STATUS_WAITING    : $icon = $this->pix_icon('waiting', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
+                                                        break;
+                        case EXAM_STATUS_REJECTED   : $icon = $this->pix_icon('rejected', $strrejected, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strrejected));
                                                         break;
                         case EXAM_STATUS_APPROVED   :
-                        case EXAM_STATUS_VALIDATED  : $icon = $this->pix_icon('t/go', $strapproved, 'moodle', array('class'=>'icon', 'title'=>$strapproved));
+                        case EXAM_STATUS_VALIDATED  : $icon = $this->pix_icon('approved', $strapproved, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strapproved));
                                                         break;
                     }
                     $cellstatus = '';
@@ -1187,7 +1188,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
                         }
 
                         if($cmid && $cansubmit) {
-                            $icon = new pix_icon('t/contextmenu', $strgenerate, 'moodle', array('class'=>'icon', 'title'=>$strgenerate));
+                            $icon = new pix_icon('contextmenu', $strgenerate, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strgenerate));
                             $url = new moodle_url('/mod/quiz/report.php', array('id'=>$cmid, 'mode'=>'makeexam'));
                             $icons[] = $this->action_icon($url, $icon);
                         }

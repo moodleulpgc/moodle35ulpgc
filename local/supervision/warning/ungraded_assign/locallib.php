@@ -113,7 +113,7 @@ class warning_ungraded_assign extends warning {
             foreach ($currentassigns as $stat) {
                 // the max time this assignment should had been graded without warning
                 $stat->timereference = $stat->timemodified;
-                $timelimit = warning::threshold_without_holidays($stat->timemodified,$warningconfig->threshold, true, false);
+                $timelimit = warning::threshold_without_holidays($stat->timemodified,$warningconfig->threshold, true, $warningconfig->weekends);
                 if($timelimit >= $timetocheck) {
                     $negatives[] = $stat->id;
                 } else {

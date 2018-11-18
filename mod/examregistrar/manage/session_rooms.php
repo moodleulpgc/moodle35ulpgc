@@ -275,7 +275,7 @@ if($elements) {
             $buttons[] = '<br />&nbsp;&nbsp;';
             $url = new moodle_url('/mod/examregistrar/manage/assignseats.php',
                                   array('id'=>$cm->id, 'edit'=>'session_rooms', 'session'=>$element->examsession, 'room'=>$element->roomid));
-            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/contextmenu', $strseats, 'moodle', array('class'=>'iconsmall', 'title'=>$strseats)));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('contextmenu', $strseats, 'mod_examregistrar', array('class'=>'iconsmall', 'title'=>$strseats)));
 
             //$buttons[] = '&nbsp;&nbsp;';
             $url = new moodle_url('/mod/examregistrar/manage/assignroomstaffers.php',

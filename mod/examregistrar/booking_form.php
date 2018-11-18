@@ -12,8 +12,9 @@ require_once($CFG->libdir.'/formslib.php');
 
 
 function examregistrar_set_lagdays($examregistrar, $config, $period, $capabilities) {
-    if((isset($capabilities['bookothers']) && $capabilities['bookothers']) OR
-       (isset($capabilities['manageexams']) && $capabilities['manageexams'])) {
+    if(!$period OR 
+        (isset($capabilities['bookothers']) && $capabilities['bookothers']) OR
+        (isset($capabilities['manageexams']) && $capabilities['manageexams'])) {
 
         return 0;
     }

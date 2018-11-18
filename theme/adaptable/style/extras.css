@@ -1118,7 +1118,8 @@ html[xmlns] .slides {
     height: 35px;
     width: 30px;
     top: 46%;
-    background: [[setting:slideroption2a]] url(/adaptable2/theme/image.php?theme=adaptable&component=theme&image=next) no-repeat 50% 50%;
+    background: [[setting:slideroption2a]] url([[pix:theme|next]]) no-repeat 50% 50%;
+
     right: 15px;
     opacity: 1;
     background-size: auto 24px;
@@ -1128,7 +1129,7 @@ html[xmlns] .slides {
     height: 35px;
     width: 30px;
     top: 46%;
-    background: [[setting:slideroption2a]] url(/adaptable2/theme/image.php?theme=adaptable&component=theme&image=previous) no-repeat 50% 50%;
+    background: [[setting:slideroption2a]] url([[pix:theme|previous]]) no-repeat 50% 50%;
     left: 15px;
     opacity: 1;
     background-size: auto 24px;

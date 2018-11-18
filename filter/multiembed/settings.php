@@ -117,6 +117,11 @@ if ($ADMIN->fulltree) {
         get_string('infogram_desc', 'filter_multiembed'),
         1));
 
+    $settings->add(new admin_setting_configcheckbox('filter_multiembed/learningapps',
+        get_string('learningapps', 'filter_multiembed'),
+        get_string('learningapps_desc', 'filter_multiembed'),
+        1));
+
     $settings->add(new admin_setting_configcheckbox('filter_multiembed/padlet',
         get_string('padlet', 'filter_multiembed'),
         get_string('padlet_desc', 'filter_multiembed'),

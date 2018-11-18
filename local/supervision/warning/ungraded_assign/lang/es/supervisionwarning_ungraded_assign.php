@@ -28,6 +28,9 @@ $string['threshold'] = 'Umbral de retraso';
 $string['config_threshold'] = 'El periodo a partir del cual si continúa sin corregir se marcará la entrega como una incidencia de supervisión, en <strong>DÍAS</strong>.';
 $string['grading'] = 'Tipo de calificación';
 $string['config_grading'] = 'La comprobación se puede limitar a sólo las Tareas evaluadas, o bien las calificadas numéricamente, o mediante una escala';
+$string['weekends'] = 'Excluir fines de semana';
+$string['config_weekends'] = 'Si se activa, se excuirán los fines de semana en el chequeo del posible retraso a partir del umbral indicado.';
+
 $string['graded'] = 'Calificada';
 $string['gradenumeric'] = 'Calificación numérica';
 $string['gradescale'] = 'Escala de calificación';

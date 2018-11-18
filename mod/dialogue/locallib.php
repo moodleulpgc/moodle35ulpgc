@@ -653,7 +653,7 @@ function dialogue_get_humanfriendly_dates($epoch) {
         60 => 'minute',
         1 => 'second'
     );
-
+    $customdatetime['timepast'] = get_string('now');
     foreach ($periods as $unit => $text) {
         if ($timediff < $unit) {
             continue;

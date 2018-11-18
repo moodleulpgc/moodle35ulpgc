@@ -18,7 +18,7 @@
 *
 * @package    theme_adaptable
 * @copyright  2015-2016 Jeremy Hopkins (Coventry University)
-* @copyright  2015-2017 Fernando Acedo (3-bits.com)
+* @copyright  2015-2018 Fernando Acedo (3-bits.com)
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 *
 */
@@ -31,7 +31,7 @@ body {
     background-color: [[setting:backcolor]];
     background-size: 100% auto;
     color: [[setting:fontcolor]];
-    font-family: [[setting:fontname]], sans-serif !important;
+    font-family: [[setting:fontname]], sans-serif;
     font-size: [[setting:fontsize]];
     font-weight: [[setting:fontweight]] !important;
     line-height: normal;
@@ -46,7 +46,7 @@ h5,
 h6 {
     margin: 0 0 10px;
     color: [[setting:fontheadercolor]];
-    font-family: [[setting:fontheadername]], sans-serif !important;
+    font-family: [[setting:fontheadername]], sans-serif;
     font-weight: [[setting:fontheaderweight]] !important;
 }
 
@@ -56,7 +56,7 @@ button,
 select,
 textarea {
     color: [[setting:fontcolor]];
-    font-family: [[setting:fontname]], sans-serif !important;
+    font-family: [[setting:fontname]], sans-serif;
     font-size: [[setting:fontsize]];
     font-weight: [[setting:fontweight]] !important;
 }
@@ -225,7 +225,7 @@ div.signuppanel h2 {
 
 #above-header .headermenu .dropdown-menu a,
 #above-header .headermenu .dropdown-toggle a {
-    font-family: [[setting:fontname]], sans-serif !important;
+    font-family: [[setting:fontname]], sans-serif;
     font-size: [[setting:topmenufontsize]];
     color: [[setting:linkcolor]] !important;
 }
@@ -282,7 +282,7 @@ div.signuppanel h2 {
     color: [[setting:fonttitlecolor]] !important;
     display: inline;
     font-size: [[setting:fonttitlesize]];
-    font-family: [[setting:fonttitlename]], sans-serif !important;
+    font-family: [[setting:fonttitlename]], sans-serif;
     font-weight: [[setting:fonttitleweight]] !important;
     height: 110px;
     line-height: 120%;
@@ -341,7 +341,7 @@ div.signuppanel h2 {
 }
 
 .headermenu .usermendrop a {
-    font-family: [[setting:fontname]], sans-serif !important;
+    font-family: [[setting:fontname]], sans-serif;
     font-size: [[setting:topmenufontsize]];
 }
 
@@ -370,7 +370,7 @@ div.signuppanel h2 {
 }
 
 .usermenu2.nav a.dropdown-toggle {
-    font-family: [[setting:fontname]], sans-serif !important;
+    font-family: [[setting:fontname]], sans-serif;
     font-size: [[setting:topmenufontsize]];
     color: [[setting:headertextcolor]];
 }
