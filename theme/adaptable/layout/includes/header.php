@@ -20,6 +20,7 @@
  * @package   theme_adaptable
  * @copyright 2015 Jeremy Hopkins (Coventry University)
  * @copyright 2015-2017 Fernando Acedo (3-bits.com)
+ * @copyright 2017-2018 Manoj Solanki (Coventry University)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
@@ -33,15 +34,14 @@ if (empty($CFG->loginhttps)) {
     $wwwroot = str_replace("http://", "https://", $CFG->wwwroot);
 }
 
-// Check if this is a course or module page and check setting to hide site title.  If not one of these pages, by default
-// show it (set $hidesitetitle to false).
+// Check if this is a course or module page and check setting to hide site title.
+// If not one of these pages, by default show it (set $hidesitetitle to false).
 if ( (strstr($PAGE->pagetype, 'course')) ||
      (strstr($PAGE->pagetype, 'mod')) && ($this->page->course->id > 1) ) {
     $hidesitetitle = !empty(($PAGE->theme->settings->coursepageheaderhidesitetitle)) ? true : false;
 } else {
     $hidesitetitle = false;
 }
-
 
 // Screen size.
 theme_adaptable_initialise_zoom($PAGE);
@@ -79,38 +79,39 @@ if (!empty($PAGE->theme->settings->headerbgimage)) {
                          background-position: 0 0; background-repeat: no-repeat; background-size: cover;"';
 }
 
+// Select fonts used.
+$fontname = '';
+$fontheadername = '';
+$fonttitlename = '';
+$fontweight = '';
+$fontheaderweight = '';
+$fonttitleweight = '';
+$fontssubset = '';
 
-// Get the fonts name.
-$fontname = str_replace(" ", "+", $PAGE->theme->settings->fontname);
-$fontheadername = str_replace(" ", "+", $PAGE->theme->settings->fontheadername);
-$fonttitlename = str_replace(" ", "+", $PAGE->theme->settings->fonttitlename);
+switch ($PAGE->theme->settings->fontname) {
+    case 'default':
+    // Get the default font used by the browser.
+    break;
 
+    default:
+    // Get the Google fonts.
+    $fontname = str_replace(" ", "+", $PAGE->theme->settings->fontname);
+    $fontheadername = str_replace(" ", "+", $PAGE->theme->settings->fontheadername);
+    $fonttitlename = str_replace(" ", "+", $PAGE->theme->settings->fonttitlename);
 
-// Get the fonts subset.
-if (!empty($PAGE->theme->settings->fontsubset)) {
-    $fontssubset = '&subset=latin,'.$PAGE->theme->settings->fontsubset;
-} else {
-    $fontssubset = '';
-}
-
-
-// Font weights.
-if (!empty($PAGE->theme->settings->fontweight)) {
-    $fontweight = ':'.$PAGE->theme->settings->fontweight.','.$PAGE->theme->settings->fontweight.'i';
-} else {
     $fontweight = ':400,400i';
-}
-
-if (!empty($PAGE->theme->settings->fontheaderweight)) {
-    $fontheaderweight = ':'.$PAGE->theme->settings->fontheaderweight.','.$PAGE->theme->settings->fontheaderweight.'i';
-} else {
     $fontheaderweight = ':400,400i';
-}
-
-if (!empty($PAGE->theme->settings->fonttitleweight)) {
-    $fonttitleweight = ':'.$PAGE->theme->settings->fonttitleweight.','.$PAGE->theme->settings->fonttitleweight.'i';
-} else {
     $fonttitleweight = ':700,700i';
+    $fontssubset = '';
+
+    // Get the Google Font weights.
+    $fontweight = ':'.$PAGE->theme->settings->fontweight.','.$PAGE->theme->settings->fontweight.'i';
+    $fontheaderweight = ':'.$PAGE->theme->settings->fontheaderweight.','.$PAGE->theme->settings->fontheaderweight.'i';
+    $fonttitleweight = ':'.$PAGE->theme->settings->fonttitleweight.','.$PAGE->theme->settings->fonttitleweight.'i';
+
+    // Get the Google fonts subset.
+    $fontssubset = '&subset=latin,'.$PAGE->theme->settings->fontsubset;
+    break;
 }
 
 // Get the HTML for the settings bits.
@@ -138,51 +139,20 @@ if ($defaultview == 1 && $setfull == "") {
     $setfull = "fullin";
 }
 
-
 // HTML header.
 echo $OUTPUT->doctype();
 ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
-
     <title><?php echo $OUTPUT->page_title(); ?></title>
     <link rel="icon" href="<?php echo $OUTPUT->favicon(); ?>" />
 
-    <link rel="stylesheet" href="<?php p($CFG->httpswwwroot) ?>/theme/adaptable/style/font-awesome.min.css">
-
 <?php
-
-// Load Google Fonts.
-if (!empty($fontname) && $fontname != 'default') {
-?>
-    <link href='https://fonts.googleapis.com/css?family=<?php echo $fontname.$fontweight.$fontssubset; ?>'
-    rel='stylesheet'
-    type='text/css'>
-<?php
-}
-?>
-
-<?php
-if (!empty($fontheadername) && $fontheadername != 'default') {
-?>
-    <link href='https://fonts.googleapis.com/css?family=<?php echo $fontheadername.$fontheaderweight.$fontssubset; ?>'
-    rel='stylesheet'
-    type='text/css'>
-<?php
-}
-?>
-
-<?php
-if (!empty($fonttitlename)  && $fonttitlename != 'default') {
-?>
-    <link href='https://fonts.googleapis.com/css?family=<?php echo $fonttitlename.$fonttitleweight.$fontssubset; ?>'
-    rel='stylesheet'
-    type='text/css'>
-<?php
-}
-
 // HTML head.
 echo $OUTPUT->standard_head_html() ?>
+    <!-- CSS print media -->
+    <link rel="stylesheet" type="text/css" href="<?php echo $wwwroot; ?>/theme/adaptable/style/print.css" media="print">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Twitter Card data -->
@@ -193,7 +163,7 @@ echo $OUTPUT->standard_head_html() ?>
     <!-- Open Graph data -->
     <meta property="og:title" content="<?php echo $OUTPUT->page_title(); ?>" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="<?php echo $CFG->wwwroot; ?>" />
+    <meta property="og:url" content="<?php echo $wwwroot; ?>" />
     <meta property="og:site_name" content="<?php echo $SITE->fullname; ?>" />
 
     <!-- Chrome, Firefox OS and Opera on Android -->
@@ -204,24 +174,59 @@ echo $OUTPUT->standard_head_html() ?>
 
     <!-- iOS Safari -->
     <meta name="apple-mobile-web-app-status-bar-style" content="<?php echo $PAGE->theme->settings->maincolor; ?>" />
+
+    <!-- Load FA icons -->
+    <link rel="stylesheet" href="<?php echo $wwwroot; ?>/theme/adaptable/style/font-awesome.min.css">
+
+    <?php
+    if ((!empty($fontname)) && ($fontname != 'default') && ($fontname != 'custom')) {
+        ?>
+    <!-- Load Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=<?php echo $fontname.$fontweight.$fontssubset; ?>'
+    rel='stylesheet'
+    type='text/css'>
+    <?php
+    }
+    ?>
+
+    <?php
+    if ((!empty($fontheadername)) && ($fontheadername != 'default') && ($fontname != 'custom')) {
+    ?>
+        <link href='https://fonts.googleapis.com/css?family=<?php echo $fontheadername.$fontheaderweight.$fontssubset; ?>'
+        rel='stylesheet'
+        type='text/css'>
+    <?php
+    }
+    ?>
+
+    <?php
+    if ((!empty($fonttitlename)) && ($fonttitlename != 'default') && ($fontname != 'custom')) {
+    ?>
+        <link href='https://fonts.googleapis.com/css?family=<?php echo $fonttitlename.$fonttitleweight.$fontssubset; ?>'
+        rel='stylesheet'
+        type='text/css'>
+    <?php
+    }
+    ?>
 </head>
 
 <body <?php echo $OUTPUT->body_attributes(array('two-column', $setzoom)); ?>>
 
-<?php echo $OUTPUT->standard_top_of_body_html();
+<?php
+echo $OUTPUT->standard_top_of_body_html();
 
-    // Development or wrong moodle version alert.
-    echo $OUTPUT->get_dev_alert();
+// Development or wrong moodle version alert.
+echo $OUTPUT->get_dev_alert();
 ?>
 
 <div id="page" class="container-fluid <?php echo "$setfull $showiconsclass"; ?>">
 
 <?php
-// If the device is a mobile and the alerts are not hidden or it is a desktop then load and show the alerts.
-if (((theme_adaptable_is_mobile()) && ($hidealertsmobile == 1)) || (theme_adaptable_is_desktop())) {
-    // Display alerts.
-    echo $OUTPUT->get_alert_messages();
-}
+    // If the device is a mobile and the alerts are not hidden or it is a desktop then load and show the alerts.
+    if (((theme_adaptable_is_mobile()) && ($hidealertsmobile == 1)) || (theme_adaptable_is_desktop())) {
+        // Display alerts.
+        echo $OUTPUT->get_alert_messages();
+    }
 
 // Background image in Header.
 ?>
@@ -241,6 +246,7 @@ if (!isloggedin() || isguestuser()) {
         // Login button.
 ?>
         <form action="<?php p($wwwroot) ?>/login/index.php" method="post">
+            <input type="hidden" name="logintoken" value="<?php echo s(\core\session\manager::get_login_token()); ?>" />
             <input type="text" name="username"
                     placeholder="<?php echo get_string('loginplaceholder', 'theme_adaptable'); ?>" size="10">
             <input type="password" name="password"
@@ -251,6 +257,7 @@ if (!isloggedin() || isguestuser()) {
     } else if ($PAGE->theme->settings->displaylogin == 'button') {
 ?>
         <form action="<?php p($wwwroot) ?>/login/index.php" method="post">
+            <input type="hidden" name="logintoken" value="<?php echo s(\core\session\manager::get_login_token()); ?>" />
             <button class="btn-login" type="submit">
                 <?php echo get_string('logintextbutton', 'theme_adaptable'); ?>
             </button>
@@ -296,7 +303,10 @@ echo $OUTPUT->get_top_menus();
 
 // Add messages / notifications (moodle 3.2 or higher).
 if ($CFG->version > 2016120400) {
-    echo $OUTPUT->navbar_plugin_output();
+    // Remove Messages and Notifications icons in Quiz pages even if they don't use SEB.
+    if ($PAGE->pagetype != "mod-quiz-attempt") {
+        echo $OUTPUT->navbar_plugin_output();
+    }
 }
 ?>
     </div>
@@ -319,45 +329,48 @@ if (!$hidesitetitle) {
 ?>
 
 <?php
-// Social icons.
-if ($PAGE->theme->settings->socialorsearch == 'social') {
-    // If it is a mobile and the social icons are not hidden or it is a desktop then load and show the social icons.
-    if (((theme_adaptable_is_mobile()) && ($hidesocialmobile == 1)) || (theme_adaptable_is_desktop())) {
-?>
-    <div class="socialbox pull-right">
-<?php
-        echo $OUTPUT->socialicons();
-?>
-    </div>
-<?php
+// Remove Search Box or Social icons in Quiz pages even if they don't use SEB.
+if ($PAGE->pagetype != "mod-quiz-attempt") {
+    // Social icons.
+    if ($PAGE->theme->settings->socialorsearch == 'social') {
+        // If it is a mobile and the social icons are not hidden or it is a desktop then load and show the social icons.
+        if (((theme_adaptable_is_mobile()) && ($hidesocialmobile == 1)) || (theme_adaptable_is_desktop())) {
+            ?>
+            <div class="socialbox pull-right">
+                <?php
+                echo $OUTPUT->socialicons();
+                ?>
+            </div>
+            <?php
+        }
     }
-}
-?>
+        ?>
 
-<?php
-// Search box.
-if ( (!$hidesitetitle) && ($PAGE->theme->settings->socialorsearch == 'search') ) { ?>
+    <?php
+    // Search box.
+    if ( (!$hidesitetitle) && ($PAGE->theme->settings->socialorsearch == 'search') ) { ?>
         <div class="searchbox">
-            <form action="<?php p($CFG->wwwroot) ?>/course/search.php">
+            <form action="<?php echo $wwwroot; ?>/course/search.php">
                 <label class="hidden" for="search-1" style="display: none;"><?php echo get_string("searchcourses")?></label>
                 <div class="search-box grey-box bg-white clear-fix">
                     <input placeholder="<?php echo get_string("searchcourses", "theme_adaptable"); ?>"
-                                        accesskey="6"
-                                        class="search_tour bg-white no-border left search-box__input ui-autocomplete-input"
-                                        type="text"
-                                        name="search"
-                                        id="search-1"
-                                        autocomplete="off">
-                    <button title="<?php echo get_string("searchcourses", "theme_adaptable")?>"
-                            type="submit" class="no-border bg-white pas search-box__button">
-                        <abbr class="fa fa-search" title="<?php echo get_string("searchcourses", "theme_adaptable"); ?>"></abbr>
-                    </button>
+                            accesskey="6"
+                            class="search_tour bg-white no-border left search-box__input ui-autocomplete-input"
+                            type="text"
+                            name="search"
+                            id="search-1"
+                            autocomplete="off">
+                            <button title="<?php echo get_string("searchcourses", "theme_adaptable")?>"
+                                    type="submit" class="no-border bg-white pas search-box__button">
+                                    <abbr class="fa fa-search" title="<?php echo get_string("searchcourses", "theme_adaptable"); ?>"></abbr>
+                            </button>
                 </div>
             </form>
         </div>
-<?php
+    <?php
+    }
 }
-?>
+    ?>
 
         <div id="course-header">
             <?php echo $OUTPUT->course_header(); ?>
@@ -371,8 +384,12 @@ if ( (!$hidesitetitle) && ($PAGE->theme->settings->socialorsearch == 'search') )
 <?php
 
 // Navbar Menu.
-if ( (isloggedin() && !isguestuser())
-   || (!empty($PAGE->theme->settings->enablenavbarwhenloggedout)) ) {
+if (
+    (isloggedin() && !isguestuser()) ||
+    (!empty($PAGE->theme->settings->enablenavbarwhenloggedout)) ) {
+
+        // Remove menu navbar in Quiz pages even if they don't use SEB.
+        if ($PAGE->pagetype != "mod-quiz-attempt") {
 ?>
     <div id="navwrap">
         <div class="container">
@@ -430,9 +447,7 @@ if (isloggedin()) {
             </a>
             </li>
 <?php
-    }
-}
-?>
+    } } } ?>
         </ul>
                             <div id="edittingbutton" class="pull-right breadcrumb-button">
                                 <?php echo $OUTPUT->page_heading_button(); ?>

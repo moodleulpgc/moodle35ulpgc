@@ -117,7 +117,7 @@ abstract class report_trackertools_form extends moodleform {
 
         $grouparray = array();
         foreach($this->usertypes as $key => $type) {
-            $grouparray[] = $mform->createElement('advcheckbox', $field.$key, '', $type, array('group' => $group));
+            $grouparray[] = $mform->createElement('advcheckbox', $field.$key, $type, '', array('group' => $group));
         }
         $group = $mform->addGroup($grouparray, $groupname, get_string($help, 'report_trackertools'), array(' '), false);
         $mform->addHelpButton($groupname, $help, 'report_trackertools');
@@ -169,7 +169,7 @@ class report_trackertools_export_form extends report_trackertools_form {
 
         $grouparray = array();
         foreach($optional as $key => $field) {
-            $grouparray[] = $mform->createElement('advcheckbox', $key, ' ', $field, array('group' => 1));
+            $grouparray[] = $mform->createElement('advcheckbox', $key, $field, '', array('group' => 1));
         }
         $group = $mform->addGroup($grouparray, 'optionalfieldgroup', get_string('optionalfields', 'report_trackertools'), array('  '), false);
         $this->add_checkbox_controller(1);
@@ -177,34 +177,15 @@ class report_trackertools_export_form extends report_trackertools_form {
         if($elements) {
             $grouparray = array();
             foreach($elements as $key => $element) {
-                $grouparray[] = $mform->createElement('advcheckbox', 'element'.$element->name, ' ', $element->description, array('group' => 2));
+                $grouparray[] = $mform->createElement('advcheckbox', 'element'.$element->name, $element->description, '', array('group' => 2));
             }
             $group = $mform->addGroup($grouparray, 'optionalfieldgroup2', get_string('customfields', 'report_trackertools'), array(' '), false);
             $this->add_checkbox_controller(2);
         }
         
         $this->add_user_staff_options('comment', 'exportcomments');
-        /*
-        $usertype = array('user' => tracker_getstring('reportedby', 'tracker'),
-                            'dev' => tracker_getstring('assignedto', 'tracker'),
-                            );
-        $grouparray = array();
-        foreach($usertype as $key => $field) {
-            $grouparray[] = $mform->createElement('advcheckbox', 'comment'.$key, '', $field, array('group' => 3));
-        }
-        $group = $mform->addGroup($grouparray, 'comments', get_string('exportcomments', 'report_trackertools'), array(' '), false);
-        $mform->addHelpButton('comments', 'exportcomments', 'report_trackertools');
-        */
         
         $this->add_user_staff_options('file', 'exportfiles');
-        /*
-        $grouparray = array();
-        foreach($usertype as $key => $field) {
-            $grouparray[] = $mform->createElement('advcheckbox', 'file'.$key, '', $field, array('group' => 4));
-        }
-        $group = $mform->addGroup($grouparray, 'files', get_string('exportfiles', 'report_trackertools'), array(' '), false);
-        $mform->addHelpButton('files', 'exportfiles', 'report_trackertools');
-*/
         
         // dataformat selection
         $name = get_string('exportfileselector', 'report_trackertools');

@@ -253,7 +253,7 @@ class course_enrolment_manager {
             } else if ($sort === 'lastseen') {
                 $sql .= " ORDER BY ul.timeaccess $direction, u.lastname $direction, u.firstname $direction";
             }
-            $this->users[$key] = $DB->get_records_sql($sql, $params, $page*$perpage, $perpage);
+            $this->users[$key] = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage);
         }
         return $this->users[$key];
     }
@@ -351,7 +351,7 @@ class course_enrolment_manager {
                    WHERE ctx.id $ctxcondition AND
                          ue.id IS NULL
                 ORDER BY u.$sort $direction, ctx.depth DESC";
-            $this->otherusers[$key] = $DB->get_records_sql($sql, $params, $page*$perpage, $perpage);
+            $this->otherusers[$key] = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage);
         }
         return $this->otherusers[$key];
     }
@@ -423,7 +423,7 @@ class course_enrolment_manager {
 
         $totalusers = $DB->count_records_sql($countfields . $sql, $params);
         $availableusers = $DB->get_records_sql($fields . $sql . $order,
-                array_merge($params, $sortparams), ($page*$perpage) - $addedenrollment, $perpage);
+                array_merge($params, $sortparams), ($page * $perpage) - $addedenrollment, $perpage);
 
         return array('totalusers' => $totalusers, 'users' => $availableusers);
     }
@@ -496,7 +496,7 @@ class course_enrolment_manager {
             $filter = $this->get_enrolment_filter();
             if ($filter && array_key_exists($filter, $instances)) {
                 $sql = " = :ifilter";
-                $params = array('ifilter'=>$filter);
+                $params = array('ifilter' => $filter);
             } else {
                 $filter = 0;
                 if ($instances) {
@@ -504,7 +504,7 @@ class course_enrolment_manager {
                 } else {
                     // no enabled instances, oops, we should probably say something
                     $sql = "= :never";
-                    $params = array('never'=>-1);
+                    $params = array('never' => -1);
                 }
             }
             $this->instancefilter = $filter;
@@ -538,7 +538,7 @@ class course_enrolment_manager {
         if ($this->_inames === null) {
             $instances = $this->get_enrolment_instances();
             $plugins = $this->get_enrolment_plugins(false);
-            foreach ($instances as $key=>$instance) {
+            foreach ($instances as $key => $instance) {
                 if (!isset($plugins[$instance->enrol])) {
                     // weird, some broken stuff in plugin
                     unset($instances[$key]);
@@ -568,7 +568,7 @@ class course_enrolment_manager {
         if ($this->_allplugins === null) {
             // Make sure we have the same objects in _allplugins and _plugins.
             $this->_allplugins = $this->_plugins;
-            foreach (enrol_get_plugins(false) as $name=>$plugin) {
+            foreach (enrol_get_plugins(false) as $name => $plugin) {
                 if (!isset($this->_allplugins[$name])) {
                     $this->_allplugins[$name] = $plugin;
                 }
@@ -604,7 +604,7 @@ class course_enrolment_manager {
             if (!is_array($this->_assignablerolesothers)) {
                 $this->_assignablerolesothers = array();
                 list($courseviewroles, $ignored) = get_roles_with_cap_in_context($this->context, 'moodle/course:view');
-                foreach ($this->_assignableroles as $roleid=>$role) {
+                foreach ($this->_assignableroles as $roleid => $role) {
                     if (isset($courseviewroles[$roleid])) {
                         $this->_assignablerolesothers[$roleid] = $role;
                     }
@@ -624,7 +624,7 @@ class course_enrolment_manager {
     public function get_all_groups() {
         if ($this->_groups === null) {
             $this->_groups = groups_get_all_groups($this->course->id);
-            foreach ($this->_groups as $gid=>$group) {
+            foreach ($this->_groups as $gid => $group) {
                 $this->_groups[$gid]->name = format_string($group->name);
             }
         }
@@ -658,7 +658,7 @@ class course_enrolment_manager {
     public function get_user_enrolment_components($userenrolment) {
         global $DB;
         if (is_numeric($userenrolment)) {
-            $userenrolment = $DB->get_record('user_enrolments', array('id'=>(int)$userenrolment));
+            $userenrolment = $DB->get_record('user_enrolments', array('id' => (int)$userenrolment));
         }
         $instances = $this->get_enrolment_instances();
         $plugins = $this->get_enrolment_plugins(false);
@@ -687,8 +687,8 @@ class course_enrolment_manager {
             }
             return false;
         }
-        $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
-        $ras = $DB->get_records('role_assignments', array('contextid'=>$this->context->id, 'userid'=>$user->id, 'roleid'=>$roleid));
+        $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+        $ras = $DB->get_records('role_assignments', array('contextid' => $this->context->id, 'userid' => $user->id, 'roleid' => $roleid));
         foreach ($ras as $ra) {
             if ($ra->component) {
                 if (strpos($ra->component, 'enrol_') !== 0) {
@@ -721,7 +721,7 @@ class course_enrolment_manager {
             }
             return false;
         }
-        return role_assign($roleid, $userid, $this->context->id, '', NULL);
+        return role_assign($roleid, $userid, $this->context->id, '', null);
     }
 
     /**
@@ -783,8 +783,8 @@ class course_enrolment_manager {
      * @return bool
      */
     public function edit_enrolment($userenrolment, $data) {
-        //Only allow editing if the user has the appropriate capability
-        //Already checked in /enrol/users.php but checking again in case this function is called from elsewhere
+        // Only allow editing if the user has the appropriate capability
+        // Already checked in /enrol/users.php but checking again in case this function is called from elsewhere
         list($instance, $plugin) = $this->get_user_enrolment_components($userenrolment);
         if ($instance && $plugin && $plugin->allow_manage($instance) && has_capability("enrol/$instance->enrol:manage", $this->context)) {
             if (!isset($data->status)) {
@@ -1033,18 +1033,18 @@ class course_enrolment_manager {
 
             // Roles
             $details['roles'] = array();
-            foreach ($this->get_user_roles($user->id) as $rid=>$rassignable) {
+            foreach ($this->get_user_roles($user->id) as $rid => $rassignable) {
                 $unchangeable = !$rassignable;
                 if (!is_siteadmin() and !isset($assignable[$rid])) {
                     $unchangeable = true;
                 }
-                $details['roles'][$rid] = array('text'=>$allroles[$rid]->localname, 'unchangeable'=>$unchangeable);
+                $details['roles'][$rid] = array('text' => $allroles[$rid]->localname, 'unchangeable' => $unchangeable);
             }
 
             // Users
             $usergroups = $this->get_user_groups($user->id);
             $details['groups'] = array();
-            foreach($usergroups as $gid=>$unused) {
+            foreach($usergroups as $gid => $unused) {
                 $details['groups'][$gid] = $allgroups[$gid]->name;
             }
 
@@ -1055,12 +1055,12 @@ class course_enrolment_manager {
                     $details['enrolments'][$ue->id] = array(
                         'text' => $ue->enrolmentinstancename,
                         'period' => null,
-                        'dimmed' =>  true,
+                        'dimmed' => true,
                         'actions' => array()
                     );
                     continue;
                 } else if ($ue->timestart and $ue->timeend) {
-                    $period = get_string('periodstartend', 'enrol', array('start'=>userdate($ue->timestart), 'end'=>userdate($ue->timeend)));
+                    $period = get_string('periodstartend', 'enrol', array('start' => userdate($ue->timestart), 'end' => userdate($ue->timeend)));
                     $periodoutside = ($ue->timestart && $ue->timeend && ($now < $ue->timestart || $now > $ue->timeend));
                 } else if ($ue->timestart) {
                     $period = get_string('periodstart', 'enrol', userdate($ue->timestart));
@@ -1076,7 +1076,7 @@ class course_enrolment_manager {
                 $details['enrolments'][$ue->id] = array(
                     'text' => $ue->enrolmentinstancename,
                     'period' => $period,
-                    'dimmed' =>  ($periodoutside or $ue->status != ENROL_USER_ACTIVE or $ue->enrolmentinstance->status != ENROL_INSTANCE_ENABLED),
+                    'dimmed' => ($periodoutside or $ue->status != ENROL_USER_ACTIVE or $ue->enrolmentinstance->status != ENROL_INSTANCE_ENABLED),
                     'actions' => $ue->enrolmentplugin->get_user_enrolment_actions($manager, $ue)
                 );
             }
@@ -1119,7 +1119,7 @@ class course_enrolment_manager {
     }
 
     public function get_manual_enrol_buttons() {
-		return;
+        return;
         $plugins = $this->get_enrolment_plugins(true); // Skip disabled plugins.
         $buttons = array();
         foreach ($plugins as $plugin) {
@@ -1421,7 +1421,7 @@ class enrol_ajax_exception extends moodle_exception {
      * @param object $a Extra words and phrases that might be required in the error string
      * @param string $debuginfo optional debugging information
      */
-    public function __construct($errorcode, $link = '', $a = NULL, $debuginfo = null) {
+    public function __construct($errorcode, $link = '', $a = null, $debuginfo = null) {
         parent::__construct($errorcode, 'enrol', $link, $a, $debuginfo);
     }
 }

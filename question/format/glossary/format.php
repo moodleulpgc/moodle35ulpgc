@@ -239,6 +239,7 @@ class qformat_glossary extends qformat_xml {
                     $qc = $this->defaultquestion();
                     $qc->qtype = 'category';
                     $qc->category = trusttext_strip($category['#']['NAME'][0]['#']);
+                    $qc->info = '';
                     $categorizedquestions[] = $qc;
                     $qo = $this->import_headers($xmlentry);
                     $categorizedquestions[] = $qo;

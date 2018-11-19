@@ -33,7 +33,11 @@ $addons = [
                     'class' => '',
                 ],
                 'delegate' => 'CoreCourseModuleDelegate',
-                'method' => 'mobile_view_activity'
+                'method' => 'mobile_view_activity',
+                'styles' => [
+                    'url' => '/mod/attendance/mobilestyles.css',
+                    'version' => 22
+                ]
             ]
         ],
         'lang' => [ // Language strings that are used in all the handlers.
@@ -46,6 +50,21 @@ $addons = [
             ['percentageallsessions', 'attendance'],
             ['maxpossiblepoints', 'attendance'],
             ['maxpossiblepercentage', 'attendance'],
-        ]
+            ['submitattendance', 'attendance'],
+            ['strftimeh', 'attendance'],
+            ['strftimehm', 'attendance'],
+            ['attendancesuccess', 'attendance'],
+            ['attendance_no_status', 'attendance'],
+            ['attendance_already_submitted', 'attendance'],
+            ['somedisabledstatus', 'attendance'],
+            ['invalidstatus', 'attendance'],
+            ['preventsharederror', 'attendance'],
+            ['closed', 'attendance'],
+            ['subnetwrong', 'attendance'],
+            ['enterpassword', 'attendance'],
+            ['incorrectpasswordshort', 'attendance'],
+            ['attendancesuccess', 'attendance'],
+            ['setallstatuses', 'attendance']
+        ],
     ]
 ];

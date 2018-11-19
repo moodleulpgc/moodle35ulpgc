@@ -833,15 +833,16 @@ class quiz_makeexam_report extends quiz_default_report {
 
                 $icon = '';
                 switch($attempt->reviewstatus) {
-                    case EXAM_STATUS_SENT       :
-                    case EXAM_STATUS_WAITING    : $icon = $output->pix_icon('i/risk_spam', $strsent, 'moodle', array('class'=>'iconlarge', 'title'=>$strsent));
+                    case EXAM_STATUS_SENT       : $icon = $output->pix_icon('sent', $strsent, 'mod_examregistrar', array('class'=>'iconlarge', 'title'=>$strsent));
                                                     break;
-                    case EXAM_STATUS_REJECTED   : $icon = $output->pix_icon('t/stop', $strrejected, 'moodle', array('class'=>'icon', 'title'=>$strrejected));
+                    case EXAM_STATUS_WAITING    : $icon = $output->pix_icon('waiting', $strsent, 'mod_examregistrar', array('class'=>'iconlarge', 'title'=>$strsent));
+                                                    break;
+                    case EXAM_STATUS_REJECTED   : $icon = $output->pix_icon('rejected', $strrejected, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strrejected));
                                                   $time = $exam->examfiles[$attempt->examfileid]->timerejected;
                                                   $cellattempt .= '<br />'.get_string('rejected', 'examregistrar').': '.userdate($time, get_string('strftimedaydatetime'));
                                                     break;
                     case EXAM_STATUS_APPROVED   :
-                    case EXAM_STATUS_VALIDATED  : $icon = $output->pix_icon('t/go', $strapproved, 'moodle', array('class'=>'iconlarge', 'title'=>$strapproved));
+                    case EXAM_STATUS_VALIDATED  : $icon = $output->pix_icon('approved', $strapproved, 'mod_examregistrar', array('class'=>'iconlarge', 'title'=>$strapproved));
                                                   $time = $exam->examfiles[$attempt->examfileid]->timeapproved;
                                                   $cellattempt .= '<br />'.get_string('approved', 'examregistrar').': '.userdate($time, get_string('strftimedaydatetime'));
                                                     break;

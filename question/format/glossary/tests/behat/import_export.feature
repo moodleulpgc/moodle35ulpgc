@@ -19,7 +19,7 @@ Feature: Test importing questions from Moodle glossary export.
 
   @javascript @_file_upload
   Scenario: import XML file of an export glossary
-    When I navigate to "Import" node in "Course administration > Question bank"
+    When I navigate to "Question bank > Import" in current page administration
     And I set the field "id_format_glossary" to "1"
     And I upload "question/format/glossary/tests/fixtures/Glossary.xml" file to "Import" filemanager
     And I press "id_submitbutton"
@@ -30,7 +30,7 @@ Feature: Test importing questions from Moodle glossary export.
     Then I should see "An activity"
 
     # Now export again.
-    And I navigate to "Export" node in "Course administration > Question bank"
+    And I follow "Export"
     And I set the field "id_format_glossary" to "1"
     And I set the field "Export category" to "Vocabulary"
     And I press "Export questions to file"

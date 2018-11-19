@@ -175,6 +175,13 @@ class filter_multiembed extends moodle_text_filter {
             $newtext = preg_replace_callback($search, 'filter_multiembed_infogramcallback', $newtext);
         }
 
+        // Search for Learningapps.
+        if (get_config('filter_multiembed', 'learningapps')) {
+            $search = $regexstart.'(www\.)?)(learningapps\.org)\/([^"]*)';
+            $search .= $regexend;
+            $newtext = preg_replace_callback($search, 'filter_multiembed_learningappscallback', $newtext);
+        }
+
         // Search for Padlet boards.
         if (get_config('filter_multiembed', 'padlet')) {
             $search = $regexstart.'(www\.)?)(padlet\.com)\/([^"]*)\/([^"]*)';
@@ -607,6 +614,24 @@ function filter_multiembed_infogramcallback($link) {
 
     return $embedcode;
 }
+
+
+/**
+ * Turns a Learningapps link into an embedded app
+ *
+ * @param  string $link HTML tag containing a link
+ * @return string HTML content after processing.
+ *
+ */
+function filter_multiembed_learningappscallback($link) {
+    $embedcode = '<iframe src="https://learningapps.org/watch?app=';
+    $embedcode .= $link[4]; // Learningapps IDs are in the 4th capturing group of the regex.
+    $embedcode .= '" style="border:0px;width:100%;height:500px" webkitallowfullscreen="true"';
+    $embedcode .= ' mozallowfullscreen="true" allowfullscreen="true"></iframe>';
+
+    return $embedcode;
+}
+
 
 /**
  * Turns a Padlet link into an embedded video

@@ -43,12 +43,34 @@
             "pointssessionscompleted": "2",
             "percentagesessionscompleted": "2"
         },
-        "cmid": "25"
+        "cmid": "25",
+        "timestamp": "1234"
     }
 }}
 {{=<% %>=}}
-<div>
+<div class="attendance_mobile_view_page">
     <core-course-module-description description="<% attendance.intro %>" component="mod_attendance" componentId="<% cmid %>"></core-course-module-description>
+    <%#showmessage%>
+    <%#messages%>
+    <span class="messages">
+        <ion-item>
+            {{ 'plugin.mod_attendance.<% string %>' | translate }}
+        </ion-item>
+    </span>
+    <%/messages%>
+    <%/showmessage%>
+    <%#sessions%>
+    <ion-item>
+        <h2><% time %></h2>
+        <h3><% groupname %></h3>
+        <h3><% currentstatus %></h3>
+        <%#sessid%>
+        <button ion-button core-site-plugins-new-content component="mod_attendance" method="<% attendancefunction %>" [args]="{cmid: <% cmid %>, courseid: <% courseid %>, sessid: <% sessid %>, timestamp: <% timestamp %>}">
+            {{ 'plugin.mod_attendance.submitattendance' | translate }}
+        </button>
+        <%/sessid%>
+    </ion-item>
+    <%/sessions%>
     <ion-item>
     <ion-grid>
         <ion-row>

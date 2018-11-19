@@ -362,6 +362,7 @@ class unified extends \local_o365\rest\o365api {
             'notebook' => 'https://'.$url.'/_layouts/groupstatus.aspx?id='.$objectid.'&target=notebook',
             'conversations' => 'https://outlook.office.com/owa/?path=/group/'.$group['mail'].'/mail',
             'calendar' => 'https://outlook.office365.com/owa/?path=/group/'.$group['mail'].'/calendar',
+            'team' => 'https://office.com', // todo get team URL.
         ];
         return $o365urls;
     }
@@ -539,7 +540,7 @@ class unified extends \local_o365\rest\o365api {
         $data = [
             '@odata.id' => $this->get_apiuri().'/v1.0/directoryObjects/'.$memberobjectid
         ];
-        $response = $this->apicall('post', $endpoint, json_encode($data));
+        $response = $this->betaapicall('post', $endpoint, json_encode($data));
         return ($response === '') ? true : $response;
     }
 
@@ -555,7 +556,7 @@ class unified extends \local_o365\rest\o365api {
         $data = [
             '@odata.id' => $this->get_apiuri().'/v1.0/users/'.$memberobjectid
         ];
-        $response = $this->apicall('post', $endpoint, json_encode($data));
+        $response = $this->betaapicall('post', $endpoint, json_encode($data));
         return ($response === '') ? true : $response;
     }
 
@@ -568,7 +569,20 @@ class unified extends \local_o365\rest\o365api {
      */
     public function remove_member_from_group($groupobjectid, $memberobjectid) {
         $endpoint = '/groups/'.$groupobjectid.'/members/'.$memberobjectid.'/$ref';
-        $response = $this->apicall('delete', $endpoint);
+        $response = $this->betaapicall('delete', $endpoint);
+        return ($response === '') ? true : $response;
+    }
+
+    /**
+     * Remove owner from group.
+     *
+     * @param string $groupobjectid The object ID of the group to remove from.
+     * @param string $memberobjectid The object ID of the item to remove (can be group object id or user object id).
+     * @return bool|string True if successful, returned string if not (may contain error info, etc).
+     */
+    public function remove_owner_from_group($groupobjectid, $memberobjectid) {
+        $endpoint = '/groups/'.$groupobjectid.'/owners/'.$memberobjectid.'/$ref';
+        $response = $this->betaapicall('delete', $endpoint);
         return ($response === '') ? true : $response;
     }
 
@@ -616,9 +630,6 @@ class unified extends \local_o365\rest\o365api {
             'department',
             'companyName',
             'preferredLanguage',
-            'telephoneNumber',
-            'facsimileTelephoneNumber',
-            'mobile',
         ];
     }
 
@@ -1113,7 +1124,7 @@ class unified extends \local_o365\rest\o365api {
      */
     public function get_application_info() {
         $oidcconfig = get_config('auth_oidc');
-        $endpoint = '/applications/?$filter=id%20eq%20\''.$oidcconfig->clientid.'\'';
+        $endpoint = '/applications/?$filter=appId%20eq%20\''.$oidcconfig->clientid.'\'';
         $response = $this->betaapicall('get', $endpoint);
         $expectedparams = ['value' => null];
         return $this->process_apicall_response($response, $expectedparams);
@@ -1551,11 +1562,13 @@ class unified extends \local_o365\rest\o365api {
     }
 
     /**
-     * Add a user to a course o365 usergoup.
+     * Add a user to a course o365 usergroup.
      *
-     * @param int $courseid The ID of the moodle group.
-     * @param int $userid The ID of the moodle user.
+     * @param int $courseid The ID of the Moodle group.
+     * @param int $userid The ID of the Moodle user.
+     *
      * @return bool|null|string True if successful, null if not applicable, string if other API error.
+     * @throws \dml_exception
      */
     public function add_user_to_course_group($courseid, $userid) {
         global $DB;
@@ -1566,13 +1579,15 @@ class unified extends \local_o365\rest\o365api {
             return null;
         }
 
-        $sql = 'SELECT u.*,
-                       tok.oidcuniqid as userobjectid
-                  FROM {auth_oidc_token} tok
-                  JOIN {user} u ON u.username = tok.username
-                 WHERE tok.resource = ? AND u.id = ? AND u.deleted = "0"';
-        $params = ['https://graph.windows.net', $userid];
+        $sql = "SELECT u.id,
+                       objs.objectid as userobjectid
+                  FROM {user} u
+                  JOIN {local_o365_objects} objs ON objs.moodleid = u.id
+                 WHERE u.deleted = 0 AND objs.type = :user AND u.id = :userid";
+        $params['user'] = 'user';
+        $params['userid'] = $userid;
         $userobject = $DB->get_record_sql($sql, $params);
+
         if (empty($userobject)) {
             return null;
         }
@@ -1582,11 +1597,48 @@ class unified extends \local_o365\rest\o365api {
     }
 
     /**
-     * Remove a user from a course o365 usergoup.
+     * Add a user as owner to a course o365 usergroup.
      *
-     * @param int $courseid The ID of the moodle group.
-     * @param int $userid The ID of the moodle user.
+     * @param int $courseid The ID of the Moodle group.
+     * @param int $userid The ID of the Moodle user.
+     *
      * @return bool|null|string True if successful, null if not applicable, string if other API error.
+     * @throws \dml_exception
+     */
+    public function add_owner_to_course_group($courseid, $userid) {
+        global $DB;
+
+        $filters = ['type' => 'group', 'subtype' => 'course', 'moodleid' => $courseid];
+        $coursegroupobject = $DB->get_record('local_o365_objects', $filters);
+        if (empty($coursegroupobject)) {
+            return null;
+        }
+
+        $sql = "SELECT u.id,
+                       objs.objectid as userobjectid
+                  FROM {user} u
+                  JOIN {local_o365_objects} objs ON objs.moodleid = u.id
+                 WHERE u.deleted = 0 AND objs.type = :user AND u.id = :userid";
+        $params['user'] = 'user';
+        $params['userid'] = $userid;
+        $userobject = $DB->get_record_sql($sql, $params);
+
+        if (empty($userobject)) {
+            return null;
+        }
+
+        $response = $this->add_owner_to_group($coursegroupobject->objectid, $userobject->userobjectid);
+        return $response;
+    }
+
+    /**
+     * Remove a user from a course o365 usergroup.
+     *
+     * @param int $courseid The ID of the Moodle group.
+     * @param int $userid The ID of the Moodle user.
+     *
+     * @return bool|null|string True if successful, null if not applicable, string if other API error.
+     * @throws \dml_exception
      */
     public function remove_user_from_course_group($courseid, $userid) {
         global $DB;
@@ -1597,18 +1649,55 @@ class unified extends \local_o365\rest\o365api {
             return null;
         }
 
-        $sql = 'SELECT u.*,
-                       tok.oidcuniqid as userobjectid
-                  FROM {auth_oidc_token} tok
-                  JOIN {user} u ON u.username = tok.username
-                 WHERE tok.resource = ? AND u.id = ? AND u.deleted = "0"';
-        $params = ['https://graph.windows.net', $userid];
+        $sql = "SELECT u.id,
+                       objs.objectid as userobjectid
+                  FROM {user} u
+                  JOIN {local_o365_objects} objs ON objs.moodleid = u.id
+                 WHERE u.deleted = 0 AND objs.type = :user AND u.id = :userid";
+        $params['user'] = 'user';
+        $params['userid'] = $userid;
         $userobject = $DB->get_record_sql($sql, $params);
+
         if (empty($userobject)) {
             return null;
         }
 
         $response = $this->remove_member_from_group($coursegroupobject->objectid, $userobject->userobjectid);
+        return $response;
+    }
+
+    /**
+     * Remove an owner from a course o365 usergroup.
+     *
+     * @param int $courseid The ID of the Moodle group.
+     * @param int $userid The ID of the Moodle user.
+     *
+     * @return bool|null|string True if successful, null if not applicable, string if other API error.
+     * @throws \dml_exception
+     */
+    public function remove_owner_from_course_group($courseid, $userid) {
+        global $DB;
+
+        $filters = ['type' => 'group', 'subtype' => 'course', 'moodleid' => $courseid];
+        $coursegroupobject = $DB->get_record('local_o365_objects', $filters);
+        if (empty($coursegroupobject)) {
+            return null;
+        }
+
+        $sql = "SELECT u.id,
+                       objs.objectid as userobjectid
+                  FROM {user} u
+                  JOIN {local_o365_objects} objs ON objs.moodleid = u.id
+                 WHERE u.deleted = 0 AND objs.type = :user AND u.id = :userid";
+        $params['user'] = 'user';
+        $params['userid'] = $userid;
+        $userobject = $DB->get_record_sql($sql, $params);
+
+        if (empty($userobject)) {
+            return null;
+        }
+
+        $response = $this->remove_owner_from_group($coursegroupobject->objectid, $userobject->userobjectid);
         return $response;
     }
 
@@ -1768,10 +1857,10 @@ class unified extends \local_o365\rest\o365api {
             return $userobjectdata->o365name;
         } else {
             // Get user data.
-            $authoidcuserdata = $DB->get_record('auth_oidc_token', ['username' => $user->username]);
-            if (empty($authoidcuserdata)) {
-                // No data for the user in the OIDC token table. Can't proceed.
-                \local_o365\utils::debug('No oidc token found for user.', 'local_o365\rest\unified::get_muser_upn', $user->username);
+            $o365user = \local_o365\obj\o365user::instance_from_muserid($user->id);
+            if (empty($o365user)) {
+                // No o365 user data for the user is available.
+                \local_o365\utils::debug('Could not construct o365user class for user.', 'rest\azuread\get_muser_upn', $user->username);
                 return false;
             }
             $httpclient = new \local_o365\httpclient();
@@ -1781,7 +1870,7 @@ class unified extends \local_o365\rest\o365api {
                 \local_o365\utils::debug($e->getMessage(), 'local_o365\rest\unified::get_muser_upn', $e);
                 return false;
             }
-            $userdata = $apiclient->get_user($authoidcuserdata->oidcuniqid);
+            $userdata = $apiclient->get_user($o365user->objectid);
             if (\local_o365\rest\unified::is_configured() && empty($userdata['objectId']) && !empty($userdata['id'])) {
                 $userdata['objectId'] = $userdata['id'];
             }
@@ -1797,5 +1886,48 @@ class unified extends \local_o365\rest\o365api {
             $userobjectdata->id = $DB->insert_record('local_o365_objects', $userobjectdata);
             return $userobjectdata->o365name;
         }
+    }
+
+    /**
+     * Create a team.
+     *
+     * @param $groupobjectid
+     *
+     * @return array|null|string
+     * @throws \moodle_exception
+     */
+    public function create_team($groupobjectid) {
+        $teamdata = [
+            'funSettings' => [
+                'allowGiphy' => true,
+                'giphyContentRating' => 'strict',
+                'allowStickersAndMemes' => true,
+                'allowCustomMemes' => true,
+            ],
+            'guestSettings' => [
+                'allowCreateUpdateChannels' => true,
+                'allowDeleteChannels' => true,
+            ],
+            'memberSettings' => [
+                'allowCreateUpdateChannels' => true,
+                'allowDeleteChannels' => true,
+                'allowAddRemoveApps' => true,
+                'allowCreateUpdateRemoveTabs' => true,
+                'allowCreateUpdateRemoveConnectors' => true,
+            ],
+            'messagingSettings' => [
+                'allowUserEditMessages' => true,
+                'allowUserDeleteMessages' => true,
+                'allowOwnerDeleteMessages' => true,
+                'allowTeamMentions' => true,
+                'allowChannelMentions' => true,
+            ],
+        ];
+
+        $response = $this->betaapicall('put', '/groups/' . $groupobjectid . '/team',
+            ['file' => json_encode($teamdata)]);
+        $expectedparams = ['id' => null];
+        $response = $this->process_apicall_response($response, $expectedparams);
+        return $response;
     }
 }

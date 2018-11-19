@@ -177,7 +177,7 @@ class base {
 
         if ($justremovetokens === true) {
             // Delete token data.
-            $DB->delete_records('auth_oidc_token', ['username' => $userrec->username]);
+            $DB->delete_records('auth_oidc_token', ['userid' => $userrec->id]);
             $eventdata = ['objectid' => $userrec->id, 'userid' => $userrec->id];
             $event = \auth_oidc\event\user_disconnected::create($eventdata);
             $event->trigger();
@@ -210,7 +210,7 @@ class base {
             // Check to see if the user has a username created by OIDC, or a self-created username.
             // OIDC-created usernames are usually very verbose, so we'll allow them to choose a sensible one.
             // Otherwise, keep their existing username.
-            $oidctoken = $DB->get_record('auth_oidc_token', ['username' => $userrec->username]);
+            $oidctoken = $DB->get_record('auth_oidc_token', ['userid' => $userrec->id]);
             $ccun = (isset($oidctoken->oidcuniqid) && strtolower($oidctoken->oidcuniqid) === $userrec->username) ? true : false;
             $customdata = [
                 'canchooseusername' => $ccun,
@@ -276,7 +276,7 @@ class base {
 
                 // Delete token data.
                 if (empty($fromform->donotremovetokens)) {
-                    $DB->delete_records('auth_oidc_token', ['username' => $origusername]);
+                    $DB->delete_records('auth_oidc_token', ['userid' => $userrec->id]);
 
                     $eventdata = ['objectid' => $userrec->id, 'userid' => $userrec->id];
                     $event = \auth_oidc\event\user_disconnected::create($eventdata);
@@ -435,7 +435,7 @@ class base {
      * @param \auth_oidc\jwt $idtoken A JWT object representing the received id_token.
      * @return \stdClass The created token database record.
      */
-    protected function createtoken($oidcuniqid, $username, $authparams, $tokenparams, \auth_oidc\jwt $idtoken) {
+    protected function createtoken($oidcuniqid, $username, $authparams, $tokenparams, \auth_oidc\jwt $idtoken, $userid = 0) {
         global $DB;
 
         // Determine remote username. Use 'upn' if available (Azure-specific), or fall back to standard 'sub'.
@@ -452,6 +452,7 @@ class base {
         $tokenrec = new \stdClass;
         $tokenrec->oidcuniqid = $oidcuniqid;
         $tokenrec->username = $username;
+        $tokenrec->userid = $userid;
         $tokenrec->oidcusername = $oidcusername;
         $tokenrec->scope = !empty($tokenparams['scope']) ? $tokenparams['scope'] : 'openid profile email';
         $tokenrec->resource = !empty($tokenparams['resource']) ? $tokenparams['resource'] : $this->config->oidcresource;

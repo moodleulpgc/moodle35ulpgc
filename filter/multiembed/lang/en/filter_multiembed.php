@@ -24,6 +24,7 @@
  */
 
 $string['filtername'] = 'Multi-Embed Filter';
+$string['privacy:metadata'] = 'The Multi-Embed filter plugin does not store any personal data.';
 
 // General filter settings.
 
@@ -78,6 +79,9 @@ $string['imgur_desc'] = 'Embed Imgur images';
 
 $string['infogram'] = 'Infogr.am';
 $string['infogram_desc'] = 'Embed Infogr.am visuals';
+
+$string['learningapps'] = 'Learningapps';
+$string['learningapps_desc'] = 'Embed Learningapps';
 
 $string['padlet'] = 'Padlet';
 $string['padlet_desc'] = 'Embed Padlet boards';

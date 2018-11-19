@@ -170,6 +170,7 @@ $string['groups_notenabledforcourse'] = 'Office Groups are not enabled for this 
 $string['groups_editsettings'] = 'Edit group settings';
 $string['groups_manage'] = 'Manage groups';
 $string['groups_more'] = 'More...';
+$string['groups_team'] = 'Team';
 $string['groups_total'] = 'Total groups: {$a}';
 
 $string['erroracpauthoidcnotconfig'] = 'Please set application credentials in auth_oidc first.';
@@ -510,7 +511,9 @@ $string['settings_usermatch'] = 'User Matching';
 $string['settings_usermatch_details'] = 'This tool allows you to match Moodle users with Office 365 users based on an custom uploaded data file.';
 $string['settings_usersynccreationrestriction'] = 'User Creation Restriction';
 $string['settings_usersynccreationrestriction_details'] = 'If enabled, only users that have the specified value for the specified Azure AD field will be created during user sync.';
+$string['settings_usersynccreationrestriction_fieldval'] = 'Field value';
 $string['settings_usersynccreationrestriction_o365group'] = 'Office 365 Group Membership';
+$string['settings_usersynccreationrestriction_regex'] = 'Value is a regular expression';
 $string['settings_onenote'] = 'Disable Office 365 OneNote';
 $string['settings_onenote_details'] = 'Disabling Office 365 OneNote will allow users to use OneNote features with a Microsoft account instead of their current Office 365 account. This setting is present to match plugin functionality from the first few plugin releases. Most users will want to leave Office 365 OneNote enabled.<br /><b>Note:</b> Using a Microsoft account with OneNote requires the following plugins: local_onenote, local_msaccount, assignfeedback_onenote, and assignsubmission_onenote.';
 $string['settings_userconnections'] = 'Connections';

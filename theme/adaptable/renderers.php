@@ -28,10 +28,13 @@ defined('MOODLE_INTERNAL') || die;
 
 // Load libraries.
 require_once($CFG->dirroot.'/course/renderer.php');
-require_once($CFG->libdir.'/coursecatlib.php');
 require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/course/format/topics/renderer.php');
 require_once($CFG->dirroot.'/course/format/weeks/renderer.php');
+
+if ($CFG->version < 2018051799) {
+    require_once($CFG->libdir.'/coursecatlib.php');
+}
 
 use \theme_adaptable\traits\single_section_page;
 
@@ -538,7 +541,7 @@ class theme_adaptable_core_renderer extends core_renderer {
         $output = '';
 
         // Development version.
-        if (get_config('theme_adaptable', 'version') < '2017053000') {
+        if (get_config('theme_adaptable', 'version') < '2018111200') {
                 $output .= '<div id="beta"><h3>';
                 $output .= get_string('beta', 'theme_adaptable');
                 $output .= '</h3></div>';
@@ -1390,21 +1393,24 @@ EOT;
         $retval = '';
         $hidebreadcrumbmobile = $PAGE->theme->settings->hidebreadcrumbmobile;
 
-        // If the device is a mobile and the breadcrumb is not hidden or it is a desktop then load and show the breadcrumb.
-        if (((theme_adaptable_is_mobile()) && $hidebreadcrumbmobile = 1) || theme_adaptable_is_desktop()) {
-            if (!isset($PAGE->theme->settings->enabletickermy)) {
-                $PAGE->theme->settings->enabletickermy = 0;
-            }
-
-            // Do not show navbar on dashboard / my home if news ticker is rendering.
-            if (!($PAGE->theme->settings->enabletickermy && $PAGE->bodyid == "page-my-index")) {
-                $retval = '<div id="page-navbar" class="span12">';
-                if ($addbutton) {
-                    $retval .= '<nav class="breadcrumb-button">' . $this->page_heading_button() . '</nav>';
+        // Remove breadcrumb in a quiz page.
+        if ($PAGE->pagetype != "mod-quiz-attempt") {
+            // If the device is a mobile and the breadcrumb is not hidden or it is a desktop then load and show the breadcrumb.
+            if (((theme_adaptable_is_mobile()) && $hidebreadcrumbmobile = 1) || theme_adaptable_is_desktop()) {
+                if (!isset($PAGE->theme->settings->enabletickermy)) {
+                    $PAGE->theme->settings->enabletickermy = 0;
                 }
 
-                $retval .= $this->navbar();
-                $retval .= '</div>';
+                // Do not show navbar on dashboard / my home if news ticker is rendering.
+                if (!($PAGE->theme->settings->enabletickermy && $PAGE->bodyid == "page-my-index")) {
+                    $retval = '<div id="page-navbar" class="span12">';
+                    if ($addbutton) {
+                        $retval .= '<nav class="breadcrumb-button">' . $this->page_heading_button() . '</nav>';
+                    }
+
+                    $retval .= $this->navbar();
+                    $retval .= '</div>';
+                }
             }
         }
 
@@ -1493,9 +1499,7 @@ EOT;
         }
 
         $footer = str_replace($this->unique_performance_info_token, $performanceinfo, $footer);
-
         $footer = str_replace($this->unique_end_html_token, $this->page->requires->get_end_code(), $footer);
-
         $this->page->set_state(moodle_page::STATE_DONE);
 
         return $output . $footer;
@@ -1938,9 +1942,15 @@ EOT;
             if (!empty($PAGE->theme->settings->logo)) {
                 // Logo.
                 $retval .= '<div id="logocontainer">';
-                $retval .= "<a href='$CFG->wwwroot'>";
+                // Remove link to home page in logo when in a quiz page.
+                if ($PAGE->pagetype != "mod-quiz-attempt") {
+                    $retval .= '<a href=' . $CFG->wwwroot . '>';
+                }
                 $retval .= '<img src=' . $PAGE->theme->setting_file_url('logo', 'logo') . ' alt="logo" id="logo" />';
-                $retval .= '</a></div>';
+                if ($PAGE->pagetype != "mod-quiz-attempt") {
+                    $retval .= '</a>';
+                }
+                $retval .= '</div>';
             }
         }
 

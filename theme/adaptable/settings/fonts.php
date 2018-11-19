@@ -18,8 +18,9 @@
  * Version details
  *
  * @package    theme_adaptable
- * @copyright 2015 Jeremy Hopkins (Coventry University)
- * @copyright 2015 Fernando Acedo (3-bits.com)
+ * @copyright  2015-2018 Jeremy Hopkins (Coventry University)
+ * @copyright  2015-2018 Fernando Acedo (3-bits.com)
+ * @copyright  2017-2018 Manoj Solanki (Coventry University)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
@@ -37,7 +38,7 @@ defined('MOODLE_INTERNAL') || die;
     $setting = new admin_setting_heading($name, $heading, '');
     $temp->add($setting);
 
-    // Main Font Name.
+    // Main Google Font Name.
     $name = 'theme_adaptable/fontname';
     $title = get_string('fontname', 'theme_adaptable');
     $description = get_string('fontnamedesc', 'theme_adaptable');
@@ -97,7 +98,7 @@ defined('MOODLE_INTERNAL') || die;
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);
 
-    // Navber Menu Font Size.
+    // Navbar Menu Font Size.
     $name = 'theme_adaptable/menufontsize';
     $title = get_string('menufontsize', 'theme_adaptable');
     $description = get_string('menufontsizedesc', 'theme_adaptable');
