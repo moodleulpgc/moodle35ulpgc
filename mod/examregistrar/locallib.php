@@ -1665,6 +1665,7 @@ function examregistrar_session_seats_makeallocation($session, $bookedsite) {
             $record->timemodified = $now;
             $record->component =  '';
             $record->modifierid =  $USER->id;
+            $record->reviewerid = 0;
 
             foreach($bookings as $booking) {
                 $record->examid = $booking->examid;
@@ -1726,6 +1727,7 @@ function examregistrar_session_seats_makeallocation($session, $bookedsite) {
     $record->timemodified = $now;
     $record->component =  '';
     $record->modifierid =  $USER->id;
+    $record->reviewerid = 0;
 
     if($uniquebookings) {
         foreach($uniquebookings as $booking) {
@@ -1848,6 +1850,8 @@ function examregistrar_session_seats_newbookings($session, $bookedsite, $timelim
         $record->timemodified = $now;
         $record->component =  '';
         $record->modifierid =  $USER->id;
+        $record->reviewerid = 0;
+        
         $refreshing = array();
         foreach($newbookings as $booking) {
             $room = 0;
