@@ -80,7 +80,7 @@ class send_student_reminders extends \core\task\scheduled_task {
                 
                 // Prepare the message class.
                 $msgdata = examswarnings_prepare_message('exam_student_reminders');
-                $student = core_user::get_noreply_user();
+                $student = \core_user::get_noreply_user();
                 $sent = array();
                 
                 $yesno = array(0=>get_string('no'), 1=>get_string('yes'));

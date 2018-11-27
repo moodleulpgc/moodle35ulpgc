@@ -118,7 +118,7 @@ class send_student_warnings extends \core\task\scheduled_task {
                     
                     // Prepare the message class.
                     $msgdata = examswarnings_prepare_message('exam_student_warnings');
-                    $student = core_user::get_noreply_user();
+                    $student = \core_user::get_noreply_user();
 
                     $sent = array();
                     

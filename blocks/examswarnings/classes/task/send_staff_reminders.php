@@ -85,7 +85,7 @@ class send_staff_reminders extends \core\task\scheduled_task {
             
                 // Prepare the message class.
                 $msgdata = examswarnings_prepare_message('exam_staff_reminders');
-                $staff = core_user::get_noreply_user();
+                $staff = \core_user::get_noreply_user();
                 $sent = array();
                 foreach($rooms as $room) {
 
