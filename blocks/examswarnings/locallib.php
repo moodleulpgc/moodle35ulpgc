@@ -264,4 +264,5 @@ function examswarnings_prepare_message($name) {
     $msgdata->notification      = 1;
     $msgdata->userfrom = core_user::get_noreply_user(); 
     $msgdata->userfrom->lastname = get_string('examreminderfrom',  'block_examswarnings');
+    return $msgdata;
 }

@@ -116,7 +116,9 @@ class checkboxelement extends trackerelement {
             }
         }
 
-        $attribute->elementitemid = implode(',', $elmvalues); // in this case we have elementitem id or idlist
+        if($elmvalues) {
+            $attribute->elementitemid = implode(',', $elmvalues); // in this case we have elementitem id or idlist
+        }
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {

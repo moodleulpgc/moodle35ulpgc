@@ -375,6 +375,7 @@ if($display) {
             echo $output->container($output->single_button($url, get_string('printuserspdf', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
             echo $output->container_end();
 
+            /*
             if($room) {
                 echo $output->container_start(' clearfix ');
                 //$url = new moodle_url('/mod/examregistrar/view.php', $baseurl->params(array()) + array('down'=>'printsingleroompdf', 'session'=>$session, 'venue'=>$bookedsite));
@@ -382,13 +383,12 @@ if($display) {
                 echo $output->container($output->single_button($printurl, get_string('responsesupload', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
                 echo $output->container_end();
             } 
+            */
 
-            /*
             echo $output->container_start(' clearfix ');
             $url->param('down', 'printsingleroomfaxpdf');
             echo $output->container($output->single_button($url, get_string('printbinderpdf', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
             echo $output->container_end();
-            */
         }
 
         $info = get_string('scheduledexams', 'examregistrar', count($exams)).'<br />';

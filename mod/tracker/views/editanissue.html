@@ -180,6 +180,9 @@ if (is_array($elementsused)){
                     echo $elementsused[$key]->edit($issue->id);
                 } else {
                     echo $elementsused[$key]->view($issue->id);
+                    
+                    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$elementsused[$key]->name, 
+                                                    'value' => format_string($elementsused[$key]->getvalue($issue->id))));
                 }
             echo "</td>";
             echo "</tr>";

@@ -622,8 +622,10 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
                 }
                 if($rooms = $exam->get_room_allocations($roomvenue)) {
                     foreach($rooms as $rid => $room) {
-                        $status = $exam->get_responses_status($rid);
                         $flag = '';
+                        /*
+                        $status = $exam->get_responses_status($rid);
+                        
                         if(!$message && $exam->examfile && $canresponse && ($now > $examdate) 
                                     && (!$exam->taken && ($status < EXAM_RESPONSES_COMPLETED) || $canreview)) {
                             $url->param('room', $rid);
@@ -631,6 +633,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
                         } elseif($exam->examfile) {
                             $flag = $this->get_responses_icon($status);
                         }
+                        */
                         $rooms[$rid] = $room->name.' ('.$room->allocated.')'.$flag;
                     }
                 }
@@ -640,6 +643,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
             
             $output .= $this->output->container_end('allocatedexamregistered');
             
+            /*
             if(!$message && $exam->examfile && ($now > $examdate)) {
                 $status = $exam->get_responses_status($venue, true);
                 $flag = $confirm = '';
@@ -656,7 +660,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
                 }
                 $output .= $this->output->container($flag.$confirm, ' fa-2x  allocatedexamresponses allocatedroomheaderright');
             }
-            
+            */
             $output .= $this->output->container_end('clearfix');
             
             //$output .= $this->output->container_end();
