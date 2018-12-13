@@ -66,14 +66,14 @@ class send_student_reminders extends \core\task\scheduled_task {
             mtrace("...config->examconfirmdays ". $config->examconfirmdays);
             $names = get_all_user_name_fields(true, 'u');
             
-            $sql = "SELECT b.id AS bid, b.userid, b.booked, MIN(b.bookedsite) AS bookedsite, e.courseid, c.fullname, c.shortname, 
+            $sql = "SELECT b.id AS bid, b.userid, b.booked, b.bookedsite, e.courseid, c.fullname, c.shortname, 
                             u.id, u.username, u.email, u.mailformat, u.idnumber, u.maildisplay, $names
                     FROM {examregistrar_bookings} b
                     JOIN {examregistrar_exams} e ON b.examid = e.id
                     JOIN {course} c ON e.courseid = c.id AND c.visible = 1
                     JOIN {user} u ON u.id = b.userid
-                    WHERE e.examregid = :examregid AND e.examsession = :session AND e.visible = 1
-                    GROUP BY b.examid, b.userid, b.booked
+                    WHERE e.examregid = :examregid AND e.examsession = :session AND e.visible = 1 AND b.booked = 1
+                    GROUP BY b.examid, b.userid
                     ORDER BY b.userid ";
             if($users = $DB->get_records_sql($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
                 mtrace("    ... doing reserved exam reminders.");
