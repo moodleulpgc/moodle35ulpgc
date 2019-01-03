@@ -18,8 +18,8 @@
  * Version details
  *
  * @package   theme_adaptable
- * @copyright 2015-2017 Jeremy Hopkins (Coventry University)
- * @copyright 2015-2017 Fernando Acedo (3-bits.com)
+ * @copyright 2015-2018 Jeremy Hopkins (Coventry University)
+ * @copyright 2015-2018 Fernando Acedo (3-bits.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
@@ -29,16 +29,16 @@ defined('MOODLE_INTERNAL') || die;
 $plugin->component = 'theme_adaptable';
 
 // Adaptable version date.
-$plugin->version   = 2018102600;
+$plugin->version   = 2018122701;
 
-// Moodle required version (+3.4.2).
-$plugin->requires  = 2016120500;
+// Moodle required version (3.5.3 or higher).
+$plugin->requires  = 2018051703;
 
 // Adaptable version.
 $plugin->release = '1.8';
 
 // Adaptable maturity (do not use ALPHA or BETA versions in production sites).
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_STABLE;
 
 // Adaptable dependencies.
 $plugin->dependencies = array(

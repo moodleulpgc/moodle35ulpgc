@@ -69,7 +69,7 @@ class restore_assignsubmission_exam_subplugin extends restore_subplugin {
 
         $DB->insert_record('assignsubmission_exam', $data);
 
-        $this->add_related_exams('assignsubmission_exam',
+        $this->add_related_files('assignsubmission_exam',
                                  'submission_exams',
                                  'submission',
                                  null,

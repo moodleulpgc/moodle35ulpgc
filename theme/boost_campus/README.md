@@ -126,7 +126,7 @@ With this setting you can add an additional course edit on / off button to the c
 
 ##### Position of switch role information
 
-With this setting you can choose the place where the information to which role a user has switched is being displayed. If not checked (default value), the role information will be displayed right beneath the user\'s name in the user menu (like in theme Boost). If checked, this information - together with a link to switch back - will be displayed beneath the course, as this functionality is course related.
+With this setting you can choose the place where the information to which role a user has switched is being displayed. If set to 'Just in the user menu' (default value), the role information will be displayed right beneath the user\'s name in the user menu (like in theme Boost). If set to 'Just in the course settings', this information - together with a link to switch back - will be displayed beneath the course, as this functionality is course related. If set to 'Both in the user menu and in the course settings' it will be shown in both places.
 
 ##### Show hint in hidden courses
 
@@ -313,6 +313,15 @@ By enabling this setting you can invert the default light navbar to a dark one w
 The default solution to display help texts in popover leads to different issues. For example popovers are not scrollable and they can reach over the viewport.
 For this reason, with this setting you can decide that the help texts should be displayed in a dedicated text box (modal dialogue) that appears in the middle of the page with enough space to hold even long helping texts.
 
+#### Breakpoint
+
+##### Change breakpoint
+
+In theme Boost, the right block column will break down even on devices with a width up to 1200 pixels (widescreen resolution of the iPad is 1024 pixels, for example).
+This is because the breakpoint is set to [media-breakpoint-down(lg)](https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints").
+
+If you think there is enough space to show the content plus the blocks column side by side on a screen width of 992 pixels and up, then enable this setting. It will change the breakpoint to media-breakpoint-down(md). This will break the blocks column only on screens with widths of less than 992 pixels.
+
 
 Further improvements to Boost core theme
 ----------------------------------------
@@ -353,6 +362,10 @@ Improved font sizes and weights on category overview page for better readability
 ### User profile page
 
 * Replaced the the user settings icon with a button to edit the profile. The menu items shown in this setting are not related to the user profile in the closer sense, they are related to the user's system preferences. So we decided to replace this with the only profile related function. Furthermore, the user preferences can be accessed any time over the user's menu in the fixed to top navigation bar.
+
+### Layout
+
+* Reduced paddings on small screens (max. 768px) to be able to show a little bit more content and less whitespace.
 
 
 How this theme works

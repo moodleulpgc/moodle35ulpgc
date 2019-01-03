@@ -89,8 +89,11 @@ $string['showsettingsincoursesetting'] = 'In course settings menu';
 $string['showsettingsincoursesetting_desc'] = 'With this setting you can change the displaying of the context menus. In Boost, there is a popup context menu right next to the cog icon. By enabling this setting the settings will occur directly beneath the course header. The settings are arranged in tabs, so it is easier for the user to get to the desired setting instead of scanning a long list of menu items. With this setting we also hide the settings icon on the participants page as the entries on this page are duplicated with the in-course course menu and therefore not necessary.<br/>
 Please note that this change does not affect users who have switched off javascript in their browsers - they will still get the behaviour from Moodle core with a popup course context menu.';
 // ...Show switch role to link within the in-course course settings.
-$string['incoursesettingsswitchtorolesetting'] = 'Move "Switch role to..." to the course settings';
-$string['incoursesettingsswitchtorolesetting_desc'] = 'With this setting you can move the "Switch role to..." link as a new tab from the user menu to the in-course course menu. The role switching is a feature which is used in course context and thus it is better to place it in the course settings menu than in the user menu. <br/>
+$string['incoursesettingsswitchtorolepositionsetting'] = '"Switch role to..." location(s)';
+$string['incoursesettingsswitchtorolesettingjustmenu'] = 'Just in the user menu';
+$string['incoursesettingsswitchtorolesettingjustcourse'] = 'Just in the course settings';
+$string['incoursesettingsswitchtorolesettingboth'] = 'In both places: in the user menu and in the course settings';
+$string['incoursesettingsswitchtorolepositionsetting_desc'] = 'With this setting you can choose the place where the information to which role a user has switched is being displayed. If set to \'Just in the user menu\' (default value), the role information will be displayed right beneath the user\'s name in the user menu(like in theme Boost). If set to \'Just in the course settings\', this information - together with a link to switch back - will be displayed beneath the course, as this functionality is course related. If set to \'Both in the user menu and in the course settings\' it will be shown in both places. <br/>
 Please note that this setting won\'t have any effect if you do not activate the "In course settings menu" above.';
 
 
@@ -183,6 +186,12 @@ $string['helptextheadingsetting'] = 'Help texts';
 $string['helptextmodalsetting'] = 'Show help texts in a modal dialogue';
 $string['helptextmodalsetting_desc'] = 'The default solution to display help texts in popover leads to different issues. For example popovers are not scrollable and they can reach over the viewport.<br/>
 For this reason, with this setting you can decide that the help texts should be displayed in a dedicated text box (modal dialogue) that appears in the middle of the page with enough space to hold even long helping texts.';
+// ...Breakpoint.
+$string['breakpointheadingsetting'] = 'Breakpoint';
+$string['breakpointsetting'] = 'Change breakpoint';
+$string['breakpointsetting_desc'] = 'In theme Boost, the right block column will break down even on devices with a width up to 1200 pixels (widescreen resolution of the iPad is 1024 pixels, for example).
+This is because the breakpoint is set to <a href="https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints">media-breakpoint-down(lg)</a>. <br/>
+If you think there is enough space to show the content plus the blocks column side by side on a screen width of 992 pixels and up, then enable this setting. It will change the breakpoint to media-breakpoint-down(md). This will break the blocks column only on screens with widths of less than 992 pixels.';
 
 // ADDITIONAL STRINGS (IN ALPHABETICAL ORDER).
 $string['cachedef_imagearea'] = 'Cache for imagearea items';

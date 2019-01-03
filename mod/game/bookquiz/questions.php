@@ -21,11 +21,11 @@
  * @copyright 2007 Vasilis Daloukas
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-
-defined('MOODLE_INTERNAL') || die();
-
+require_once( "../../../config.php");
 require_once( "../headergame.php");
 require_once("../locallib.php");
+
+require_login($course->id, false, $cm);
 
 $attempt = game_getattempt( $game, $detail);
 if ($game->bookid == 0) {

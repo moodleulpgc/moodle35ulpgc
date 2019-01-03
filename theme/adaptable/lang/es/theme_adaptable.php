@@ -24,6 +24,7 @@
  *
  */
 
+
 // General.
 $string['choosereadme'] = '
 <div class="clearfix">
@@ -79,39 +80,41 @@ $string['region-side-pre'] = 'Izquierda';
 $string['frnt-footer'] = 'Los bloques situados en esta zona solo son visibles para los administradores.';
 $string['side-post1'] = 'Barra lateral en el pie de página ';
 
-$string['region-frnt-market-a'] = 'Region-a';
-$string['region-frnt-market-b'] = 'Region-b';
-$string['region-frnt-market-c'] = 'Region-c';
-$string['region-frnt-market-d'] = 'Region-d';
-$string['region-frnt-market-e'] = 'Region-e';
-$string['region-frnt-market-f'] = 'Region-f';
-$string['region-frnt-market-g'] = 'Region-g';
-$string['region-frnt-market-h'] = 'Region-h';
-$string['region-frnt-market-i'] = 'Region-i';
-$string['region-frnt-market-j'] = 'Region-j';
-$string['region-frnt-market-k'] = 'Region-k';
-$string['region-frnt-market-l'] = 'Region-l';
-$string['region-frnt-market-m'] = 'Region-m';
-$string['region-frnt-market-n'] = 'Region-n';
-$string['region-frnt-market-o'] = 'Region-o';
-$string['region-frnt-market-p'] = 'Region-p';
-$string['region-frnt-market-q'] = 'Region-q';
-$string['region-frnt-market-r'] = 'Region-r';
-$string['region-frnt-market-s'] = 'Region-s';
-$string['region-frnt-market-t'] = 'Region-t';
+$string['region-frnt-market-a'] = 'Región-a';
+$string['region-frnt-market-b'] = 'Región-b';
+$string['region-frnt-market-c'] = 'Región-c';
+$string['region-frnt-market-d'] = 'Región-d';
+$string['region-frnt-market-e'] = 'Región-e';
+$string['region-frnt-market-f'] = 'Región-f';
+$string['region-frnt-market-g'] = 'Región-g';
+$string['region-frnt-market-h'] = 'Región-h';
+$string['region-frnt-market-i'] = 'Región-i';
+$string['region-frnt-market-j'] = 'Región-j';
+$string['region-frnt-market-k'] = 'Región-k';
+$string['region-frnt-market-l'] = 'Región-l';
+$string['region-frnt-market-m'] = 'Región-m';
+$string['region-frnt-market-n'] = 'Región-n';
+$string['region-frnt-market-o'] = 'Región-o';
+$string['region-frnt-market-p'] = 'Región-p';
+$string['region-frnt-market-q'] = 'Región-q';
+$string['region-frnt-market-r'] = 'Región-r';
+$string['region-frnt-market-s'] = 'Región-s';
+$string['region-frnt-market-t'] = 'Región-t';
 
 // Course page block regions.
-$string['region-course-top-a'] = 'Region Superior Página Curso 1';
-$string['region-course-top-b'] = 'Region Superior Página Curso 2';
-$string['region-course-top-c'] = 'Region Superior Página Curso 3';
-$string['region-course-top-d'] = 'Region Superior Página Curso 4';
+$string['region-course-top-a'] = 'Región superior página curso 1';
+$string['region-course-top-b'] = 'Región superior página curso 2';
+$string['region-course-top-c'] = 'Región superior página curso 3';
+$string['region-course-top-d'] = 'Región superior página curso 4';
 
-$string['region-news-slider-a'] = 'Region para presentación de diapositivas de cursos';
+$string['region-news-slider-a'] = 'Región para presentación de diapositivas de cursos';
 
-$string['region-course-bottom-a'] = 'Region Inferior Página Curso 5';
-$string['region-course-bottom-b'] = 'Region Inferior Página Curso 6';
-$string['region-course-bottom-c'] = 'Region Inferior Página Curso 7';
-$string['region-course-bottom-d'] = 'Region Inferior Página Curso 8';
+$string['region-course-section-a'] = 'Región inferior de la pagina de actividad del curso';
+
+$string['region-course-bottom-a'] = 'Región Inferior Página Curso 5';
+$string['region-course-bottom-b'] = 'Región Inferior Página Curso 6';
+$string['region-course-bottom-c'] = 'Región Inferior Página Curso 7';
+$string['region-course-bottom-d'] = 'Región Inferior Página Curso 8';
 
 // Settings page headings ******************************************.
 $string['settingsmaincolors'] = 'Colores principales';
@@ -271,7 +274,7 @@ $string['sliderstyle1'] = 'Diapositivas estilo 1';
 $string['sliderstyle2'] = 'Diapositivas estilo 2';
 
 
-// Regiones para Bloques ***************************************************.
+// Block Regions ***************************************************.
 $string['blocklayoutbuilder'] = 'Constructor de regiones para bloques';
 $string['blocklayoutbuilderdesc'] = 'A continuación puedes crear tu propia distribución de regiones para los bloques de moodle en la página principal.
 Para añadir contenido a estas regiones necesitarás <strong>Activar edición en la página principal de Moodle</strong>.
@@ -325,6 +328,12 @@ $string['coursepagenewssliderblockregionheadingdesc'] = 'Una región creada espe
 $string['coursepageblocksliderenabled'] = 'Activar la región para el bloque de dispositivas personalizadas en la página de curso';
 $string['coursepageblocksliderenableddesc'] = 'Activar esta región en todas las páginas de cursos.';
 
+$string['coursepageactivitybottomblockregionheading'] = 'Región inferior para bloques de actividades del curso';
+$string['coursepageactivitybottomblockregionheadingdesc'] = 'Región para bloques que aparece en la parte inferior de la página de actividades.';
+
+$string['coursepageblockactivitybottomenabled'] = 'Activar la región inferior para bloques de la página del curso';
+$string['coursepageblockactivitybottomenableddesc'] = 'Activar la región para bloques situada en la parte inferior de la página del curso.';
+
 $string['coursepagesidebarinfooterenabled'] = 'Mover la barra lateral al pie';
 $string['coursepagesidebarinfooterenableddesc'] = 'Mover la barra lateral al pie de página para obtener más ancho de pantalla para el curso.';
 
@@ -334,7 +343,7 @@ $string['layoutcount1'] = 'Puedes crear un máximo de ';
 $string['layoutcount2'] = ' regiones para bloques. Ahora estás usando: ';
 
 
-// Bloques promocionales & Cuadros Informativos *************************************.
+// Marketing Blocks & Info Box *************************************.
 $string['marketingsettings'] = 'Bloques promocionales';
 $string['marketingsettingsheading'] = 'Personaliza los bloques promocionales que aparecen en la página de inicio. Ver la distribución <a href="./../theme/adaptable/pix/layout.png" target="_blank">aqui</a>';
 $string['marketingdesc'] = 'Dispones de dos cuadros informativos a los que puedes aplicar diferentes estilos. Además puedes activar el constructor de regiones
@@ -499,6 +508,16 @@ $string['navbardropdownhovercolor'] = 'Color hover del menú desplegable';
 $string['navbardropdownhovercolordesc'] = 'Color del menú desplegable cuando pasa el cursor por encima.';
 $string['navbardropdowntransitiontime'] = 'Tiempo de trandición';
 $string['navbardropdowntransitiontimedesc'] = 'Tiempo del evento de transición en segundos.  Muestra un efecto de fundido cuando el cursor pasa sobre el menú que contiene sub-menús.';
+
+// This Course menu *********************************************************.
+$string['enablemysitesdesc'] = 'Muestra un desplegable con las actividades del curso y otras opciones';
+$string['headernavbarthiscourseheading'] = 'Menú "Este curso"';
+$string['headernavbarthiscourseheadingdesc'] = 'En este menú, el alumno puede acceder directamente todas las actividades del curso y a la lista de participantes y sus calificaciones.';
+
+$string['displayparticipants'] = 'Mostrar "Participantes"';
+$string['displayparticipantsdesc'] = 'Muestra el item "Participantes" en el menú';
+$string['displaygrades'] = 'Mostrar "Calificaciones"';
+$string['displaygradesdesc'] = 'Muestra el item "Calificaciones" en el menú';
 
 // My courses menu *********************************************************.
 $string['enablemysitesdesc'] = 'Mostrar los cursos del usuario';
@@ -827,11 +846,17 @@ $string['fontdesc'] = 'Selecciona la fuente de <a href="https://www.google.com/f
 $string['fontname'] = 'Fuente principal';
 $string['fontnamedesc'] = 'Establece la fuente principal. Selecciona defecto o una fuente de <a href="https://www.google.com/fonts" target="_blank">Google Fonts</a>.';
 
+$string['customfontname'] = 'Fuente principal personalizada';
+$string['customfontnamedesc'] = 'Introduce el nombre de la fuente principal personalizada sólo si has seleccionado &apos;Personalizada&apos; en el desplegable de la fuente principal.';
+
 $string['fontsize'] = 'Tamaño de la fuente principal';
 $string['fontsizedesc'] = 'Selecciona el tamaño por defecto de la fuente principal (en porcentaje) usada en el sitio.';
 
 $string['fontheadername'] = 'Fuente encabezamientos';
 $string['fontheadernamedesc'] = 'Establece la fuente de los encabezamientos utilizados en la plantilla. Selecciona default o una fuente de <a href="https://www.google.com/fonts" target="_blank">Google Fonts</a>.';
+
+$string['customfontheadername'] = 'Fuente encabezamiento personalizada';
+$string['customfontheadernamedesc'] = 'Introduce el nombre de la fuente personalizada de los encabezamientos sólo si has seleccionado &apos;Personalizada&apos; en el desplegable de la fuente de encabezamientos.';
 
 $string['fontcolor'] = 'Color de la fuente principal';
 $string['fontcolordesc'] = 'Establece el color de la fuente principal.';
@@ -847,6 +872,9 @@ $string['fontheaderweightdesc'] = 'Establece el grueso de la fuente de los encab
 
 $string['fonttitlename'] = 'Fuente del título del sitio';
 $string['fonttitlenamedesc'] = 'Establece la fuente del título del sitio situado en la cabecera. Selecciona default o una fuente de <a href="https://www.google.com/fonts" target="_blank">Google Fonts</a>.';
+
+$string['customfonttitlename'] = 'Fuente para titulos personalizada';
+$string['customfonttitlenamedesc'] = 'Introduce el nombre de la fuente personalizada de los títulos sólo si has seleccionado &apos;Personalizada&apos; en el desplegable de la fuente de títulos.';
 
 $string['fonttitlecolor'] = 'Color de la fuente del título del sitio';
 $string['fonttitlecolordesc'] = 'Establece el color de la fuente del título del sitio situado en la cabecera.';
@@ -1549,6 +1577,15 @@ $string['genericsettingsdescription'] = 'Introduce tu propio código CSS y Javas
 
 $string['jssection'] = 'Javascript personalizado';
 $string['jssectiondesc'] = 'Introduce el código Javascript personalizado.';
+
+$string['jssectionrestricted'] = 'Código Javascript personalizado condicional';
+$string['jssectionrestricteddesc'] = 'Introduce el código Javascript basado en el campo personalizado de texto. Este código sólo se ejecutará si se cumple la condición.';
+
+$string['jssectionrestrictedprofilefield'] = 'Campo personalizado para Javascript';
+$string['jssectionrestrictedprofilefielddesc'] = 'Introduce el campo personalizado de usuario para ejecutar el código de la parte superior. Por ejemplo: facultad=ingenieria';
+
+$string['jssectionrestricteddashboardonly'] = 'Incluye código Javascript solo en la página del Área personal';
+$string['jssectionrestricteddashboardonlydesc'] = 'Muestra el código Javascript solo en el Área Personal. Si no, se muestra en todo el sitio.';
 
 // Cache definitions.
 $string['cachedef_userdata'] = 'El tiempo para guardar una sesión de un usuario específico.';

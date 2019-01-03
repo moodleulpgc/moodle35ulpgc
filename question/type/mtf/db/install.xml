@@ -12,7 +12,7 @@
 				<FIELD NAME="scoringmethod" TYPE="char" LENGTH="200" NOTNULL="true"
 					SEQUENCE="false"
 					COMMENT="The scoring method used in the MTF question ('mtfonezero' or 'subpoints')." />
-				<FIELD NAME="shuffleoptions" TYPE="int" LENGTH="4" NOTNULL="true"
+				<FIELD NAME="shuffleanswers" TYPE="int" LENGTH="4" NOTNULL="true"
 					DEFAULT="1" SEQUENCE="false"
 					COMMENT="Whether the options should be shuffled with each attempt." />
 				<FIELD NAME="numberofrows" TYPE="int" LENGTH="4" NOTNULL="true"

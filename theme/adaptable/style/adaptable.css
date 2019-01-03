@@ -379,8 +379,9 @@ div.signuppanel h2 {
     padding-right: 3px;
 }
 
-.badge {
-    background-color: #ff0000;
+.badge,
+.count-container {
+    background-color: [[setting:msgbadgecolor]];
 }
 
 .slidewrap {
@@ -1825,8 +1826,7 @@ div.questionbankwindow.block {
     height: 60px;
 }
 
-/* New Messages / Notifications topbar */
-
+/* New Messages / Notifications topbar (moodle 3.2 and higher) */
 /* messages icons margin */
 #nav-notification-popover-container,
 #nav-message-popover-container {
@@ -1857,7 +1857,6 @@ div.questionbankwindow.block {
 
 .count-container {
     right: -5px;
-
 }
 
 .popover-region-toggle::before,
@@ -1865,6 +1864,30 @@ div.questionbankwindow.block {
     visibility: hidden;
 }
 
+/* New message drawer (moodle 3.6 and higher) */
+.message-drawer {
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.08);
+    border-left: 1px solid [[setting:headerbkcolor]];
+}
+
+.rounded-circle {
+    max-width: none !important;
+}
+
+/* Set icon colour to white to fit default Adaptable colours)
+Change the filter selector for other colours */
+.message-drawer button img.icon {
+    filter: grayscale(100%) brightness(5);
+
+    max-width: none !important;
+    margin-left: -5px;
+    padding-right: 0;
+}
+
+.message-drawer button {
+    padding: 0 8px;
+    background-color: [[setting:buttoncolor]];
+}
 
 /* Dimmed text (courses or users) */
 .dimmed,
@@ -1967,7 +1990,6 @@ a.dimmed_text:visited,
 .choosercontainer #chooseform .selected .instruction {
     display: none;
 }
-
 /* End Activity chooser styling */
 
 #savediscardsection {

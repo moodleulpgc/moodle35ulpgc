@@ -31,6 +31,7 @@ require_once(__DIR__ . '/../stack/input/factory.class.php');
  * @group qtype_stack
  */
 class stack_algebra_input_test extends qtype_stack_testcase {
+
     public function test_internal_validate_parameter() {
         $el = stack_input_factory::make('algebraic', 'input', 'x^2');
         $this->assertTrue($el->validate_parameter('boxWidth', 30));
@@ -45,6 +46,16 @@ class stack_algebra_input_test extends qtype_stack_testcase {
 
     public function test_render_blank() {
         $el = stack_input_factory::make('algebraic', 'ans1', 'x^2');
+        $this->assertEquals('<input type="text" name="stack1__ans1" id="stack1__ans1" '
+                .'size="16.5" style="width: 13.6em" autocapitalize="none" spellcheck="false" value="" />',
+                $el->render(new stack_input_state(stack_input::VALID, array(), '', '', '', '', ''),
+                        'stack1__ans1', false, null));
+    }
+
+    public function test_render_blank_allowempty() {
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'ans1', 'x^2');
+        $el->set_parameter('options', 'allowempty');
         $this->assertEquals('<input type="text" name="stack1__ans1" id="stack1__ans1" '
                 .'size="16.5" style="width: 13.6em" autocapitalize="none" spellcheck="false" value="" />',
                 $el->render(new stack_input_state(stack_input::VALID, array(), '', '', '', '', ''),
@@ -335,6 +346,30 @@ class stack_algebra_input_test extends qtype_stack_testcase {
         $this->assertEquals('SA_not_expression', $state->note);
     }
 
+    public function test_validate_student_response_sametype_subscripts_true_valid() {
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'sans1', 'mu_0*(I_0-I_1)');
+        $el->set_parameter('sameType', true);
+        $state = $el->validate_student_response(array('sans1' => 'mu_0*(I_1-I_2)'), $options, 'x', array('tans'));
+        $this->assertEquals(stack_input::VALID, $state->status);
+        $this->assertEquals('mu_0*(I_1-I_2)', $state->contentsmodified);
+        $this->assertEquals('\[ {\mu}_{0}\cdot \left({I}_{1}-{I}_{2}\right) \]', $state->contentsdisplayed);
+        $this->assertEquals('\( \left[ {I}_{1} , {I}_{2} , {\mu}_{0} \right]\) ', $state->lvars);
+    }
+
+    public function test_validate_student_response_sametype_subscripts_true_invalid() {
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'sans1', 'mu_0*(I_0-I_1)');
+        $el->set_parameter('sameType', true);
+        $state = $el->validate_student_response(array('sans1' => '{mu_0*(I_1-I_2)}'), $options, 'x', array('tans'));
+        $this->assertEquals(stack_input::INVALID, $state->status);
+        $this->assertEquals('SA_not_expression', $state->note);
+        $this->assertEquals('{mu_0*(I_1-I_2)}', $state->contentsmodified);
+        $this->assertEquals('\[ \left \{{\mu}_{0}\cdot \left({I}_{1}-{I}_{2}\right) \right \} \]',
+            $state->contentsdisplayed);
+        $this->assertEquals('\( \left[ {I}_{1} , {I}_{2} , {\mu}_{0} \right]\) ', $state->lvars);
+    }
+
     public function test_validate_student_response_display_1() {
         $options = new stack_options();
         $el = stack_input_factory::make('algebraic', 'sans1', '-3*x^2-4');
@@ -460,7 +495,7 @@ class stack_algebra_input_test extends qtype_stack_testcase {
     public function test_validate_student_response_forbidwords_int() {
         // We need this as an alias.
         $options = new stack_options();
-        $el = stack_input_factory::make('algebraic', 'sans1', '2*x');
+        $el = stack_input_factory::make('algebraic', 'sans1', 'int(x^2+1,x)+c');
         $state = $el->validate_student_response(array('sans1' => 'integrate(x^2+1,x)+c'), $options, 'int(x^2+1,x)+c', array('ta'));
         $this->assertEquals(stack_input::VALID, $state->status);
         $this->assertEquals('nounint(x^2+1,x)+c', $state->contentsmodified);
@@ -605,5 +640,19 @@ class stack_algebra_input_test extends qtype_stack_testcase {
         $this->assertEquals(stack_input::INVALID, $state->status);
         $this->assertEquals('x^2', $state->contentsmodified);
         $this->assertEquals('\[ x^2 \]', $state->contentsdisplayed);
+    }
+
+    public function test_validate_student_response_with_allowempty() {
+        $options = new stack_options();
+        $el = stack_input_factory::make('algebraic', 'sans1', '1/2');
+        $el->set_parameter('options', 'allowempty');
+        $state = $el->validate_student_response(array('sans1' => ''), $options, '3.14', null);
+        // In this case empty responses jump straight to score.
+        $this->assertEquals(stack_input::SCORE, $state->status);
+        $this->assertEquals('EMPTYANSWER', $state->contentsmodified);
+        $this->assertEquals('\[ {\it EMPTYANSWER} \]', $state->contentsdisplayed);
+        $this->assertEquals('', $state->errors);
+        $this->assertEquals('This input can be left blank.',
+                $el->get_teacher_answer_display($state->contentsmodified, $state->contentsdisplayed));
     }
 }

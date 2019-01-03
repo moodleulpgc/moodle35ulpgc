@@ -29,7 +29,7 @@ Feature: Verify bulk operations
     And I add a "Simple Certificate" to section "2" and I fill the form with:
       | Certificate Name | Test Simple Certificate |
       | Certificate Text | Test Simple Certificate |
-	And I log out
+    And I log out
 
   Scenario: Verify if list all user without any grading restrictions
     Given I log in as "teacher1"
@@ -45,25 +45,14 @@ Feature: Verify bulk operations
   Scenario: Verify if list all user with grading restrictions
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I put a grade restrinction to "Test Simple Certificate" with "Grade assignment" min grade "70"
-    And I follow "Grade assignment"
-    And I navigate to "View all submissions" in current page administration
-    And I click on "Grade" "link" in the "Tumé Arandú" "table_row"
-    And I set the following fields to these values:
-      | Grade | 70 |
+    And I setup a grade restrinction to "Test Simple Certificate" with "Grade assignment" min grade "70"
+    And I press "Save and return to course"
+    And I am on "Course 1" course homepage
+    And I navigate to "View > Grader report" in the course gradebook
+    And I turn editing mode on
+    And I give the grade "70" to the user "Tumé Arandú" for the grade item "Grade assignment"
+    And I give the grade "69" to the user "Arasy Guaraní" for the grade item "Grade assignment"
     And I press "Save changes"
-    And I press "Ok"
-    And I follow "Edit settings"
-    And I press "Cancel"
-    And I follow "Grade assignment"
-    And I navigate to "View all submissions" in current page administration
-    And I click on "Grade" "link" in the "Arasy Guaraní" "table_row"
-    And I set the following fields to these values:
-      | Grade | 69 |
-    And I press "Save changes"
-    And I press "Ok"
-    And I follow "Edit settings"
-    And I press "Cancel"
     And I am on "Course 1" course homepage
     And I follow "Test Simple Certificate"
     And I click on "Bulk operations" "link"
@@ -75,35 +64,18 @@ Feature: Verify bulk operations
   Scenario: Verify if list only user whose match grading restrictions
   	Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I put a grade restrinction to "Test Simple Certificate" with "Grade assignment" min grade "70"
-    And I follow "Grade assignment"
-    And I navigate to "View all submissions" in current page administration
-    And I click on "Grade" "link" in the "Tumé Arandú" "table_row"
-    And I set the following fields to these values:
-      | Grade | 70 |
+    And I setup a grade restrinction to "Test Simple Certificate" with "Grade assignment" min grade "70"
+    And I press "Save and return to course"
+    And I am on "Course 1" course homepage
+    And I navigate to "View > Grader report" in the course gradebook
+    And I turn editing mode on
+    And I give the grade "70" to the user "Tumé Arandú" for the grade item "Grade assignment"
+    And I give the grade "69" to the user "Arasy Guaraní" for the grade item "Grade assignment"
     And I press "Save changes"
-    And I press "Ok"
-    And I follow "Edit settings"
-    And I press "Cancel"
-    And I follow "Grade assignment"
-    And I navigate to "View all submissions" in current page administration
-    And I click on "Grade" "link" in the "Arasy Guaraní" "table_row"
-    And I set the following fields to these values:
-      | Grade | 69 |
-    And I press "Save changes"
-    And I press "Ok"
-    And I follow "Edit settings"
-    And I press "Cancel"
     And I am on "Course 1" course homepage
     And I follow "Test Simple Certificate"
     And I click on "Bulk operations" "link"
     And I set the field "issuelist" to "Users that met the activity conditions"
-    Then "Tumé Arandú" "text" should exist in the ".generaltable" "css_element"
-    But "Arasy Guaraní" "text" should not exist in the ".generaltable" "css_element"
+    Then I should see "Tumé Arandú" in the ".generaltable" "css_element"
+    But I should not see "Arasy Guaraní" in the ".generaltable" "css_element"
   
-  
-  
-    
-    
-    
-	

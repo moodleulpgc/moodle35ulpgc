@@ -33,7 +33,7 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
 
     public $scoringmethod;
 
-    public $shuffleoptions;
+    public $shuffleanswers;
 
     public $numberofrows;
 
@@ -51,7 +51,7 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
      */
     public function start_attempt(question_attempt_step $step, $variant) {
         $this->order = array_keys($this->rows);
-        if ($this->shuffleoptions) {
+        if ($this->shuffleanswers) {
             shuffle($this->order);
         }
         $step->set_qt_var('_order', implode(',', $this->order));
@@ -265,10 +265,8 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
                 }
             }
         }
-
         return implode('; ', $result);
     }
-
     /**
      * (non-PHPdoc).
      *
@@ -486,28 +484,16 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
         return question_utils::to_plain_text($text, $format);
     }
 
+    /**
+     * Computes the final grade when "Multiple Attempts" or "Hints" are enabled
+     *
+     * @param array $responses Contains the user responses. 1st dimension = attempt, 2nd dimension = answers
+     * @param int $totaltries Not needed
+     */
     public function compute_final_grade($responses, $totaltries) {
-        $totalstemscore = 0;
-        foreach ($this->order as $key => $rowid) {
-            $fieldname = $this->field($key);
-
-            $lastwrongindex = -1;
-            $finallyright = false;
-            foreach ($responses as $i => $response) {
-                if (!array_key_exists($fieldname, $response) || !$response[$fieldname]) {
-                    $lastwrongindex = $i;
-                    $finallyright = false;
-                } else {
-                    $finallyright = true;
-                }
-            }
-
-            if ($finallyright) {
-                $totalstemscore += max(0, 1 - ($lastwrongindex + 1) * $this->penalty);
-            }
-        }
-
-        return $totalstemscore / count($this->order);
+        $last_response = sizeOf($responses) - 1;
+        $num_points = isset($responses[$last_response]) ? $this->grading()->grade_question($this, $responses[$last_response]) : 0;
+        return max(0, $num_points - max(0, $last_response) * $this->penalty);
     }
 
     /**
@@ -525,11 +511,6 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
         $hint = parent::get_hint($hintnumber, $qa);
         if (is_null($hint)) {
             return $hint;
-        }
-
-        if ($this->get_num_selected_choices($qa->get_last_qt_data()) > $this->get_num_correct_choices()) {
-            $hint = clone ($hint);
-            $this->disable_hint_settings_when_too_many_selected($hint);
         }
         return $hint;
     }

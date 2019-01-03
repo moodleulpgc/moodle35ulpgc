@@ -44,9 +44,9 @@ input.form-submit,
 input#id_submitbutton,
 input#id_submitbutton2,
 .path-admin .buttons input[type="submit"],
+.nav-pills > .active > a,
 td.submit input {
     font-family: [[setting:fontname]];
-    font-family: [[setting:customfontname]], sans-serif;
     background-image: none;
     background-color: [[setting:buttoncolor]];
     background-size: 100% 200%;
@@ -113,10 +113,11 @@ a.submit:hover,
 #page-login-index2 .forgetpass a:hover,
 .submitbutton:hover,
 .btn:hover,
-.btn:active {
+.btn:active,
+.nav-pills > .active > a:hover, .nav-pills > .active > a:focus {
     background: none;
     background-position: 0 -100%;
-    background-color: [[setting:buttonhovercolor]];
+    background-color: [[setting:buttonhovercolor]] !important;
     text-decoration: none !important;
     color: [[setting:buttontextcolor]] !important;
 }
@@ -128,7 +129,7 @@ a.submit:focus, #notice .singlebutton + .singlebutton input:focus,
 .submit.buttons input[name="cancel"]:focus,
 #page-login-index2 .forgetpass a:focus,
 .btn:focus {
-    background-color: [[setting:buttonhovercolor]];
+    background-color: [[setting:buttonhovercolor]] !important;
     background-position: 0 -100%;
     text-decoration: none !important;
     color: [[setting:buttontextcolor]] !important;
@@ -179,7 +180,7 @@ input#id_submitbutton2[disabled],
 .path-admin .buttons input[type="submit"][disabled],
 td.submit input[disabled] {
     background-image: none;
-    background-color: [[setting:buttonhovercolor]];
+    background-color: [[setting:buttonhovercolor]] !important;
     color: [[setting:buttontextcolor]] !important;
     box-shadow: 0 [[setting:buttondropshadow]] 0 0 rgba(0, 0, 0, 0.5) inset;
 }
@@ -219,7 +220,6 @@ td.submit input[disabled] {
 input[name="addcancel"],
 button[name="resetbutton"] {
     font-family: [[setting:fontname]];
-    font-family: [[setting:customfontname]], sans-serif;
     font-size: 14px;
     line-height: 20px;
     height: 36px;

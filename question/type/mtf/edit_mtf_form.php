@@ -271,12 +271,11 @@ class qtype_mtf_edit_form extends question_edit_form {
         $mform->addHelpButton('radiogroupscoring', 'scoringmethod', 'qtype_mtf');
         $mform->setDefault('scoringmethod', 'subpoints');
 
-        // Add the shuffleoptions checkbox.
-        $mform->addElement('advcheckbox', 'shuffleoptions',
-                get_string('shuffleoptions', 'qtype_mtf'), null, null, array(0, 1
+        // Add the shuffleanswers checkbox.
+        $mform->addElement('advcheckbox', 'shuffleanswers',
+                get_string('shuffleanswers', 'qtype_mtf'), null, null, array(0, 1
                 ));
-        $mform->addHelpButton('shuffleoptions', 'shuffleoptions', 'qtype_mtf');
-
+        $mform->addHelpButton('shuffleanswers', 'shuffleanswers', 'qtype_mtf');
         $mform->addElement('header', 'answerhdr', get_string('optionsandfeedback', 'qtype_mtf'), '');
         $mform->setExpanded('answerhdr', 1);
 
@@ -293,7 +292,6 @@ class qtype_mtf_edit_form extends question_edit_form {
                     ));
             $mform->setType('responsetext_' . $li, PARAM_TEXT);
             $mform->addRule('responsetext_' . $li, null, 'required', null, 'client');
-
             $mform->setDefault('responsetext_' . $li, get_string('responsetext' . $li, 'qtype_mtf'));
         }
         $mform->addElement('html', '</span>');
@@ -324,7 +322,6 @@ class qtype_mtf_edit_form extends question_edit_form {
         $mform->addElement('hidden', 'qtype_mtf_lastnumberofcols');
         $mform->setType('qtype_mtf_lastnumberofcols', PARAM_INT);
         $mform->setDefault('qtype_mtf_lastnumberofcols', $this->numberofrows);
-
         $mform->addElement('hidden', 'makecopy');
         $mform->setType('makecopy', PARAM_ALPHA);
 
@@ -382,26 +379,33 @@ class qtype_mtf_edit_form extends question_edit_form {
         } else {
             $i = $thecurrenteditorcounter;
         }
-
+        $responses[] = $mform->createElement('html', '<br/><br/>');
         $mform->setDefault('numberofrows', $i);
         // Add the option editor.
-        $responses[] = $mform->createElement('html',
-                '<div class="optionbox" id="qtype_mtf_optionbox_response' . '">');
+        $responses[] = $mform->createElement('html', '<div class="optionbox" id="qtype_mtf_optionbox_response' . '">');
+        $responses[] = $mform->createElement('html', '<div class="option_question">');
         $responses[] = $mform->createElement('html', '<div class="optionandresponses">');
-
         $responses[] = $mform->createElement('html', '<div class="optiontext">');
-
         $responses[] = $mform->createElement('editor', 'option', $label,
                 array('rows' => 3
                 ), $this->editoroptions);
 
         $responses[] = $mform->createElement('html', '</div>');
+        $responses[] = $mform->createElement('html', '</div>'); // Close div.optionsandresponses.
 
+        // Add the feedback text editor in a new line.
+        $responses[] = $mform->createElement('html', '<div class="feedbacktext">');
+        $responses[] = $mform->createElement('editor', 'feedback',
+                get_string('feedbackforoption', 'qtype_mtf') . ' ' . $label,
+                        array('rows' => 1, 'placeholder' => ''
+                        ), $this->editoroptions);
+        $responses[] = $mform->createElement('html', '</div>'); // Close div.feedbacktext.
+        $responses[] = $mform->createElement('html', '</div>'); // Close div.option_question.
+        $responses[] = $mform->createElement('html', '<div class="option_answer">');
         // Add the radio buttons for responses.
         $responses[] = $mform->createElement('html', '<div class="responses">');
         $radiobuttons = array();
         $radiobuttonname = 'weightbutton';
-
         for ($j = 1; $j <= 2; ++$j) {
             if ($j == 1) {
                 $negativeorpositive = 'positive'; // Usually TRUE.
@@ -419,27 +423,12 @@ class qtype_mtf_edit_form extends question_edit_form {
                         $attributes);
             }
         }
-
         $responses[] = $mform->createElement('group', 'radiobuttonsgroupname', '', $radiobuttons,
                 array('<br/>'
                 ), false);
-
         $responses[] = $mform->createElement('html', '</div>'); // Close div.responses.
-        $responses[] = $mform->createElement('html', '</div>'); // Close
-                                                                // div.optionsandresponses.
-
-        $responses[] = $mform->createElement('html', '<br /><br />'); // Close
-                                                                      // div.optionsandresponses.
-
-        // Add the feedback text editor in a new line.
-        $responses[] = $mform->createElement('html', '<div class="feedbacktext">');
-        $responses[] = $mform->createElement('editor', 'feedback',
-                '<label class="feedbacktitle">' . get_string('feedbackforoption', 'qtype_mtf') . ' ' .
-                         $label . '</label>',
-                        array('rows' => 1, 'placeholder' => ''
-                        ), $this->editoroptions);
-        $responses[] = $mform->createElement('html', '</div>'); // Close div.feedbacktext.
-        $responses[] = $mform->createElement('html', '</div><br />'); // Close div.optionbox.
+        $responses[] = $mform->createElement('html', '</div>'); // Close div.option_answer.
+        $responses[] = $mform->createElement('html', '</div>'); // Close div.optionbox.
 
         $repeatedoptions['feedback']['type'] = PARAM_RAW;
         $repeatedoptions[$radiobuttonname]['default'] = 2;
@@ -449,6 +438,13 @@ class qtype_mtf_edit_form extends question_edit_form {
         return $responses;
     }
 
+    protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
+        list($repeated, $repeatedoptions) = parent::get_hint_fields($withclearwrong, $withshownumpartscorrect);
+        $repeatedoptions['hintclearwrong']['disabledif'] = array('single', 'eq', 1);
+        $repeatedoptions['hintshownumcorrect']['disabledif'] = array('single', 'eq', 1);
+        return array($repeated, $repeatedoptions);
+    }
+    
     /**
      * (non-PHPdoc).
      *
@@ -456,9 +452,10 @@ class qtype_mtf_edit_form extends question_edit_form {
      */
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
+        $question = $this->data_preprocessing_hints($question, true, true);
 
         if (isset($question->options)) {
-            $question->shuffleoptions = $question->options->shuffleoptions;
+            $question->shuffleanswers = $question->options->shuffleanswers;
             $question->scoringmethod = $question->options->scoringmethod;
             $question->rows = $question->options->rows;
             $question->columns = $question->options->columns;

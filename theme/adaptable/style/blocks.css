@@ -100,7 +100,7 @@
 .block .content a:hover,
 .block .content li a:hover,
 .block .content td a:hover {
-    color: [[setting:linkhovercolor]];
+    color: [[setting:linkhover]];
     text-decoration: none !important;
 }
 
@@ -140,6 +140,11 @@
     background-color: [[setting:buttonhovercolor]] !important;
 }
 
+/* Course Timeline block */
+.block .content .block-timeline a:hover {
+    background-color: [[setting:navbardropdownhovercolor]] !important;
+    color: #333 !important;
+}
 
 /* Login block */
 .block_login label {
@@ -531,5 +536,14 @@ body.has_dock div#dock {
 
 .showblockicons .block_twitter_search .header .title h2:before {
     content: "\f099";
+    font-family: FontAwesome;
+}
+
+.showblockicons .block_overview .header .title h2:before {
+    content: "\f03a";
+    font-family: FontAwesome;
+}
+.showblockicons .block_timeline .header .title h2:before {
+    content: "\f062";
     font-family: FontAwesome;
 }

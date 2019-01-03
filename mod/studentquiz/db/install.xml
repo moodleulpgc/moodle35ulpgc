@@ -23,6 +23,7 @@
         <FIELD NAME="correctanswerquantifier" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Point factor multiplied with number of correct answers"/>
         <FIELD NAME="incorrectanswerquantifier" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Point factor multiplied with number of incorrect answers"/>
         <FIELD NAME="allowedqtypes" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" COMMENT="which question types are allowed"/>
+        <FIELD NAME="aggregated" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Property if studentquiz instance is using aggregated values"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -51,6 +52,7 @@
     </TABLE>
     <TABLE NAME="studentquiz_progress" COMMENT="Store progress information of student with this question">
         <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
             <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of question"/>
             <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user"/>
             <FIELD NAME="studentquizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of studentquiz"/>
@@ -59,7 +61,8 @@
             <FIELD NAME="correctattempts" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of correct answers" />
         </FIELDS>
         <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="questionid,userid,studentquizid"/>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="questioniduseridstudentquizid" TYPE="unique" FIELDS="questionid,userid,studentquizid"/>
             <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
             <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
             <KEY NAME="studentquizid" TYPE="foreign" FIELDS="studentquizid" REFTABLE="studentquiz" REFFIELDS="id"/>
@@ -121,6 +124,7 @@
             <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
             <FIELD NAME="questionusageid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
             <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+            <FIELD NAME="ids" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT=""/>
         </FIELDS>
         <KEYS>
             <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

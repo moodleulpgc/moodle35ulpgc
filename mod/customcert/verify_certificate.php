@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// This file does not need require_login because capability to verify can be granted to guests, skip codechecker here.
 // @codingStandardsIgnoreLine
 require_once('../../config.php');
 
@@ -114,8 +115,6 @@ if ($form->get_data()) {
         $sql .= " AND c.id = :customcertid";
         $params = ['code' => $code, 'customcertid' => $customcert->id];
     }
-
-    $sql .= " AND u.deleted = 0";
 
     // It is possible (though unlikely) that there is the same code for issued certificates.
     if ($issues = $DB->get_records_sql($sql, $params)) {

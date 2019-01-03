@@ -174,7 +174,7 @@ class activity {
                         'itemtype' => 'mod',
                         'itemmodule' => $mod->modname,
                         'iteminstance' => $mod->instance,
-                        'outcomeid' => NULL
+                        'outcomeid' => null
                 ));
 
                 $grade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $USER->id));
@@ -816,7 +816,7 @@ class activity {
                     JOIN (SELECT $modfield AS modid, MAX(id) AS maxattempt
                     FROM {".$submissiontable."}
                     WHERE userid = ?
-                    GROUP BY modid) AS smx
+                    GROUP BY $modfield) AS smx
                     ON smx.modid = st.$modfield
                     AND smx.maxattempt = st.id
 

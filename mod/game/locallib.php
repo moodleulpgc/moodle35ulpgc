@@ -879,14 +879,6 @@ function game_updateattempts( $game, $attempt, $score, $finished, $cm, $course) 
         $updrec = new stdClass();
         $updrec->id = $attempt->id;
         $updrec->timelastattempt = time();
-        $updrec->lastip = getremoteaddr();
-        if (isset( $_SERVER[ 'REMOTE_HOST'])) {
-            $updrec->lastremotehost = $_SERVER[ 'REMOTE_HOST'];
-        } else {
-            $updrec->lastremotehost = gethostbyaddr( $updrec->lastip);
-        }
-        $updrec->lastip = substr( $updrec->lastip, 0, 30);
-        $updrec->lastremotehost = substr( $updrec->lastremotehost, 0, 50);
 
         if ($score >= 0) {
             $updrec->score = $score;
@@ -918,10 +910,12 @@ function game_updateattempts( $game, $attempt, $score, $finished, $cm, $course) 
 
     // Update completion state.
     $completion = new completion_info( $course);
-    if ($completion->is_enabled( $cm) && $game->completionpass) {
+    if ($completion->is_enabled($cm) && ($game->completionattemptsexhausted || $game->completionpass)) {
         if (!$finished) {
             game_save_best_score( $game);
         }
+        $completion->update_state( $cm, COMPLETION_COMPLETE);
+    } else if( $completion->is_enabled($cm) && (! is_null($cm->completiongradeitemnumber)) && ($game->completionpass == 0)) {
         $completion->update_state( $cm, COMPLETION_COMPLETE);
     }
 }

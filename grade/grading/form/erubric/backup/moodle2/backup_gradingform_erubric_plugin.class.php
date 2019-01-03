@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,10 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Support for backup API
+ * Learning Analytics Enriched Rubric (e-rubric) - Backup
  *
- * @package    gradingform
- * @subpackage Learinng Analytics Enriched Rubric (e-rubric)
+ * Defines learning analytics enriched rubric backup structures.
+ *
+ * @package    gradingform_erubric
+ * @category   grading
  * @copyright  2012 John Dimopoulos <johndimopoulos@sch.gr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,10 +28,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Defines learning analytics enriched rubric backup structures.
-
- * @package    gradingform
- * @subpackage Learinng Analytics Enriched Rubric (e-rubric)
+ * This class contains all necessary definitions needed for a successful backup of all e-rubric data.
+ *
+ * @package    gradingform_erubric
+ * @category   grading
  * @copyright  2012 John Dimopoulos <johndimopoulos@sch.gr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -52,12 +53,13 @@ class backup_gradingform_erubric_plugin extends backup_gradingform_plugin {
 
         // Define our elements.
         $ecriteria = new backup_nested_element('enrichedcriteria');
-        $ecriterion = new backup_nested_element('enrichedcriterion', array('id'), array(
-            'sortorder', 'description', 'descriptionformat', 'criteriontype', 'collaborationtype', 'coursemodules', 'operator', 'referencetype'));
+        $ecriterion = new backup_nested_element('enrichedcriterion', array('id'), array('sortorder', 'description',
+                                                'descriptionformat', 'criteriontype', 'collaborationtype', 'coursemodules',
+                                                'operator', 'referencetype'));
 
         $elevels = new backup_nested_element('enrichedlevels');
-        $elevel = new backup_nested_element('enrichedlevel', array('id'), array(
-            'score', 'definition', 'definitionformat', 'enrichedvalue'));
+        $elevel = new backup_nested_element('enrichedlevel', array('id'), array('score', 'definition', 'definitionformat',
+                                            'enrichedvalue'));
 
         // Build elements hierarchy.
         $pluginwrapper->add_child($ecriteria);
@@ -92,21 +94,25 @@ class backup_gradingform_erubric_plugin extends backup_gradingform_plugin {
         // Connect our visible container to the parent.
         $plugin->add_child($pluginwrapper);
 
-        // Define our elements
+        // Define our elements.
         $efillings = new backup_nested_element('enrichedfillings');
-        $efilling = new backup_nested_element('enrichedfilling', array('id'), array(
-            'criterionid', 'levelid', 'remark', 'remarkformat', 'enrichedbenchmark', 'enrichedbenchmarkstudent', 'enrichedbenchmarkstudents'));
+        $efilling = new backup_nested_element('enrichedfilling', array('id'), array('criterionid', 'levelid', 'remark',
+                              'remarkformat', 'enrichedbenchmark', 'enrichedbenchmarkstudent', 'enrichedbenchmarkstudents'));
 
-        // Build elements hierarchy
+        // Build elements hierarchy.
         $pluginwrapper->add_child($efillings);
         $efillings->add_child($efilling);
 
-        // Set sources to populate the data
-        $efilling->set_source_table('gradingform_erubric_fillings',
-            array('instanceid' => backup::VAR_PARENTID));
+        // Binding criterionid to ensure it's existence.
+        $efilling->set_source_sql("SELECT rf.*
+                FROM {gradingform_erubric_fillings} rf
+                JOIN {grading_instances} gi ON gi.id = rf.instanceid
+                JOIN {gradingform_erubric_criteria} rc ON rc.id = rf.criterionid AND gi.definitionid = rc.definitionid
+                WHERE rf.instanceid = :instanceid",
+                array('instanceid' => backup::VAR_PARENTID));
 
         // No need to annotate ids or files yet (one day when remark field supports
-        // embedded fileds, they must be annotated here).
+        // embedded files, they must be annotated here).
 
         return $plugin;
     }

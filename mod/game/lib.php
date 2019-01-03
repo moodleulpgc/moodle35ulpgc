@@ -105,7 +105,7 @@ function game_update_instance($game) {
         $game->param1 = 0;
     }
 
-    if ($game->param1 == '') {
+    if ($game->param1 == 0) {
         $game->param1 = 0;
     }
 
@@ -113,7 +113,7 @@ function game_update_instance($game) {
         $game->param2 = 0;
     }
 
-    if ($game->param2 == '') {
+    if ($game->param2 == 0) {
         $game->param2 = 0;
     }
 
@@ -139,6 +139,15 @@ function game_update_instance($game) {
  * @param stdClass $game
  */
 function game_before_add_or_update(&$game) {
+
+    if (isset( $game->toptext)) {
+        $game->toptext = $game->toptext[ 'text'];
+    }
+
+    if (isset( $game->bottomtext)) {
+        $game->bottomtext = $game->bottomtext[ 'text'];
+    }
+
     if (isset( $game->questioncategoryid)) {
         $pos = strpos( $game->questioncategoryid, ',');
         if ($pos != false) {
@@ -1386,6 +1395,14 @@ function game_get_completion_state($course, $cm, $userid, $type) {
                 return $grades[$userid]->is_passed($item);
             }
         }
+    } else if (!is_null( $cm->completiongradeitemnumber)) {
+        require_once($CFG->libdir . '/gradelib.php');
+        $item = grade_item::fetch(array('courseid' => $course->id, 'itemtype' => 'mod',
+                'itemmodule' => 'game', 'iteminstance' => $cm->instance, 'outcomeid' => null));
+        if ($item) {
+            $grades = grade_grade::fetch_users_grades($item, array($userid), false);
+            return !empty($grades[$userid]);
+        }
     }
 
     return false;
@@ -1493,4 +1510,37 @@ function mod_game_get_completion_active_rule_descriptions($cm) {
         }
     }
     return $descriptions;
+}
+
+/**
+ * Delete all the attempts belonging to a user in a particular game.
+ *
+ * @param int $gameid The id of game.
+ * @param object $user The user object.
+ */
+function game_delete_user_attempts( $gameid, $user) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot . '/mod/game/locallib.php');
+
+    $sql = "SELECT id FROM {$CFG->prefix}game_attempts WHERE gameid=$gameid AND userid={$user->id}";
+    $recs = $DB->get_records_sql( $sql);
+    foreach ($recs as $rec) {
+        $params = [ 'id' => $rec->id];
+        $DB->delete_records('game_bookquiz', $params);
+        $DB->delete_records('game_cross', $params);
+        $DB->delete_records('game_cryptex', $params);
+        $DB->delete_records('game_hangman', $params);
+        $DB->delete_records('game_hiddenpicture', $params);
+        $DB->delete_records('game_millionaire', $params);
+        $DB->delete_records('game_snakes', $params);
+        $DB->delete_records('game_sudoku', $params);
+    }
+
+    $params = [ 'game' => $gameid, 'userid' => $user->id];
+    $DB->delete_records('game_grades', $params);
+
+    $params = [ 'gameid' => $gameid, 'userid' => $user->id];
+    $DB->delete_records('game_attempts', $params);
+    $DB->delete_records('game_repetitions', $params);
+    $DB->delete_records('game_queries', $params);
 }

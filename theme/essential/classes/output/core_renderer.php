@@ -506,11 +506,12 @@ class core_renderer extends \core_renderer {
             }
         }
 
-        if (($showfrontpagemenu) || ($showcoursemenu) || ($showusermenu)) {
-            return $this->render_navbar_action_menu($menu, $title);
-        } else {
+        if ($menu->is_empty()) {
             return '';
+        } else if (($showfrontpagemenu) || ($showcoursemenu) || ($showusermenu)) {
+            return $this->render_navbar_action_menu($menu, $title);
         }
+        return '';
     }
 
     /**
@@ -936,7 +937,7 @@ class core_renderer extends \core_renderer {
     }
 
     protected static function timeaccesscompare($a, $b) {
-        // timeaccess is lastaccess entry and timestart an enrol entry.
+        // The timeaccess is lastaccess entry and timestart an enrol entry.
         if ((!empty($a->timeaccess)) && (!empty($b->timeaccess))) {
             // Both last access.
             if ($a->timeaccess == $b->timeaccess) {
@@ -951,13 +952,13 @@ class core_renderer extends \core_renderer {
             return ($a->timestart > $b->timestart) ? -1 : 1;
         }
 
-        // Must be comparing an enrol with a last access.
-        // -1 is to say that 'a' comes before 'b'.
+        /* Must be comparing an enrol with a last access.
+           -1 is to say that 'a' comes before 'b'. */
         if (!empty($a->timestart)) {
-            // 'a' is the enrol entry.
+            // If 'a' is the enrol entry.
             return -1;
         }
-        // 'b' must be the enrol entry.
+        // Then 'b' must be the enrol entry.
         return 1;
     }
 
@@ -1262,17 +1263,13 @@ class core_renderer extends \core_renderer {
                 $branchlabel = $this->getfontawesomemarkup('book').$branchtitle;
                 $branchurl = $this->page->url;
                 $branch = $activitystreammenu->add($branchlabel, $branchurl, $branchtitle, 10002);
-                $branchtitle = get_string('people', 'theme_essential');
-                $branchlabel = $this->getfontawesomemarkup('users').$branchtitle;
-                $branchurl = new moodle_url('/user/index.php', array('id' => $this->page->course->id));
-                $branch->add($branchlabel, $branchurl, $branchtitle, 100003);
                 $context = context_course::instance($this->page->course->id);
                 if (((has_capability('gradereport/overview:view', $context) || has_capability('gradereport/user:view', $context)) &&
                         $this->page->course->showgrades) || has_capability('gradereport/grader:view', $context)) {
                     $branchtitle = get_string('grades');
                     $branchlabel = $this->getfontawesomemarkup('list-alt', array('icon')).$branchtitle;
                     $branchurl = new moodle_url('/grade/report/index.php', array('id' => $this->page->course->id));
-                    $branch->add($branchlabel, $branchurl, $branchtitle, 100004);
+                    $branch->add($branchlabel, $branchurl, $branchtitle, 100003);
                 }
 
                 $data = $this->get_course_activities();
@@ -1291,6 +1288,140 @@ class core_renderer extends \core_renderer {
             }
         }
         return '';
+    }
+
+    /**
+     * Renders the participants menu.
+     *
+     * @return string Markup if any.
+     */
+    public function custom_menu_participants() {
+        $output = '';
+        if ((!isguestuser()) &&
+            ((\theme_essential\toolbox::get_setting('participantsmenu')) &&
+            (($this->page->pagelayout == 'course') || ($this->page->pagelayout == 'incourse')))
+        ) {
+            $users = $this->get_enrolled_users();
+            if (!empty($users)) {
+                /* Not using a custom menu so to make use of the user picture rendering code, otherwise a lot of work to do and
+                   would then mean that can alter the menu for scrolling with less chance of complications. */
+                $output .= html_writer::start_tag('div', array('class' => 'custom_menu', 'id' => 'custom_menu_participants'));
+                $output .= html_writer::start_tag('ul', array('class' => 'nav'));
+                $output .= html_writer::start_tag('li', array('class' => 'dropdown'));
+
+                $menutitle = get_string('participants');
+                $output .= html_writer::start_tag('a', array(
+                    'class' => 'dropdown-toggle',
+                    'data-toggle' => 'dropdown',
+                    'href' => $this->page->url,
+                    'title' => $menutitle
+                ));
+                $output .= $this->getfontawesomemarkup('users');
+                $output .= $menutitle;
+                $output .= $this->getfontawesomemarkup('caret-right');
+                $output .= html_writer::end_tag('a');
+                $output .= html_writer::start_tag('div', array('class' => 'dropdown-menu'));
+                $output .= html_writer::start_tag('ul', array('class' => 'participants'));
+                foreach ($users as $user) {
+                    $output .= html_writer::start_tag('li');
+                    $output .= $this->render($user);
+                    $output .= html_writer::end_tag('li');
+                }
+
+                $output .= html_writer::end_tag('ul');
+                $output .= html_writer::start_tag('ul');
+                $output .= html_writer::start_tag('li');
+                $gotopeopletitle = get_string('gotopeople', 'theme_essential');
+                $output .= html_writer::start_tag('a', array(
+                    'href' => new moodle_url('/user/index.php', array('id' => $this->page->course->id)),
+                    'title' => $gotopeopletitle
+                ));
+                $output .= $this->getfontawesomemarkup('users');
+                $output .= $gotopeopletitle;
+                $output .= html_writer::end_tag('a');
+                $output .= html_writer::end_tag('li');
+
+                $output .= html_writer::end_tag('ul');
+                $output .= html_writer::end_tag('div');
+
+                $output .= html_writer::end_tag('li');
+                $output .= html_writer::end_tag('ul');
+                $output .= html_writer::end_tag('div');
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * Gets the list of enrolled users on the current course.
+     *
+     * @return array of user_picture objects or empty if none.
+     */
+    protected function get_enrolled_users() {
+        // Adapted from /course/recent_form.php.
+        $course = $this->page->course;
+        $courseid = $course->id;
+        $context = \context_course::instance($courseid);
+
+        $groupoptions = array();
+        if (\groups_get_course_groupmode($course) == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
+            // Limited group access.
+            $groups = \groups_get_user_groups($courseid);
+            if (!empty($groups[$course->defaultgroupingid])) {
+                foreach ($groups[$course->defaultgroupingid] as $groupid) {
+                    $groupoptions[$groupid] = $groupid;
+                }
+            }
+        } else {
+            $groupoptions = array(0 => 0);
+            if (has_capability('moodle/site:accessallgroups', $context)) {
+                // User can see all groups.
+                $allgroups = \groups_get_all_groups($courseid);
+            } else {
+                // User can see course level groups.
+                $allgroups = \groups_get_all_groups($courseid, 0, $course->defaultgroupingid);
+            }
+            foreach ($allgroups as $group) {
+                $groupoptions[$group->id] = $group->id;
+            }
+        }
+
+        if ($courseid == SITEID) {
+            $viewparticipants = course_can_view_participants(\context_system::instance());
+        } else {
+            $viewparticipants = course_can_view_participants($context);
+        }
+
+        $users = array();
+        if ($viewparticipants) {
+            if (isset($groupoptions[0])) {
+                // Can see all enrolled users.
+                if ($enrolled = get_enrolled_users($context, null, 0, \user_picture::fields('u'))) {
+                    foreach ($enrolled as $euser) {
+                        $userpicture = new \user_picture($euser);
+                        $userpicture->includefullname = true;
+                        $userpicture->size = 14;
+                        $users[$euser->id] = $userpicture;
+                    }
+                }
+            } else {
+                // Can see users from some groups only.
+                foreach ($groupoptions as $groupid) {
+                    if ($enrolled = get_enrolled_users($context, null, $groupid, \user_picture::fields('u'))) {
+                        foreach ($enrolled as $euser) {
+                            if (!array_key_exists($euser->id, $users)) {
+                                $userpicture = new \user_picture($euser);
+                                $userpicture->includefullname = true;
+                                $userpicture->size = 14;
+                                $users[$euser->id] = $userpicture;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $users;
     }
 
     protected function render_the_custom_menu(custom_menu $custommenu, $id, $usessubmenus = false, $additionalclasses = '') {
@@ -1469,13 +1600,13 @@ class core_renderer extends \core_renderer {
     /**
      * Internal implementation of user image rendering.
      *
-     * @param user_picture $userpicture
-     * @return string
+     * @param user_picture $userpicture.
+     * @return string Markup.
      */
     protected function render_user_picture(\user_picture $userpicture) {
         if ($this->page->pagetype == 'mod-forum-discuss') {
             $userpicture->size = 1;
-        } else if ((empty($userpicture->size)) || ($userpicture->size != 64)) {
+        } else if ((empty($userpicture->size)) || ($userpicture->size >= 64)) {
             $userpicture->size = 72;
         }
         return parent::render_user_picture($userpicture);

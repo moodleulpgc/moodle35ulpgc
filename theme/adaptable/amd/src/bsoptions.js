@@ -24,13 +24,15 @@ define(['jquery', 'theme_bootstrapbase/bootstrap', 'core/log'], function($, boot
                 });
             });
 
-            // Conditional javascript to resolve anchor link clicking issue with sticky navbar
+            // Conditional javascript to resolve anchor link clicking issue with sticky navbar.
             // in old bootstrap version. Re: issue #919.
-            // Original issue / solution discussion here: https://github.com/twbs/bootstrap/issues/1768
+            // Original issue / solution discussion here: https://github.com/twbs/bootstrap/issues/1768.
             if (hasaffix) {
                 var shiftWindow = function() { scrollBy(0, -50) };
-	            if (location.hash) shiftWindow();
-	            window.addEventListener("hashchange", shiftWindow);
+                if (location.hash) {
+                    shiftWindow();
+                }
+                window.addEventListener("hashchange", shiftWindow);
             }
         }
     };

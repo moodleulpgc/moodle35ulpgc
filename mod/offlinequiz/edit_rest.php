@@ -22,7 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 if (!defined('AJAX_SCRIPT')) {
     define('AJAX_SCRIPT', true);
@@ -108,8 +107,8 @@ switch($requestmethod) {
                         $slot = $structure->get_slot_by_id($id);
                         if (!is_numeric(str_replace(',', '.', $maxmark))) {
                             $summarks = $DB->get_field('offlinequiz_groups', 'sumgrades', array('id' => $offlinequizgroup->id));
-                            echo json_encode(array('instancemaxmark' => offlinequiz_format_question_grade
-                                             ($offlinequiz, $slot->maxmark),
+                            echo json_encode(array('instancemaxmark' =>
+                                             offlinequiz_format_question_grade($offlinequiz, $slot->maxmark),
                                             'newsummarks' => offlinequiz_format_grade($offlinequiz, $summarks)));
 
                             break;

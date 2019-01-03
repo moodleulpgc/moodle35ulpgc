@@ -56,6 +56,19 @@ $userid = $USER->id;
 
 $questionusage = question_engine::load_questions_usage_by_activity($attempt->questionusageid);
 
+$slots = $questionusage->get_slots();
+
+$questionids = explode(",", $attempt->ids);
+$originalnumofquestionids = count($questionids);
+
+if (!in_array($slot, $slots)) {
+    mod_studentquiz_add_question_to_attempt($questionusage, $studentquiz, $questionids, $slot - 1);
+    if (count($questionids) != $originalnumofquestionids) {
+        $attempt->ids = implode(",", $questionids);
+        $DB->update_record('studentquiz_attempt', $attempt);
+    }
+}
+
 $actionurl = new moodle_url('/mod/studentquiz/attempt.php', array('cmid' => $cmid, 'id' => $attemptid, 'slot' => $slot));
 // Reroute this to attempt summary page if desired.
 $stopurl = new moodle_url('/mod/studentquiz/view.php', array('id' => $cmid));
@@ -63,7 +76,7 @@ $stopurl = new moodle_url('/mod/studentquiz/view.php', array('id' => $cmid));
 // Get Current Question.
 $question = $questionusage->get_question($slot);
 // Navigatable?
-$questionscount = $questionusage->question_count();
+$questionscount = count($questionids);
 $hasnext = $slot < $questionscount;
 $hasprevious = $slot > $questionusage->get_first_question_number();
 $canfinish = $questionusage->can_question_finish_during_attempt($slot);
@@ -104,6 +117,43 @@ if (data_submitted()) {
         $questionusage->process_all_actions();
         // We save the attempts always to db, as there is no finish/submission step expected for the user.
         question_engine::save_questions_usage_by_activity($questionusage);
+
+        // Only add studentquiz_progress information, if it is a studentquiz aggregated type
+        if ($studentquiz->aggregated) {
+            $qa = $questionusage->get_question_attempt($slot);
+            $q = $questionusage->get_question($slot);
+
+            $studentquizprogress = $DB->get_record('studentquiz_progress', array('questionid' => $q->id,
+                'userid' => $userid, 'studentquizid' => $studentquiz->id));
+            $updatestudentquizprogress = true;
+            if ($studentquizprogress == false) {
+                $updatestudentquizprogress = false;
+                $studentquizprogress = mod_studentquiz_get_studenquiz_progress_class($q->id, $userid, $studentquiz->id);
+            }
+
+            $studentquizprogress->attempts += 1;
+
+            switch($qa->get_state()) {
+                case question_state::$gradedright:
+                    $studentquizprogress->correctattempts += 1;
+                    $studentquizprogress->lastanswercorrect = 1;
+                    break;
+                case question_state::$gradedwrong:
+                case question_state::$gradedpartial:
+                    $studentquizprogress->lastanswercorrect = 0;
+                    break;
+                case question_state::$todo:
+                default:
+                    break;
+            }
+
+            if ($updatestudentquizprogress) {
+                $DB->update_record('studentquiz_progress', $studentquizprogress);
+            } else {
+                $studentquizprogress->id = $DB->insert_record('studentquiz_progress', $studentquizprogress, true);
+            }
+        }
+
         redirect($actionurl);
     }
 }
@@ -121,10 +171,19 @@ switch($questionusage->get_question_attempt($slot)->get_state()) {
     default:
         $hasanswered = false;
 }
+
 // Is rated?
 $hasrated = false;
 
 $options = new question_display_options();
+
+
+if ($question->qtype instanceof qtype_description
+    || $question->qtype instanceof qtype_essay) {
+    $hasanswered = true;
+    $options->readonly = true;
+}
+
 // TODO do they do anything? $headtags not used anywhere and question_engin..._js returns void.
 $headtags = '';
 $headtags .= $questionusage->render_question_head_html($slot);
@@ -161,7 +220,6 @@ $html .= html_writer::start_tag('form', array('method' => 'post', 'action' => $a
 $html .= '<input type="hidden" class="cmid_field" name="cmid" value="' . $cmid . '" />';
 
 // Output the question.
-// TODO, options?
 $html .= $questionusage->render_question($slot, $options, (string)$slot);
 
 // Output the rating.

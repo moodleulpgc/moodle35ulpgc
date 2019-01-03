@@ -269,7 +269,7 @@ foreach ($questions as $question) {
     // Create the mtf options.
     $mtf = new stdClass();
     $mtf->questionid = $question->id;
-    $mtf->shuffleoptions = $multichoice->shuffleanswers;
+    $mtf->shuffleanswers = $multichoice->shuffleanswers;
     $mtf->numberofrows = count($rows);
     $mtf->numberofcolumns = $colmtfount;
     $mtf->answernumbering = $multichoice->answernumbering;

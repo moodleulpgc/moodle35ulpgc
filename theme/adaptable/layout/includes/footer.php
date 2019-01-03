@@ -25,9 +25,14 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-$hidepagefootermobile = $PAGE->theme->settings->hidepagefootermobile;
+
+// Load messages / notifications (ONLY moodle 3.6.1 or higher).
+if ($CFG->version > 2018120300) {
+    echo $OUTPUT->standard_after_main_region_html();
+}
 
 // If the device is a mobile and the footer is not hidden or it is a desktop then load and show the footer.
+$hidepagefootermobile = $PAGE->theme->settings->hidepagefootermobile;
 if (((theme_adaptable_is_mobile()) && ($hidepagefootermobile == 1)) || (theme_adaptable_is_desktop())) {
 ?>
 

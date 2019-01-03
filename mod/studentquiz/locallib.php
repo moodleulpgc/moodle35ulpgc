@@ -64,12 +64,28 @@ const STUDENTQUIZ_DEFAULT_QUIZ_BEHAVIOUR = 'immediatefeedback';
 function mod_studentquiz_load_studentquiz($cmid, $contextid) {
     global $DB;
     if ($studentquiz = $DB->get_record('studentquiz', array('coursemodule' => $cmid))) {
-        if ($studentquiz->category = question_get_default_category($contextid)) {
-            $studentquiz->categoryid = $studentquiz->category->id;
+        if ($contextid !== false) {
+            if ($studentquiz->category = question_get_default_category($contextid)) {
+                $studentquiz->categoryid = $studentquiz->category->id;
+                return $studentquiz;
+            }
+        } else {
             return $studentquiz;
         }
     }
     return false;
+}
+
+function mod_studentquiz_get_studenquiz_progress_class($questionid, $userid, $studentquizid, $lastanswercorrect = 0, $attempts = 0, $correctattempts = 0) {
+    $studentquizprogress = new stdClass();
+    $studentquizprogress->questionid = $questionid;
+    $studentquizprogress->userid = $userid;
+    $studentquizprogress->studentquizid = $studentquizid;
+    $studentquizprogress->lastanswercorrect = $lastanswercorrect;
+    $studentquizprogress->attempts = $attempts;
+    $studentquizprogress->correctattempts = $correctattempts;
+
+    return $studentquizprogress;
 }
 
 /**
@@ -87,6 +103,65 @@ function mod_studentquiz_flip_approved($questionid) {
     } else {
         $DB->set_field('studentquiz_question', 'approved', !$approved, array('questionid' => $questionid));
     }
+}
+
+/**
+ * Returns studentquiz_progress entries for a single studentquiz instance.
+ * It is calculated using the question_attempts data.
+ *
+ * @param $studentquizid stdClass
+ * @return array
+ * @throws dml_exception
+ */
+function mod_studentquiz_get_studentquiz_progress_from_question_attempts_steps($studentquizid) {
+    global $DB;
+
+    $records = $DB->get_recordset_sql(mod_studentquiz_get_studentquiz_progress_from_question_attempts_steps_sql($studentquizid));
+
+    $studentquizprogresses = array();
+
+    foreach ($records as $r) {
+        $studentquizprogress = mod_studentquiz_get_studenquiz_progress_class(
+            $r->questionid_, $r->userid_, $r->studentquizid,
+            $r->lastanswercorrect == 'gradedright' ? 1 : 0, $r->attempts, $r->correctattempts);
+        array_push($studentquizprogresses, $studentquizprogress);
+    }
+
+    return $studentquizprogresses;
+}
+
+/**
+ * Return the sql query for migrating question_attempts into studentquiz_progress
+ *
+ * @param $studentquizid stdClass
+ * @return string
+ *
+ */
+function mod_studentquiz_get_studentquiz_progress_from_question_attempts_steps_sql($studentquizid) {
+    $sql = <<<EOL
+Select
+q.id as questionid_,
+qas.userid as userid_,
+s.id as studentquizid,
+COUNT(qas.id) as attempts,
+SUM(CASE WHEN qas.state = 'gradedright' THEN 1 ELSE 0 END) as correctattempts,
+(Select qas1.state
+From {question} q1
+join {question_attempts} qa1 ON qa1.questionid = q1.id
+join {question_attempt_steps} qas1 ON qas1.questionattemptid = qa1.id
+where qas1.fraction is not null and q1.id = questionid_ and qas1.userid = userid_
+order by qas1.id DESC limit 1) AS lastanswercorrect
+From {question} q
+JOIN {question_categories} qc ON qc.id = q.category
+JOIN {context} co ON co.id = qc.contextid
+join {course_modules} cm ON cm.id = co.instanceid
+join {studentquiz} s ON s.coursemodule = cm.id
+join {question_attempts} qa ON qa.questionid = q.id
+join {question_attempt_steps} qas ON qas.questionattemptid = qa.id
+where s.id = $studentquizid and qas.state != 'todo'
+group by q.id,qas.userid
+EOL;
+    return $sql;
 }
 
 /**
@@ -372,29 +447,46 @@ function mod_studentquiz_generate_attempt($ids, $studentquiz, $userid) {
     // TODO: Check if this is instance id from studentquiz table.
     $attempt->studentquizid = $studentquiz->id;
 
-    // Add questions to usage.
-    // Don't shuffle($ids) as per requirement for now.
-    $usageorder = array();
-    $allowedcategories = question_categorylist($studentquiz->categoryid);
-    foreach ($ids as $i => $questionid) {
-        $questiondata = question_bank::load_question($questionid);
-        // We have to check if the question is really from this module, limit questions to categories used in this module.
-        if (in_array($questiondata->category, $allowedcategories)) {
-            $usageorder[$i] = $questionusage->add_question($questiondata);
-        }
-    }
-
-    // Persistence.
-    // TODO: Is it necessary to start all questions here, or just the current one?
-    $questionusage->start_all_questions();
+    // Add first question to usage.
+    mod_studentquiz_add_question_to_attempt($questionusage, $studentquiz, $ids);
 
     question_engine::save_questions_usage_by_activity($questionusage);
 
     $attempt->questionusageid = $questionusage->get_id();
+    $attempt->ids = implode(",", $ids);
 
     $attempt->id = $DB->insert_record('studentquiz_attempt', $attempt);
 
     return $attempt;
+}
+
+/**
+ * @param $questionusage question_usage_by_activity
+ * @param $studentquiz stdClass $studentquiz generating this attempt
+ * @param $questionids array $ids of question ids to be used in this attempt
+ * @throws coding_exception
+ */
+function mod_studentquiz_add_question_to_attempt(&$questionusage, $studentquiz, &$questionids, $lastslost = 0) {
+    $allowedcategories = question_categorylist($studentquiz->categoryid);
+    $i = $lastslost;
+    $addedquestions = 0;
+    while ($addedquestions <= 0 && $i < count($questionids)) {
+        $questiondata = question_bank::load_question($questionids[$i]);
+        if (in_array($questiondata->category, $allowedcategories)) {
+            $questionusage->add_question($questiondata);
+            $addedquestions++;
+        } else {
+            unset($questionids[$i]);
+            $questionids = array_values($questionids);
+        }
+        $i++;
+    }
+
+    if ($addedquestions == 0) {
+        throw new moodle_exception("Could not load any valid question for attempt", "studentquiz");
+    }
+
+    $questionusage->start_question($i);
 }
 
 
@@ -550,10 +642,10 @@ function mod_studentquiz_comment_renderer($comments, $userid, $anonymize, $ismod
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @return moodle_recordset of paginated ranking table
  */
-function mod_studentquiz_get_user_ranking_table($cmid, $quantifiers, $limitfrom = 0, $limitnum = 0) {
+function mod_studentquiz_get_user_ranking_table($cmid, $quantifiers, $aggregated, $limitfrom = 0, $limitnum = 0) {
     global $DB;
     $select = mod_studentquiz_helper_attempt_stat_select();
-    $joins = mod_studentquiz_helper_attempt_stat_joins();
+    $joins = mod_studentquiz_helper_attempt_stat_joins($aggregated);
     $statsbycat = ' ) statspercategory GROUP BY userid, firstname, lastname';
     $order = ' ORDER BY points DESC, questions_created DESC, questions_approved DESC, rates_average DESC, '
             .' question_attempts_correct DESC, question_attempts_incorrect ASC ';
@@ -575,7 +667,7 @@ function mod_studentquiz_get_user_ranking_table($cmid, $quantifiers, $limitfrom 
  * @param stdClass $quantifiers ad-hoc class containing quantifiers for weighted points score.
  * @return moodle_recordset of paginated ranking table
  */
-function mod_studentquiz_community_stats($cmid) {
+function mod_studentquiz_community_stats($cmid, $aggregated) {
     global $DB;
     $select = 'SELECT '
         .' count(*) participants,'
@@ -597,13 +689,11 @@ function mod_studentquiz_community_stats($cmid) {
         .' COALESCE(sum(lastattempt.last_attempt_exists), 0) last_attempt_exists,'
         .' COALESCE(sum(lastattempt.last_attempt_correct), 0) last_attempt_correct,'
         .' COALESCE(sum(lastattempt.last_attempt_incorrect), 0) last_attempt_incorrect';
-    $joins = mod_studentquiz_helper_attempt_stat_joins();
-    $DB->set_debug(false);
+    $joins = mod_studentquiz_helper_attempt_stat_joins($aggregated);
     $rs = $DB->get_record_sql($select.$joins,
         array('cmid1' => $cmid, 'cmid2' => $cmid, 'cmid3' => $cmid,
             'cmid4' => $cmid, 'cmid5' => $cmid, 'cmid6' => $cmid, 'cmid7' => $cmid
         ));
-    $DB->set_debug(false);
     return $rs;
 }
 
@@ -615,13 +705,12 @@ function mod_studentquiz_community_stats($cmid) {
  * @return array of user ranking stats
  * TODO: use mod_studentquiz_report_record type
  */
-function mod_studentquiz_user_stats($cmid, $quantifiers, $userid) {
+function mod_studentquiz_user_stats($cmid, $quantifiers, $userid, $aggregated) {
     global $DB;
     $select = mod_studentquiz_helper_attempt_stat_select();
-    $joins = mod_studentquiz_helper_attempt_stat_joins();
+    $joins = mod_studentquiz_helper_attempt_stat_joins($aggregated);
     $addwhere = ' AND u.id = :userid ';
     $statsbycat = ' ) statspercategory GROUP BY userid, firstname, lastname';
-    $DB->set_debug(false);
     $rs = $DB->get_record_sql($select.$joins.$addwhere.$statsbycat,
         array('cmid1' => $cmid, 'cmid2' => $cmid, 'cmid3' => $cmid,
             'cmid4' => $cmid, 'cmid5' => $cmid, 'cmid6' => $cmid, 'cmid7' => $cmid
@@ -632,7 +721,6 @@ function mod_studentquiz_user_stats($cmid, $quantifiers, $userid) {
         , 'incorrectanswerquantifier' => $quantifiers->incorrectanswer
             , 'userid' => $userid
         ));
-    $DB->set_debug(false);
     return $rs;
 }
 
@@ -650,6 +738,7 @@ function mod_studentquiz_helper_attempt_stat_select() {
         // See: https://dev.mysql.com/doc/refman/5.7/en/group-by-optimization.html.
         .' MAX(points) points,'
         .' MAX(questions_created) questions_created,'
+        .' MAX(questions_created_and_rated) questions_created_and_rated,'
         .' MAX(questions_approved) questions_approved,'
         .' MAX(rates_received) rates_received,'
         .' MAX(rates_average) rates_average,'
@@ -669,12 +758,14 @@ function mod_studentquiz_helper_attempt_stat_select() {
         .' COALESCE ( ROUND('
         .' COALESCE(creators.countq, 0) * :questionquantifier  ' // Questions created.
         .'+ COALESCE(approvals.countq, 0) * :approvedquantifier  ' // Questions approved.
-        .'+ COALESCE(rates.avgv, 0) * COALESCE(creators.countq, 0) * :ratequantifier  ' // Rating.
+        .'+ COALESCE(rates.avgv, 0) * (COALESCE(creators.countq, 0) - COALESCE(rates.not_rated_questions, 0)) * :ratequantifier  ' // Rating.
         .'+ COALESCE(lastattempt.last_attempt_correct, 0) * :correctanswerquantifier  ' // Correct answers.
         .'+ COALESCE(lastattempt.last_attempt_incorrect, 0) * :incorrectanswerquantifier ' // Incorrect answers.
         .' , 1) , 0) points, '
         // Questions created.
         .' COALESCE(creators.countq, 0) questions_created,'
+        // Questions created and rated.
+        .' COALESCE(COALESCE(creators.countq, 0) - COALESCE(rates.not_rated_questions, 0), 0) questions_created_and_rated,'
         // Questions approved.
         .' COALESCE(approvals.countq, 0) questions_approved,'
         // Questions rating received.
@@ -694,118 +785,148 @@ function mod_studentquiz_helper_attempt_stat_select() {
  * @return string
  * TODO: Refactor: There must be a better way to do this!
  */
-function mod_studentquiz_helper_attempt_stat_joins() {
-    return ' FROM {studentquiz} sq'
+function mod_studentquiz_helper_attempt_stat_joins($aggregated) {
+    $sql = ' FROM {studentquiz} sq'
         // Get this Studentquiz Question category.
-        .' JOIN {context} con ON con.instanceid = sq.coursemodule'
-        .' JOIN {question_categories} qc ON qc.contextid = con.id'
+        . ' JOIN {context} con ON con.instanceid = sq.coursemodule'
+        . ' JOIN {question_categories} qc ON qc.contextid = con.id'
         // Only enrolled users.
-        .' JOIN {course} c ON c.id = sq.course'
-        .' JOIN {enrol} e ON e.courseid = c.id'
-        .' JOIN {user_enrolments} ue ON ue.enrolid = e.id'
-        .' JOIN {user} u ON ue.userid = u.id'
+        . ' JOIN {course} c ON c.id = sq.course'
+        . ' JOIN {enrol} e ON e.courseid = c.id'
+        . ' JOIN {user_enrolments} ue ON ue.enrolid = e.id'
+        . ' JOIN {user} u ON ue.userid = u.id'
         // Question created by user.
-        .' LEFT JOIN'
-        .' ( SELECT count(*) countq, q.createdby creator'
-        .' FROM {studentquiz} sq'
-        .' JOIN {context} con ON con.instanceid = sq.coursemodule'
-        .' JOIN {question_categories} qc ON qc.contextid = con.id'
-        .' JOIN {question} q on q.category = qc.id'
-        .' WHERE q.hidden = 0 AND q.parent = 0 AND sq.coursemodule = :cmid4'
-        .' GROUP BY creator'
-        .' ) creators ON creators.creator = u.id'
+        . ' LEFT JOIN'
+        . ' ( SELECT count(*) countq, q.createdby creator'
+        . ' FROM {studentquiz} sq'
+        . ' JOIN {context} con ON con.instanceid = sq.coursemodule'
+        . ' JOIN {question_categories} qc ON qc.contextid = con.id'
+        . ' JOIN {question} q on q.category = qc.id'
+        . ' WHERE q.hidden = 0 AND q.parent = 0 AND sq.coursemodule = :cmid4'
+        . ' GROUP BY creator'
+        . ' ) creators ON creators.creator = u.id'
         // Approved questions.
-        .' LEFT JOIN'
-        .' ( SELECT count(*) countq, q.createdby creator'
-        .' FROM {studentquiz} sq'
-        .' JOIN {context} con ON con.instanceid = sq.coursemodule'
-        .' JOIN {question_categories} qc ON qc.contextid = con.id'
-        .' JOIN {question} q on q.category = qc.id'
-        .' JOIN {studentquiz_question} sqq ON q.id = sqq.questionid'
-        .' where q.hidden = 0 AND q.parent = 0 AND sqq.approved = 1 AND sq.coursemodule = :cmid5'
-        .' group by creator'
-        .' ) approvals ON approvals.creator = u.id'
+        . ' LEFT JOIN'
+        . ' ( SELECT count(*) countq, q.createdby creator'
+        . ' FROM {studentquiz} sq'
+        . ' JOIN {context} con ON con.instanceid = sq.coursemodule'
+        . ' JOIN {question_categories} qc ON qc.contextid = con.id'
+        . ' JOIN {question} q on q.category = qc.id'
+        . ' JOIN {studentquiz_question} sqq ON q.id = sqq.questionid'
+        . ' where q.hidden = 0 AND q.parent = 0 AND sqq.approved = 1 AND sq.coursemodule = :cmid5'
+        . ' group by creator'
+        . ' ) approvals ON approvals.creator = u.id'
         // Average of Average Rating of own questions.
-        .' LEFT JOIN'
-        .' (SELECT'
-        .'    createdby,'
-        .'    AVG(avg_rate_perq) avgv,'
-        .'    SUM(num_rate_perq) countv'
-        .'  FROM ('
-        .'      SELECT'
-        .'          q.id,'
-        .'          q.createdby createdby,'
-        .'          AVG(sqv.rate) avg_rate_perq,'
-        .'          COUNT(sqv.rate) num_rate_perq'
-        .'      FROM {studentquiz} sq'
-        .'      JOIN {context} con on con.instanceid = sq.coursemodule'
-        .'      JOIN {question_categories} qc on qc.contextid = con.id'
-        .'      JOIN {question} q on q.category = qc.id'
-        .'      JOIN {studentquiz_rate} sqv on q.id = sqv.questionid'
-        .'      WHERE'
-        .'          q.hidden = 0 AND q.parent = 0'
-        .'          and sq.coursemodule = :cmid6'
-        .'      GROUP BY q.id, q.createdby'
-        .'      ) avgratingperquestion'
-        .'  GROUP BY createdby'
-        .' ) rates ON rates.createdby = u.id'
-        // Question attempts: sum of number of graded attempts per question.
-        .' LEFT JOIN'
-        .' ('
-        .' SELECT count(*) counta,'
-        .' SUM(CASE WHEN state = \'gradedright\' THEN 1 ELSE 0 END) countright,'
-        .' SUM(CASE WHEN qas.state = \'gradedwrong\' THEN 1 WHEN qas.state = \'gradedpartial\' THEN 1 ELSE 0 END) countwrong,'
-        .' sqa.userid userid'
-        .' FROM {studentquiz} sq'
-        .' JOIN {studentquiz_attempt} sqa ON sq.id = sqa.studentquizid'
-        .' JOIN {question_usages} qu ON qu.id = sqa.questionusageid'
-        .' JOIN {question_attempts} qa ON qa.questionusageid = qu.id'
-        .' JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id'
-        .' LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id'
-        .' WHERE sq.coursemodule = :cmid7'
-        .' AND qas.state in (\'gradedright\', \'gradedwrong\', \'gradedpartial\')'
-        // Only count grading triggered by submits.
-        .' AND qasd.name = \'-submit\''
-        .' group by sqa.userid'
-        .' ) attempts ON attempts.userid = u.id'
-        // Latest attempts.
-        .' LEFT JOIN'
-        .' ('
-        .' SELECT'
-        .' sqa.userid,'
-        .' count(*) last_attempt_exists,'
-        .' SUM(CASE WHEN qas.state = \'gradedright\' THEN 1 ELSE 0 END) last_attempt_correct,'
-        .' SUM(CASE '
-        .'        WHEN qas.state = \'gradedwrong\' THEN 1'
-        .'        WHEN qas.state = \'gradedpartial\' THEN 1 ELSE 0 END) last_attempt_incorrect'
-        .' FROM {studentquiz} sq'
-        .' JOIN {studentquiz_attempt} sqa ON sq.id = sqa.studentquizid'
-        .' JOIN {question_usages} qu ON qu.id = sqa.questionusageid'
-        .' JOIN {question_attempts} qa ON qa.questionusageid = qu.id'
-        .' JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id'
-        .' LEFT JOIN {question_attempt_step_data} qasd ON'
-        .' qasd.attemptstepid = qas.id and'
-        .' qasd.id in ('
-        // SELECT only latest states (its a constant result).
-        .' SELECT max(qasd.id) latest_grading_event'
-        .' FROM {studentquiz} sq'
-        .' JOIN {studentquiz_attempt} sqa ON sq.id = sqa.studentquizid'
-        .' JOIN {question_usages} qu ON qu.id = sqa.questionusageid'
-        .' JOIN {question_attempts} qa ON qa.questionusageid = qu.id'
-        .' JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id'
-        .' LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id'
-        .' WHERE sq.coursemodule = :cmid1'
-        .'   AND qas.state in (\'gradedright\', \'gradedwrong\', \'gradedpartial\')'
-        .'   AND qasd.name = \'-submit\''
-        .' group by sqa.userid, questionid'
-        .' )'
-        .' WHERE sq.coursemodule = :cmid2'
-        .' AND qas.state in (\'gradedright\', \'gradedpartial\', \'gradedwrong\')'
-        // Only count grading triggered by submits.
-        .' AND qasd.name = \'-submit\''
-        .' group by sqa.userid'
-        .' ) lastattempt ON lastattempt.userid = u.id'
-        .' WHERE sq.coursemodule = :cmid3';
+        . ' LEFT JOIN'
+        . ' (SELECT'
+        . '    createdby,'
+        . '    AVG(avg_rate_perq) avgv,'
+        . '    SUM(num_rate_perq) countv,'
+        . '    SUM(question_not_rated) not_rated_questions'
+        . '  FROM ('
+        . '      SELECT'
+        . '          q.id,'
+        . '          q.createdby createdby,'
+        . '          AVG(sqv.rate) avg_rate_perq,'
+        . '          COUNT(sqv.rate) num_rate_perq,'
+        . '          MAX(CASE WHEN sqv.id is null then 1 else 0 end) question_not_rated'
+        . '      FROM {studentquiz} sq'
+        . '      JOIN {context} con on con.instanceid = sq.coursemodule'
+        . '      JOIN {question_categories} qc on qc.contextid = con.id'
+        . '      JOIN {question} q on q.category = qc.id'
+        . '      LEFT JOIN {studentquiz_rate} sqv on q.id = sqv.questionid'
+        . '      WHERE'
+        . '          q.hidden = 0 AND q.parent = 0'
+        . '          and sq.coursemodule = :cmid6'
+        . '      GROUP BY q.id, q.createdby'
+        . '      ) avgratingperquestion'
+        . '  GROUP BY createdby'
+        . ' ) rates ON rates.createdby = u.id';
+    if ($aggregated) {
+        $sql .= ' LEFT JOIN (SELECT'
+            . ' sp.userid,'
+            . ' COUNT(*) last_attempt_exists,'
+            . ' SUM(lastanswercorrect) last_attempt_correct,'
+            . ' SUM(1 - lastanswercorrect) last_attempt_incorrect'
+            . ' FROM'
+            . ' {studentquiz_progress} AS sp'
+            . ' JOIN {studentquiz} sq ON sq.id = sp.studentquizid'
+            . ' WHERE'
+            . ' sq.coursemodule = :cmid2'
+            . ' GROUP BY sp.userid) lastattempt ON lastattempt.userid = u.id'
+            . ' LEFT JOIN (SELECT'
+            . ' SUM(attempts) counta,'
+            . ' SUM(correctattempts) countright,'
+            . ' SUM(attempts - correctattempts) countwrong,'
+            . ' sp.userid userid'
+            . ' FROM'
+            . ' {studentquiz_progress} AS sp'
+            . ' JOIN {studentquiz} sq ON sq.id = sp.studentquizid'
+            . ' WHERE'
+            . ' sq.coursemodule = :cmid1'
+            . ' GROUP BY sp.userid) attempts ON attempts.userid = u.id';
+    } else {
+        $sql .= ' LEFT JOIN'
+            . ' ('
+            . ' SELECT count(*) counta,'
+            . ' SUM(CASE WHEN state = \'gradedright\' THEN 1 ELSE 0 END) countright,'
+            . ' SUM(CASE WHEN qas.state = \'gradedwrong\' THEN 1 WHEN qas.state = \'gradedpartial\' THEN 1 ELSE 0 END) countwrong,'
+            . ' sqa.userid userid'
+            . ' FROM {studentquiz} sq'
+            . ' JOIN {studentquiz_attempt} sqa ON sq.id = sqa.studentquizid'
+            . ' JOIN {question_usages} qu ON qu.id = sqa.questionusageid'
+            . ' JOIN {question_attempts} qa ON qa.questionusageid = qu.id'
+            . ' JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id'
+            . ' LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id'
+            . ' WHERE sq.coursemodule = :cmid7'
+            . ' AND qas.state in (\'gradedright\', \'gradedwrong\', \'gradedpartial\')'
+            // Only count grading triggered by submits.
+            . ' AND qasd.name = \'-submit\''
+            . ' group by sqa.userid'
+            . ' ) attempts ON attempts.userid = u.id'
+            // Latest attempts.
+            . ' LEFT JOIN'
+            . ' ('
+            . ' SELECT'
+            . ' sqa.userid,'
+            . ' count(*) last_attempt_exists,'
+            . ' SUM(CASE WHEN qas.state = \'gradedright\' THEN 1 ELSE 0 END) last_attempt_correct,'
+            . ' SUM(CASE '
+            . '        WHEN qas.state = \'gradedwrong\' THEN 1'
+            . '        WHEN qas.state = \'gradedpartial\' THEN 1 ELSE 0 END) last_attempt_incorrect'
+            . ' FROM {studentquiz} sq'
+            . ' JOIN {studentquiz_attempt} sqa ON sq.id = sqa.studentquizid'
+            . ' JOIN {question_usages} qu ON qu.id = sqa.questionusageid'
+            . ' JOIN {question_attempts} qa ON qa.questionusageid = qu.id'
+            . ' JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id'
+            . ' LEFT JOIN {question_attempt_step_data} qasd ON'
+            . ' qasd.attemptstepid = qas.id and'
+            . ' qasd.id in ('
+            // SELECT only latest states (its a constant result).
+            . ' SELECT max(qasd.id) latest_grading_event'
+            . ' FROM {studentquiz} sq'
+            . ' JOIN {studentquiz_attempt} sqa ON sq.id = sqa.studentquizid'
+            . ' JOIN {question_usages} qu ON qu.id = sqa.questionusageid'
+            . ' JOIN {question_attempts} qa ON qa.questionusageid = qu.id'
+            . ' JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id'
+            . ' JOIN {question} qq ON qq.id = qa.questionid'
+            . ' LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid = qas.id'
+            . ' WHERE sq.coursemodule = :cmid1'
+            . '   AND qas.state in (\'gradedright\', \'gradedwrong\', \'gradedpartial\')'
+            . '   AND qasd.name = \'-submit\''
+            . ' group by sqa.userid, questionid'
+            . ' )'
+            . ' WHERE sq.coursemodule = :cmid2'
+            . ' AND qas.state in (\'gradedright\', \'gradedpartial\', \'gradedwrong\')'
+            // Only count grading triggered by submits.
+            . ' AND qasd.name = \'-submit\''
+            . ' group by sqa.userid'
+            . ' ) lastattempt ON lastattempt.userid = u.id';
+    }
+    // Question attempts: sum of number of graded attempts per question.
+    $sql .= ' WHERE sq.coursemodule = :cmid3';
+
+    return $sql;
 }
 
 /**
@@ -815,7 +936,8 @@ function mod_studentquiz_helper_attempt_stat_joins() {
 function mod_studentquiz_get_question_types() {
     $types = question_bank::get_creatable_qtypes();
     $returntypes = array();
-
+    // Don't allow Question type essay anymore.
+    unset($types["essay"]);
     foreach ($types as $name => $qtype) {
         if ($name != 'randomsamatch') {
             $returntypes[$name] = $qtype->local_name();
@@ -824,39 +946,41 @@ function mod_studentquiz_get_question_types() {
     return $returntypes;
 }
 
+function mod_studentquiz_get_question_types_keys() {
+    $types = mod_studentquiz_get_question_types();
+    return array_keys($types);
+}
+
+
+
 /**
  * Add capabilities to teacher (Non editing teacher) and
  * Student roles in the context of this context
- * @param stdClass $context of the studentquiz activity
- * @return true or exception
+ *
+ * @param context $context of the studentquiz activity
  */
 function mod_studentquiz_ensure_question_capabilities($context) {
     global $CFG;
 
-    $archtyperoles = array('student', 'teacher');
-    $roles = array();
-    foreach ($archtyperoles as $archtyperole) {
-        foreach (get_archetype_roles($archtyperole) as $role) {
-            $roles[] = $role;
-        }
-    }
-    $capabilities = array(
+    $neededcapabilities = array(
         'moodle/question:add',
         'moodle/question:usemine',
         'moodle/question:viewmine',
         'moodle/question:editmine'
     );
-    if ($CFG->version >= 2018051700) { // Moodle 3.5+
-        $capabilities[] = 'moodle/question:tagmine';
+    if ($CFG->version >= 2018051700) { // Moodle 3.5+.
+        $neededcapabilities[] = 'moodle/question:tagmine';
     }
-    foreach ($capabilities as $capability) {
-        // TODO: Enforcing capabilities shouldn't be required that hard, but we had issues in unit-tests
-        // see https://travis-ci.org/frankkoch/moodle-mod_studentquiz/builds/381355375
-        foreach ($roles as $role) {
-            assign_capability($capability, CAP_ALLOW, $role->id, $context->id, false);
+
+    // Get the ids of all the roles that can submit questions in this activity.
+    list($roleids) = get_roles_with_cap_in_context($context, 'mod/studentquiz:submit');
+    foreach ($roleids as $roleid) {
+        // If needed, add an override for each question capability.
+        foreach ($neededcapabilities as $capability) {
+            // This function only creates an override if needed.
+            role_change_permission($roleid, $context, $capability, CAP_ALLOW);
         }
     }
-    return true;
 }
 
 /**
@@ -920,7 +1044,7 @@ function mod_studentquiz_migrate_old_quiz_usage($courseorigid=null) {
             $oldquizzes = array();
 
             // For each course we need to find the studentquizzes.
-            // "up" section: Only get the topmost category of that studentquiz, which isn't "top" if that one exists
+            // "up" section: Only get the topmost category of that studentquiz, which isn't "top" if that one exists.
             $studentquizzes = $DB->get_records_sql('
                 select s.id, s.name, cm.id as cmid, c.id as contextid, qc.id as categoryid, qc.name as categoryname, qc.parent
                 from {studentquiz} s
@@ -1080,7 +1204,6 @@ function mod_studentquiz_get_tags_by_question_ids($ids) {
 
 function mod_studentquiz_count_questions($cmid) {
     global $DB;
-    $DB->set_debug(false);
     $rs = $DB->count_records_sql('SELECT count(*) FROM {studentquiz} sq'
         // Get this Studentquiz Question category.
         .' JOIN {context} con ON con.instanceid = sq.coursemodule'
@@ -1088,7 +1211,6 @@ function mod_studentquiz_count_questions($cmid) {
         // Only enrolled users.
         .' JOIN {question} q ON q.category = qc.id'
         .'  WHERE q.hidden = 0 AND q.parent = 0 AND sq.coursemodule = :cmid', array('cmid' => $cmid));
-    $DB->set_debug(false);
     return $rs;
 }
 
@@ -1100,7 +1222,6 @@ function mod_studentquiz_count_questions($cmid) {
  */
 function mod_studentquiz_question_stats($cmid) {
     global $DB;
-    $DB->set_debug(false);
     $sql = 'SELECT count(*) questions_available,'
        .'          avg(rating.avg_rating) as average_rating,'
        .'          sum(sqq.approved) as questions_approved'
@@ -1125,7 +1246,6 @@ function mod_studentquiz_question_stats($cmid) {
         .' ) rating on rating.questionid = q.id'
         .' WHERE q.hidden = 0 and q.parent = 0 and sq.coursemodule = :cmid1';
     $rs = $DB->get_record_sql($sql, array('cmid1' => $cmid, 'cmid2' => $cmid));
-    $DB->set_debug(false);
     return $rs;
 }
 

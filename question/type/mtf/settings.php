@@ -40,7 +40,7 @@ if ($ADMIN->fulltree) {
 
     // Shuffle options.
     $settings->add(
-            new admin_setting_configcheckbox('qtype_mtf/shuffleoptions',
-                    get_string('shuffleoptions', 'qtype_mtf'),
-                    get_string('shuffleoptions_help', 'qtype_mtf'), 1));
+            new admin_setting_configcheckbox('qtype_mtf/shuffleanswers',
+                    get_string('shuffleanswers', 'qtype_mtf'),
+                    get_string('shuffleanswers_help', 'qtype_mtf'), 1));
 }

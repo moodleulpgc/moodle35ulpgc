@@ -33,6 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_studentquiz_renderer extends plugin_renderer_base {
 
+    protected $cachedquestionpreviewlinkimage;
+
     /**
      * TODO: document blocks missing everywhere here
      * @param $celldata
@@ -68,6 +70,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         // TODO: Refactor: use mod_studentquiz_report_record_type!
         $userstats = $report->get_user_stats();
         $sqstats = $report->get_studentquiz_stats();
+        $cmid = $report->get_cm_id();
         if (!$userstats) {
             $bc = new block_contents();
             $bc->attributes['id'] = 'mod_studentquiz_statblock';
@@ -90,6 +93,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         $info2->total = $userstats->questions_created;
         $info2->group = 0;
         $info2->one = $userstats->questions_approved;
+        $unansweredquestions = $sqstats->questions_available - $userstats->last_attempt_exists;
         $bc->content = html_writer::div($this->render_progress_bar($info1), '', array('style' => 'width:inherit'))
              . html_writer::div(
                 get_string('statistic_block_progress_last_attempt_correct', 'studentquiz')
@@ -102,7 +106,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             . html_writer::div(
                 get_string('statistic_block_progress_never', 'studentquiz')
                 .html_writer::span(
-                    '<b class="stat never-answered">' . ($sqstats->questions_available - $userstats->last_attempt_exists) .'</b>',
+                    '<b class="stat never-answered">' . ($unansweredquestions) .'</b>',
                     '', array('style' => 'float: right;color:#f0ad4e;')))
             . html_writer::div(
                 get_string('statistic_block_progress_available', 'studentquiz')
@@ -115,6 +119,12 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             . html_writer::div(get_string('statistic_block_created', 'studentquiz')
                 .html_writer::span('<b>' .$userstats->questions_created .'</b>', '',
                     array('style' => 'float: right;')));
+
+        // Add More link to Stat block.
+        $reporturl = new moodle_url('/mod/studentquiz/reportstat.php', ['id' => $cmid]);
+        $readmorelink = $this->render_report_more_link($reporturl);
+        $bc->content .= $readmorelink;
+
         return $bc;
     }
 
@@ -124,6 +134,12 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         $anonymname = get_string('creator_anonym_firstname', 'studentquiz') . ' '
                         . get_string('creator_anonym_lastname', 'studentquiz');
         $anonymise = $report->is_anonymized();
+        $studentquiz = mod_studentquiz_load_studentquiz($report->get_cm_id(), $this->page->context->id);
+        // We need to check this instead of using $report->is_anonymized()
+        // because we want to apply this text regardless of role.
+        $blocktitle = $studentquiz->anonymrank ? get_string('ranking_block_title_anonymised', 'studentquiz') :
+                get_string('ranking_block_title', 'studentquiz');
+        $cmid = $report->get_cm_id();
         $rows = array();
         $rank = 1;
         foreach ($ranking as $row) {
@@ -145,8 +161,14 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         $bc->attributes['id'] = 'mod_studentquiz_rankingblock';
         $bc->attributes['role'] = 'navigation';
         $bc->attributes['aria-labelledby'] = 'mod_studentquiz_navblock_title';
-        $bc->title = html_writer::span(get_string('ranking_block_title', 'studentquiz'));
+        $bc->title = html_writer::span($blocktitle);
         $bc->content = implode('', $rows);
+
+        // Add More link to Ranking block.
+        $reporturl = new moodle_url('/mod/studentquiz/reportrank.php', ['id' => $cmid]);
+        $readmorelink = $this->render_report_more_link($reporturl);
+        $bc->content .= $readmorelink;
+
         return $bc;
     }
 
@@ -270,23 +292,23 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      * @param bool $showlabel if true, show the word 'Preview' after the icon.
      *      If false, just show the icon.
      */
-    public function question_preview_link($question, $context, $showlabel) {
+    public function question_preview_link($question, $context, $showlabel, $previewtext) {
         if ($showlabel) {
             $alt = '';
-            $label = ' ' . get_string('preview');
+            $label = ' ' . $previewtext;
             $attributes = array();
         } else {
-            $alt = get_string('preview');
+            $alt = $previewtext;
             $label = '';
             $attributes = array('title' => $alt);
         }
-
-        $image = $this->pix_icon('t/preview', $alt, '', array('class' => 'iconsmall'));
+        if ($this->cachedquestionpreviewlinkimage == null) {
+            $this->cachedquestionpreviewlinkimage = $this->pix_icon('t/preview', $alt, '', array('class' => 'iconsmall'));
+        }
         $params = array('cmid' => $context->instanceid, 'questionid' => $question->id);
         $link = new moodle_url('/mod/studentquiz/preview.php', $params);
-        $action = new popup_action('click', $link, 'questionpreview',
-            question_preview_popup_params());
-        return $this->action_link($link, $image . $label, $action, $attributes);
+        $action = new popup_action('click', $link, 'questionpreview', question_preview_popup_params());
+        return $this->action_link($link, $this->cachedquestionpreviewlinkimage . $label, $action, $attributes);
     }
 
     /**
@@ -379,17 +401,18 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
 
     /**
      * Render the content of difficulty level column.
+     * The svg image is renderer later using javascript.
+     * See render_bar_javascript_snippet()
      *
      * @param $question
      * @param $rowclasses
      * @return string
      */
     public function render_difficulty_level_column($question, $rowclasses) {
-        $output = '';
-
         $nodifficultylevel = get_string('no_difficulty_level', 'studentquiz');
         $difficultytitle = get_string('difficulty_all_column_name', 'studentquiz');
         $mydifficultytitle = get_string('mydifficulty_column_name', 'studentquiz');
+        $title = "";
         if (!empty($question->difficultylevel) || !empty($question->mydifficulty)) {
             $title = $difficultytitle . ': ' . (100 * round($question->difficultylevel, 2)) . '% ';
             if (!empty($question->mydifficulty)) {
@@ -397,9 +420,15 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             } else {
                 $title .= ', ' . $mydifficultytitle . ': ' . $nodifficultylevel;
             }
-            $output .= html_writer::span($this->render_difficultybar($question->difficultylevel, $question->mydifficulty), null,
-                    ['title' => $title]);
         }
+
+        $output = html_writer::tag("span", "",
+            array(
+                "class" => "mod_studentquiz_difficulty",
+                "data-difficultylevel" => $question->difficultylevel,
+                "data-mydifficulty" => $question->mydifficulty,
+                "title" => $title
+            ));
 
         return $output;
     }
@@ -494,18 +523,18 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
 
     /**
      * Render the content of rate column.
+     * The svg image is renderer later using javascript.
+     * See render_bar_javascript_snippet()
      *
      * @param $question
      * @param $rowclasses
      * @return string
      */
     public function render_rate_column($question, $rowclasses) {
-        $output = '';
-
         $myratingtitle = get_string('myrate_column_name', 'studentquiz');
         $ratingtitle = get_string('rate_all_column_name', 'studentquiz');
         $notavailable = get_string('no_rates', 'studentquiz');
-
+        $title = "";
         if (!empty($question->rate) || !empty($question->myrate)) {
             $title = $ratingtitle . ': ' . round($question->rate, 2) . ' ';
             if (!empty($question->myrate)) {
@@ -513,11 +542,15 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             } else {
                 $title .= ', ' . $myratingtitle . ': ' . $notavailable;
             }
-            $output .= html_writer::span($this->render_ratingbar($question->rate, $question->myrate), null,
-                    ['title' => $title]);
-        } else {
-            $output .= $notavailable;
         }
+
+        $output = html_writer::tag("span", "",
+            array(
+                "class" => "mod_studentquiz_ratingbar",
+                "data-rate" => $question->rate,
+                "data-myrate" => $question->myrate,
+                "title" => $title
+            ));
 
         return $output;
     }
@@ -736,7 +769,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      *
      * @return array
      */
-    public function get_is_sortable_difficulty_level_column() {
+    public function get_is_sortable_difficulty_level_column($aggregated) {
         return [
                 'difficulty' => [
                         'field' => 'dl.difficultylevel',
@@ -744,7 +777,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
                         'tip' => get_string('average_column_name', 'studentquiz')
                 ],
                 'mydifficulty' => [
-                        'field' => 'mydiffs.mydifficulty',
+                        'field' => $aggregated ? 'mydifficulty' : 'mydiffs.mydifficulty',
                         'title' => get_string('mine_column_name', 'studentquiz'),
                         'tip' => get_string('mine_column_name', 'studentquiz')
                 ]
@@ -769,6 +802,20 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
                         'tip' => get_string('mine_column_name', 'studentquiz')
                 ]
         ];
+    }
+
+    /**
+     * Get report read more link.
+     *
+     * @param moodle_url $url Url to the report.
+     * @return string Html string of read more link.
+     */
+    public function render_report_more_link($url) {
+        $output = html_writer::start_div('report_more_url');
+        $output .= html_writer::link($url, get_string('more', 'studentquiz'));
+        $output .= html_writer::end_div();
+
+        return $output;
     }
 
 }
@@ -823,8 +870,8 @@ class mod_studentquiz_overview_renderer extends mod_studentquiz_renderer {
     }
 
     /**
-     * @param $view
-     * @return mixed
+     * @param mod_studentquiz_view $view
+     * @return string
      * TODO: REFACTOR!
      */
     public function render_questionbank($view) {
@@ -834,11 +881,12 @@ class mod_studentquiz_overview_renderer extends mod_studentquiz_renderer {
     }
 
     /**
-     * @param $view
+     * @param mod_studentquiz_view $view
      * @return string
      */
     public function render_select_qtype_form($view) {
-        return $view->get_questionbank()->create_new_question_form($view->get_category_id(), true);
+        return $view->get_questionbank()->create_new_question_form($view->get_category_id(),
+                has_capability('moodle/question:add', $view->get_context()));
     }
 
     /**
@@ -919,6 +967,113 @@ class mod_studentquiz_overview_renderer extends mod_studentquiz_renderer {
                 }
               }';
         $output .= html_writer::end_tag('script');
+        return $output;
+    }
+
+    /**
+     * Returns javascript for rendering difficulty and rating svg
+     *
+     * @return string (javascript)
+     */
+    public function render_bar_javascript_snippet() {
+        $output = <<<EOT
+    boltbase = ",1.838819l3.59776,4.98423l-1.4835,0.58821l4.53027,4.2704l-1.48284,0.71317l5.60036,7.15099l-9.49921,-5.48006l1.81184,\
+    -0.76102l-5.90211,-3.51003l2.11492,-1.08472l-6.23178,-3.68217l6.94429,-3.189z";
+    starbase = ",8.514401l5.348972,0l1.652874,-5.081501l1.652875,5.081501l5.348971,0l-4.327402,3.140505l1.652959,5.081501l-4.327403,\
+    -3.14059l-4.327402,3.14059l1.65296,-5.081501l-4.327403,-3.140505z";
+
+    function getNode(n, v) {
+        n = document.createElementNS("http://www.w3.org/2000/svg", n);
+        for (var p in v)
+            n.setAttributeNS(null, p.replace(/[A-Z]/g, function(m, p, o, s) { return "-" + m.toLowerCase(); }), v[p]);
+        return n
+    }
+
+    function getBoltOrStar(svg, m, filled, base) {
+        var fillcolor = "#ffc107";
+        if(!filled) {
+            fillcolor = "#fff";
+        }
+        var r = getNode("path", {stroke:"#868e96", fill: fillcolor, d: "m" + m + base});
+        svg.appendChild(r);
+    }
+
+    function addBackground(svg, level) {
+        var r = getNode('rect', { x: 0.396847, y: 0.397703, rx: 5, ry: 5, width: 100, height: 20, "stroke-width": 0.5, fill:'#fff', stroke:"#868e96"});
+        svg.appendChild(r);
+
+        var r = getNode('rect', { x: 0.396847, y: 0.397703, rx: 5, ry: 5, width: level, height: 20, "stroke-width": 0.5, fill: '#007bff', stroke:"#868e96"});
+        svg.appendChild(r);
+    }
+
+    function createStarBar(mine, average) {
+        var svg = getNode("svg", {width: 101, height: 21 });
+        var g = getNode("g", {});
+        svg.appendChild(g);
+        addBackground(g, average * 20);
+        var stars = mine * 5;
+        for(var i = 5; i <= 85; i = i + 20) {
+            var makestar = false;
+            if(stars > 0) {
+                makestar = true;
+            }
+            getBoltOrStar(g, i, makestar, starbase);
+            stars = stars - 5;
+        }
+        return svg;
+    }
+
+    function createBoltBar(mine, average) {
+        var svg = getNode("svg", {width: 101, height: 21});
+        var g = getNode("g", {});
+        svg.appendChild(g);
+        addBackground(g, average * 100);
+        var bolts = mine * 5;
+        for(var i = 8; i <= 88; i = i + 20) {
+            var makebolt = false;
+            if(bolts > 0) {
+                makebolt = true;
+            }
+            getBoltOrStar(g, i, makebolt, boltbase);
+            bolts = bolts - 1;
+        }
+        return svg;
+    }
+
+
+    require(['jquery'], function($) {
+        $(".mod_studentquiz_difficulty").each(function(){
+        var difficultylevel = $(this).data("difficultylevel");
+        var mydifficulty = $(this).data("mydifficulty");
+            if(difficultylevel === undefined && mydifficulty === undefined) {
+                $(this).append("n.a.");
+            }else{
+                if(difficultylevel === undefined) {
+                    difficultylevel = 0;
+                }
+                if(mydifficulty === undefined) {
+                    mydifficulty = 0;
+                }
+                $(this).append(createBoltBar(mydifficulty,difficultylevel));
+            }
+        });
+        $(".mod_studentquiz_ratingbar").each(function(){
+        var rate = $(this).data("rate");
+        var myrate = $(this).data("myrate");
+            if(rate === undefined && myrate === undefined) {
+                $(this).append("n.a.");
+            }else{
+                if(rate === undefined) {
+                    difficultylevel = 0;
+                }
+                if(myrate === undefined) {
+                    mydifficulty = 0;
+                }
+                $(this).append(createStarBar(myrate,rate));
+            }
+        });
+    });
+EOT;
         return $output;
     }
 
@@ -1501,15 +1656,15 @@ class mod_studentquiz_ranking_renderer extends mod_studentquiz_renderer {
                     . get_string('creator_anonym_lastname', 'studentquiz');
             }
             $celldata[] = array(
-                $rank,
-                $username,
-                round($ur->points, 2),
-                round($ur->questions_created * $report->get_quantifier_question(), 2),
-                round($ur->questions_approved * $report->get_quantifier_approved(), 2),
-                round($ur->rates_average * $ur->questions_created * $report->get_quantifier_rate(), 2),
-                round($ur->last_attempt_correct * $report->get_quantifier_correctanswer(), 2),
-                round($ur->last_attempt_incorrect * $report->get_quantifier_incorrectanswer(), 2),
-                (100 * round($ur->last_attempt_correct / max($numofquestions, 1), 2)) . ' %'
+                $rank, // Row: Rank
+                $username, // Row: Fullname
+                round($ur->points, 2), // Row: Total Points
+                round($ur->questions_created * $report->get_quantifier_question(), 2), // Points for questions created
+                round($ur->questions_approved * $report->get_quantifier_approved(), 2), // Points for approved questions
+                round($ur->rates_average * $ur->questions_created_and_rated * $report->get_quantifier_rate(), 2), // Points for stars received
+                round($ur->last_attempt_correct * $report->get_quantifier_correctanswer(), 2), // Points for latest correct attemps
+                round($ur->last_attempt_incorrect * $report->get_quantifier_incorrectanswer(), 2), // Points for latest wrong attemps
+                (100 * round($ur->last_attempt_correct / max($numofquestions, 1), 2)) . ' %' // Personal Progress
             );
             $rowstyle[] = ($userid == $ur->userid) ? array('class' => 'mod-studentquiz-summary-highlight') : array();
         }
@@ -1517,4 +1672,26 @@ class mod_studentquiz_ranking_renderer extends mod_studentquiz_renderer {
         $data = $this->render_table_data($celldata, $rowstyle);
         return $this->render_table($data, $size, $align, $head, $caption);
     }
+}
+
+class mod_studentquiz_migration_renderer extends mod_studentquiz_renderer {
+
+    public function view_body_success($cmid, $studentquiz) {
+        return $this->output->notification(get_string('migrated_successful', 'studentquiz'),
+                \core\output\notification::NOTIFY_SUCCESS)
+            . $this->output->single_button(new moodle_url('/mod/studentquiz/view.php', array('id' => $cmid)),
+                get_string('finish_button', 'studentquiz'));
+    }
+
+    public function view_body($cmid, $studentquiz) {
+        if ($studentquiz->aggregated == 1) {
+            return $this->output->error_text(get_string('migrate_already_done', 'studentquiz'));
+
+        } else {
+            return $this->output->confirm(get_string('migrate_ask', 'studentquiz'),
+                new moodle_url('/mod/studentquiz/migrate.php', array('id' => $cmid, 'do' => 'yes')),
+                new moodle_url('/mod/studentquiz/view.php', array('id' => $cmid)));
+        }
+    }
+
 }

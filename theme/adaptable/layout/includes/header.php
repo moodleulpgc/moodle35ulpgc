@@ -90,27 +90,31 @@ $fontssubset = '';
 
 switch ($PAGE->theme->settings->fontname) {
     case 'default':
-    // Get the default font used by the browser.
+        // Get the default font used by the browser.
     break;
 
     default:
-    // Get the Google fonts.
-    $fontname = str_replace(" ", "+", $PAGE->theme->settings->fontname);
-    $fontheadername = str_replace(" ", "+", $PAGE->theme->settings->fontheadername);
-    $fonttitlename = str_replace(" ", "+", $PAGE->theme->settings->fonttitlename);
+        // Get the Google fonts.
+        $fontname = str_replace(" ", "+", $PAGE->theme->settings->fontname);
+        $fontheadername = str_replace(" ", "+", $PAGE->theme->settings->fontheadername);
+        $fonttitlename = str_replace(" ", "+", $PAGE->theme->settings->fonttitlename);
 
-    $fontweight = ':400,400i';
-    $fontheaderweight = ':400,400i';
-    $fonttitleweight = ':700,700i';
-    $fontssubset = '';
+        $fontweight = ':400,400i';
+        $fontheaderweight = ':400,400i';
+        $fonttitleweight = ':700,700i';
+        $fontssubset = '';
 
-    // Get the Google Font weights.
-    $fontweight = ':'.$PAGE->theme->settings->fontweight.','.$PAGE->theme->settings->fontweight.'i';
-    $fontheaderweight = ':'.$PAGE->theme->settings->fontheaderweight.','.$PAGE->theme->settings->fontheaderweight.'i';
-    $fonttitleweight = ':'.$PAGE->theme->settings->fonttitleweight.','.$PAGE->theme->settings->fonttitleweight.'i';
+        // Get the Google Font weights.
+        $fontweight = ':'.$PAGE->theme->settings->fontweight.','.$PAGE->theme->settings->fontweight.'i';
+        $fontheaderweight = ':'.$PAGE->theme->settings->fontheaderweight.','.$PAGE->theme->settings->fontheaderweight.'i';
+        $fonttitleweight = ':'.$PAGE->theme->settings->fonttitleweight.','.$PAGE->theme->settings->fonttitleweight.'i';
 
-    // Get the Google fonts subset.
-    $fontssubset = '&subset=latin,'.$PAGE->theme->settings->fontsubset;
+        // Get the Google fonts subset.
+        if (!empty($PAGE->theme->settings->fontsubset)) {
+            $fontssubset = '&subset='.$PAGE->theme->settings->fontsubset;
+        } else {
+            $fontssubset = '';
+        }
     break;
 }
 
@@ -164,7 +168,7 @@ echo $OUTPUT->standard_head_html() ?>
     <meta property="og:title" content="<?php echo $OUTPUT->page_title(); ?>" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="<?php echo $wwwroot; ?>" />
-    <meta property="og:site_name" content="<?php echo $SITE->fullname; ?>" />
+    <meta name="og:site_name" value="<?php echo $SITE->fullname; ?>" />
 
     <!-- Chrome, Firefox OS and Opera on Android -->
     <meta name="theme-color" content="<?php echo $PAGE->theme->settings->maincolor; ?>" />
@@ -223,10 +227,10 @@ echo $OUTPUT->get_dev_alert();
 
 <?php
     // If the device is a mobile and the alerts are not hidden or it is a desktop then load and show the alerts.
-    if (((theme_adaptable_is_mobile()) && ($hidealertsmobile == 1)) || (theme_adaptable_is_desktop())) {
-        // Display alerts.
-        echo $OUTPUT->get_alert_messages();
-    }
+if (((theme_adaptable_is_mobile()) && ($hidealertsmobile == 1)) || (theme_adaptable_is_desktop())) {
+    // Display alerts.
+    echo $OUTPUT->get_alert_messages();
+}
 
 // Background image in Header.
 ?>
@@ -362,7 +366,8 @@ if ($PAGE->pagetype != "mod-quiz-attempt") {
                             autocomplete="off">
                             <button title="<?php echo get_string("searchcourses", "theme_adaptable")?>"
                                     type="submit" class="no-border bg-white pas search-box__button">
-                                    <abbr class="fa fa-search" title="<?php echo get_string("searchcourses", "theme_adaptable"); ?>"></abbr>
+                                    <abbr class="fa fa-search" title="<?php echo get_string("searchcourses", "theme_adaptable");?>">
+                                    </abbr>
                             </button>
                 </div>
             </form>
@@ -388,8 +393,8 @@ if (
     (isloggedin() && !isguestuser()) ||
     (!empty($PAGE->theme->settings->enablenavbarwhenloggedout)) ) {
 
-        // Remove menu navbar in Quiz pages even if they don't use SEB.
-        if ($PAGE->pagetype != "mod-quiz-attempt") {
+    // Remove menu navbar in Quiz pages even if they don't use SEB.
+    if ($PAGE->pagetype != "mod-quiz-attempt") {
 ?>
     <div id="navwrap">
         <div class="container">
@@ -434,20 +439,23 @@ if (isloggedin()) {
     }
 
     if ($PAGE->theme->settings->enablezoom) { ?>
-            <li class="hbll">
-                <a href="javascript:void(0);" class="moodlewidth" title="<?php echo get_string('fullscreen', 'theme_adaptable') ?>">
+        <li class="hbll">
+            <a href="javascript:void(0);" class="moodlewidth" title="<?php echo get_string('fullscreen', 'theme_adaptable') ?>">
                 <i class="fa fa-expand fa-lg"></i>
                 <span class="zoomdesc"><?php echo get_string('fullscreen', 'theme_adaptable') ?></span>
             </a>
         </li>
         <li class="sbll">
-                <a href="javascript:void(0);" class="moodlewidth" title="<?php echo get_string('standardview', 'theme_adaptable') ?>">
-                    <i class="fa fa-compress fa-lg"></i>
+            <a href="javascript:void(0);" class="moodlewidth" title="<?php echo get_string('standardview', 'theme_adaptable') ?>">
+                <i class="fa fa-compress fa-lg"></i>
                 <span class="zoomdesc"><?php echo get_string('standardview', 'theme_adaptable') ?></span>
             </a>
             </li>
 <?php
-    } } } ?>
+    }
+}
+    }
+    ?>
         </ul>
                             <div id="edittingbutton" class="pull-right breadcrumb-button">
                                 <?php echo $OUTPUT->page_heading_button(); ?>

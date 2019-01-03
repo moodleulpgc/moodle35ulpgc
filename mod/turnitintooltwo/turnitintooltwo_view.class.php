@@ -23,6 +23,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__."/lib.php");
 require_once(__DIR__.'/turnitintooltwo_form.class.php');
+require_once(__DIR__.'/turnitintooltwo_submission.class.php');
 
 class turnitintooltwo_view {
 
@@ -108,6 +109,7 @@ class turnitintooltwo_view {
         $PAGE->requires->string_for_js('postdate_warning', 'turnitintooltwo');
         $PAGE->requires->string_for_js('deleteconfirm', 'turnitintooltwo');
         $PAGE->requires->string_for_js('turnitindeleteconfirm', 'turnitintooltwo');
+        $PAGE->requires->string_for_js('max_marks_warning', 'turnitintooltwo');
     }
 
     /**
@@ -146,7 +148,7 @@ class turnitintooltwo_view {
         $module = $DB->get_record('config_plugins', array('plugin' => 'mod_turnitintool'));
         if ( $module ) {
             $tabs[] = new tabobject('v1migration', $CFG->wwwroot.'/mod/turnitintooltwo/settings_extras.php?cmd=v1migration',
-                        get_string('v1migrationtitle', 'turnitintooltwo'), get_string('v1migrationtitle', 'turnitintooltwo'), false);    
+                        get_string('v1migrationtitle', 'turnitintooltwo'), get_string('v1migrationtitle', 'turnitintooltwo'), false);
         }
 
         $selected = ($cmd == 'activitylog') ? 'apilog' : $cmd;
@@ -300,7 +302,7 @@ class turnitintooltwo_view {
 
             if ($istutor || $eulaaccepted == 1) {
 
-                if ($prevsubmission) {
+                if ($prevsubmission && ($istutor || $turnitintooltwoassignment->turnitintooltwo->studentreports)) {
                     $genparams = turnitintooltwo_get_report_gen_speed_params();
                     $elements[] = array('html', '<div class="tii_checkagainstnote">' . get_string('reportgenspeed_resubmission', 'turnitintooltwo', $genparams) . '</div>');
                 }
@@ -809,12 +811,18 @@ class turnitintooltwo_view {
                 $rubricviewlink .= $OUTPUT->box_end(true);
             }
 
+            // Show warning to instructor when changing maxmarks if grades exist
+            $turnitintooltwosubmission = new turnitintooltwo_submission();
+            $getgrades = $turnitintooltwosubmission->count_graded_submissions($turnitintooltwoassignment->turnitintooltwo->id);
+
+            $class = $getgrades > 0 ? 'max_marks_warning' : '';
+
             // Allow marks to be editable if a tutor is logged in.
             $textfield = $partdetails[$partid]->maxmarks.$rubricviewlink;
             if ($istutor) {
                 $textfield = html_writer::link('#', $partdetails[$partid]->maxmarks,
                                                 array('title' => get_string('edit', 'turnitintooltwo'),
-                                                    'class' => 'editable_text editable_text_'.$partid, 'id' => 'marks_'.$partid,
+                                                    'class' => 'editable_text editable_text_'.$partid . ' ' . $class, 'id' => 'marks_'.$partid,
                                                     'data-type' => 'text', 'data-pk' => $partid, 'data-name' => 'maxmarks',
                                                     'data-params' => "{ 'assignment': ".
                                                                         $turnitintooltwoassignment->turnitintooltwo->id.", ".
@@ -1458,7 +1466,7 @@ class turnitintooltwo_view {
         } else {
             $data = array($partid, $checkbox, $studentlastname, $studentname, $rawtitle, $title, $objectid, $rawmodified, $modified);
         }
-        
+
         if (($istutor) || (!$istutor && $turnitintooltwoassignment->turnitintooltwo->studentreports)) {
             $data[] = $rawscore;
             $data[] = $score;
@@ -1496,8 +1504,8 @@ class turnitintooltwo_view {
 
         if ($istutor && !empty($submission->id)) {
             return true;
-        } else {            
-            if ((empty($submission->submission_objectid) && !empty($submission->id) 
+        } else {
+            if ((empty($submission->submission_objectid) && !empty($submission->id)
                 && ((time() < $dtdue) || (time() >= $dtdue && $allowlatesubmissions == 1)))) {
                 return true;
             }

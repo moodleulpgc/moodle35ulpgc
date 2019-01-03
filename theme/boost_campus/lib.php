@@ -57,7 +57,7 @@ function theme_boost_campus_get_main_scss_content($theme) {
     $pre = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/pre.scss');
     // Post CSS - this is loaded AFTER the main scss but before the extra scss from the setting.
     $post = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/post.scss');
-    
+
     // Load ULPGC specific css 
     // load moove _blocks
     $blocks = file_get_contents($CFG->dirroot . '/theme/boost_campus/scss/_blocks.scss');
@@ -67,7 +67,6 @@ function theme_boost_campus_get_main_scss_content($theme) {
     }
     
     $post .= "\n". $blocks."\n".$ulpgc ;
-
     // Combine them together.
     return $pre . "\n" . $scss . "\n" . $post;
 }
@@ -106,11 +105,12 @@ function theme_boost_campus_get_pre_scss($theme) {
         'footerblocks' => ['footerblocks'],
         'imageareaitemsmaxheight' => ['imageareaitemsmaxheight'],
         'showsettingsincourse' => ['showsettingsincourse'],
-        'incoursesettingsswitchtorole' => ['incoursesettingsswitchtorole'],
+        'incoursesettingsswitchtoroleposition' => ['incoursesettingsswitchtoroleposition'],
         'hidefooteronloginpage' => ['hidefooteronloginpage'],
         'footerhideusertourslink' => ['footerhideusertourslink'],
         'navdrawerfullwidth' => ['navdrawerfullwidth'],
-        'helptextmodal' => ['helptextmodal']
+        'helptextmodal' => ['helptextmodal'],
+        'breakpoint' => ['breakpoint']
         // MODIFICATION END.
     ];
 

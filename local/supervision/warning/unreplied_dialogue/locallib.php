@@ -164,11 +164,10 @@ class warning_unreplied_dialogue extends warning {
                 if(!$stat->courseid || !has_capability('mod/dialogue:open', $modcontext, $stat->userid) || !has_capability('mod/dialogue:receiveasstaff', $modcontext, $stat->recipientid) ) {
                     // the stat is incorrect because imposible to open/read better close if possible
                     if($stat->conversationid) {
-                        $message = $DB->get_records('dialogue_messages', 
-                                        array('dialogueid'=>$stat->dialogueid,'conversationid'=>$stat->conversationid, 'authorid'=>$stat->userid), 
-                                        'conversationindex DESC', 'id, state', 0, 1);
-                        if($message = reset($message)) {
-                            $message->state = \mod_dialogue\dialogue::STATE_CLOSED;
+                        if($message = reset($DB->get_records('dialogue_messages', array('dialogueid'=>$stat->dialogueid, 
+                                                                                    'conversationid'=>$stat->conversationid, 'authorid'=>$stat->userid), 
+                                                                                    'conversationindex DESC', 'id, state', 0, 1))) {
+                            $message->state = \mod_dialogue\dialoge::STATE_CLOSED;
 //                            $DB->set_field('dialogue_conversations', 'closed', 1, array('id'=>$stat->conversationid));
                             $DB->update_record('dialogue_messages', $message);
                         }

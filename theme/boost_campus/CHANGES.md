@@ -1,8 +1,27 @@
 moodle-theme_boost_campus
-=========================
 
 Changes
 -------
+
+### Unreleased
+
+* 2018-12-20 - Fixed a bug with modal help text setting occuring in (sub)plugins that use only enabled / enabled_help for the help texts.
+* 2018-12-19- Improved the feature showhintcourseguestaccess to not be shown in some edge cases.
+* 2018-12-18 - Adding 'both' option for 'Switch to role…' menu fixes - Many thanks to Luca Bösch (lucaboesch) for his proposal and main work on this!
+* 2018-12-17 - Setting to change the breakpoint for smaller screens.
+* 2018-12-13 - Improved whitespaces on small screens to show more of the content.
+
+### Release v3.5-r4
+
+* 2018-12-12 - Bugfix: Improved font size for all modal help text dialogues.
+* 2018-12-12 - Adjusted navbar.mustache template due to upstream changes in MDL-62145.
+* 2018-12-06 - Bugfix: Improved placement of the footnote to prevent that it covers the login form on small mobile devices.
+* 2018-12-04 - Bugfix: body and html tags were closed before additional layout elements were added.
+* 2018-12-04 - Changed travis.yml due to upstream changes.
+
+### Release v3.5-r3
+
+* 2018-11-26 - Fixed broken login functionality caused by Moodle security patch (see MDL-63183).
 
 ### Release v3.5-r2
 

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,10 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Support for restore API
+ * Learning Analytics Enriched Rubric (e-rubric) - Restore
  *
- * @package    gradingform
- * @subpackage Learinng Analytics Enriched Rubric (e-rubric)
+ * Restores the learning analytics enriched rubric specific data from grading.xml file.
+ *
+ * @package    gradingform_erubric
+ * @category   grading
  * @copyright  2012 John Dimopoulos <johndimopoulos@sch.gr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,10 +28,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Restores the learning analytics enriched rubric specific data from grading.xml file.
- 
- * @package    gradingform
- * @subpackage Learinng Analytics Enriched Rubric (e-rubric)
+ * This class contains all necessary definitions needed for a successful restore of all e-rubric data.
+ *
+ * @package    gradingform_erubric
+ * @category   grading
  * @copyright  2012 John Dimopoulos <johndimopoulos@sch.gr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -74,6 +75,8 @@ class restore_gradingform_erubric_plugin extends restore_gradingform_plugin {
      *
      * Sets the mapping 'gradingform_erubric_criterion' to be used later by
      * {@link self::process_gradinform_erubric_filling()}
+     *
+     * @param stdClass|array $data
      */
     public function process_gradingform_erubric_criterion($data) {
         global $DB;
@@ -91,6 +94,8 @@ class restore_gradingform_erubric_plugin extends restore_gradingform_plugin {
      *
      * Sets the mapping 'gradingform_erubric_level' to be used later by
      * {@link self::process_gradinform_erubric_filling()}
+     *
+     * @param stdClass|array $data
      */
     public function process_gradingform_erubric_level($data) {
         global $DB;
@@ -105,6 +110,8 @@ class restore_gradingform_erubric_plugin extends restore_gradingform_plugin {
 
     /**
      * Processes filling element data.
+     *
+     * @param stdClass|array $data
      */
     public function process_gradinform_erubric_filling($data) {
         global $DB;
@@ -114,6 +121,8 @@ class restore_gradingform_erubric_plugin extends restore_gradingform_plugin {
         $data->criterionid = $this->get_mappingid('gradingform_erubric_criterion', $data->criterionid);
         $data->levelid = $this->get_mappingid('gradingform_erubric_level', $data->levelid);
 
-        $DB->insert_record('gradingform_erubric_fillings', $data);
+        if (!empty($data->criterionid)) {
+            $DB->insert_record('gradingform_erubric_fillings', $data);
+        }
     }
 }

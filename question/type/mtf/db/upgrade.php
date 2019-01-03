@@ -32,5 +32,13 @@ function xmldb_qtype_mtf_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
+    $table = new xmldb_table('qtype_mtf_options');
+    $oldfield = new xmldb_field('shuffleoptions', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1');
+    if($dbman->field_exists($table, $oldfield)){
+        $dbman->rename_field($table, $oldfield, 'shuffleanswers');
+    }
+
+
+
     return true;
 }

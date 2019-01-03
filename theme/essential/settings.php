@@ -62,7 +62,7 @@ if ($ADMIN->fulltree) {
     $name = 'theme_essential/flatnavigation';
     $title = get_string('flatnavigation', 'theme_essential');
     $description = get_string('flatnavigationdesc', 'theme_essential');
-    $default = true;
+    $default = false;
     $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $essentialsettingsgeneric->add($setting);
@@ -1227,6 +1227,14 @@ if ($ADMIN->fulltree) {
     $setting->set_updatedcallback('theme_reset_all_caches');
     $essentialsettingsheader->add($setting);
 
+    // Participants menu.
+    $name = 'theme_essential/participantsmenu';
+    $title = get_string('participantsmenu', 'theme_essential');
+    $description = get_string('participantsmenudesc', 'theme_essential');
+    $default = true;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+    $essentialsettingsheader->add($setting);
+
     // Choose breadcrumbstyle.
     $name = 'theme_essential/breadcrumbstyle';
     $title = get_string('breadcrumbstyle', 'theme_essential');
@@ -1456,6 +1464,14 @@ if ($ADMIN->fulltree) {
     $name = 'theme_essential/coursegradesmi';
     $title = get_string('coursegradesmi', 'theme_essential');
     $description = get_string('coursegradesmidesc', 'theme_essential');
+    $default = true;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
+    $essentialsettingsheader->add($setting);
+
+    // Badges.
+    $name = 'theme_essential/badgesmi';
+    $title = get_string('badgesmi', 'theme_essential');
+    $description = get_string('badgesmidesc', 'theme_essential');
     $default = true;
     $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
     $essentialsettingsheader->add($setting);

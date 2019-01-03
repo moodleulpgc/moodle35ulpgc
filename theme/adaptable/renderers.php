@@ -541,14 +541,14 @@ class theme_adaptable_core_renderer extends core_renderer {
         $output = '';
 
         // Development version.
-        if (get_config('theme_adaptable', 'version') < '2018111200') {
+        if (get_config('theme_adaptable', 'version') < '2018121000') {
                 $output .= '<div id="beta"><h3>';
                 $output .= get_string('beta', 'theme_adaptable');
                 $output .= '</h3></div>';
         }
 
-        // Deprecated moodle version (3.4.2 or older).
-        if ($CFG->version < 2016120500) {
+        // Deprecated moodle version (3.5.3 or older).
+        if ($CFG->version < 2018051703) {
                 $output .= '<div id="beta"><center><h3>';
                 $output .= get_string('deprecated', 'theme_adaptable');
                 $output .= '</h3></center></div>';
@@ -1913,12 +1913,63 @@ EOT;
 
             if (!empty($PAGE->theme->settings->$menunumber) && $access == true && !$this->hideinforum()) {
                 $menu = ($PAGE->theme->settings->$menunumber);
+
+                /******************************************************************************************
+                 * @copyright 2018 Mathieu Domingo
+                 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+                 *
+                 * Parse the end of each line to look for capabilities.
+                 */
+
+                // Explode the content of the toolmenu in an "array of lines".
+                $linesmenu = explode("\n", $menu);
+
+                // For each line we take the "$key" to be able to remove it from the "array of lines".
+                foreach ($linesmenu as $key => $line) {
+                    // Explode each line in an "array of cells".
+                    $cells = explode("|", $line);
+
+                    // If there is more than 3 cells, the user have add some "|text" to the line.
+                    if (count($cells) > 3) {
+                        // We look each cells added to the line for capabilities.
+                        for ($i = 3; $i < count($cells); $i++) {
+                            // Check if the current cell contain a valid capability or not.
+                            if (!$capinfo = get_capability_info(trim($cells[$i]))) {
+                                // NOTE: echo $cells[$i]." is not a valid capability";.
+
+                                // Should we say to the user that the capability is not valid ?.
+                                // It should be better to print this when the "admin" fill the toolmenu, not when we print it.
+
+                                // If it's not valid, check the next cell (here we could change the behaviour from "do nothing" to "delete the line")
+                                continue;
+                            }
+
+                            // Check if the current user have the capability contained in the current cell.
+                            if (!has_capability(trim($cells[$i]), context_course::instance($PAGE->course->id))) {
+                                // We remove the current line from the array.
+                                unset($linesmenu[$key]);
+
+                                // We have removed the line, we don't need to check nexts cells.
+                                break;
+
+                                // NOTE: The behaviour here is "the user need to have ALL capabilities written on the line"
+                                // I.E: AND logic only, it needs a more complex traitement if we want to take in account some logics mixing OR and AND.
+                            }
+                        }
+                    }
+                }
+
+                // Once we have finish to check all lines, we recreate the menu
+                // (without the lines that the user don't have the capabilities needed) to continue the original process.
+                $menu = implode("\n", $linesmenu);
+
                 $label = $PAGE->theme->settings->$menutitle;
 
                 // Check the option of displaying a sub-menu arrow symbol.
                 if (!empty($PAGE->theme->settings->navbardisplaysubmenuarrow)) {
                     $label .= ' &nbsp;<i class="fa fa-caret-down"></i>';
                 }
+
                 $custommenuitems = $this->parse_custom_menu($menu, $label, $class, '</span>');
                 $custommenu = new custom_menu($custommenuitems);
                 $retval .= $this->render_custom_menu($custommenu);

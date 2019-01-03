@@ -25,6 +25,49 @@ global $CFG;
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/type/kprime/lib.php');
 
+/**
+ * Question hint for kprime.
+ *
+ * An extension of {@link question_hint} for questions like match and multiple
+ * choice with multile answers, where there are options for whether to show the
+ * number of parts right at each stage, and to reset the wrong parts.
+ *
+ * @copyright  2010 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class question_hint_kprime extends question_hint_with_parts {
+
+    public $statewhichincorrect;
+
+    /**
+     * Constructor.
+     * @param int the hint id from the database.
+     * @param string $hint The hint text
+     * @param int the corresponding text FORMAT_... type.
+     * @param bool $shownumcorrect whether the number of right parts should be shown
+     * @param bool $clearwrong whether the wrong parts should be reset.
+     */
+    public function __construct($id, $hint, $hintformat, $shownumcorrect,
+                                                            $clearwrong, $statewhichincorrect) {
+        parent::__construct($id, $hint, $hintformat, $shownumcorrect, $clearwrong);
+        $this->statewhichincorrect = $statewhichincorrect;
+    }
+
+    /**
+     * Create a basic hint from a row loaded from the question_hints table in the database.
+     * @param object $row with property options as well as hint, shownumcorrect and clearwrong set.
+     * @return question_hint_kprime
+     */
+    public static function load_from_record($row) {
+        return new question_hint_kprime($row->id, $row->hint, $row->hintformat,
+                $row->shownumcorrect, $row->clearwrong, $row->options);
+    }
+
+    public function adjust_display_options(question_display_options $options) {
+        parent::adjust_display_options($options);
+        $options->statewhichincorrect = $this->statewhichincorrect;
+    }
+}
 
 /**
  * The kprime question type.
@@ -264,7 +307,82 @@ class qtype_kprime extends question_type {
             }
         }
     }
+    
+    public function save_hints($formdata, $withparts = false) {
+        global $DB;
+        $context = $formdata->context;
 
+        $oldhints = $DB->get_records('question_hints',
+                array('questionid' => $formdata->id), 'id ASC');
+
+        if (!empty($formdata->hint)) {
+            $numhints = max(array_keys($formdata->hint)) + 1;
+        } else {
+            $numhints = 0;
+        }
+
+        if ($withparts) {
+            if (!empty($formdata->hintclearwrong)) {
+                $numclears = max(array_keys($formdata->hintclearwrong)) + 1;
+            } else {
+                $numclears = 0;
+            }
+            if (!empty($formdata->hintshownumcorrect)) {
+                $numshows = max(array_keys($formdata->hintshownumcorrect)) + 1;
+            } else {
+                $numshows = 0;
+            }
+            $numhints = max($numhints, $numclears, $numshows);
+        }
+
+        for ($i = 0; $i < $numhints; $i += 1) {
+            if (html_is_blank($formdata->hint[$i]['text'])) {
+                $formdata->hint[$i]['text'] = '';
+            }
+
+            if ($withparts) {
+                $clearwrong = !empty($formdata->hintclearwrong[$i]);
+                $shownumcorrect = !empty($formdata->hintshownumcorrect[$i]);
+                $statewhichincorrect = !empty($formdata->hintoptions[$i]);
+            }
+
+            if (empty($formdata->hint[$i]['text']) && empty($clearwrong) &&
+                    empty($shownumcorrect) && empty($statewhichincorrect)) {
+                continue;
+            }
+
+            // Update an existing hint if possible.
+            $hint = array_shift($oldhints);
+            if (!$hint) {
+                $hint = new stdClass();
+                $hint->questionid = $formdata->id;
+                $hint->hint = '';
+                $hint->id = $DB->insert_record('question_hints', $hint);
+            }
+
+            $hint->hint = $this->import_or_save_files($formdata->hint[$i],
+                    $context, 'question', 'hint', $hint->id);
+            $hint->hintformat = $formdata->hint[$i]['format'];
+            if ($withparts) {
+                $hint->clearwrong = $clearwrong;
+                $hint->shownumcorrect = $shownumcorrect;
+                $hint->options = $statewhichincorrect;
+            }
+            $DB->update_record('question_hints', $hint);
+        }
+
+        // Delete any remaining old hints.
+        $fs = get_file_storage();
+        foreach ($oldhints as $oldhint) {
+            $fs->delete_area_files($context->id, 'question', 'hint', $oldhint->id);
+            $DB->delete_records('question_hints', array('id' => $oldhint->id));
+        }
+    }
+
+    protected function make_hint($hint) {
+        return question_hint_kprime::load_from_record($hint);
+    }
+    
     /**
      * Initialise the common question_definition fields.
      *

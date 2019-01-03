@@ -152,7 +152,7 @@ class stack_cas_casstring {
                 'conmetderiv' => true, 'constvalue' => true, 'cont2part' => true, 'context' => true, 'contexts' => true,
                 'contortion' => true, 'contour' => true, 'contour_levels' => true, 'contour_plot' => true,
                 'contract_edge' => true, 'contragrad' => true, 'contrib_ode' => true, 'convert' => true, 'coord' => true,
-                'copy_graph' => true, 'covdiff' => true, 'covers' => true, 'create_list' => true, 'csetup' => true,
+                'copy_graph' => true, 'covdiff' => true, 'covers' => true, 'csetup' => true,
                 'ct_coords' => true, 'ct_coordsys' => true, 'ctaylor' => true, 'ctaypov' => true, 'ctaypt' => true,
                 'ctayswitch' => true, 'ctayvar' => true, 'ctorsion_flag' => true, 'ctransform' => true,
                 'ctrgsimp' => true, 'cunlisp' => true, 'declare_constvalue' => true, 'declare_dimensions' => true,
@@ -485,7 +485,7 @@ class stack_cas_casstring {
                 'gal' => true, 'deg' => true, 'cal' => true, 'btu' => true, 'rem' => true,
                 'nounor' => true, 'nounand' => true, 'xor' => true, 'nounint' => true, 'noundiff' => true, 'root' => true,
                 'all' => true, 'none' => true, 'stackeq' => true, 'stacklet' => true,
-                'stackunits' => true, 'stackvector' => true
+                'stackunits' => true, 'stackvector' => true, 'EMPTYANSWER' => true
                 );
 
     /**
@@ -557,7 +557,7 @@ class stack_cas_casstring {
         if (!($conditions === null || is_array($conditions))) {
             throw new stack_exception('stack_cas_casstring: conditions must be null or an array.');
         }
-        if (count($conditions) != 0) {
+        if (!empty($conditions)) {
             $this->conditions   = $conditions;
         }
     }
@@ -1609,11 +1609,11 @@ class stack_cas_casstring {
         }
         if ($validationmethod == 'units') {
             // Note, we don't pass in forbidfloats as this option is ignored by the units validation.
-            $this->casstring = 'stack_validate_units(['.$starredanswer.'], '.$lowestterms.', '.$tans.', "inline", '.$fltfmt.')';
+            $this->casstring = '(make_multsgn("blank"),stack_validate_units(['.$starredanswer.'], '.$lowestterms.', '.$tans.', "inline", '.$fltfmt.'))';
         }
         if ($validationmethod == 'unitsnegpow') {
             // Note, we don't pass in forbidfloats as this option is ignored by the units validation.
-            $this->casstring = 'stack_validate_units(['.$starredanswer.'], '.$lowestterms.', '.$tans.', "negpow", '.$fltfmt.')';
+            $this->casstring = '(make_multsgn("blank"),stack_validate_units(['.$starredanswer.'], '.$lowestterms.', '.$tans.', "negpow", '.$fltfmt.'))';
         }
 
         return true;

@@ -1,7 +1,7 @@
 Adaptable - the most adaptable moodle theme
 ===========================================
 
-Version 1.7.1 (2018073000)
+Version 1.8 (2018121400)
 
 Adaptable is a highly customisable responsive two column moodle theme based on the popular BCU theme adding:
 
@@ -21,7 +21,7 @@ Adaptable is a highly customisable responsive two column moodle theme based on t
 -Dismissible bootstrap alerts
 -Option to add login form in header on front page
 -Logo and Favicon uploader
--Modern emojis (thanks to EmojiOne) 
+-Modern emojis (thanks to EmojiOne)
 -Front Page layout builder
 -Dashboard layout builder
 -Course layout builder
@@ -30,13 +30,13 @@ Adaptable is a highly customisable responsive two column moodle theme based on t
 
 
 In addition many fields (menus, news items, alerts and help links) can be targeted using custom profile fields, thus it is possible
-to present different users with different nagivation items and notices. It is also possible for individual users to customise where 
+to present different users with different nagivation items and notices. It is also possible for individual users to customise where
 they want top menu navigation to appear (disable, home pages only, sitewide) using custom profile fields.
 
-Adaptable has a lot of settings and may seem daunting at first, our advice is to simply install with the default settings and play 
+Adaptable has a lot of settings and may seem daunting at first, our advice is to simply install with the default settings and play
 with it afterwards.
 
-With a little time you should be able to setup an attractive Moodle site with a high degree of individuality without without 
+With a little time you should be able to setup an attractive Moodle site with a high degree of individuality without without
 knowing any CSS.
 
 This theme has been developed by:
@@ -48,8 +48,8 @@ Developers
 Manoj Solanki (Coventry University)
 
 
-NOTE: This Adaptable version is compatible with moodle 3.4.2 and higher ONLY. 
-For older versions use Adaptable 1.6 or 1.3 branch.
+NOTE: This Adaptable version is compatible with moodle 3.5.3 and higher ONLY.
+For older versions use Adaptable 1.7 or 1.3 branch.
 
 
 Change Log
@@ -61,7 +61,7 @@ HTML/CSS sample code for block areas
 ------------------------------------
 Here you will find some code samples to help you to customize the Info Box and the Marketing Blocks.
 
-You can insert any HTML tag to customize the frontpage blocks. Use a <div> tag as a main container and add the height to keep the 
+You can insert any HTML tag to customize the frontpage blocks. Use a <div> tag as a main container and add the height to keep the
 same value in all the blocks.
 
 The Font Awesome icons set is available in
@@ -114,7 +114,7 @@ old BCU.
 
 It is recommended to use the new marketing blocks builder that allows you to create your own layout and add much more blocks.
 
-There are 8 rows where you can add up to 4 blocks in each with a total of 32 block of different size. See pix/layout.png for 
+There are 8 rows where you can add up to 4 blocks in each with a total of 32 block of different size. See pix/layout.png for
 more information.
 
 You can enter any HTML code to the block, include FA icons, images, videos and apply inline styles.
@@ -214,16 +214,16 @@ From version 1.3 the news ticker do not need to create an unordered list. Just a
 
 Messages / Notifications
 ------------------------
-From version 3.2 moodle includes a new system to display messages and 
-notifications in the screen. 
+From version 3.2 moodle includes a new system to display messages and
+notifications in the screen.
 
-The new system displays a hardcoded black icons that are difficult to see when using dark background colour in the top header. 
+The new system displays a hardcoded black icons that are difficult to see when using dark background colour in the top header.
 In that case, you can use an alternate icons pack using white colour.
 
-Login the server by FTP or SFTP and open /theme/adaptable/pix_core/i and 
+Login the server by FTP or SFTP and open /theme/adaptable/pix_core/i and
 delete notifications.png and rename notifications-white.png to notifications.png
 
-Then open /theme/adaptable/pix_core/t and delete message.png and 
+Then open /theme/adaptable/pix_core/t and delete message.png and
 rename message-white.png to message.png
 
 
@@ -238,13 +238,13 @@ You will find more information, tips and tricks in: https://adaptable.ws
 
 Versioning
 ----------
-Adaptable is maintained under the Semantic Versioning guidelines as much as possible. Releases will be numbered with the 
+Adaptable is maintained under the Semantic Versioning guidelines as much as possible. Releases will be numbered with the
 following format:
 
 major.minor.patch
 
-and following these guidelines: 
-- Breaking backward compatibility bumps the major (and resets the minor and patch) 
+and following these guidelines:
+- Breaking backward compatibility bumps the major (and resets the minor and patch)
 - New additions without breaking backward compatibility bumps the minor (and resets the patch)
 - Bug fixes and misc changes bumps the patch
 
@@ -253,7 +253,7 @@ For more information on SemVer, please visit http://semver.org.
 
 Acknowledgments
 ---------------
-Big thanks to all the volunteers that are collaborating and testing Adaptable continuously. We really appreciate your help and 
+Big thanks to all the volunteers that are collaborating and testing Adaptable continuously. We really appreciate your help and
 support to develop the most adaptable theme for moodle.
 
 Development:
@@ -262,7 +262,7 @@ Development:
 - COMETE (Paris Ouest University)
 - Marina Glancy
 - Nick Phillips
-- Björn Bettzüche 
+- Björn Bettzüche
 - Michael Milette
 - Bas Brands
 - Gareth Barnard
@@ -288,13 +288,13 @@ Licenses
 Adaptable is licensed under:
 GPL v3 (GNU General Public License) - http://www.gnu.org/licenses
 
-Google Fonts released under: 
-SIL Open Font License v1.1 - http://scripts.sil.org/OFL 
-Apache 2 license - https://www.apache.org/licenses/LICENSE-2.0 
+Google Fonts released under:
+SIL Open Font License v1.1 - http://scripts.sil.org/OFL
+Apache 2 license - https://www.apache.org/licenses/LICENSE-2.0
 The Ubuntu fonts use the Ubuntu Font License v1.0 - http://font.ubuntu.com/ufl/ubuntu-font-licence-1.0.txt
 
 The Font Awesome font (by Dave Gandy) http://fontawesome.io) is licensed under:
-SIL Open Font License v1.1 - http://scripts.sil.org/OFL 
+SIL Open Font License v1.1 - http://scripts.sil.org/OFL
 
 Font Awesome CSS, LESS, and SASS files are licensed under:
 MIT License - https://opensource.org/licenses/mit-license.html
@@ -305,7 +305,7 @@ Creative Commons Attribution 4.0 International - https://creativecommons.org/lic
 
 Follow Us
 ---------
-Twitter - https://twitter.com/adaptable_theme 
+Twitter - https://twitter.com/adaptable_theme
 Facebook - https://www.facebook.com/adaptable.theme
 
 Modify it! - Improve it! - Share it!

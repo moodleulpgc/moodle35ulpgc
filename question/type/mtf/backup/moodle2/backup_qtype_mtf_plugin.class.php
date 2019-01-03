@@ -42,7 +42,7 @@ class backup_qtype_mtf_plugin extends backup_qtype_plugin {
         // Now create the qtype own structures.
         $mtf = new backup_nested_element('mtf', array('id'
         ),
-                array('scoringmethod', 'shuffleoptions', 'numberofrows', 'numberofcolumns',
+                array('scoringmethod', 'shuffleanswers', 'numberofrows', 'numberofcolumns',
                     'answernumbering'
                 ));
         $rows = new backup_nested_element('rows');

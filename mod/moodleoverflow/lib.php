@@ -373,7 +373,6 @@ function moodleoverflow_delete_instance($id) {
  * @return stdClass|null
  */
 function moodleoverflow_user_outline($course, $user, $mod, $moodleoverflow) {
-
     $return       = new stdClass();
     $return->time = 0;
     $return->info = '';
@@ -405,13 +404,6 @@ function moodleoverflow_print_recent_activity($course, $viewfullnames, $timestar
  */
 function moodleoverflow_get_extra_capabilities() {
     return array();
-}
-
-/**
- * Deprecated.
- */
-function moodleoverflow_cron() {
-
 }
 
 /* File API */
@@ -613,8 +605,6 @@ function moodleoverflow_extend_settings_navigation(settings_navigation $settings
         }
     }
 }
-
-/* Cronjob functions. */
 
 /**
  * Determine the current context if one wa not already specified.

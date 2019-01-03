@@ -40,6 +40,7 @@ $string['pluginname_link'] = 'question/type/kprime';
 $string['pluginnameadding'] = 'Adding a Kprime question';
 $string['pluginnameediting'] = 'Editing a Kprime question';
 $string['pluginnamesummary'] = 'In Kprime questions exactly four options have to be correctly rated as "true" or "false".';
+$string['privacy:metadata'] = 'The KPrime question type plugin does not store any personal data.';
 $string['responsedesc'] = 'The text used as a default for response {$a}.';
 $string['responseno'] = 'Response {$a}';
 $string['responsetext'] = 'Response Text {$a}';

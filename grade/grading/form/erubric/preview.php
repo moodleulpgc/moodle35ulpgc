@@ -15,15 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Learning Analytics Enriched Rubric (e-rubric) - Preview e-Rubric Page
+ *
  * Preview Learning Analytics Enriched Rubric page
  *
- * @package    gradingform
- * @subpackage Learinng Analytics Enriched Rubric (e-rubric)
+ * @package    gradingform_erubric
+ * @category   grading
  * @copyright  2012 John Dimopoulos
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__.'../../../../config.php');
+require_once(__DIR__.'/../../../../config.php');
 require_once(__DIR__.'/lib.php');
 require_once(__DIR__.'/edit_form.php');
 require_once($CFG->dirroot.'/grade/grading/lib.php');
@@ -50,6 +52,5 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
-
 echo $controller->render_preview($PAGE);
 echo $OUTPUT->footer();

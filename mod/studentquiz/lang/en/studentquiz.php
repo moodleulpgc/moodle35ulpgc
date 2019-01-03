@@ -54,6 +54,7 @@ $string['mydifficulty_column_name'] = 'My Difficulty';
 $string['difficulty_all_column_name'] = 'Community Difficulty';
 $string['mylastattempt_column_name'] = 'My Last Attempt';
 $string['myrate_column_name'] = 'My Rating';
+$string['more'] = 'More';
 $string['start_quiz_button'] = 'Start Quiz';
 $string['review_button'] = 'Review';
 $string['finish_button'] = 'Finish';
@@ -95,6 +96,7 @@ $string['no_questions_add'] = 'There are no questions in this StudentQuiz. Feel 
 // Blocks.
 $string['statistic_block_title'] = 'My Progress';
 $string['ranking_block_title'] = 'Ranking';
+$string['ranking_block_title_anonymised'] = 'Ranking (anonymised)';
 $string['statistic_block_progress_never'] = 'Questions never answered';
 $string['statistic_block_progress_last_attempt_correct'] = 'Latest attempt correct';
 $string['statistic_block_progress_last_attempt_incorrect'] = 'Latest attempt wrong';
@@ -164,6 +166,7 @@ $string['settings_removeqbehavior_help'] = 'This info should appear only once du
 $string['settings_allowallqtypes'] = 'Allow all question types';
 $string['settings_allowedqtypes'] = 'Allowed question types';
 $string['settings_allowedqtypes_help'] = 'Here you specify the type of questions that are allowed';
+$string['settings_qtypes_default_new_activity'] = 'The following are default for a new activity';
 
 // Error messages.
 $string['needtoallowatleastoneqtype'] = 'You need to allow at least one question type';
@@ -172,6 +175,7 @@ $string['please_enrole_message'] = 'Please enroll in this course to see your per
 // Admin settings.
 $string['rankingsettingsheader'] = 'Ranking settings';
 $string['rankingsettingsdescription'] = 'The values you set here define the ranking default values that are used in the settings form when you create a new studentquiz.';
+$string['defaultquestiontypessettingsheader'] = 'Default question types';
 
 // Report Dashboard.
 $string['reportquiz_total_attempt'] = 'Times user run the quiz';
@@ -380,3 +384,10 @@ $string['privacy:metadata:studentquiz_attempt:studentquizid'] = 'ID of the Stude
 $string['privacy:metadata:studentquiz_attempt:userid'] = 'ID of the user.';
 $string['privacy:metadata:studentquiz_attempt:questionusageid'] = 'ID of the question usage.';
 $string['privacy:metadata:studentquiz_attempt:categoryid'] = 'ID of the category.';
+
+$string['migrate_studentquiz_short'] = 'Speed-up this question set';
+$string['migrate_studentquiz'] = 'Migrate StudentQuiz questions prior to version 3.2.1 to the faster version with aggregated values';
+$string['migrate_ask'] = 'The speed of StudentQuiz improved with version 3.2.1, but this question set is still based on a prior version.
+Questions and quizzes will be loaded faster if you run this speed-up migration. You will experience faster loading; nothing else will change.';
+$string['migrate_already_done'] = 'Nothing was done because this activity has been migrated already!';
+$string['migrated_successful'] = 'This activity has been migrated successfully!';

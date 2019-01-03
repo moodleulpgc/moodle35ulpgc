@@ -41,6 +41,7 @@ $string['pluginname_link'] = 'question/type/kprime';
 $string['pluginnameadding'] = 'Kprim-Frage hinzufügen';
 $string['pluginnameediting'] = 'Kprim-Frage bearbeiten';
 $string['pluginnamesummary'] = 'In Kprim-Fragen müssen genau vier Wahlantworten als «richtig» oder «falsch» bewertet werden.';
+$string['privacy:metadata'] = 'Das KPrim Fragetyp-Plugin speichert keine persönlichen Daten';
 $string['responsedesc'] = 'Standardtext für die Wahrheitsauswahl {$a}.';
 $string['responseno'] = 'Wahrheitsauswahl {$a}';
 $string['responsetext'] = 'Text für Wahrheitsauswahl {$a}';
