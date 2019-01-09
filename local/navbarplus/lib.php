@@ -153,14 +153,14 @@ function local_navbarplus_render_navbar_output() {
         }
     }
     // If setting resetuseertours is enabled.
-    if (isset($config->resetusertours)) {
+    if (isset($config->resetusertours) && $config->resetusertours == true) {
         if (isloggedin() || !isguestuser()) {
             // Get the tour for the current page.
             $tour = \tool_usertours\manager::get_current_tour();
             if (!empty($tour)) {
                 // Open div.
                 $output .= html_writer::start_tag('div', array('class' => 'localnavbarplus nav-link',
-                                                               'id'    => 'local_navbarplus_resetusertour'));
+                                                               'id'    => 'localnavbarplus-resetusertour'));
                 // Use the Font Awesome icon "map".
                 $itemicon = '<i class="icon fa fa-map fa-fw"></i>';
                 // Use the string for resetting the tour.

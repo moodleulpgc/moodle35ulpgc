@@ -34,6 +34,8 @@ $string['tracker:shareelements'] = 'Share elements at site level';
 $string['tracker:viewallissues'] = 'See all tickets';
 $string['tracker:viewpriority'] = 'View priority of my owned tickets';
 $string['tracker:viewreports'] = 'View issue work reports';
+$string['tracker:otherscomments'] = 'View comments by others';
+
 
 $string['AND'] = 'AND';
 $string['IN'] = 'IN';

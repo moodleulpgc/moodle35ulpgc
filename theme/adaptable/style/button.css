@@ -28,6 +28,28 @@
 
 
 /* Default style for all the buttons */
+.btn,
+.btn a {
+    display: inline-block;
+    margin-bottom: 0;
+    font-family: [[setting:fontname]];
+    font-size: 14px;
+    line-height: 20px;
+    color: [[setting:buttontextcolor]] !important;
+    text-align: center;
+    text-shadow: none;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    border-bottom-color: #b3b3b3;
+    border-radius: [[setting:buttonradius]];
+    box-shadow: 0 [[setting:buttondropshadow]] 0 0 rgba(0, 0, 0, 0.5) inset;
+    padding: 8px 15px 8px;
+}
+
+.btn-primary,
 .path-mod-workshop .assessment-summary.graded .singlebutton input[type="submit"],
 .path-mod-workshop .example-summary.graded .singlebutton input[type="submit"],
 .btn-link,
@@ -66,30 +88,11 @@ td.submit input {
     transition: background .2s ease-out;
 }
 
-.btn,
-.btn a {
-    display: inline-block;
-    margin-bottom: 0;
-    font-size: 14px;
-    line-height: 20px;
-    color: [[setting:buttontextcolor]] !important;
-    text-align: center;
-    text-shadow: none;
-    vertical-align: middle;
-    cursor: pointer;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-    border-bottom-color: #b3b3b3;
-    border-radius: [[setting:buttonradius]];
-    box-shadow: 0 [[setting:buttondropshadow]] 0 0 rgba(0, 0, 0, 0.5) inset;
-    padding: 8px 15px 8px;
-}
-
 /* Secondary button */
 .btn-secondary {
     border-color: #cccccc !important;
     color: #292b2c !important;
+    min-height: 36px;
 }
 
 /* Child buttons */
@@ -98,6 +101,7 @@ td.submit input {
     color: [[setting:buttontextcolor]] !important;
 }
 
+/* Action buttons */
 #notice .singlebutton + .singlebutton input,
 .submit.buttons input[name="cancel"] {
     background-color: [[setting:editoffbk]] !important;
@@ -296,4 +300,24 @@ button[name="resetbutton"]:hover,
 /* Caret */
 .btn .caret {
     border-top-color: [[setting:buttontextcolor]] !important;
+}
+
+/* Message Drawer styles (moodle 3.6 and higher) */
+
+/* Hide messages drawer unused buttons */
+.message-drawer .btn.hidden {
+    display: none !important;
+}
+
+/* Display buttons with same height than the rest */
+.message-drawer .btn-block {
+    min-height: 36px;
+}
+
+/* Set action buttons to action colour */
+.message-drawer button[data-action="confirm-delete-conversation"],
+.message-drawer button[data-action="confirm-block"] {
+    background-color: [[setting:editoffbk]] !important;
+    text-shadow: none !important;
+    color: #ffffff !important;
 }

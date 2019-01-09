@@ -4,8 +4,10 @@ moodle-local_navbarplus
 Changes
 -------
 
-### Unreleased
+### Release v3.5-r2
 
+* 2019-01-09 - Unified CSS classes: changed local_navbarplus_resetusertour to localnavbarplus-resetusertour.
+* 2019-01-05 - Bugfix: Corrected check for the user tours setting.
 * 2018-12-05 - Changed travis.yml due to upstream changes.
 
 ### Release v3.5-r1

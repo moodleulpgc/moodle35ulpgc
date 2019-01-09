@@ -15,19 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the ordering question type
+ * Master Password Form
  *
- * @package    qtype_ordering
- * @copyright  2013 Gordon Bateson (gordonbateson@gmail.com)
+ * @package    auth_basic
+ * @copyright  2018 Nathan Nguyen <nathannguyen@catalyst-au.nete>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Prevent direct access to this script.
 defined('MOODLE_INTERNAL') || die();
+require_once("$CFG->libdir/formslib.php");
 
-$plugin->cron      = 0;
-$plugin->component = 'qtype_ordering';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2010112400; // Moodle 2.0
-$plugin->version   = 2019010883;
-$plugin->release   = '2019-01-08 (83)';
+class savepassword extends moodleform {
+
+    protected function definition() {
+        $mform = $this->_form;
+
+        $mform->addElement('text', 'password', get_string('password', 'auth_basic'), array('disabled' => true));
+        $mform->setDefault('password', $this->_customdata['password']);
+
+        $buttonarray = array();
+        $buttonarray[] =& $mform->createElement('submit', 'submitbutton', get_string('savepassword', 'auth_basic'));
+        $buttonarray[] =& $mform->createElement('cancel', 'cancel', get_string('regeneratepassword', 'auth_basic'));
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+
+    }
+}
