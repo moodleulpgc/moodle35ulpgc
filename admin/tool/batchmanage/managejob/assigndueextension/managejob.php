@@ -24,7 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-//include_once($CFG->dirroot.'/tool/batchmanage/managejob_forms.php');
+global $CFG;
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
 /**
  * Abstract class for feedback_plugin inherited from assign_plugin abstract class.
@@ -151,7 +152,7 @@ class batchmanage_managejob_assigndueextension extends batchmanage_managejob_plu
             }
             
             // get the request parameters
-            $cm = get_coursemodule_from_id('assign', $mod->cmid, 0, false, MUST_EXIST);
+            list ($course, $cm) = get_course_and_cm_from_cmid($mod->cmid, 'assign');
             $context = context_module::instance($cm->id);
             $assign = new assign($context,$cm,$course);
             $users = array_keys($assign->list_participants(0, true));
