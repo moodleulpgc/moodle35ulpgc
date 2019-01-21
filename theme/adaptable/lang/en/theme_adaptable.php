@@ -77,7 +77,7 @@ $string['region-middle'] = 'Middle';
 $string['region-frnt-footer'] = 'Footer';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
-$string['frnt-footer'] = 'Blocks in this area will only be visible to admin users.';
+$string['frnt-footer'] = 'Blocks in this area will only be visible to admin users';
 $string['side-post1'] = 'side bar in footer';
 
 $string['region-frnt-market-a'] = 'Page region 1';
@@ -1367,8 +1367,6 @@ $string['enablemysitesdesc'] = 'Display a dropdown with a users courses';
 $string['mysitesexclude'] = 'Enable excluding hidden courses';
 $string['mysitesinclude'] = 'Enable including hidden courses';
 $string['mysitesdisabled'] = 'Disable';
-
-$string['frnt-footer'] = 'Blocks in this area will only be visible to admin users.';
 
 $string['enableticker'] = 'Enable the news ticker on the homepage?';
 $string['enabletickerdesc'] = 'Check to enable the homepage ticker.';

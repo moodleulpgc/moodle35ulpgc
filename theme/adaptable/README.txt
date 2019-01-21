@@ -1,14 +1,18 @@
 Adaptable - the most adaptable moodle theme
 ===========================================
 
-Version 1.8 (2018121400)
+Version 1.8.0 (2019011700)
 
-Adaptable is a highly customisable responsive two column moodle theme based on the popular BCU theme adding:
+NOTE: This Adaptable version is compatible with moodle 3.5.3 and higher ONLY.
+For older versions use Adaptable 1.7 or 1.3 branch.
 
--Customisable fonts (Google Fonts)
--Fully customisable colors
--Fully customisable block styles (including FA icons)
--Fully customisable buttons
+
+Adaptable is a highly customizable responsive two column moodle theme based on the popular BCU theme adding:
+
+-Customizable fonts (Google Fonts)
+-Fully customizable colors
+-Fully customizable block styles (including FA icons)
+-Fully customizable buttons
 -Additional header navigation
 -News Ticker
 -Alternative jQuery slider
@@ -17,7 +21,7 @@ Adaptable is a highly customisable responsive two column moodle theme based on t
 -Additional layout settings for width, slider width, padding of
  various elements
 -Social icons
--Mobile settings (customise how theme looks on mobile devices)
+-Mobile settings (customize how theme looks on mobile devices)
 -Dismissible bootstrap alerts
 -Option to add login form in header on front page
 -Logo and Favicon uploader
@@ -30,8 +34,8 @@ Adaptable is a highly customisable responsive two column moodle theme based on t
 
 
 In addition many fields (menus, news items, alerts and help links) can be targeted using custom profile fields, thus it is possible
-to present different users with different nagivation items and notices. It is also possible for individual users to customise where
-they want top menu navigation to appear (disable, home pages only, sitewide) using custom profile fields.
+to present different users with different navigation items and notices. It is also possible for individual users to customize where
+they want top menu navigation to appear (disable, home pages only, site wide) using custom profile fields.
 
 Adaptable has a lot of settings and may seem daunting at first, our advice is to simply install with the default settings and play
 with it afterwards.
@@ -48,20 +52,26 @@ Developers
 Manoj Solanki (Coventry University)
 
 
-NOTE: This Adaptable version is compatible with moodle 3.5.3 and higher ONLY.
-For older versions use Adaptable 1.7 or 1.3 branch.
-
-
-Change Log
+Change Log in 1.8
 ------------------------------------
-The change log is available in: https://adaptable.ws/overview/change-log
+What's new?
+- Set Adaptable styles in the new messages drawer
+- Add icons for hsuforum and customcert activities
+- Add a capability option to the Tool Menu
+
+
+Bugs fixed:
+- User menu doesn't render in correct position on test 3.6.1 system
+- Fix menus in the new Timeline block and Overview Courses
+- Buttons Font
+- Error "syntax error, unexpected end of file" in layout/secure.php
 
 
 HTML/CSS sample code for block areas
 ------------------------------------
 Here you will find some code samples to help you to customize the Info Box and the Marketing Blocks.
 
-You can insert any HTML tag to customize the frontpage blocks. Use a <div> tag as a main container and add the height to keep the
+You can insert any HTML tag to customize the front page blocks. Use a <div> tag as a main container and add the height to keep the
 same value in all the blocks.
 
 The Font Awesome icons set is available in
@@ -73,7 +83,7 @@ http://fortawesome.github.io/Font-Awesome/examples/
 
 Front Page Slider Styles
 ------------------------
-Add images with at least 1900x400px. If you want to reduce or increase the height, Adaptable will resize the image automatically.
+Add images with at least 1900px x 400px. If you want to reduce or increase the height, Adaptable will resize the image automatically.
 There are two possible slider styles each with different markup required:
 
 
@@ -109,7 +119,7 @@ Frontpage Marketing Block HTML structure Coventry
 Front page Info Box and Marketing Blocks
 ----------------------------------------
 
-There are two Info blocks in the frontpage located above and below the Marketing Blocks. These are just for compatibility with the
+There are two Info blocks in the front page located above and below the Marketing Blocks. These are just for compatibility with the
 old BCU.
 
 It is recommended to use the new marketing blocks builder that allows you to create your own layout and add much more blocks.
@@ -117,7 +127,7 @@ It is recommended to use the new marketing blocks builder that allows you to cre
 There are 8 rows where you can add up to 4 blocks in each with a total of 32 block of different size. See pix/layout.png for
 more information.
 
-You can enter any HTML code to the block, include FA icons, images, videos and apply inline styles.
+You can enter any HTML code to the block, include FA icons, images, videos and apply in-line styles.
 
 Some samples:
 
@@ -205,7 +215,7 @@ News Ticker
 -----------
 From version 1.3 the news ticker do not need to create an unordered list. Just add paragraphs using <p> tags:
 
-<p>Configure all the theme colours</p>
+<p>Configure all the theme colors</p>
 <p>Use any Google Font for the content, headings and site title</p>
 <p>Display a logo or a configurable title site</p>
 <p>Configurable Slideshow</p>
@@ -214,11 +224,10 @@ From version 1.3 the news ticker do not need to create an unordered list. Just a
 
 Messages / Notifications
 ------------------------
-From version 3.2 moodle includes a new system to display messages and
-notifications in the screen.
+Moodle 3.2 includes a new system to display messages and notifications in the screen.
 
-The new system displays a hardcoded black icons that are difficult to see when using dark background colour in the top header.
-In that case, you can use an alternate icons pack using white colour.
+The new system displays a hard coded black icons that are difficult to see when using dark background color in the top header.
+In that case, you can use an alternate icons pack using white color.
 
 Login the server by FTP or SFTP and open /theme/adaptable/pix_core/i and
 delete notifications.png and rename notifications-white.png to notifications.png
@@ -226,14 +235,14 @@ delete notifications.png and rename notifications-white.png to notifications.png
 Then open /theme/adaptable/pix_core/t and delete message.png and
 rename message-white.png to message.png
 
+From moodle 3.6 the messages and notifications has been changed to the called "Messages Drawer".
+
 
 Activities icons
 ------------------------
 From version 1.4, Adaptable includes its own icons pack that replace the default moodle icons.
 If you don't want to use the icons just remove adaptable/pix_plugins and adaptable/pix_core/f
 You can enable this icons from the administration.
-
-You will find more information, tips and tricks in: https://adaptable.ws
 
 
 Versioning
@@ -259,7 +268,7 @@ support to develop the most adaptable theme for moodle.
 Development:
 - Justin Hunt
 - Leonid Chernyavskiy
-- COMETE (Paris Ouest University)
+- COMETE (Université Paris Nanterre)
 - Marina Glancy
 - Nick Phillips
 - Björn Bettzüche
@@ -267,6 +276,7 @@ Development:
 - Bas Brands
 - Gareth Barnard
 - Konrád Lőrinczi
+- Mathieu Domingo
 
 Testing:
 - Andrew Walding

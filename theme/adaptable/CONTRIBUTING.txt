@@ -13,7 +13,7 @@ without errors or warnings. This is mandatory to approve the PR.
     -Comment your code as much as you can. This will help other developers to understand your code and will help also in 
 the approval.
     -Use space instead tab for indentation. Tab is not allowed. Use four spaces for indentation.
-    -Use only the default Bootstrap 2 media queries: 1200px, 979px, 767px and 480px. Other values are not valid
+    -Use only the default Bootstrap 2 media queries are: 1200px, 979px, 767px and 480px. Other values are not valid
     -The PR must include only the issue related. If you want to submit a PR with several fixes then you must create an issue for 
 each one and submit a different PR for each one.
     -Add the needed strings ONLY in English (British). DO NOT translate to other languages. The strings added will be translated 

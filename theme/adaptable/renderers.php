@@ -541,7 +541,7 @@ class theme_adaptable_core_renderer extends core_renderer {
         $output = '';
 
         // Development version.
-        if (get_config('theme_adaptable', 'version') < '2018121000') {
+        if (get_config('theme_adaptable', 'version') < '2019011500') {
                 $output .= '<div id="beta"><h3>';
                 $output .= get_string('beta', 'theme_adaptable');
                 $output .= '</h3></div>';
@@ -1937,10 +1937,10 @@ EOT;
                             if (!$capinfo = get_capability_info(trim($cells[$i]))) {
                                 // NOTE: echo $cells[$i]." is not a valid capability";.
 
-                                // Should we say to the user that the capability is not valid ?.
+                                // Should we say to the user that the capability is not valid ?
                                 // It should be better to print this when the "admin" fill the toolmenu, not when we print it.
 
-                                // If it's not valid, check the next cell (here we could change the behaviour from "do nothing" to "delete the line")
+                                // If it's not valid, check the next cell (here we could change the behaviour from "do nothing" to "delete the line").
                                 continue;
                             }
 

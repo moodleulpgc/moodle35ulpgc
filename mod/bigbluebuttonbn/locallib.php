@@ -2213,36 +2213,54 @@ function bigbluebuttonbn_get_recording_imported_instances($recordid) {
  * @return array
  */
 function bigbluebuttonbn_get_instance_type_profiles($context = null) {
-    if($context) { // ecastro ULPGC
-        $instanceprofiles = array();
-        if(has_capability('mod/bigbluebuttonbn:room', $context)) {
-            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
-                    'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
-                        'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
-                        'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype'));
+    // ecastro ULPGC room / recordings
+    $room = true;
+    $recordings = true;
+    if($context) {
+        if(!has_capability('mod/bigbluebuttonbn:room', $context)) {
+            $room = false;
         }
-        if(has_capability('mod/bigbluebuttonbn:record', $context)) {
-            $instanceprofiles[BIGBLUEBUTTONBN_TYPE_ALL] = array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
-                    'features' => array('all'));
+        if(!has_any_capability(array('mod/bigbluebuttonbn:record', 'mod/bigbluebuttonbn:managerecordings'), $context)) {
+            $recordings = false;
         }
-        $instanceprofiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY] = array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
-                    'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings'));
-    
-    } else {
-        $instanceprofiles = array(
-                BIGBLUEBUTTONBN_TYPE_ALL => 
-                array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
-                    'features' => array('all')),
-                BIGBLUEBUTTONBN_TYPE_ROOM_ONLY =>     
-                array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
-                    'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
-                        'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
-                        'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype')),
-                BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY =>         
-                array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only',
-                    'bigbluebuttonbn'), 'features' => array('showrecordings', 'importrecordings')),
-        );
     }
+    
+    if($room && $recordings) { 
+            $features = array('all');
+    } else {
+        $features = array();
+        if($room) { 
+            $features = array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
+                'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype');
+        }
+        if($recordings) {     
+            $features += array('showrecordings', 'importrecordings');
+        }
+    } 
+    // end ecastro ULPGC room / recordings
+    
+    $instanceprofiles = array(
+            BIGBLUEBUTTONBN_TYPE_ALL => 
+            array('id' => BIGBLUEBUTTONBN_TYPE_ALL, 'name' => get_string('instance_type_default', 'bigbluebuttonbn'),
+                'features' => $features),
+            BIGBLUEBUTTONBN_TYPE_ROOM_ONLY =>     
+            array('id' => BIGBLUEBUTTONBN_TYPE_ROOM_ONLY, 'name' => get_string('instance_type_room_only', 'bigbluebuttonbn'),
+                'features' => array('showroom', 'welcomemessage', 'voicebridge', 'waitformoderator', 'userlimit', 'recording',
+                                    'sendnotifications', 'preuploadpresentation', 'permissions', 'schedule', 'groups',
+                                    'modstandardelshdr', 'availabilityconditionsheader', 'tagshdr', 'competenciessection', 'clienttype')),
+            BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY =>         
+            array('id' => BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY, 'name' => get_string('instance_type_recording_only', 'bigbluebuttonbn'), 
+                'features' => array('showrecordings', 'importrecordings')),
+    );
+    
+    if(!$room) {
+        unset($instanceprofiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY]['features'][0]);
+    }
+    if(!$recordings) {
+        unset($instanceprofiles[BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY]['features'][0]);
+    }
+    
     return $instanceprofiles;
 }
 
@@ -2291,9 +2309,17 @@ function bigbluebuttonbn_get_instance_profiles_array($profiles = null) {
         $profiles = bigbluebuttonbn_get_instance_type_profiles();
     }
     $profilesarray = array();
+    
     foreach ($profiles as $profile) {
+        if(($profile['id'] == BIGBLUEBUTTONBN_TYPE_ALL && $profile['features'][0] != 'all') ||   // ecastro ULPGC
+            ($profile['id'] == BIGBLUEBUTTONBN_TYPE_ROOM_ONLY && !isset($profile['features'][0])) ||
+            ($profile['id'] == BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY && !isset($profile['features'][0]))) {
+            continue;
+        }
+    
         $profilesarray += array("{$profile['id']}" => $profile['name']);
     }
+    
     return $profilesarray;
 }
 

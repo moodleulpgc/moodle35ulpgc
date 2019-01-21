@@ -77,7 +77,7 @@ $string['region-middle'] = 'Centro';
 $string['region-frnt-footer'] = 'Pie';
 $string['region-side-post'] = 'Derecha';
 $string['region-side-pre'] = 'Izquierda';
-$string['frnt-footer'] = 'Los bloques situados en esta zona solo son visibles para los administradores.';
+$string['frnt-footer'] = 'Los bloques situados en esta regi&Oacute;n solo son visibles para los administradores.';
 $string['side-post1'] = 'Barra lateral en el pie de página ';
 
 $string['region-frnt-market-a'] = 'Región-a';
@@ -1367,8 +1367,6 @@ $string['enablemysitesdesc'] = 'Mostrar las actividades del curso';
 $string['mysitesexclude'] = 'Mostrar excluyendo los cursos ocultos';
 $string['mysitesinclude'] = 'Mostrar incluyendo los cursos ocultos';
 $string['mysitesdisabled'] = 'Desactivado';
-
-$string['frnt-footer'] = 'Los bloques de este área solo serán visibles para los administradores.';
 
 $string['enableticker'] = 'Mostrar los anuncios en la página principal';
 $string['enabletickerdesc'] = 'Muestra la barra de anuncios en la página principal.';

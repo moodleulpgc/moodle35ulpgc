@@ -78,4 +78,4 @@ $table = new enrol_apply_manage_table($id);
 $table->define_baseurl($manageurl);
 
 $renderer = $PAGE->get_renderer('enrol_apply');
-$renderer->manage_page($table, $manageurl);
+$renderer->manage_page($table, $manageurl, $instance);

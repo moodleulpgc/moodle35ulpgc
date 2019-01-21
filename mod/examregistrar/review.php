@@ -103,14 +103,14 @@ if($delete) {
             $strrejected = get_string('rejected', 'examregistrar');
             $strsent = get_string('sent', 'examregistrar');
             switch($examfile->status) {
-                case EXAM_STATUS_SENT       : $icon = $this->pix_icon('sent', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
+                case EXAM_STATUS_SENT       : $icon = $OUTPUT->pix_icon('sent', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
                                                 break;
-                case EXAM_STATUS_WAITING    : $icon = $this->pix_icon('waiting', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
+                case EXAM_STATUS_WAITING    : $icon = $OUTPUT->pix_icon('waiting', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
                                                 break;
-                case EXAM_STATUS_REJECTED   : $icon = $this->pix_icon('rejected', $strrejected, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strrejected));
+                case EXAM_STATUS_REJECTED   : $icon = $OUTPUT->pix_icon('rejected', $strrejected, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strrejected));
                                                 break;
                 case EXAM_STATUS_APPROVED   :
-                case EXAM_STATUS_VALIDATED  : $icon = $this->pix_icon('approved', $strapproved, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strapproved));
+                case EXAM_STATUS_VALIDATED  : $icon = $OUTPUT->pix_icon('approved', $strapproved, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strapproved));
                                                         break;
                 default : $icon = $OUTPUT->pix_icon('i/risk_dataloss', $strsent, 'moodle', array('class'=>'icon', 'title'=>''));
             }

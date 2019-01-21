@@ -7,6 +7,11 @@ Changes in 3.6.0 (2019/01/06)
 ---------------------------------------------------------------------------------------
 - Removed unused dependence of 'eventslib.php' (deprecated in 3.6)
 
+Changes in 3.5.0 (2019/12/11)
+---------------------------------------------------------------------------------------
+- Add privacy api
+- Fix some minor bugs:
+
 Changes in 3.4.0 (2018/01/11)
 ---------------------------------------------------------------------------------------
 - Removed Preview menu option for users who are not able to grade

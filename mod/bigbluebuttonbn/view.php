@@ -294,7 +294,8 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     if (isset($bbbsession['bigbluebuttonbn']->type)) {
         $type = $bbbsession['bigbluebuttonbn']->type;
     }
-    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles();
+    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles($bbbsession['context']);
+    
     $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
     $pinginterval = (int)\mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
     // JavaScript for locales.
