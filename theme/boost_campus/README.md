@@ -9,7 +9,7 @@ Moodle Boost child theme which is intended to meet the needs of university campu
 Requirements
 ------------
 
-This plugin requires Moodle 3.5+
+This plugin requires Moodle 3.6+
 
 
 Motivation for this theme
@@ -366,6 +366,7 @@ Improved font sizes and weights on category overview page for better readability
 ### Layout
 
 * Reduced paddings on small screens (max. 768px) to be able to show a little bit more content and less whitespace.
+* Removed unnecessary double border and padding around blocks in main column on Dashboard.
 
 
 How this theme works

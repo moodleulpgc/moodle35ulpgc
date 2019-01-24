@@ -297,6 +297,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $typeprofiles = bigbluebuttonbn_get_instance_type_profiles($bbbsession['context']);
     
     $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
+    
     $pinginterval = (int)\mod_bigbluebuttonbn\locallib\config::get('waitformoderator_ping_interval') * 1000;
     // JavaScript for locales.
     $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
@@ -440,18 +441,19 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
  */
 function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, &$jsvars) {
     $bigbluebuttonbnid = null;
-    if ($enabledfeatures['showroom']) {
+    if ($enabledfeatures['showrecordings']) {
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
+    
     // Get recordings.
     $recordings = bigbluebuttonbn_get_recordings(
-        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
+        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showrecordings'],
         $bbbsession['bigbluebuttonbn']->recordings_deleted
       );
     if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
-            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom']
+            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showrecordings']
           );
         /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
          * recordings are not included. */

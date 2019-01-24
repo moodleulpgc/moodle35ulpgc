@@ -5,11 +5,18 @@ Changes
 
 ### Unreleased
 
+* 2019-01-24 - Adjusted function render_login due to upstream changes in theme Boost.
+* 2018-01-24 - Check compatibility for Moodle 3.6, no functionality change.
+
+### Release v3.5-r5
+
+* 2018-01-23 - Remove unnecessary double border and padding around blocks in main column on Dashboard.
+* 2018-01-23 - Improved whitespaces on small screens to show more of the course content.
+* 2018-12-20 - Fixed loginform.mustache as a wrong bootstrap class sneaked in previously and as a modification comment was missing
 * 2018-12-20 - Fixed a bug with modal help text setting occuring in (sub)plugins that use only enabled / enabled_help for the help texts.
-* 2018-12-19- Improved the feature showhintcourseguestaccess to not be shown in some edge cases.
+* 2018-12-19 - Improved the feature showhintcourseguestaccess to not be shown in some edge cases.
 * 2018-12-18 - Adding 'both' option for 'Switch to role…' menu fixes - Many thanks to Luca Bösch (lucaboesch) for his proposal and main work on this!
 * 2018-12-17 - Setting to change the breakpoint for smaller screens.
-* 2018-12-13 - Improved whitespaces on small screens to show more of the content.
 
 ### Release v3.5-r4
 
