@@ -164,7 +164,7 @@ if ($ADMIN->fulltree) {
     $setting->set_updatedcallback('theme_reset_all_caches');
     $essentialsettingsgeneric->add($setting);
 
-    $readme = new moodle_url('/theme/essential/README.txt');
+    $readme = new moodle_url('/theme/essential/README.md');
     $readme = html_writer::link($readme, get_string('readme_click', 'theme_essential'), array('target' => '_blank'));
 
     $essentialreadme = new admin_setting_heading('theme_essential_readme',
@@ -216,6 +216,35 @@ if ($ADMIN->fulltree) {
     $description = get_string('searchallcoursecontentdefaultdesc', 'theme_essential');
     $default = true;
     $setting = new admin_setting_configcheckbox($name, $title, $description, $default, true, false);
+    $essentialsettingsfeature->add($setting);
+
+    // Course content search sort results by.
+    $ccssrchoices = array(
+        'csd' => get_string('csd', 'theme_essential'),
+        'ced' => get_string('ced', 'theme_essential'),
+        'cfn' => get_string('cfn', 'theme_essential'),
+        'ccd' => get_string('ccd', 'theme_essential'),
+        'cid' => get_string('cid', 'theme_essential')
+    );
+
+    $name = 'theme_essential/coursecontentsearchsortattribute';
+    $title = get_string('coursecontentsearchsortattribute', 'theme_essential');
+    $description = get_string('coursecontentsearchsortattributedesc', 'theme_essential');
+    $default = 'cid';
+    $setting = new essential_admin_setting_configselect($name, $title, $description, $default, $ccssrchoices);
+    $essentialsettingsfeature->add($setting);
+
+    // Course content search sort order.
+    $name = 'theme_essential/coursecontentsearchsortorder';
+    $title = get_string('coursecontentsearchsortorder', 'theme_essential');
+    $description = get_string('coursecontentsearchsortorderdesc', 'theme_essential');
+    $default = 'asc';
+    $setting = new essential_admin_setting_configselect($name, $title, $description, $default,
+        array(
+            'asc' => get_string('sortasc', 'grades'),
+            'desc' => get_string('sortdesc', 'grades')
+        )
+    );
     $essentialsettingsfeature->add($setting);
 
     // Custom scrollbars.

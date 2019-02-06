@@ -70,7 +70,12 @@ function local_boostnavigation_get_all_childrenkeys(navigation_node $navigationn
 function local_boostnavigation_build_custom_nodes($customnodes, navigation_node $node,
         $keyprefix='localboostnavigationcustom', $showinflatnavigation=true, $collapse=false,
         $collapsedefault=false) {
-    global $USER;
+    global $USER, $FULLME;
+
+    // Build full page URL if we have it available to be used down below.
+    if (!empty($FULLME)) {
+        $pagefullurl = new moodle_url($FULLME);
+    }
 
     // Initialize counter which is later used for the node IDs.
     $nodecount = 0;
@@ -120,10 +125,10 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             // Check if this is a child node and get the node title.
                             if (substr($setting, 0, 1) == '-') {
                                 $nodeischild = true;
-                                $nodetitle = substr($setting, 1);
+                                $nodetitle = local_boostnavigation_build_node_title(substr($setting, 1));
                             } else {
                                 $nodeischild = false;
-                                $nodetitle = $setting;
+                                $nodetitle = local_boostnavigation_build_node_title($setting);
                             }
 
                             // Set the node to be basically visible.
@@ -276,6 +281,14 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                     $customnode->hidden = false;
                 }
 
+                // For some strange reason, Moodle core does only compare the URL base when searching the active navigation node.
+                // This will result in the wrong node being highlighted if we add multiple nodes which only differ by the URL
+                // parameter as custom nodes.
+                // We try to overcome this problem as best as possible by actively setting the active node.
+                if ($pagefullurl instanceof moodle_url && $nodeurl->compare($pagefullurl, URL_MATCH_PARAMS)) {
+                    $customnode->make_active();
+                }
+
                 // Finally, set the node icon.
                 $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
             }
@@ -342,6 +355,7 @@ function local_boostnavigation_build_node_url($url) {
     // Define placeholders which should be replaced later.
     $placeholders = array('courseid' => (isset($COURSE->id) ? $COURSE->id : ''),
             'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+            'editingtoggle' => ($PAGE->user_is_editing() ? 'off' : 'on'),
             'userid' => (isset($USER->id) ? $USER->id : ''),
             'userusername' => (isset($USER->username) ? $USER->username : ''),
             'pagecontextid' => (is_object($PAGE->context) ? $PAGE->context->id : ''),
@@ -357,6 +371,33 @@ function local_boostnavigation_build_node_url($url) {
     }
 
     return new moodle_url($url);
+}
+
+/**
+ * This function takes the plugin's custom node title, replaces placeholders if necessary and returns the title.
+ *
+ * @param string $title
+ * @return string
+ */
+function local_boostnavigation_build_node_title($title) {
+    global $USER, $COURSE, $PAGE;
+
+    // Define placeholders which should be replaced later.
+    $placeholders = array('coursefullname' => (isset($COURSE->fullname) ? format_string($COURSE->fullname) : ''),
+            'courseshortname' => (isset($COURSE->shortname) ? $COURSE->shortname : ''),
+            'editingtoggle' => ($PAGE->user_is_editing() ? get_string('turneditingoff') : get_string('turneditingon')),
+            'userfullname' => fullname($USER),
+            'userusername' => (isset($USER->username) ? $USER->username : ''));
+
+    // Check if there is any placeholder in the title.
+    if (strpos($title, '{') !== false) {
+        // If yes, replace the placeholders in the title.
+        foreach ($placeholders as $search => $replace) {
+            $title = str_replace('{' . $search . '}', $replace, $title);
+        }
+    }
+
+    return $title;
 }
 
 /**

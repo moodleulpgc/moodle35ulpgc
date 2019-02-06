@@ -46,7 +46,8 @@
         "hasblocks":true,
         "navdraweropen":true,
         "regionmainsettingsmenu": "",
-        "hasregionmainsettingsmenu": false
+        "hasregionmainsettingsmenu": false,
+        "pagebottomelements": ""
     }
 }}
 {{! MODIFICATION:
@@ -55,6 +56,7 @@
     * If setting "showsettingsincourse" is enabled, then render course context menu from theme_boost_campus/settings_link_page
       template and use the equivalent own javascript "incoursesettings".
     * Call to own navbar mustache template instead of boost/navbar.
+    * Add own additional layout elements: the footer, footnote or image area.
 }}
 {{> theme_boost/head }}
 
@@ -106,16 +108,15 @@
                     </i>
 
                     <section id="sidepre-blocks" data-region="blocks-column" class="d-print-none">
-                        {{{ sidepreblocks }}}
-                    </section>
-
+                    {{{ sidepreblocks }}}
+                </section>
                 {{/hasblocks}}
             </div>
         </div>
     </div>
     {{> theme_boost/nav-drawer }}
-
 </div>
+{{{ pagebottomelements }}}
 
 </body>
 </html>

@@ -4,8 +4,15 @@ moodle-local_boostnavigation
 Changes
 -------
 
-### Unreleased
+### v3.5-r4
 
+* 2019-02-04 - Fix a flaw in the language pack for the node title placeholders.
+
+### v3.5-r3
+
+* 2019-02-04 - Improvement: Add placeholders for node titles.
+* 2019-02-04 - Improvement: Add editingtoggle placeholder for custom nodes.
+* 2019-02-04 - Improvement: Make sure that the right custom node with parameters is active and highlighted.
 * 2018-12-05 - Changed travis.yml due to upstream changes.
 * 2018-07-23 - Remove deprecated strings file as the strings were fully depreated before.
 

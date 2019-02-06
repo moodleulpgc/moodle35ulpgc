@@ -166,6 +166,21 @@ function xmldb_bigbluebuttonbn_upgrade($oldversion = 0) {
         // Update db version tag.
         upgrade_mod_savepoint(true, 2017101015, 'bigbluebuttonbn');
     }
+    // ecastro ULPGC
+    if ($oldversion < 2017101017.001) {
+        if($capabilty = $DB->get_record('capabilities', 
+                                array('name'=>'mod/bigbluebuttonbn:room', 'component'=>'mod_bigbluebuttonbn'))) {
+            $capabilty->name = 'mod/bigbluebuttonbn:meeting';
+            $DB->update_record('capabilities', $capabilty);
+        }
+        if($capabilty = $DB->get_record('capabilities', 
+                                array('name'=>'mod/bigbluebuttonbn:record', 'component'=>'mod_bigbluebuttonbn'))) {
+            $capabilty->name = 'mod/bigbluebuttonbn:recording';
+            $DB->update_record('capabilities', $capabilty);
+        }
+        upgrade_mod_savepoint(true, 2017101017.001, 'bigbluebuttonbn');    
+    }   
+    
     return true;
 }
 

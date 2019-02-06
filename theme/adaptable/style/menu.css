@@ -118,14 +118,11 @@
     font-size: [[setting:menufontsize]];
     background-clip: padding-box;
     background-color: #fff;
-    display: none;
-    float: right;
     list-style: outside none none;
-    margin: 2px 0;
     padding: 5px 0;
     position: absolute;
     right: 0;
-    min-width: 250px;
+    min-width: 230px;
     top: 26px;
     z-index: 1000;
     border-radius: [[setting:navbardropdownborderradius]];

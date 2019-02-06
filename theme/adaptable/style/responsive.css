@@ -218,8 +218,17 @@ Only screen and (max-width : 480px)
         top: 30px;
         width: 300px;
     }
-    .navbar .nav .dropdown-menu, .headermenu .dropdown-menu, .langmenu .dropdown-menu {
+    .headermenu .dropdown-menu, .langmenu .dropdown-menu {
         min-width: 150px;
+    }
+
+    .navbar .nav .dropdown-menu {
+        min-width: 150px;
+        float: none;
+        position: static;
+        margin-top: 0 !important;
+        top: 0;
+        border: 0;
     }
 
 .icon {

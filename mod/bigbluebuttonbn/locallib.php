@@ -2217,10 +2217,10 @@ function bigbluebuttonbn_get_instance_type_profiles($context = null) {
     $room = true;
     $recordings = true;
     if($context) {
-        if(!has_capability('mod/bigbluebuttonbn:room', $context)) {
+        if(!has_capability('mod/bigbluebuttonbn:meeting', $context)) {
             $room = false;
         }
-        if(!has_any_capability(array('mod/bigbluebuttonbn:record', 'mod/bigbluebuttonbn:managerecordings'), $context)) {
+        if(!has_any_capability(array('mod/bigbluebuttonbn:recording', 'mod/bigbluebuttonbn:managerecordings'), $context)) {
             $recordings = false;
         }
     }
@@ -2254,6 +2254,7 @@ function bigbluebuttonbn_get_instance_type_profiles($context = null) {
                 'features' => array('showrecordings', 'importrecordings')),
     );
     
+    // ecastro ULPGC
     if(!$room) {
         unset($instanceprofiles[BIGBLUEBUTTONBN_TYPE_ROOM_ONLY]['features'][0]);
     }

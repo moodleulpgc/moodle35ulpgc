@@ -251,7 +251,7 @@ function local_ulpgccore_aggregate_values_bounds($grade_category, $grade_values,
             // hidden grade items are excluded from aggregation
 
             $grade_category->load_grade_item();
-
+            
             // first remove hidden grade items if any
             foreach($items as $itemid => $item) {
                 if($item->hidden) {
@@ -261,7 +261,7 @@ function local_ulpgccore_aggregate_values_bounds($grade_category, $grade_values,
                     }
                 }
             }
-            
+                        
             if(!$grade_values) {
                 $agg_grade = null;
                 break;
@@ -269,27 +269,41 @@ function local_ulpgccore_aggregate_values_bounds($grade_category, $grade_values,
 
             $failed = false;
             $empty = true;
+            $sum = 0;
+            $summax = 0;
+            
             foreach($grade_values as $itemid=>$grade_value) {
-                $weights[$itemid] = 0;
+                $weights[$itemid] = 1;
                 $gradepass = grade_grade::standardise_score($items[$itemid]->gradepass, $items[$itemid]->grademin, $items[$itemid]->grademax, 0, 1);
-                if(($grade_values[$itemid] < $gradepass)) {
+                if(($grade_value < $gradepass)) {
                     $failed = true;
                 }
                 if(!isset($novalue[$itemid]) || isset($grade_values[$itemid])) {
                     $empty = false;
                 }
+                $sum += $grade_value * $items[$itemid]->grademax;
+                $summax += $items[$itemid]->grademax;
             }
 
+            /*
             $grade_category->aggregation = GRADE_AGGREGATE_SUM;
             $result = $grade_category->aggregate_values_and_adjust_bounds($grade_values,
                                                                         $items, $weights, $grademinoverrides, $grademaxoverrides);
+            print_object($result);
+            print_object(" ----- result -----");
             $grade_category->aggregation = GRADE_AGGREGATE_ULPGC_SUM;                                                        
             list($agg_grade, $grademin, $grademax) = array_values($result);
+            */
+            
+            $grademin = $grade_category->grade_item->grademin;
+            $grademax = $grade_category->grade_item->grademax;
             
             if($empty) {
                 $agg_grade = null;
             } elseif($failed) {
                 $agg_grade = min($grade_values) / grade_grade::standardise_score($grademax, $grademin, $grademax, 0, 1); // Re-normalize score.
+            } else {
+                $agg_grade = ($sum / $summax) / grade_grade::standardise_score($grademax, $grademin, $grademax, 0, 1); // Re-normalize score.
             }     
             
             break;

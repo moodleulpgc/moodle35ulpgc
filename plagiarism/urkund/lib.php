@@ -138,13 +138,6 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
         if (empty($plagiarismvalues[$cmid])) {
             $plagiarismvalues[$cmid] = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => $cmid), '', 'name,value');
         }
-        $plagiarismsettings = $this->get_settings();
-        if (!empty($plagiarismsettings['urkund_wordcount'])) {
-            $wordcount = $plagiarismsettings['urkund_wordcount'];
-        } else {
-            // Set a sensible default if we can't find one.
-            $wordcount = 50;
-        }
 
         $showcontent = true;
         $showfiles = true;
@@ -155,7 +148,7 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
                 $showfiles = false;
             }
         }
-        if (!empty($linkarray['content']) && $showcontent && str_word_count($linkarray['content']) > $wordcount) {
+        if (!empty($linkarray['content']) && $showcontent) {
             $filename = "content-" . $COURSE->id . "-" . $cmid . "-". $userid . ".htm";
             $filepath = $CFG->tempdir."/urkund/" . $filename;
             $file = new stdclass();
@@ -254,11 +247,22 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
             $reset = '';
             if (has_capability('plagiarism/urkund:resetfile', $modulecontext) &&
                 !empty($results['error'])) { // This is a teacher viewing the responses.
-                // Strip out some possible known text to tidy it up.
-                $erroresponse = format_text($results['error'], FORMAT_PLAIN);
-                $erroresponse = str_replace('{&quot;LocalisedMessage&quot;:&quot;', '', $erroresponse);
-                $erroresponse = str_replace('&quot;,&quot;Message&quot;:null}', '', $erroresponse);
-                $title .= ': ' . $erroresponse;
+
+                $xml = simplexml_load_string($results['error']);
+
+                if (!empty($xml->SubmissionData->Status->ErrorCode)) {
+                    $errorcode = $xml->SubmissionData->Status->ErrorCode;
+                    if ($errorcode == 3 OR $errorcode == 4 OR $errorcode == 5001 OR $errorcode == 7001) {
+                        // We have custom error messages for these response codes.
+                        $errormessage = get_string('errorcode_' . $errorcode, 'plagiarism_urkund');
+                    } else {
+                        $errormessage = get_string('errorcode_unknown', 'plagiarism_urkund', $errorcode);
+                    }
+                } else {
+                    $errormessage = get_string('errorcode_unknown', 'plagiarism_urkund', '');
+                }
+
+                $title .= ': ' . $errormessage;
                 $url = new moodle_url('/plagiarism/urkund/reset.php', array('cmid' => $cmid, 'pf' => $results['pid'],
                                                                             'sesskey' => sesskey()));
                 $reset = "<a href='$url'>".get_string('reset')."</a>";
@@ -454,6 +458,16 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
             }
             // Array of possible plagiarism config options.
             $plagiarismelements = $this->config_options();
+            $contextmodule = context_module::instance($data->coursemodule);
+
+            foreach ($plagiarismelements as $key => $elements) {
+                if (!has_capability('plagiarism/urkund:resubmitonclose', $contextmodule) &&
+                    $elements == 'urkund_resubmit_on_close') {
+
+                    unset($plagiarismelements[$key]);
+                }
+            }
+
             // First get existing values.
             if (empty($data->coursemodule)) {
                 debugging("URKUND settings failure - no coursemodule set in form data, URKUND could not be enabled.");
@@ -510,14 +524,29 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
         }
         if (!empty($cmid)) {
             $plagiarismvalues = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => $cmid), '', 'name, value');
+            // If this is an older assignment, it may not have a resubmit_on_close setting in place. If the site default is to turn this on
+            // we don't want to turn it on for "old" assignments without being specified.
+            if (!empty($plagiarismvalues) && !isset($plagiarismvalues['urkund_resubmit_on_close'])) {
+                $plagiarismvalues['urkund_resubmit_on_close'] = 0;
+            }
         }
         // Get Defaults - cmid(0) is the default list.
         $plagiarismdefaults = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => 0), '', 'name, value');
         $plagiarismelements = $this->config_options();
+        foreach ($plagiarismelements as $key => $elements) {
+            if (!has_capability('plagiarism/urkund:resubmitonclose', $context) && $elements == 'urkund_resubmit_on_close') {
+                unset($plagiarismelements[$key]);
+            }
+        }
+
         if (has_capability('plagiarism/urkund:enable', $context)) {
             urkund_get_form_elements($mform);
             if ($mform->elementExists('urkund_draft_submit') && $mform->elementExists('submissiondrafts')) {
                 $mform->hideif('urkund_draft_submit', 'submissiondrafts', 'eq', 0);
+            }
+
+            if (!has_capability('plagiarism/urkund:resubmitonclose', $context)) {
+                $mform->removeElement('urkund_resubmit_on_close');
             }
             // Disable all plagiarism elements if use_plagiarism eg 0.
             foreach ($plagiarismelements as $element) {
@@ -671,11 +700,11 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
             }
         }
 
-        if (!empty($plagiarismsettings['urkund_wordcount'])) {
-            $wordcount = $plagiarismsettings['urkund_wordcount'];
+        if (!empty($plagiarismsettings['urkund_charcount'])) {
+            $charcount = $plagiarismsettings['urkund_charcount'];
         } else {
             // Set a sensible default if we can't find one.
-            $wordcount = 50;
+            $charcount = 450;
         }
 
         if ($eventdata['eventtype'] == 'assignsubmission_submitted' && empty($eventdata['other']['submission_editable'])) {
@@ -704,7 +733,7 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
 
                 if ($showcontent) { // If we should be handling in-line text.
                     $submission = $DB->get_record('assignsubmission_onlinetext', array('submission' => $eventdata['objectid']));
-                    if (!empty($submission) && str_word_count($submission->onlinetext) > $wordcount) {
+                    if (!empty($submission) && strlen(utf8_decode(strip_tags($eventdata['other']['content']))) >= $charcount) {
                         $content = trim(format_text($submission->onlinetext, $submission->onlineformat,
                             array('context' => $modulecontext)));
                         $file = urkund_create_temp_file($cmid, $eventdata['courseid'], $userid, $content);
@@ -724,7 +753,8 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
 
         // Text is attached.
         $result = true;
-        if (!empty($eventdata['other']['content']) && $showcontent && str_word_count($eventdata['other']['content']) > $wordcount) {
+        if (!empty($eventdata['other']['content']) && $showcontent &&
+            strlen(utf8_decode(strip_tags($eventdata['other']['content']))) >= $charcount) {
 
             $file = urkund_create_temp_file($cmid, $eventdata['courseid'], $userid, $eventdata['other']['content']);
             urkund_queue_file($cmid, $userid, $file, $relateduserid);
