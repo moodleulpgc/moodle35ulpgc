@@ -75,6 +75,9 @@ class send_student_reminders extends \core\task\scheduled_task {
                     WHERE e.examregid = :examregid AND e.examsession = :session AND e.visible = 1 AND b.booked = 1
                     GROUP BY b.examid, b.userid
                     ORDER BY b.userid ";
+                    // changed to booked = 1, not sendong reminders if not booked. 
+                    // this simplifies if booked several times, many entries on table.
+                    // may add a repeated query with booked = 0 (and not exists booked = 1) to add explicitly unbooked, but not neccesary now  
             if($users = $DB->get_records_sql($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
                 mtrace("    ... doing reserved exam reminders.");
                 
@@ -97,7 +100,7 @@ class send_student_reminders extends \core\task\scheduled_task {
                         $message = str_replace($search, $replace, $message);
                     }
                     
-                    $student = username_load_fields_from_object($student, $user, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                    $student = username_load_fields_from_object($student, $user, null, array('id', 'idnumber', 'email', 'mailformat', 'maildisplay'));
                     $student->emailstop = 0;
                     
                     $msgdata->userto = $student;

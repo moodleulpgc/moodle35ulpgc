@@ -131,7 +131,7 @@ class send_student_warnings extends \core\task\scheduled_task {
                             $message = str_replace($search, $replace, $message);
                         }
                         
-                        $student = username_load_fields_from_object($student, $user, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                        $student = username_load_fields_from_object($student, $user, null, array('id', 'idnumber', 'email', 'mailformat', 'maildisplay'));
                         $student->emailstop = 0;
                         
                         $msgdata->userto = $student;

@@ -125,7 +125,7 @@ class send_staff_reminders extends \core\task\scheduled_task {
                                 $message = str_replace($search, $replace, $message);
                             }
                             
-                            $staff = username_load_fields_from_object($staff, $user, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));
+                            $staff = username_load_fields_from_object($staff, $user, null, array('id', 'idnumber', 'email', 'mailformat', 'maildisplay'));
                             $staff->emailstop = 0;
                             
                             $msgdata->userto = $staff;
