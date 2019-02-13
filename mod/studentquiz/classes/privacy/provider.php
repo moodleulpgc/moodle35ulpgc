@@ -26,15 +26,27 @@ namespace mod_studentquiz\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 use \core_privacy\local\request\approved_contextlist;
+use \core_privacy\local\request\approved_userlist;
 use \core_privacy\local\request\contextlist;
 use \core_privacy\local\request\helper;
+use \core_privacy\local\request\userlist;
 use \core_privacy\local\request\writer;
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\request\transform;
 
+// A polyfill for Moodle 3.3.
+if (interface_exists('\core_privacy\local\request\core_userlist_provider')) {
+    interface studentquiz_userlist extends \core_privacy\local\request\core_userlist_provider
+    {
+    }
+} else {
+    interface studentquiz_userlist
+    {
+    }
+}
+
 require_once($CFG->libdir . '/questionlib.php');
 
-global $CFG;
 /**
  * Implementation of the privacy subsystem plugin provider for the StudentQuiz activity module.
  *
@@ -42,7 +54,8 @@ global $CFG;
  */
 class provider implements
         \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider {
+        \core_privacy\local\request\plugin\provider,
+        studentquiz_userlist {
 
     /**
      * Returns meta data about this system.
@@ -50,13 +63,12 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection): collection {
+    public static function get_metadata(collection $collection) : collection {
         $collection->add_database_table('studentquiz_rate', [
                 'rate' => 'privacy:metadata:studentquiz_rate:rate',
                 'questionid' => 'privacy:metadata:studentquiz_rate:questionid',
                 'userid' => 'privacy:metadata:studentquiz_rate:userid'
         ], 'privacy:metadata:studentquiz_rate');
-
         $collection->add_database_table('studentquiz_progress', [
                 'questionid' => 'privacy:metadata:studentquiz_progress:questionid',
                 'userid' => 'privacy:metadata:studentquiz_progress:userid',
@@ -95,12 +107,12 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid): contextlist {
+    public static function get_contexts_for_userid(int $userid) : contextlist {
         $contextlist = new contextlist();
 
         // Get activity context if user created/modified the question or their data exist in these table
         // base on user ID field: rate, comment, progress, practice, attempt.
-        $sql = 'SELECT DISTINCT ctx.id
+        $sql = "SELECT DISTINCT ctx.id
                   FROM {context} ctx
                   JOIN {studentquiz} sq ON sq.coursemodule = ctx.instanceid
                        AND contextlevel = :contextmodule
@@ -114,19 +126,23 @@ class provider implements
              LEFT JOIN {studentquiz_practice} practice ON practice.studentquizcoursemodule = sq.coursemodule
              LEFT JOIN {studentquiz_attempt} attempt ON attempt.categoryid = ca.id
                        AND attempt.studentquizid = sq.id
-                 WHERE (question.id IS NOT NULL
-                       OR rate.id IS NOT NULL
-                       OR comment.id IS NOT NULL
-                       OR progress.questionid IS NOT NULL
-                       OR practice.id IS NOT NULL
-                       OR attempt.id IS NOT NULL)
-                       AND (q.createdby = :createduser
-                       OR q.modifiedby = :modifieduser
-                       OR rate.userid = :rateuser
-                       OR comment.userid = :commentuser
-                       OR progress.userid = :progressuser
-                       OR practice.userid = :practiceuser
-                       OR attempt.userid = :attemptuser)';
+                 WHERE (
+                         question.id IS NOT NULL
+                         OR rate.id IS NOT NULL
+                         OR comment.id IS NOT NULL
+                         OR progress.questionid IS NOT NULL
+                         OR practice.id IS NOT NULL
+                         OR attempt.id IS NOT NULL
+                       )
+                       AND (
+                             q.createdby = :createduser
+                             OR q.modifiedby = :modifieduser
+                             OR rate.userid = :rateuser
+                             OR comment.userid = :commentuser
+                             OR progress.userid = :progressuser
+                             OR practice.userid = :practiceuser
+                             OR attempt.userid = :attemptuser
+                           )";
 
         $params = [
                 'contextmodule' => CONTEXT_MODULE,
@@ -163,19 +179,19 @@ class provider implements
 
         list($contextsql, $contextparam) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
-        $sql = "SELECT DISTINCT ctx.id as contextid,
-                       q.id as questionid, q.name as questionname, question.approved as questionapproved,
-                       q.createdby as questioncreatedby, q.modifiedby as questionmodifiedby,
-                       rate.id as rateid, rate.rate as raterate, rate.questionid as ratequestionid, rate.userid as rateuserid,
-                       comment.id as commentid, comment.comment as commentcomment, comment.questionid as commentquestionid,
-                       comment.userid as commentuserid, comment.created as commentcreate,
-                       progress.questionid as progressquestionid, progress.userid as progressuserid,
-                       progress.studentquizid as progressstudentquizid, progress.lastanswercorrect as progresslastanswercorrect,
-                       progress.attempts as progressattempts, progress.correctattempts as progresscorrectattempts,
-                       practice.id as practiceid, practice.quizcoursemodule as practicequizcoursemodule,
-                       practice.studentquizcoursemodule as practicestudentquizcoursemodule, practice.userid as practiceuserid,
-                       attempt.id as attemptid, attempt.studentquizid as attempstudentquizid,attempt.userid as attemptuserid,
-                       attempt.questionusageid as attemptquestionusageid, attempt.categoryid as attemptcategoryid
+        $sql = "SELECT DISTINCT ctx.id AS contextid,
+                       q.id AS questionid, q.name AS questionname, question.approved AS questionapproved,
+                       q.createdby AS questioncreatedby, q.modifiedby AS questionmodifiedby,
+                       rate.id AS rateid, rate.rate AS raterate, rate.questionid AS ratequestionid, rate.userid AS rateuserid,
+                       comment.id AS commentid, comment.comment AS commentcomment, comment.questionid AS commentquestionid,
+                       comment.userid AS commentuserid, comment.created AS commentcreate,
+                       progress.questionid AS progressquestionid, progress.userid AS progressuserid,
+                       progress.studentquizid AS progressstudentquizid, progress.lastanswercorrect AS progresslastanswercorrect,
+                       progress.attempts AS progressattempts, progress.correctattempts AS progresscorrectattempts,
+                       practice.id AS practiceid, practice.quizcoursemodule AS practicequizcoursemodule,
+                       practice.studentquizcoursemodule AS practicestudentquizcoursemodule, practice.userid AS practiceuserid,
+                       attempt.id AS attemptid, attempt.studentquizid AS attempstudentquizid,attempt.userid AS attemptuserid,
+                       attempt.questionusageid AS attemptquestionusageid, attempt.categoryid AS attemptcategoryid
                   FROM {context} ctx
                   JOIN {studentquiz} sq ON sq.coursemodule = ctx.instanceid
                        AND contextlevel = :contextmodule
@@ -189,19 +205,23 @@ class provider implements
              LEFT JOIN {studentquiz_practice} practice ON practice.studentquizcoursemodule = sq.coursemodule
              LEFT JOIN {studentquiz_attempt} attempt ON attempt.categoryid = ca.id
                        AND attempt.studentquizid = sq.id
-                 WHERE (question.id IS NOT NULL
-                       OR rate.id IS NOT NULL
-                       OR comment.id IS NOT NULL
-                       OR progress.questionid IS NOT NULL
-                       OR practice.id IS NOT NULL
-                       OR attempt.id IS NOT NULL)
-                       AND (q.createdby = :createduser
-                       OR q.modifiedby = :modifieduser
-                       OR rate.userid = :rateuser
-                       OR comment.userid = :commentuser
-                       OR progress.userid = :progressuser
-                       OR practice.userid = :practiceuser
-                       OR attempt.userid = :attemptuser)
+                 WHERE (
+                         question.id IS NOT NULL
+                         OR rate.id IS NOT NULL
+                         OR comment.id IS NOT NULL
+                         OR progress.questionid IS NOT NULL
+                         OR practice.id IS NOT NULL
+                         OR attempt.id IS NOT NULL
+                       )
+                       AND (
+                             q.createdby = :createduser
+                             OR q.modifiedby = :modifieduser
+                             OR rate.userid = :rateuser
+                             OR comment.userid = :commentuser
+                             OR progress.userid = :progressuser
+                             OR practice.userid = :practiceuser
+                             OR attempt.userid = :attemptuser
+                           )
                        AND ctx.id {$contextsql}
               ORDER BY ctx.id ASC";
 
@@ -323,11 +343,13 @@ class provider implements
         }
 
         // Query to get all question ID belong to this module context.
-        $sql = 'SELECT q.id
+        $sql = "SELECT q.id
                   FROM {question} q
-                 WHERE q.category IN (SELECT id
-                                        FROM {question_categories} c
-                                       WHERE c.contextid = :contextid)';
+                 WHERE q.category IN (
+                                       SELECT id
+                                         FROM {question_categories} c
+                                        WHERE c.contextid = :contextid
+                                      )";
 
         $params = [
                 'contextid' => $context->id
@@ -381,9 +403,11 @@ class provider implements
 
         // Delete attempts belong to this context.
         $DB->execute("DELETE FROM {studentquiz_attempt}
-                       WHERE studentquizid IN (SELECT id
-                                                 FROM {studentquiz}
-                                                WHERE coursemodule = :coursemodule)", [
+                       WHERE studentquizid IN (
+                                                SELECT id
+                                                  FROM {studentquiz}
+                                                 WHERE coursemodule = :coursemodule
+                                              )", [
                 'coursemodule' => $context->instanceid
         ]);
     }
@@ -411,9 +435,11 @@ class provider implements
         // Query to get all question ID belong to the course modules.
         $sql = "SELECT q.id
                   FROM {question} q
-                 WHERE q.category IN (SELECT id
-                                        FROM {question_categories} c
-                                       WHERE c.contextid {$contextsql})";
+                 WHERE q.category IN (
+                                       SELECT id
+                                         FROM {question_categories} c
+                                        WHERE c.contextid {$contextsql}
+                                      )";
 
         $records = $DB->get_records_sql($sql, $contextparam);
 
@@ -471,10 +497,172 @@ class provider implements
         // Delete attempts belong to user within approved context.
         $DB->execute("DELETE FROM {studentquiz_attempt}
                        WHERE userid = :userid
-                             AND studentquizid IN (SELECT id
-                                                     FROM {studentquiz}
-                                                    WHERE coursemodule {$studentquizsql})", [
+                             AND studentquizid IN (
+                                                    SELECT id
+                                                      FROM {studentquiz}
+                                                     WHERE coursemodule {$studentquizsql}
+                                                  )", [
                         'userid' => $userid
                 ] + $sudentquizparams);
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in
+     *                           this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+
+        $params = [
+            'instanceid' => $context->instanceid,
+            'modulename' => 'studentquiz',
+            'contextid' => $userlist->get_context()->id
+        ];
+
+        // Question's creator.
+        $sql = "SELECT q.createdby
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {question_categories} qc ON qc.contextid = :contextid
+                  JOIN {question} q ON q.category = qc.id
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('createdby', $sql, $params);
+
+        // Question's modifier.
+        $sql = "SELECT q.modifiedby
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {question_categories} qc ON qc.contextid = :contextid
+                  JOIN {question} q ON q.category = qc.id
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('modifiedby', $sql, $params);
+
+        // User rating.
+        $sql = "SELECT r.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {question_categories} qc ON qc.contextid = :contextid
+                  JOIN {question} q ON q.category = qc.id
+                  JOIN {studentquiz_rate} r ON r.questionid = q.id
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // User comment.
+        $sql = "SELECT c.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {question_categories} qc ON qc.contextid = :contextid
+                  JOIN {question} q ON q.category = qc.id
+                  JOIN {studentquiz_comment} c ON c.questionid = q.id
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // User progress.
+        $sql = "SELECT p.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {question_categories} qc ON qc.contextid = :contextid
+                  JOIN {question} q ON q.category = qc.id
+                  JOIN {studentquiz_progress} p ON p.questionid = q.id
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // User practices.
+        $sql = "SELECT practice.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {studentquiz} sq ON sq.coursemodule = cm.id
+                  JOIN {studentquiz_practice} practice ON practice.studentquizcoursemodule = sq.coursemodule
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // User attempt.
+        $sql = "SELECT attempt.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {question_categories} qc ON qc.contextid = :contextid
+                  JOIN {studentquiz} sq ON sq.coursemodule = cm.id
+                  JOIN {studentquiz_attempt} attempt ON attempt.categoryid = qc.id
+                       AND attempt.studentquizid = sq.id
+                 WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $context = $userlist->get_context();
+        $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
+
+        list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+
+        // Query to get all question ID belong to the course modules.
+        $sql = "SELECT q.id
+                  FROM {question} q
+                 WHERE q.category IN (SELECT id
+                                        FROM {question_categories} c
+                                       WHERE c.contextid = :contextid)";
+
+        $records = $DB->get_records_sql($sql, ['contextid' => $context->id]);
+        $questionids = array_column($records, 'id');
+
+        if (empty($questionids)) {
+            return;
+        }
+
+        $guestuserid = guest_user()->id;
+
+        list($questionsql, $questionparams) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        // If user created questions, change the owner to guest by set the field User ID guest user.
+        $DB->execute("UPDATE {question}
+                         SET createdby = :guestid
+                       WHERE id {$questionsql}
+                             AND (createdby {$userinsql})", ['guestid' => $guestuserid] + $questionparams + $userinparams);
+
+        // If user modified questions, change the owner to guest by set the field User ID to guest user.
+        $DB->execute("UPDATE {question}
+                         SET modifiedby = :guestid
+                       WHERE id {$questionsql}
+                             AND (modifiedby {$userinsql})", ['guestid' => $guestuserid] + $questionparams + $userinparams);
+
+        // Delete rates belong to users.
+        $DB->execute("DELETE FROM {studentquiz_rate}
+                       WHERE questionid {$questionsql}
+                             AND userid {$userinsql}", $questionparams + $userinparams);
+
+        // Delete comments belong to users.
+        $DB->execute("DELETE FROM {studentquiz_comment}
+                       WHERE questionid {$questionsql}
+                             AND userid {$userinsql}", $questionparams + $userinparams);
+
+        // Delete progress belong to users.
+        $DB->execute("DELETE FROM {studentquiz_progress}
+                       WHERE questionid {$questionsql}
+                             AND userid {$userinsql}", $questionparams + $userinparams);
+
+        // Delete practice belong to users.
+        $DB->execute("DELETE FROM {studentquiz_practice}
+                       WHERE studentquizcoursemodule = :coursemodule
+                             AND userid {$userinsql}", ['coursemodule' => $context->instanceid] + $userinparams);
+
+        // Delete attempts belong to users.
+        $DB->execute("DELETE FROM {studentquiz_attempt}
+                       WHERE userid {$userinsql}
+                             AND studentquizid = :studentquizid", [
+                        'studentquizid' => $cm->instance
+                ] + $userinparams);
     }
 }

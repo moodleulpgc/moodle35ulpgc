@@ -295,9 +295,13 @@ class batchmanage_managejob_modconfig extends batchmanage_managejob_plugin {
                 $moduleinfo->gradepass = unformat_float($moduleinfo->gradepass);
             }
             
+            
+            $oldcourse = clone($COURSE);
+            $COURSE = $course;
             $mformclassname = 'mod_'.$modselector->module.'_mod_form';
             $mform = new $mformclassname($moduleinfo, $mod->cwsection, null, $course);
             $mform->set_data($moduleinfo);
+            $COURSE = $oldcourse;
 
             // adds fields in morm back to moduleinfo
             $rp = new ReflectionProperty($mformclassname, '_form');

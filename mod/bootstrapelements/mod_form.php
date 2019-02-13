@@ -31,7 +31,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_bootstrapelements_mod_form extends moodleform_mod {
 
     public function definition() {
-        GLOBAL $CFG;
+        GLOBAL $CFG, $PAGE;
 
         $mform = $this->_form;
 
@@ -53,10 +53,7 @@ class mod_bootstrapelements_mod_form extends moodleform_mod {
 
         $formhtml = '<link href="'.$CFG->wwwroot.'/mod/bootstrapelements/css/fontawesome-iconpicker.min.css"';
         $formhtml .= ' rel="stylesheet" type="text/css">';
-        $formhtml .= '<script type="text/javascript" src="' .
-            $CFG->wwwroot.'/mod/bootstrapelements/js/fontawesome-iconpicker.min.js"></script>';
-        $formhtml .= '<script type="text/javascript">$(function(){ $("#id_bootstrapicon").';
-        $formhtml .= 'iconpicker({placement: "right", selectedCustomClass: "label label-success"}); });</script>';
+        $PAGE->requires->js_call_amd('mod_bootstrapelements/bootstrapelementsincludes', 'init');
 
         $mform->addElement('html', $formhtml);
         $this->standard_coursemodule_elements();

@@ -22,9 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
-require_once(dirname(__FILE__) . '/locallib.php');
+require_once(__DIR__ . '/locallib.php');
 
 // Get parameters.
 $cmid = required_param('cmid', PARAM_INT);
@@ -87,7 +87,6 @@ if (data_submitted()) {
         // There is submitted data. Process it.
         $transaction = $DB->start_delegated_transaction();
         $questionusage->finish_question($slot);
-        // TODO: Update tracking data --> studentquiz progress, studentquiz_attempt.
         $transaction->allow_commit();
 
         if ($hasnext) {
@@ -107,10 +106,8 @@ if (data_submitted()) {
     } else if (optional_param('finish', null, PARAM_BOOL)) {
         $transaction = $DB->start_delegated_transaction();
         $questionusage->finish_question($slot);
-        // TODO: Update tracking data --> studentquiz progress, studentquiz_attempt.
         $transaction->allow_commit();
 
-        // TODO Trigger events?
         redirect($stopurl);
     } else {
         // On every submission save the attempt.
@@ -204,7 +201,7 @@ $info = new stdClass();
 $info->total = $questionscount;
 $info->group = 0;
 $info->one = max($slot - (!$hasanswered ? 1 : 0), 0);
-$texttotal = $questionscount . ' ' . get_string('questions', 'studentquiz');
+$texttotal = get_string('num_questions', 'studentquiz', $questionscount);
 $html = '';
 
 $html .= html_writer::div($output->render_progress_bar($info, $texttotal, true), '', array('title' => $texttotal));
@@ -217,7 +214,7 @@ $html .= html_writer::tag('h2', $title);
 $html .= html_writer::start_tag('form', array('method' => 'post', 'action' => $actionurl,
     'enctype' => 'multipart/form-data', 'id' => 'responseform'));
 
-$html .= '<input type="hidden" class="cmid_field" name="cmid" value="' . $cmid . '" />';
+$html .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid', 'value' => $cmid, 'class' => 'cmid_field'));
 
 // Output the question.
 $html .= $questionusage->render_question($slot, $options, (string)$slot);

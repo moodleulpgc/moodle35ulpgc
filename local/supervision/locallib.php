@@ -358,9 +358,11 @@
 
                 $msgdata->courseid = $stat->courseid;
                 $msgdata->subject = get_string('warningmailsubject', 'local_supervision', $stat->shortname);
-                $msgdata->fullmessage = get_string('warningemailtxt',  'local_supervision', $info );
-                $msgdata->fullmessagehtml = get_string('warningemailhtml',  'local_supervision', $info);
-                $msgdata->smallmessage = get_string('warningsmalltxt',  'local_supervision', $info);
+                $msgdata->fullmessage = get_string('warningemailtxt', 'local_supervision', $info );
+                $msgdata->fullmessagehtml = get_string('warningemailhtml', 'local_supervision', $info);
+                $msgdata->smallmessage = get_string('warningsmalltxt', 'local_supervision', $stat->shortname);
+                $msgdata->contexturl = $stat->url;
+                $msgdata->contexturlname = $stat->info;
                 $msgdata->fullmessageformat = FORMAT_HTML;
                 
                 $user = username_load_fields_from_object($user, $stat, null, array('idnumber', 'email', 'mailformat', 'maildisplay'));

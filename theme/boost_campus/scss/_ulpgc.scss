@@ -400,6 +400,15 @@ div.userlist table#participants th.header.c1{min-width: 12rem;}
     bottom: -1px;
 }
 
+.activity.bootstrapelements .btn.btn-lg,
+.activity.bootstrapelements h4.panel-title {
+    font-size: unset;
+    font-weight: 400;
+}
+
+.activity.bootstrapelements .no-overflow i.fa {
+    font-size: 24px;
+}
 
 .que.multichoice .answer div.r0 .fa-check-square,
 .que.multichoice .answer div.r1 .fa-check-square {

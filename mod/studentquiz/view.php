@@ -25,14 +25,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(__DIR__)).'/config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/viewlib.php');
-require_once(__DIR__.'/classes/event/studentquiz_questionbank_viewed.php');
-require_once(__DIR__.'/reportlib.php');
+require_once(__DIR__ . '/classes/event/studentquiz_questionbank_viewed.php');
+require_once(__DIR__ . '/reportlib.php');
 
 // Get parameters.
 if (!$cmid = optional_param('cmid', 0, PARAM_INT)) {
     $cmid = required_param('id', PARAM_INT);
+    // Some internal moodle functions (e.g. question_edit_setup()) require the cmid to be found in $_xxx['cmid'],
+    // but moodle allows to view a mod page with parameter id in place of cmid.
+    $_GET['cmid'] = $cmid;
 }
 
 // Load course and course module requested.
@@ -97,7 +100,7 @@ echo $OUTPUT->header();
 // Render view.
 echo $renderer->render_overview($view);
 
-$PAGE->requires->js_init_code($renderer->render_bar_javascript_snippet());
+$PAGE->requires->js_init_code($renderer->render_bar_javascript_snippet(), true);
 
 echo $OUTPUT->footer();
 

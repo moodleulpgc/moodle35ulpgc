@@ -1,7 +1,7 @@
 Adaptable - the most adaptable moodle theme
 ===========================================
 
-Version 1.8.0 (2019011700)
+Version 1.8.0.1 (2019011701)
 
 NOTE: This Adaptable version is compatible with moodle 3.5.3 and higher ONLY.
 For older versions use Adaptable 1.7 or 1.3 branch.

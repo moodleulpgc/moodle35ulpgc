@@ -12,6 +12,7 @@ This will help teachers add more dynamic, interactive content within courses whi
 
 Themes known to work with this plugin are:
 * BCU Theme
+* Adaptable Theme
 * Essential Theme
 * Shoehorn Theme
 
@@ -20,13 +21,8 @@ We will expand this list to include other themes as we confirm their compatibili
 **Future Plans**:
 
 * Auto detect theme compatability and fall back on non supported themes (so multiple themes in the same site can be supported)
-* Add Fontawesome options to easily add icons
 * Add color options
 * Add additional icon to Toggle to make it clear it is clickable
 * Look at other elements such as callouts and possibly Tabs / Accordion
 
 If you have any other suggestions for improvement please let us know!
-
-Maintainer
-----------
-This plugin has been written and is currently maintained by Michael Grant working at Birmingham City University.

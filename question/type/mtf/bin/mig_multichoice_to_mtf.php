@@ -17,290 +17,479 @@
 /**
  *
  * @package qtype_mtf
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+ * @author Martin Hanusch martin.hanusch@let.ethz.ch
+ * @copyright ETHz 2018 martin.hanusch@let.ethz.ch
  */
+ 
+// **********************************************************************************************************************
+// Dependencies
 require_once(dirname(__FILE__) . '/../../../../config.php');
 require_once($CFG->dirroot . '/lib/moodlelib.php');
 require_once($CFG->dirroot . '/question/type/mtf/lib.php');
 
+// **********************************************************************************************************************
+// Getting parameters
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $categoryid = optional_param('categoryid', 0, PARAM_INT);
 $all = optional_param('all', 0, PARAM_INT);
-$dryrun = optional_param('dryrun', 0, PARAM_INT);
+$dryrun = optional_param('dryrun', 1, PARAM_INT);
+$migratesingle = optional_param('migratesingleanswer', 0, PARAM_INT);
 
 @set_time_limit(0);
 @ini_set('memory_limit', '3072M'); // Whooping 3GB due to huge number of questions text size.
 
-require_login();
+// **********************************************************************************************************************
+// General Page Setup
+echo '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' .
+    '<style>body{font-family: "Courier New", Courier, monospace; font-size: 12px; background: #ebebeb; color: #5a5a5a;}</style></head>';
+echo "=========================================================================================<br/>\n";
+echo "M I G R A T I O N :: Multichoice to MTF<br/>\n";
+echo "=========================================================================================<br/>\n";
 
+// **********************************************************************************************************************
+// Checking for permissions
+require_login();
 if (!is_siteadmin()) {
-    echo 'You are not a Website Administrator!';
+    echo "<br/>[<font color='red'>ERR</font>] You are not a Website Administrator";
     die();
 }
 
-// Helper function to turn weight records from the database into an array
-// indexed by rowid and columnid.
-function weight_records_to_array($weightrecords) {
-    $weights = array();
-    foreach ($weightrecords as $weight) {
-        if (!array_key_exists($weight->rowid, $weights)) {
-            $weights[$weight->rowid] = array();
-        }
-        $weights[$weight->rowid][$weight->colid] = $weight;
-    }
-    return $weights;
-}
-
-$starttime = time();
+$starttime = microtime(1);
+$fs = get_file_storage();
 
 $sql = "SELECT q.*
         FROM {question} q
         WHERE q.qtype = 'multichoice'
-        and q.id in (select questionid from {qtype_multichoice_options} where single = '0')
         ";
+ //"and q.id in (select questionid from {qtype_multichoice_options} where single = '0')";
 $params = array();
 
-if (!$all && (!($courseid > 0 || $categoryid > 0))) {
-    echo "<br /><center><h1><br />**********<br />
-    MultiChoice To MTF<br />**********<br />
-    ********** Multichoice (with Multi Answers Only) migration To qtype_mtf (MTF ETHz). **********<br />
-    <br /><font color='red'>You should specify either the '<font color='black'>courseid</font>'
-    or the '<font color='black'>categoryid</font>' parameter Or set the parameter '<font color='black'>all</font>'
-    to 1. Please set '<font color='black'>dryrun</font>' parameter to 1
-    in order to simulate the migration before committing to the database.
-    No migration will be done without restrictions!</font>
-	</center>
-	<br /><br />Examples:
+// **********************************************************************************************************************
+// Showing information when either no or too many parameters are selected.
+$num_parameters = ($all == 0 ? 0 : 1) + ($courseid == 0 ? 0 : 1) + ($categoryid == 0 ? 0 : 1);
+if (($all != 1 && $courseid <= 0 && $categoryid <= 0) || $num_parameters > 1 ) {
+    echo "
+    <br/>\nParameters:<br/><br/>\n\n
+    =========================================================================================<br/>\n
+    You must specify certain parameters for this script to work: <br/><br/>\n\n
+    Step 1: <b>NECESSARY </b> - Use ONE of the following three parameters-value pairs:
+    <ul>
+        <li><b>courseid</b> (values: <i>a valid course ID</i>)</li>
+        <li><b>categoryid</b> (values: <i>a valid category ID</i>)</b></li>
+        <li><b>all</b> (values: 1)</li>
+    </ul>
+    This parameter-value pairs define which MTF questions will be migrated.<br/><br/>\n\n
+    Step 2: <b>IMPORTANT AND STRONGLY RECOMMENDED:</b><br/>\n
+    <ul>
+        <li><b>dryrun</b> (values: <i>0,1</i>)</li>
+        <li><b>migratesingleanswer</b> (values: <i>0,1</i>)</li>
+    </ul>
+    The Dryrun Option is enabled (1) by default.<br/>\n
+    With Dryrun enabled no changes will be made to the database.<br/>\n
+    Use Dryrun to receive information about possible issues before migrating.<br/><br/>\n\n
+    The MigrateSingleAnswer Option is disabled (0) by default.<br/>\n
+    With migratesingleanswer enabled those Multichoice Questions with only one correct option<br/>\n
+    are included into the Migration to MTF as well.<br/><br/>\n\n
+    =========================================================================================<br/><br/>\n\n
+    Examples:<br/><br/>\n\n
+    =========================================================================================<br/>\n
 	<ul>
-	<li><strong>Specific Course</strong>:
-    MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?<font color='blue'>courseid=55</font>
-	<li><strong>Specific Question Category</strong>:
-    MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?<font color='blue'>categoryid=1</font>
-	<li><strong>All Multi question</strong>:
-    MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?<font color='blue'>all=1</font>
-	<li><strong><font color=red>IMPORTANT & STRONGLY RECOMMENDED</font></strong>:
-    Dry run (no changes made to database - only simulating what will happen)
-    can be done before migrating by using any of the above URLs and
-    adding <strong>&dryrun=1</strong> to the end of the URL.
-    Example: MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?all=1<font color='red'>&dryrun=1</font>
+        <li><strong>Migrate MTF Questions in a specific course</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?<b>courseid=55</b>
+        <li><strong>Migrate MTF Questions in a specific category</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?<b>categoryid=1</b>
+        <li><strong>Migrate all MTF Questions</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?<b>all=1</b>
+        <li><strong>Disable Dryrun</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1<b>&dryrun=0</b>
+        <li><strong>Enable MigrateSingleAnswer</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1&dryrun=0<b>&migratesingleanswer=1</b>
 	</ul>
-	</h1><br/>\n";
+    <br/>\n";
     die();
 }
 
+// **********************************************************************************************************************
+// Parameter Information
+echo "-----------------------------------------------------------------------------------------<br/><br/>\n\n";
+echo ($dryrun == 1 ? "[<font style='color:#228d00;'>ON </font>] ":"[<font color='red'>OFF</font>] ") . 
+    "Dryrun: " . ($dryrun == 1 ? "NO changes to the database will be made!" : "Migration is being processed") . "<br/>\n";
+echo ($migratesingle == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font color='red'>OFF</font>] ") . 
+    "MigrateSingleAnswer<br/><br/>\n\n";
+echo "-----------------------------------------------------------------------------------------<br/>\n";
+echo "=========================================================================================<br/>\n";
+
+// **********************************************************************************************************************
+// Get the categories : Case 1
+if($all == 1) {
+    if ($categories = $DB->get_records('question_categories', array())) {
+        echo "Migration of all MTF Questions<br/>\n";
+    } else {
+        echo "<br/>[<font color='red'>ERR</font>] Could not get categories<br/>\n";
+        die();
+    }
+}
+// Get the categories : Case 2
 if ($courseid > 0) {
     if (!$course = $DB->get_record('course', array('id' => $courseid
     ))) {
-        echo "<br/><font color='red'>Course with ID $courseid  not found...!</font><br/>\n";
+        echo "<br/>[<font color='red'>ERR</font>] Course with ID " . $courseid . " not found<br/>\n";
         die();
     }
     $coursecontext = context_course::instance($courseid);
+    $contextid = $coursecontext->id;
+
     $categories = $DB->get_records('question_categories',
             array('contextid' => $coursecontext->id
             ));
     $catids = array_keys($categories);
     if (!empty($catids)) {
+        echo "Migration of MTF Questions within courseid " . $courseid . " <br/>\n";
         list($csql, $params) = $DB->get_in_or_equal($catids);
         $sql .= " AND category $csql ";
     } else {
-        echo "<br/><font color='red'>No question categories for course found... weird!</font><br/>\n";
-        echo "I'm not doing anything without restrictions!\n";
+        echo "<br/>[<font color='red'>ERR</font>] No question categories for course found.<br/>\n";
         die();
     }
 }
-
+// Get the categories : Case 3
 if ($categoryid > 0) {
-    if ($category = $DB->get_record('question_categories', array('id' => $categoryid
+    if ($categories[$categoryid] = $DB->get_record('question_categories', array('id' => $categoryid
     ))) {
-        echo 'Migration restricted to category "' . $category->name . "\".<br/>\n";
+        echo 'Migration of MTF questions within category "' . $categories[$categoryid]->name . "\"<br/>\n";
         $sql .= ' AND category = :category ';
-        $params = array('category' => $categoryid
-        );
+        $params = array('category' => $categoryid);
+        $contextid = $DB->get_field('question_categories', 'contextid', array('id' => $categoryid));
     } else {
-        echo "<br/><font color='red'>Question category with ID $categoryid  not found...!</font><br/>\n";
+        echo "<br/>[<font color='red'>ERR</font>] Question category with ID " . $categoryid . " not found<br/>\n";
         die();
     }
 }
 
+// **********************************************************************************************************************
+// Get the questions based on the previous set parameters
+$sql .= " ORDER BY category ASC";
 $questions = $DB->get_records_sql($sql, $params);
-echo '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head>';
-echo 'Migrating ' . count($questions) . " multichoice with multi-answers to MTF questions... <br/>\n";
-
-if ($dryrun) {
-    echo "***********************************************************<br/>\n";
-    echo "*   Dry run: NO changes to the database will be made! *<br/>\n";
-    echo "***********************************************************<br/>\n";
+echo 'Questions found: ' . count($questions) . "<br/>\n";
+echo "=========================================================================================<br/><br/>\n\n";
+if (count($questions) == 0) {
+    echo "<br/>[<font color='red'>ERR</font>] No questions found<br/>\n";
+    die();
 }
 
-$counter = 0;
-$notmigrated = array();
+// **********************************************************************************************************************
+// Processing the single questions
+echo "Migrating questions...<br/>\n";
+$num_migrated = 0;
+//$num_categories = 0; //Code for duplicating a category
+$questions_migrated = [];
+$questions_notmigrated = [];
+//$category_map = []; //Code for duplicating a category
+
 foreach ($questions as $question) {
     set_time_limit(600);
-    $transaction = $DB->start_delegated_transaction();
-    $oldquestionid = $question->id;
-    // Retrieve rows and columns and count them.
-    $multichoice = $DB->get_record('qtype_multichoice_options',
-            array('questionid' => $oldquestionid, 'single' => 0
-            ));
-    $rows = $DB->get_records('question_answers', array('question' => $question->id
-    ), ' id ASC ');
-    $rowids = array_keys($rows);
-    $columns = array();
-    if ($multichoice->single == 0) {
-        $colmtfount = 2;
+    $question->oldid = $question->id;
+    $question->oldname =  $question->name;
+
+    // *****************************************************
+    // Getting related question data from database
+    $multichoice_options = $DB->get_record('qtype_multichoice_options', array('questionid' => $question->oldid));
+    $question_answers = $DB->get_records('question_answers', array('question' => $question->oldid), ' id ASC ');
+    $question_hints = $DB->get_records('question_hints', array('questionid' => $question->id), ' id ASC ');
+
+    // *****************************************************
+    // Checking for possible errors before doing anyting.
+    // Getting question weights in case of a complete record.
+    if (!isset($question_answers) || !isset($multichoice_options->single) || !isset($migratesingle) || !isset($question_hints)) {
+        $question_weights = array("error"=>true, "message"=>"Database records incomplete.", "notices"=>[]);
     } else {
-        $colmtfount = 1;
+        $question_weights = get_weights($question_answers, $multichoice_options->single, $migratesingle);
+        $rownumber = $question_weights["rownumber"];
+
+        // *****************************************************
+        // Checking if question has a parent question (Cloze question)
+        if ($question->parent != 0) {
+            $question_weights = array("error"=>true, "message"=>"Question will not be migrated. It is part of a Cloze question.", "notices"=>[]);
+        }
     }
-    for ($i = 1; $i <= $colmtfount; $i++) {
-        $colns = new stdClass();
-        $colns->id = $i;
-        $columns[$i] = $colns;
+
+    // *****************************************************
+    // If weights are not mapable, skip the question
+    // and continue; with the next iteration.
+    if ($question_weights["error"]) {
+        echo '[<font style="color:#ff0909;">ERR</font>] - question <i>"' . $question->oldname . 
+            '"</i> (ID: <a href="' . $CFG->wwwroot . '/question/preview.php?id=' . $question->oldid . 
+            '" target="_blank">' . $question->oldid . '</a>) is not migratable: ' . $question_weights["message"];
+        echo sizeOf($question_weights["notices"]) > 0 ? " ::: <b>Notices:</b> " . implode(" | ", $question_weights["notices"]) : null;
+        echo "<br/>\n";
+        array_push($questions_notmigrated, array("id"=>$question->oldid, "name"=>$question->oldname));
+        continue;        
+    } else {
+        $num_migrated++;
     }
-    $totalnumberofcolumns = count($columns);
-    if ($dryrun) {
-        echo "<br/>\n" .
-                 '--------------------------------------------------------------------------------' .
-                 "<br/>\n";
-        if (count($rows) <= 1) {
-            echo 'Question: "' . $question->name . '" with ID ' . $question->id .
-                     " would NOT migrated! It has the wrong number of options!<br/>\n";
-            $notmigrated[] = $question;
-        } else if ($colmtfount < 1 || $colmtfount > 2) {
-            echo 'Question: "' . $question->name . '" with ID ' . $question->id .
-                     " would NOT migrated! It has the wrong number of responses!<br/>\n";
-            $notmigrated[] = $question;
+
+    // *****************************************************
+    // if Dryrun is disabled, changes to the database 
+    // are made from this point on
+    if ($dryrun == 0) {
+        try {
+            $transaction = $DB->start_delegated_transaction();
+
+            // *****************************************************
+            // Duplicating a category
+            /*//Code for duplicating a category
+            if (!array_key_exists($question->category, $category_map)) {
+                $category_to_insert = clone $categories[$question->category];
+                $category_to_insert->name .= " (MC to MTF)"; 
+                $category_to_insert->stamp = make_unique_id_code();
+                unset($category_to_insert->id);
+                $category_map[$question->category] = $DB->insert_record('question_categories', $category_to_insert);
+                $num_categories++;
+                echo '[<font style="color:#228d00;">OK </font>] category - <i>"' . $categories[$question->category]->name . 
+                '" > "' . $category_to_insert->name . '"</i> (ID: ' . $category_map[$question->category] . ")<br/>\n";
+            }
+            */
+
+            // *****************************************************
+            // Get contextid from question category
+            $contextid = $DB->get_field('question_categories', 'contextid', array('id' => $question->category));
+            if (!isset($contextid)) {
+                echo "<br/>[<font color='red'>ERR</font>] No context id found for this question.";
+                continue;
+            }
+
+            // *****************************************************
+            // Duplicating  mdl_question
+            // --->         mdl_question
+            unset($question->id);
+            //$question->category = $category_map[$question->category]; //Code for duplicating a category
+            $question->parent = 0;
+            $question->name = substr($question->name . " (MTF " . date("Y-m-d H:i:s") . ")", 0, 255);
+            $question->qtype = "mtf";
+            $question->stamp = make_unique_id_code();
+            $question->version = make_unique_id_code();
+            $question->timecreated = time();
+            $question->timemodified = time();
+            $question->modifiedby = $USER->id;
+            $question->createdby = $USER->id;
+            $question->id = $DB->insert_record('question', $question);
+
+            // *****************************************************
+            // Tansferring  mdl_question_answers
+            // --->         mdl_qtype_mtf_weights
+            foreach ($question_weights["message"] as $keyrow => $row) {
+                foreach ($row as $keycolumn => $column){
+                    $entry = new stdClass();
+                    $entry->questionid = $question->id;
+                    $entry->rownumber = $keyrow;
+                    $entry->columnnumber = $keycolumn;
+                    $entry->weight = $column;
+                    $DB->insert_record('qtype_mtf_weights', $entry);
+                    unset($entry);
+                }
+            }
+
+            // *****************************************************
+            // Tansferring  mdl_question_answers
+            // --->         mdl_qtype_mtf_rows
+            $iterator = 1;
+            foreach ($question_answers as $key => $row) {
+                $entry = new stdClass();
+                $entry->questionid = $question->id;
+                $entry->number = $iterator++;
+                $entry->optiontext = $question_answers[$key]->answer;
+                $entry->optiontextformat = FORMAT_HTML;
+                $entry->optionfeedback = $question_answers[$key]->feedback;
+                $entry->optionfeedbackformat = FORMAT_HTML;
+                $mtfrowid = $DB->insert_record('qtype_mtf_rows', $entry);
+                unset($entry);
+
+                // *****************************************************
+                // Copy images in the answer text.
+                copy_files($fs, $contextid, $question_answers[$key]->id, $mtfrowid, $question_answers[$key]->answer, "answer", "qtype_mtf", "optiontext");
+                // *****************************************************
+                // Copy images in the answer feedback.
+                copy_files($fs, $contextid, $question_answers[$key]->id, $mtfrowid, $question_answers[$key]->feedback, "answerfeedback", "qtype_mtf", "feedbacktext");
+            }
+
+            // *****************************************************
+            // Tansferring  mdl_question_hints 
+            // --->         mdl_question_hints
+            foreach ($question_hints as $key => $row) {
+                $entry = new stdClass();
+                $entry->questionid = $question->id;
+                $entry->hint = $row->hint;
+                $entry->hintformat = $row->hintformat;
+                $entry->shownumcorrect = $row->shownumcorrect;
+                $entry->clearwrong = $row->clearwrong;
+                $entry->options = $row->options;
+                $DB->insert_record('question_hints', $entry);
+                unset($entry);
+            }           
+
+            // *****************************************************
+            // Tansferring  mdl_qtype_multichoice_options
+            // --->         mdl_qtype_mtf_options
+            $entry = new stdClass();
+            $entry->questionid = $question->id;
+            if ($multichoice_options->single == 1) {
+                $entry->scoringmethod = "mtfonezero";
+            } else {
+                $entry->scoringmethod = "subpoints";
+            }
+            $entry->shuffleanswers = $multichoice_options->shuffleanswers;
+            $entry->numberofrows = sizeOf($question_answers);
+            $entry->numberofcolumns = 2;
+            $entry->answernumbering = $multichoice_options->answernumbering;
+            $DB->insert_record('qtype_mtf_options', $entry);
+            unset($entry);
+            
+            // *****************************************************
+            // Creating  mdl_qtype_mtf_columns
+            for ($i = 1; $i <= 2; $i++) {
+                $entry = new stdClass();
+                $entry->questionid = $question->id;
+                $entry->number = $i;
+                $i == 1 ? $entry->responsetext = "True" : $entry->responsetext = "False";
+                $entry->responsetextformat = FORMAT_MOODLE;
+                $DB->insert_record('qtype_mtf_columns', $entry);
+                unset($entry);
+            }
+
+            // *****************************************************
+            // Copy images in the questiontext to new itemid.
+            copy_files($fs, $contextid, $question->oldid, $question->id, $question->questiontext, "questiontext", "question", "questiontext");
+            // *****************************************************
+            // Copy images in the general feedback to new itemid.
+            copy_files($fs, $contextid, $question->oldid, $question->id, $question->generalfeedback, "generalfeedback", "question", "generalfeedback");
+
+            // *****************************************************
+            // Copy tags
+            $tags = $DB->get_records_sql("SELECT * FROM {tag_instance} WHERE itemid = :itemid", array('itemid' => $question->oldid));
+            foreach ($tags as $tag) {
+                $entry = new stdClass();
+                $entry->tagid = $tag->tagid;
+                $entry->component = $tag->component;
+                $entry->itemtype = $tag->itemtype;
+                $entry->itemid = $question->id;
+                $entry->contextid = $tag->contextid;
+                $entry->tiuserid = $tag->tiuserid;
+                $entry->ordering = $tag->ordering;
+                $entry->timecreated = $tag->timecreated;
+                $entry->timemodified = $tag->timemodified;
+                $DB->insert_record('tag_instance', $entry);
+            }
+
+            // *****************************************************
+            // Save changes to the database
+            $transaction->allow_commit();
+        } catch (Exception $e) {
+            $transaction->rollback($e);
+        }
+    }
+
+    // *****************************************************
+    // Output: Question Migration Success
+    echo '[<font style="color:#228d00;">OK </font>] - question <i>"' . $question->oldname . '"</i> ' . 
+    '(ID: <a href="' . $CFG->wwwroot . '/question/preview.php?id=' . $question->oldid . 
+    '" target="_blank">' . $question->oldid . '</a>) ';
+    echo $dryrun == 0 ? ' > <i>"' . $question->name . '"</i> ' .
+    '(ID: <a href="' . $CFG->wwwroot . '/question/preview.php?id=' . $question->id . 
+    '" target="_blank">' . $question->id . '</a>)' : " is migratable";
+    echo sizeOf($question_weights["notices"]) > 0 ? " ::: <b>Notices:</b> " . implode(" | ", $question_weights["notices"]) : null;
+    echo "<br/>\n";
+}
+
+// **********************************************************************************************************************
+// Showing final summary
+echo "<br/>\n";
+echo "=========================================================================================<br/>\n";
+echo sizeOf($questions_notmigrated) > 0 ? "Not Migrated: <br/>" : null;
+foreach ($questions_notmigrated as $entry) {
+    echo '<a href="' . $CFG->wwwroot . '/question/preview.php?id=' . $entry["id"] . '" target="_blank">' . 
+    $CFG->wwwroot . '/question/preview.php?id=' . $entry["id"] . "</a> - " . $entry["name"] . "<br/>\n";
+}
+echo "=========================================================================================<br/>\n";
+echo "SCRIPT DONE: Time needed: " . round(microtime(1) - $starttime, 4) . " seconds.<br/>\n";
+//echo $dryrun == 0 ? $num_categories . " categories duplicated.<br/>\n" : null; //Code for duplicating a category
+echo $num_migrated . "/" . count($questions) . " questions " . ($dryrun == 1 ? "would be " : null) . "migrated.<br/>\n";
+echo "=========================================================================================<br/>\n";
+
+
+// **********************************************************************************************************************
+// Mapping the multichoice fractions to mtf weights.
+// This function checks for possible mapping problems.
+function get_weights($fractions, $single, $migratesingle) {
+    $rownumber = 1;
+    $notices = [];
+    $answers = [];
+    $answers[$rownumber] = [];
+
+    // *****************************************************
+    // Error - Case 1: No rows in mdl_question_answers
+    if (count($fractions) < 1) {
+        return array("error"=>true, "message"=>"Question has the wrong number of options", "notices"=>$notices, "rownumber"=>$rownumber);
+    }
+
+    // *****************************************************
+    // Error - Case 2: single in mdl_multichoice_options
+    // is neither 0 or 1
+    if ($single < 0 || $single > 1) {
+        return array("error"=>true, "message"=>"Question has the wrong number of responses", "notices"=>$notices, "rownumber"=>$rownumber);
+    }
+
+    // *****************************************************
+    // Error - Case 3: single answer is enabled (1) in
+    // mdl_multichoice_options
+    if ($single == 1) {
+        if($migratesingle == 0) {
+            return array("error"=>true, "message"=>"Question has only one correct answer (Solution: migratesingleanswer=1)", "notices"=>$notices, "rownumber"=>$rownumber);
+        }
+    }
+
+    // *****************************************************
+    // All good
+    foreach ($fractions as $record) {
+        if ($record->fraction > 0) {
+            $answers[$rownumber][1] = 1.000;
+            $answers[$rownumber][2] = 0.000;
         } else {
-            echo $question->id . ': "' . $question->name . '" with ID ' .
-                     "<a href='$CFG->wwwroot/question/preview.php?id=$question->id' target='_blank'>" .
-                     $question->id . "</a> would be migrated!<br/>\n";
+            $answers[$rownumber][1] = 0.000;
+            $answers[$rownumber][2] = 1.000;
         }
-        continue;
-    } else {
-        echo "<br/>\n" .
-                 '--------------------------------------------------------------------------------' .
-                 "<br/>\n";
-        echo 'Multichoice Question (With Multi Answers only): "' . $question->name . "\"<br/>\n";
+        $rownumber++;
     }
-    // If the Multichoice question has got too manu options or responses, we ignore it.
-    if (count($rows) <= 1) {
-        echo "&nbsp;&nbsp; Question has the wrong number of options! Question is not migrated.<br/>\n";
-        $notmigrated[] = $question;
-        continue;
-    }
-    if ($colmtfount < 1 || $colmtfount > 2) {
-        echo "&nbsp;&nbsp; Question has the wrong number of responses! Question is not migrated.<br/>\n";
-        $notmigrated[] = $question;
-        continue;
-    }
-    // Create a new mtf question in the same category.
-    unset($question->id);
-    $questionname = substr($question->name . ' (MTF ' . date("Y-m-d H:i:s") . ')', 0, 255);
-    // Original Question Name plus SCMTF limited by 255 chars.
-    $question->qtype = 'mtf';
-    $question->name = $questionname;
-    $question->timecreated = time();
-    $question->timemodified = time();
-    $question->modifiedby = $USER->id;
-    $question->createdby = $USER->id;
-    // Get the new question ID.
-    $question->id = $DB->insert_record('question', $question);
-    echo 'New mtf Question: "' . $question->name . '" with ID ' . $question->id . "<br/>\n";
-    $rowcount = 1;
-    $ignorequestion = 0;
-    foreach ($rows as $row) {
-        // Create a new mtf row.
-        $mtfrow = new stdClass();
-        $mtfrow->questionid = $question->id;
-        $mtfrow->number = $rowcount++;
-        $mtfrow->optiontext = $row->answer;
-        $mtfrow->optiontextformat = FORMAT_HTML;
-        $mtfrow->optionfeedback = $row->feedback;
-        $mtfrow->optionfeedbackformat = FORMAT_HTML;
-        $mtfrow->id = $DB->insert_record('qtype_mtf_rows', $mtfrow);
-        $colcount = 1;
-        $textcount = 1;
-        $weightpicked = 0;
-        if ($multichoice->single == 0) {
-            // Create a new first mtf column.
-            $mtfcolumn = new stdClass();
-            $mtfcolumn->questionid = $question->id;
-            $mtfcolumn->number = 1;
-            $mtfcolumn->responsetext = 'True';
-            $mtfcolumn->responsetextformat = FORMAT_MOODLE;
-            if ($ignorequestion != $question->id) {
-                $mtfcolumn->id = $DB->insert_record('qtype_mtf_columns', $mtfcolumn);
-            }
-            // Create a new second mtf column.
-            $mtfcolumn2 = new stdClass();
-            $mtfcolumn2->questionid = $question->id;
-            $mtfcolumn2->number = 2;
-            $mtfcolumn2->responsetext = 'False';
-            $mtfcolumn2->responsetextformat = FORMAT_MOODLE;
-            if ($ignorequestion != $question->id) {
-                $mtfcolumn2->id = $DB->insert_record('qtype_mtf_columns', $mtfcolumn2);
-            }
-            // Create a new first weight entry.
-            $mtfweight = new stdClass();
-            $mtfweight->questionid = $question->id;
-            $mtfweight->rownumber = $mtfrow->number;
-            $mtfweight->columnnumber = $mtfcolumn->number;
-            if ($row->fraction > 0) {
-                $mtfweight->weight = 1.0;
-            } else {
-                $mtfweight->weight = 0.0;
-            }
-            $weightpicked = $mtfweight->weight;
-            $mtfweight->id = $DB->insert_record('qtype_mtf_weights', $mtfweight);
-            // Create a new second weight entry.
-            $mtfweight2 = new stdClass();
-            $mtfweight2->questionid = $question->id;
-            $mtfweight2->rownumber = $mtfrow->number;
-            $mtfweight2->columnnumber = $mtfcolumn2->number;
-            if ($weightpicked == 1.0) { // New option opposite to first option.
-                $mtfweight2->weight = 0.0;
-            } else {
-                $mtfweight2->weight = 1.0;
-            }
-            $mtfweight2->id = $DB->insert_record('qtype_mtf_weights', $mtfweight2);
+    return array("error"=>false, "message"=>$answers, "notices"=>$notices, "rownumber"=>$rownumber);
+}
+
+function get_image_filenames($text) {
+    $result = array();
+    $strings = preg_split("/<img|<source/i", $text);
+    foreach ($strings as $string) {
+        $matches = array();
+        if (preg_match('!@@PLUGINFILE@@/(.+)!u', $string, $matches) && count($matches) > 0) {
+            $filename = mb_substr($matches[1], 0, mb_strpos($matches[1], '"'));
+            $filename = urldecode($filename);
+            $result[] = $filename;
         }
-        $ignorequestion = $question->id;
     }
-    // Create the mtf options.
-    $mtf = new stdClass();
-    $mtf->questionid = $question->id;
-    $mtf->shuffleanswers = $multichoice->shuffleanswers;
-    $mtf->numberofrows = count($rows);
-    $mtf->numberofcolumns = $colmtfount;
-    $mtf->answernumbering = $multichoice->answernumbering;
-    if ($colmtfount == 1) {
-        $mtf->scoringmethod = 'mtfonezero';
-    } else {
-        $mtf->scoringmethod = 'subpoints';
-    }
-    $mtf->id = $DB->insert_record('qtype_mtf_options', $mtf);
-    $transaction->allow_commit();
+    return $result;
 }
-echo '--------------------------------------------------------------------------------' . "<br/>\n";
 
-$endtime = time();
-$used = $endtime - $starttime;
-$mins = round($used / 60);
-$used = ($used - ($mins * 60));
-
-echo "<br/>\n ******** MTF SCRIPT DONE - ";
-echo ' Time needed: ' . $mins . ' mins and ' . $used . " secs. ********<br/>\n<br/>\n";
-
-echo " ******** Questions that were NOT migrated: ";
-if (count($notmigrated) > 0) {
-    echo "<br/>\n ID | Link | Question Name<br/>\n";
-    echo "----------------------------------------<br/>\n<font color='red'>";
-    foreach ($notmigrated as $question) {
-        echo "$question->id | <a href='$CFG->wwwroot/question/preview.php?id=$question->id' target='_blank'>" .
-                 $question->id . '</a> | ' . $question->name . "<br/>\n";
+// **********************************************************************************************************************
+// Copying files from one question to another
+function copy_files($fs, $contextid, $oldid, $newid, $text, $type, $component, $filearea) {
+    $filenames = get_image_filenames($text);
+    foreach ($filenames as $filename) {
+        $file = $fs->get_file($contextid, 'question', $type, $oldid, '/', $filename);
+        if ($file) {
+            $newfile = new stdClass();
+            $newfile->component = $component;
+            $newfile->filearea = $filearea;
+            $newfile->itemid = $newid;
+            if (!$fs->get_file($contextid, $newfile->component, $newfile->filearea, $newfile->itemid, '/', $filename)) {
+                $fs->create_file_from_storedfile($newfile, $file);
+            }
+        }
     }
-    echo "</font>";
-} else {
-    echo "NONE. All can be migrated with no problems. ********";
 }
-die();

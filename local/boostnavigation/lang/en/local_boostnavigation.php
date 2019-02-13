@@ -114,7 +114,7 @@ Please note:
 <li>If the custom node does not show up in Boost\'s nav drawer, please check if all mandatory params are set correctly and if the optional language setting fits to your current Moodle user language.</li>
 <li>Due to the way how Boost\'s nav drawer is built in Moodle core, all custom nodes are displayed equally. Adding custom CSS classes, custom HTML element ids or a target attribute to open the link in a new window is impossible.</li>
 </ul>';
-$string['setting_customnodesusageusers'] = 'Each line consists of a link title, a link URL, supported language(s) (optional), supported cohort(s) (optional) and supported role(s) (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
+$string['setting_customnodesusageusers'] = 'Each line consists of a link title, a link URL, supported language(s) (optional), supported cohort(s) (optional), supported role(s) (optional), supported global roles(s) (optional) and an icon (optional) - separated by pipe characters. Each custom node needs to be written in a new line.<br />
 For example:<br />
 Moodle.org website|http://www.moodle.org|en,de<br />
 Our university|http://www.our-university.edu<br />
@@ -127,6 +127,8 @@ Further information to the parameters:
 <li><b>Supported language(s) (optional):</b> This setting can be used for displaying the custom node to users of the specified language only. Separate more than one supported language with commas. If the custom node should be displayed in all languages, then leave this field empty.</li >
 <li><b>Supported cohort(s) (optional):</b> This setting can be used for displaying the custom node to members of the specified cohort only. Use the cohort\'s ID, not the cohort\'s name, for this setting. Separate more than one supported cohort with commas. If the custom node should be displayed for users regardless of any cohort membership, then leave this field empty.</li>
 <li><b>Supported role(s) (optional):</b> This setting can be used for displaying the custom node only to members with the specified role in each context. Use the role\'s shortname for this setting. Separate more than one supported role with commas. If the custom node should be displayed for users regardless of any role, then leave this field empty.</li>
+<li><b>Supported system role(s) (optional):</b> This setting can be used for displaying the custom node only to users with the specified role in system context. Use the role\'s shortname for this setting. The shortname \'admin\' is supported to check if the user is a site admin. Separate more than one supported role with commas. If the custom node should be displayed for users regardless of any system role, then leave this field empty.</li>
+<li><b>Icon (optional):</b> This icon will be used as icon for the custom node, for example fa-flag. Use a Font Awesome icon identifier (<a href="http://fontawesome.io/icons/">See the icon list on fontawesome.io</a>) to identify which icon should be used. Font Awesome is included in Boost, classic Moodle pix icons are not supported here. If you just want to use a standard bullet icon for the custom node, then leave this field empty.</li>
 </ul>
 Please note:
 <ul>

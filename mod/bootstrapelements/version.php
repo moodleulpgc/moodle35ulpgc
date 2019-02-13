@@ -26,9 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017121800;
+$plugin->version   = 2019021200;
 $plugin->requires  = 2014050800;
 $plugin->component = 'mod_bootstrapelements';
 $plugin->cron      = 0;
-$plugin->release   = '1.2';
+$plugin->release   = '1.3';
 $plugin->maturity  = MATURITY_STABLE;
