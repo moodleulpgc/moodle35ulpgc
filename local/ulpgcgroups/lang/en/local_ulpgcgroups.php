@@ -103,4 +103,8 @@ $string['groupmembershipfailed'] = 'Not added, failure on adding membership';
 $string['groupmembershipadded'] = 'User added as group member';
 $string['usernotfoundskip'] = 'User not found, skipped';
 
+$string['enclosure'] = 'Field enclosure';
+$string['enclosure_help'] = 'Character enclosing text fields in CSV texts and files. 
 
+In CSV files multi word fields may be enclosed by a character that marks field start and end. 
+It\'s an optional feature. If present it mustbe a single character, usually ["] or [\'].';
