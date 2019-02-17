@@ -68,15 +68,48 @@ class format_topicgroup extends format_topics {
      * @return array of options
      */
     public function course_format_options($foreditform = false) {
-        $courseformatoptions = parent:: course_format_options($foreditform);
+        $courseformatoptions = parent::course_format_options($foreditform);
 
-        static $topicgroupformatoptions = false;
-        if ($foreditform ) {
+        if (!isset($courseformatoptions['accessallgroups'])) {
+            $courseformatoptions['accessallgroups'] = array(
+                'default' => get_config('format_topicgroup', 'accessallgroups'),
+                'type' => PARAM_INT,
+            );
+            $courseformatoptions['manageactivities'] = array(
+                'default' => get_config('format_topicgroup', 'manageactivities'),
+                'type' => PARAM_INT,
+            );
+        }
+
+        if ($foreditform) {
+        
             $courseformatoptionsedit = array();
             // include here optional
-
+            $attributes = array(array(  0   => get_string('cap_keep', 'format_topicgroup'),
+                                       -1   => get_string('cap_prevent', 'format_topicgroup'),
+                                        1   => get_string('cap_allow', 'format_topicgroup'),
+                                    )
+                                );
+            
+            $courseformatoptionsedit = array(
+                'accessallgroups' => array('label' => get_string('accessallgroups', 'format_topicgroup'),
+                                            'help' => 'accessallgroups',
+                                            'help_component' => 'format_topicgroup',
+                                            'element_type' => 'select',
+                                            'element_attributes' => $attributes,
+                                        ),
+            
+                'manageactivities' => array('label' => get_string('manageactivities', 'format_topicgroup'),
+                                            'help' => 'manageactivities',
+                                            'help_component' => 'format_topicgroup',
+                                            'element_type' => 'select',
+                                            'element_attributes' => $attributes,
+                                        ),
+            );
+            
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
+        
         return $courseformatoptions;
     }
 
@@ -120,12 +153,29 @@ class format_topicgroup extends format_topics {
         $context = context_course::instance($this->courseid);
         $config = get_config('format_topicgroup');
         $editingroles = explode(',', $config->editingroles);
+        $options = $this->get_format_options();
         if($restrictedroles = explode(',', $config->restrictedroles)) {
             foreach($restrictedroles as $role) {
-                //role_change_permission($role, $context, 'moodle/site:accessallgroups', CAP_PREVENT);
-//                print_object( "role_change_permission $role  moodle/site:accessallgroups " );
+                if($options['accessallgroups']) {
+                    $permission = ($options['accessallgroups'] < 0) ? CAP_PREVENT : CAP_ALLOW;
+                    role_change_permission($role, $context, 'moodle/site:accessallgroups', $permission);
+                }
+                if($options['manageactivities']) {
+                    $permission = ($options['manageactivities'] < 0) ? CAP_PREVENT : CAP_ALLOW;
+                    $caps = array('moodle/course:manageactivities',
+                                    'moodle/course:enrolconfig',
+                                    'moodle/course:movesections',
+                                    'moodle/course:sectionvisibility',
+                                    'moodle/course:update',
+                                    'moodle/filter:manage',
+                                    'moodle/grade:manage',
+                                    'moodle/competency:coursecompetencymanage',
+                                );
+                    foreach($caps  as $cap) { 
+                        role_change_permission($role, $context, $cap, $permission);
+                    }
+                }
                 role_change_permission($role, $context, 'moodle/course:setcurrentsection', CAP_PREVENT);
-                //print_object( "role_change_permission $role  moodle/course:setcurrentsection " );
             }
         }
 

@@ -23,6 +23,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ $string['accessallgroups'] = 'Restringir acceso a todos los grupos';
+$string['accessallgroups_help'] = 'Si se activa, los profesores NO coordinadores perderán la capacidad de acceder a todos los grupos: 
+deberán ser miembros del grupo, explícitamente, paar poder participar en el mismo.'; 
+$string['accessallgroups_default'] = 'Restringir acceso a todos los grupos';
+$string['accessallgroups_desc'] = 'Valor inicial de esta parámetro en cada formulario de configuración de curso';
 $string['currentsection'] = 'Tema actual';
 $string['currentgrouping'] = 'Restringido actualmente a';
 $string['sectionname'] = 'Tema';
@@ -48,7 +53,18 @@ $string['restrictsection'] = 'Restringir la sección al agrupamiento';
 $string['editrestrictsection'] = 'Modificar la restricción por agrupamientos';
 $string['unrestrictsection'] = 'Eliminar restricción al agrupamiento ';
 $string['restrictedsectionlbl'] = 'Accesible solo por miembros de {$a} ';
+$string['manageactivities'] = 'Restringir gestión de actividades';
+$string['manageactivities_help'] = 'Si se activa, entonces los profesores NO coordinadores perderán varias capacidades relativas al menejo y gestión de actividades. 
 
+ * Gestión de actividades, editar y borrar elementos del curso.
+ * Gestión y posicionameinto de secciones.
+ * Gestión del libro de calificaciones.
+
+';
+$string['manageactivities_desc'] = 'Default value of this capability parameter in each course config form.';
+$string['cap_keep'] = 'Do not change';
+$string['cap_prevent'] = 'Yes, prevent';
+$string['cap_allow'] = 'No, allow';
 $string['managerestrictions'] = 'Gestionar restricciones de sección';
 
 $string['setgrouping'] = 'Establecer una restricción por Agrupamiento';

@@ -46,21 +46,34 @@ if ($ADMIN->fulltree) {
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
 
-    $roles = get_all_roles();
-    $options=array();
-    foreach($roles as $role) {
-        $options[$role->id] = $role->name;
-    }
-
-    list($usql, $params) = $DB->get_in_or_equal(array('editingcoordteacher'));
+    list($usql, $params) = $DB->get_in_or_equal(array('editingcoordteacher','editingteacher'));
     $defaulteditroles = $DB->get_records_select('role', " shortname $usql ", $params, '', 'id, name');
 
-    $settings->add(new admin_setting_configmultiselect('format_topicgroup/editingroles', get_string('editingroles', 'format_topicgroup'), get_string('editingroles_desc', 'format_topicgroup'), array_keys($defaulteditroles), $options));
+    $settings->add(new admin_setting_pickroles('format_topicgroup/editingroles', 
+                                                get_string('editingroles', 'format_topicgroup'), 
+                                                get_string('editingroles_desc', 'format_topicgroup'), 
+                                                array_keys($defaulteditroles)));
+    
 
     $like = $DB->sql_like('shortname', '?');
     $defaultroles = $DB->get_records_select('role', " $like ", array('%teacher%'), '', 'id, name');
     $defaultroles = array_diff_key($defaultroles, $defaulteditroles);
 
-    $settings->add(new admin_setting_configmultiselect('format_topicgroup/restrictedroles', get_string('restrictedroles', 'format_topicgroup'), get_string('restrictedroles_desc', 'format_topicgroup'), array_keys($defaultroles), $options));
+    $settings->add(new admin_setting_pickroles('format_topicgroup/restrictedroles', 
+                                                        get_string('restrictedroles', 'format_topicgroup'), 
+                                                        get_string('restrictedroles_desc', 'format_topicgroup'), 
+                                                        array_keys($defaultroles)));
 
+                                                        
+    $options = array(0  => get_string('cap_keep', 'format_topicgroup'),
+                    -1  => get_string('cap_prevent', 'format_topicgroup'),
+                     1  => get_string('cap_allow', 'format_topicgroup'),
+                    );                                                    
+    $settings->add(new admin_setting_configselect('format_topicgroup/accessallgroups', 
+                                                        get_string('accessallgroups_default', 'format_topicgroup'), 
+                                                        get_string('accessallgroups_desc', 'format_topicgroup'), 0, $options));
+    
+    $settings->add(new admin_setting_configselect('format_topicgroup/manageactivities', 
+                                                        get_string('manageactivities', 'format_topicgroup'), 
+                                                        get_string('manageactivities_desc', 'format_topicgroup'), 0, $options));
 }

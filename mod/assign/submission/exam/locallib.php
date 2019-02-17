@@ -307,9 +307,9 @@ class assign_submission_exam extends assign_submission_plugin {
         if ($count <= ASSIGNSUBMISSION_EXAM_MAXSUMMARYEXAMS) {
             return $this->assignment->render_area_files('assignsubmission_exam',
                                                         ASSIGNSUBMISSION_EXAM_FILEAREA,
-                                                        $submission->id).'files XXX TTT';
+                                                        $submission->id);
         } else {
-            return get_string('countfiles', 'assignsubmission_exam', $count).'XXXXX';
+            return get_string('countfiles', 'assignsubmission_exam', $count);
         }
     }
 
