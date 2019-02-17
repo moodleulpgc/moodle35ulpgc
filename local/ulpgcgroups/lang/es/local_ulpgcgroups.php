@@ -87,3 +87,8 @@ Puesto, Asistencia, Calificación
 
 $string['exportformatselector'] = 'Formato de exportación';
 $string['exportdownload'] = 'Descargar';
+$string['groupmembershipexists'] = 'Ya es miembro del grupo';
+$string['notenrolledincourse'] = 'Usuario no enrolado en el curso, no agregado';
+$string['groupmembershipfailed'] = 'No agregado debido a fallo en la inscripción en grupo';
+$string['groupmembershipadded'] = 'Usuario agregado como miembro del grupo';
+$string['usernotfoundskip'] = 'Usuario no encontrado, desestimado';
