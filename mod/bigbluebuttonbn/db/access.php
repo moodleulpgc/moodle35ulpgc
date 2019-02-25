@@ -64,6 +64,15 @@ $capabilities = array(
         ),
     ),
 
+    // Ability to import recordings.
+    'mod/bigbluebuttonbn:importrecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        ),
+    ),
+    
     // Ability to generate live meeting.
     'mod/bigbluebuttonbn:meeting' => array(
         'captype' => 'write',
