@@ -87,3 +87,13 @@ Puesto, Asistencia, Calificación
 
 $string['exportformatselector'] = 'Formato de exportación';
 $string['exportdownload'] = 'Descargar';
+$string['groupmembershipexists'] = 'Ya es miembro del grupo';
+$string['notenrolledincourse'] = 'Usuario no enrolado en el curso, no agregado';
+$string['groupmembershipfailed'] = 'No agregado debido a fallo en la inscripción en grupo';
+$string['groupmembershipadded'] = 'Usuario agregado como miembro del grupo';
+$string['usernotfoundskip'] = 'Usuario no encontrado, desestimado';
+$string['enclosure'] = 'Carácter circundante';
+$string['enclosure_help'] = 'Carácter circundante de cada campo en texto y ficheros CSV. 
+
+En ficheros CSV cada campo multipalabra puede estar circundado por un carácter que marca el inicio y final del campo. 
+Es un detalle opcional. Si se utiliza, debe ser un único carácter, no un conjunto de letras, usualmente ["] o [\'].';

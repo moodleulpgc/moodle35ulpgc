@@ -65,7 +65,7 @@ class batchmanage_mod_configurator_form extends batchmanageform {
  */
 class batchmanage_mod_config_form extends batchmanageform {
     function definition() {
-        global $CFG, $DB;
+        global $CFG, $COURSE, $DB;
 
         $mform =& $this->_form;
         $managejob = $this->_customdata['managejob'];
@@ -75,7 +75,7 @@ class batchmanage_mod_config_form extends batchmanageform {
             $next = get_string('savechanges');
         }
         
-        $refcourse = $DB->get_record('course', array('shortname'=>get_config('managejob_modconfig', 'referencecourse')), 'id, shortname, fullname, category, format', MUST_EXIST);
+        $refcourse = $DB->get_record('course', array('shortname'=>get_config('managejob_modconfig', 'referencecourse')), '*', MUST_EXIST);
         $modselector = json_decode($managejob->formsdata['mod_selector']);
         $managejob->refmod_cmid = json_decode($managejob->formsdata['mod_configurator']);
        
@@ -86,8 +86,12 @@ class batchmanage_mod_config_form extends batchmanageform {
         $cm = get_coursemodule_from_id($modselector->module,$managejob->refmod_cmid);
         $modinfo = $managejob->get_modinfodata($cm);
         
+        
+        $oldcourse = clone($COURSE);
+        $COURSE = $refcourse;
         $configform = new $formclass($modinfo, $modinfo->section, null, $refcourse);
         $configform->set_data($modinfo);
+        $COURSE = $oldcourse;
         
         $rp = new ReflectionProperty($formclass, '_form');
         $rp->setAccessible(true);
@@ -105,7 +109,7 @@ class batchmanage_mod_config_form extends batchmanageform {
             if($key && !$ignored) {
                 $element = $innerform->getElement($key);
                 $type = $element->getType();
-                if($type != 'hidden') {
+                if(($type != 'hidden') && ($type != 'filemanager')) {
                     if($type != 'header') {
                         $this->add_grouped_element($element, $key);
                     } else {

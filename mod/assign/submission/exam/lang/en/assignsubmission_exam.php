@@ -28,7 +28,9 @@ $string['countexams'] = '{$a} exams';
 $string['default'] = 'Enabled by default';
 $string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
 $string['enabled'] = 'exam submissions';
-$string['enabled_help'] = 'If enabled, students are able to upload one or more exams as their submission.';
+$string['enabled_help'] = 'If enabled, the item is used as an Exam. 
+The activity icon is changed and teachers can upload files as students submissions. 
+The students don not submit anything here <i>per se</i> (only if other types enabled).';
 $string['event_assessable_uploaded'] = 'A exam has been uploaded.';
 $string['exam'] = 'exam submissions';
 $string['maxbytes'] = 'Maximum exam size';

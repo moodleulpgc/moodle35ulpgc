@@ -23,6 +23,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['accessallgroups'] = 'Restrict access to all groups';
+$string['accessallgroups_help'] = 'If set, then lesser teachers will lose the capability to access to all groups: 
+they must be explicit members of a group to be able to participate in it.'; 
+$string['accessallgroups_default'] = 'Restrict access to all groups';
+$string['accessallgroups_desc'] = 'Default value of this capability parameter in each course config form.';
 $string['currentsection'] = 'This topic';
 $string['currentgrouping'] = 'Current restriction';
 $string['sectionname'] = 'Topic';
@@ -51,7 +56,17 @@ $string['restrictsection'] = 'Restrict section to grouping';
 $string['editrestrictsection'] = 'Edit section grouping restriction';
 $string['unrestrictsection'] = 'Unlock section from grouping';
 $string['restrictedsectionlbl'] = 'Accesible only to {$a} ';
+$string['manageactivities'] = 'Restrict manage activities capability';
+$string['manageactivities_help'] = 'If set, then the restricted roles will lose several capabilities related to manage course activities. 
 
+ * manage activities
+ * manage sections
+
+';
+$string['manageactivities_desc'] = 'Default value of this capability parameter in each course config form.';
+$string['cap_keep'] = 'Do not change';
+$string['cap_prevent'] = 'Yes, prevent';
+$string['cap_allow'] = 'No, allow';
 $string['managerestrictions'] = 'Manage section restrictions';
 
 $string['setgrouping'] = 'Set grouping restriction';

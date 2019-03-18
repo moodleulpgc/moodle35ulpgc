@@ -4,6 +4,21 @@ moodle-local_boostnavigation
 Changes
 -------
 
+### v3.5-r7
+
+* 2019-02-06 - Add the new custom node definition fields to the settings description.
+
+### v3.5-r6
+
+* 2019-02-06 - Bugfix: Get rid of a debug message which appeared when there wasn't an icon defined for a custom node.
+
+### v3.5-r5
+
+* 2019-02-06 - Add support for icons in custom nodes.
+* 2019-02-06 - Improve processing of the language parameter - Credits to Adrian Perez.
+* 2019-02-06 - Add support for system roles and site-admin on custom course nodes - Credits to Adrian Perez.
+* 2019-02-05 - Improve the accessibility of the collapsible nodes, let users open / close the MyCourses node with the keyboard.
+
 ### v3.5-r4
 
 * 2019-02-04 - Fix a flaw in the language pack for the node title placeholders.

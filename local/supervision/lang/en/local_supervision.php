@@ -136,7 +136,7 @@ Puede ver más detalles en el <a href="{$a->reporturl}">Informe de Supervisión 
 Por favor, recuerde los plazos establecidos. <br />
 Este es un mensaje automático que continuará enviándose mientras persista la situación. No responda este mensaje.
 ';
-$string['warningsmalltxt'] = 'Supervision alerts on {$a->shortname}';
+$string['warningsmalltxt'] = 'Supervision alerts on {$a}';
 $string['warningmailsubject'] = '[{$a}]: Aviso de actividad pendiente ';
 $string['warningautomatic'] = 'Monitorización de actividades pendientes';
 $string['emailstudent'] = '  con respecto al estudiante {$a->fullname} con DNI {$a->idnumber} ';

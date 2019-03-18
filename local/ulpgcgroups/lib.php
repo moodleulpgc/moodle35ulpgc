@@ -359,19 +359,19 @@ function local_ulpgcgroups_import_group_users($adduser, $newgroup, $context = nu
         if(!has_capability('moodle/course:managegroups', $context)) {
             $message .= $OUTPUT->notification(get_string('nopermission'));
         } else if(in_array($gid,$groups['0'])) {
-            $message .= $OUTPUT->notification(get_string('groupmembershipexists', 'group', array('name'=>$newgroup->name,'member'=>$newgroup->member) ));
+            $message .= $OUTPUT->notification(get_string('groupmembershipexists', 'local_ulpgcgroups', array('name'=>$newgroup->name,'member'=>$newgroup->member) ));
         } else if(!groups_add_member($gid, $newmember->id)) {
             if(!is_enrolled($context, $newmember->id)) {
-                $message .= $OUTPUT->notification(get_string('notenrolledincourse', 'group', array('name'=>$newgroup->name,'member'=>$newgroup->member) ));
+                $message .= $OUTPUT->notification(get_string('notenrolledincourse', 'local_ulpgcgroups', array('name'=>$newgroup->name,'member'=>$newgroup->member) ));
             } else {
-                $message .= $OUTPUT->notification(get_string('groupmembershipfailed', 'group', array('name'=>$newgroup->name,'member'=>$newgroup->member) ));
+                $message .= $OUTPUT->notification(get_string('groupmembershipfailed', 'local_ulpgcgroups', array('name'=>$newgroup->name,'member'=>$newgroup->member) ));
             }
         } else {
-            $message .= $OUTPUT->notification(get_string('groupmembershipadded', 'group', array('name'=>$newgroup->name,'member'=>$newgroup->member)), 'notifysuccess' );
+            $message .= $OUTPUT->notification(get_string('groupmembershipadded', 'local_ulpgcgroups', array('name'=>$newgroup->name,'member'=>$newgroup->member)), 'notifysuccess' );
         }
     } else {
         if(isset($newgroup->member)) { // ecastro ULPGC
-            $message .= $OUTPUT->notification(get_string('usernotfoundskip', 'group', array('name'=>$newgroup->name,'member'=>$newgroup->member)));
+            $message .= $OUTPUT->notification(get_string('usernotfoundskip', 'local_ulpgcgroups', array('name'=>$newgroup->name,'member'=>$newgroup->member)));
         }
     }
     

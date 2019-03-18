@@ -150,7 +150,7 @@ class qtype_formulas_test extends advanced_testcase {
                 4 => '');
         $this->assertEquals($expected, $this->qtype->split_questiontext($q->questiontext, $q->parts));
     }
-    
+
     /**
      * Test to make sure that loading of question options works, including in an error case.
      */
@@ -170,17 +170,19 @@ class qtype_formulas_test extends advanced_testcase {
         $cat = $generator->create_question_category(array());
 
         $formdata->category = "{$cat->id},{$cat->contextid}";
+        $formdata->id = 0;
         qtype_formulas_edit_form::mock_submit((array)$formdata);
-        echo "after mocksubmit";
+        // echo "after mocksubmit";
         // var_dump($_POST);
         $form = qtype_formulas_test_helper::get_question_editing_form($cat, $questiondata);
-        var_dump($form);
+        $form->id = 0;
+        // var_dump($form);
         $this->assertTrue($form->is_validated());
 
         $fromform = $form->get_data();
-// var_dump($fromform); pas correct
+        // var_dump($fromform); pas correct
         $returnedfromsave = $this->qtype->save_question($questiondata, $fromform);
-// var_dump($returnedfromsave);
+        // var_dump($returnedfromsave);
         // Now get just the raw DB record.
         $question = $DB->get_record('question', ['id' => $returnedfromsave->id], '*', MUST_EXIST);
         // $testanswers = $DB->get_records('qtype_formulas_answers');

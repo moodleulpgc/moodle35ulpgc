@@ -606,6 +606,7 @@ class assign_feedback_historic extends assign_feedback_plugin {
         return $this->view($grade) == '';
     }
 
+   
     /**
      * Check to see if the grade feedback has been modified from a form input in this plugin.
      *
@@ -635,16 +636,37 @@ class assign_feedback_historic extends assign_feedback_plugin {
         return false;
     }
   
-    
     /**
-     * Automatically hide the setting for the historic feedback plugin.
+     * This is a hack to avoid usage of historic in module config form;
+     * transform form elements to prevent use by non-allowed users
      *
-     * @return bool false
+     * @param MoodleQuickForm $mform The form to add elements to
+     * @param array $pluginsenabled A list of form elements to be added to a group.
+     *                              These are the enabledplugins.
+     * @return void
      */
-    public function is_configurable() {
-        return true;
+    public function get_settings(MoodleQuickForm $mform, & $pluginsenabled = null) {
+        global $COURSE;
+        
+        if(!$context = $this->assignment->get_context()) {
+            $context = context_course::instance($COURSE->id);
+        }
+        if($pluginsenabled && !has_capability('assignfeedback/historic:manage', $context)) {
+            $name = $this->get_subtype() . '_' . $this->get_type() . '_enabled';
+            foreach($pluginsenabled as $i => $element) {
+                if($element->getName() == $name) {
+                    if(!$value = $this->get_config('enabled')) {
+                        $pluginsenabled[$i] = $mform->createElement('hidden', $name, 0);
+                        $mform->setType($name, PARAM_BOOL);
+                        unset($pluginsenabled[$i+1]);
+                    } else {
+                        $element->freeze();
+                    }
+                }
+            }
+        }
     }
-
+    
     /**
      * Return a list of the batch grading operations performed by this plugin.
      * This plugin supports batch copy to/from other Assign grades.

@@ -33,7 +33,7 @@ require_once(__DIR__ . '/question_text_row.php');
 require_once(__DIR__ . '/rate_column.php');
 require_once(__DIR__ . '/difficulty_level_column.php');
 require_once(__DIR__ . '/tag_column.php');
-require_once(__DIR__ . '/performances_column.php');
+require_once(__DIR__ . '/practice_column.php');
 require_once(__DIR__ . '/comments_column.php');
 require_once(__DIR__ . '/approved_column.php');
 require_once(__DIR__ . '/anonym_creator_name_column.php');
@@ -128,14 +128,13 @@ class studentquiz_bank_view extends \core_question\bank\view {
         // Init search conditions with filterform state.
         $cateorycondition = new \core_question\bank\search\category_condition(
                 $pagevars['cat'], $pagevars['recurse'], $contexts, $pageurl, $course);
-        $studentquizcondition = new \mod_studentquiz\condition\studentquiz_condition($cm, $this->filterform, $this->report);
+        $studentquizcondition = new \mod_studentquiz\condition\studentquiz_condition($cm, $this->filterform, $this->report, $studentquiz);
         $this->isfilteractive = $studentquizcondition->is_filter_active();
         $this->searchconditions = array ($cateorycondition, $studentquizcondition);
         $this->renderer = $PAGE->get_renderer('mod_studentquiz', 'overview');
     }
 
     /**
-     * (Copy from parent class - modified several code snippets)
      * Shows the question bank editing interface.
      *
      * The function also processes a number of actions:
@@ -202,7 +201,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
     }
 
     /**
-     * (Copy from parent class - modified several code snippets)
      * process action buttons
      *
      * Check for commands on this page and modify variables as necessary.
@@ -253,11 +251,11 @@ class studentquiz_bank_view extends \core_question\bank\view {
             }
             if ($questionids) {
                 list($usql, $params) = $DB->get_in_or_equal($questionids);
-                $questions = $DB->get_records_sql("
-                        SELECT q.*, c.contextid
-                        FROM {question} q
-                        JOIN {question_categories} c ON c.id = q.category
-                        WHERE q.id {$usql}", $params);
+                $sql = "SELECT q.*, c.contextid
+                          FROM {question} q
+                          JOIN {question_categories} c ON c.id = q.category
+                         WHERE q.id {$usql}";
+                $questions = $DB->get_records_sql($sql, $params);
                 foreach ($questions as $question) {
                     question_require_capability_on($question, 'move');
                 }
@@ -305,8 +303,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
     }
 
     /**
-     * (Copy from parent class - modified several code snippets)
-     *
      * Confirmation on process action if needed
      * @return boolean
      */
@@ -349,7 +345,7 @@ class studentquiz_bank_view extends \core_question\bank\view {
             if (optional_param('deleteselected', false, PARAM_BOOL)) {
                 // Add an explanation about questions in use.
                 if ($inuse) {
-                    $questionnames .= '<br />'.get_string('questionsinuse', 'question');
+                    $questionnames .= \html_writer::empty_tag('br').get_string('questionsinuse', 'question');
                 }
 
                 $deleteurl = new \moodle_url($baseurl, array('deleteselected' => $questionlist, 'confirm' => md5($questionlist),
@@ -361,7 +357,7 @@ class studentquiz_bank_view extends \core_question\bank\view {
             } else if (optional_param('approveselected', false, PARAM_BOOL)) {
                 // Add an explanation about questions in use.
                 if ($inuse) {
-                    $questionnames .= '<br />'.get_string('questionsinuse', 'studentquiz');
+                    $questionnames .= \html_writer::empty_tag('br').get_string('questionsinuse', 'studentquiz');
                 }
 
                 $approveurl = new \moodle_url($baseurl, array('approveselected' => $questionlist, 'confirm' => md5($questionlist),
@@ -393,8 +389,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
     }
 
     /**
-     * (Copy from parent class - modified several code snippets)
-     *
      * Create the SQL query to retrieve the indicated questions, based on
      * \core_question\bank\search\condition filters.
      */
@@ -491,10 +485,17 @@ class studentquiz_bank_view extends \core_question\bank\view {
             $qtypecontainer = \html_writer::div(
                 print_choose_qtype_to_add_form(array(), $allowedtypes, true
             ), '', array('id' => 'qtypechoicecontainer'));
-            $output .= \html_writer::div(
-                $OUTPUT->render(new \single_button($url, $caption, 'get', true)) .
-                $qtypecontainer, 'createnewquestion'
-            );
+            $questionsubmissionbutton = new \single_button($url, $caption, 'get', true);
+
+            list($message, $questionsubmissionallow) = mod_studentquiz_check_availability($this->studentquiz->opensubmissionfrom,
+                    $this->studentquiz->closesubmissionfrom, 'submission');
+
+            $questionsubmissionbutton->disabled = !$questionsubmissionallow;
+            $output .= \html_writer::div($OUTPUT->render($questionsubmissionbutton) . $qtypecontainer, 'createnewquestion');
+
+            if (!empty($message)) {
+                $output .= $this->renderer->render_availability_message($message, 'mod_studentquiz_submission_info');
+            }
         } else {
             $output .= get_string('nopermissionadd', 'question');
         }
@@ -502,7 +503,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
     }
 
     /**
-     * (Copy from parent class - modified several code snippets)
      * Prints the table of questions in a category with interactions
      *
      * @param array $contexts Not used!
@@ -549,7 +549,7 @@ class studentquiz_bank_view extends \core_question\bank\view {
 
     protected function display_question_list_rows() {
         $output = '';
-        $output .= '<div class="categoryquestionscontainer">';
+        $output .= \html_writer::start_div('categoryquestionscontainer');
         ob_start();
         $this->start_table();
         $rowcount = 0;
@@ -561,7 +561,7 @@ class studentquiz_bank_view extends \core_question\bank\view {
         $this->end_table();
         $output .= ob_get_contents();
         ob_end_clean();
-        $output .= "</div>\n";
+        $output .= \html_writer::end_div();
         return $output;
     }
 
@@ -575,7 +575,7 @@ class studentquiz_bank_view extends \core_question\bank\view {
         // Fast filters.
         $this->fields[] = new \toggle_filter_checkbox('onlynew',
             get_string('filter_label_onlynew', 'studentquiz'),
-            false, 'myatts.myattempts', array('myattempts', 'myattempts_op'), 0, 0,
+            false, 'myattempts', array('myattempts', 'myattempts_op'), 0, 0,
             get_string('filter_label_onlynew_help', 'studentquiz'));
 
         $this->fields[] = new \toggle_filter_checkbox('onlyapproved',
@@ -595,7 +595,7 @@ class studentquiz_bank_view extends \core_question\bank\view {
 
         $this->fields[] = new \toggle_filter_checkbox('onlydifficultforme',
             get_string('filter_label_onlydifficultforme', 'studentquiz'),
-            false, 'mydiffs.mydifficulty', array('mydifficulty', 'mydifficulty_op'), 1, 0.60,
+            false, 'mydifficulty', array('mydifficulty', 'mydifficulty_op'), 1, 0.60,
             get_string('filter_label_onlydifficultforme_help', 'studentquiz', '60'));
 
         $this->fields[] = new \toggle_filter_checkbox('onlydifficult',
@@ -664,118 +664,25 @@ class studentquiz_bank_view extends \core_question\bank\view {
      */
     private function initialize_filter_form($pageurl) {
         $this->isfilteractive = false;
-        $this->set_filter_post_data();
 
-        $reset = optional_param('resetbutton', false, PARAM_ALPHA);
-        if ($reset) {
-            $this->reset_filter();
+        // If reset button was pressed, redirect the user again to the page.
+        // This means all submitted data is intentionally lost and thus the form clean again.
+        if (optional_param('resetbutton', false, PARAM_ALPHA)) {
+            redirect($pageurl);
         }
 
-        $createdby = optional_param('createdby', false, PARAM_INT);
-        if ($createdby) {
-            $this->set_createdby_user_id();
-        }
-
-        $this->modify_base_url();
         $this->filterform = new \mod_studentquiz_question_bank_filter_form(
             $this->fields,
             $pageurl->out(),
             array('cmid' => $this->cm->id)
         );
-        $this->filterform->set_defaults();
-    }
-
-    /**
-     * Set data for filter recognition
-     */
-    private function set_filter_post_data() {
-        foreach ($this->fields as $field) {
-            if (isset($_GET[$field->_name])) {
-                $_POST[$field->_name] = $_GET[$field->_name];
-            }
-
-            if (isset($_GET[$field->_name . '_op'])) {
-                $_POST[$field->_name . '_op'] = $_GET[$field->_name . '_op'];
-            }
-        }
-
-        if (isset($_POST['timecreated_sdt'])) {
-            $_POST['timecreated_sdt']['enabled'] = '1';
-            $_POST['timecreated_sdt']['day'] = $_GET['timecreated_sdt_day'];
-            $_POST['timecreated_sdt']['month'] = $_GET['timecreated_sdt_month'];
-            $_POST['timecreated_sdt']['year'] = $_GET['timecreated_sdt_year'];
-        }
-
-        if (isset($_POST['timecreated_edt'])) {
-            $_POST['timecreated_edt']['enabled'] = '1';
-            $_POST['timecreated_edt']['day'] = $_GET['timecreated_edt_day'];
-            $_POST['timecreated_edt']['month'] = $_GET['timecreated_edt_month'];
-            $_POST['timecreated_edt']['year'] = $_GET['timecreated_edt_year'];
-        }
-
-        if (isset($_GET['createdby'])) {
-            $_POST['createdby'] = '1';
-        }
-    }
-
-    /**
-     * Reset the filter
-     */
-    private function reset_filter() {
-        foreach ($this->fields as $field) {
-            $_POST[$field->_name] = '';
-            $_POST[$field->_name . '_op'] = '0';
-        }
-
-        unset($_POST['timecreated_sdt']);
-        unset($_POST['timecreated_edt']);
-        unset($_POST['createdby']);
-    }
-
-    /**
-     * Set createby POST data
-     */
-    private function set_createdby_user_id() {
-        global $USER;
-        $_POST['createdby'] = $USER->id;
-    }
-
-    /**
-     * Modify base url for ordering
-     */
-    private function modify_base_url() {
-        foreach ($this->fields as $field) {
-            if (isset($_POST[$field->_name])) {
-                $this->baseurl->param($field->_name, $_POST[$field->_name]);
-            }
-
-            if (isset($_POST[$field->_name . '_op'])) {
-                $this->baseurl->param($field->_name . '_op', $_POST[$field->_name . '_op']);
-            }
-        }
-
-        if (isset($_POST['timecreated_sdt'])) {
-            $this->baseurl->param('timecreated_sdt_day', $_POST['timecreated_sdt']['day']);
-            $this->baseurl->param('timecreated_sdt_month', $_POST['timecreated_sdt']['month']);
-            $this->baseurl->param('timecreated_sdt_year', $_POST['timecreated_sdt']['year']);
-        }
-
-        if (isset($_POST['timecreated_edt'])) {
-            $this->baseurl->param('timecreated_edt_day', $_POST['timecreated_edt']['day']);
-            $this->baseurl->param('timecreated_edt_month', $_POST['timecreated_edt']['month']);
-            $this->baseurl->param('timecreated_edt_year', $_POST['timecreated_edt']['year']);
-        }
-
-        if (isset($_POST['createdby'])) {
-            $this->baseurl->param('createdby', $_POST['createdby']);
-        }
     }
 
     /**
      * Load question from database
      * @param int $page
      * @param int $perpage
-     * @return pqginated array of questions
+     * @return paginated array of questions
      */
     private function load_questions($page, $perpage) {
         global $DB;

@@ -64,10 +64,17 @@ $capabilities = array(
         ),
     ),
 
-    // ecastro ULPGC capabilities
+    // Ability to import recordings.
+    'mod/bigbluebuttonbn:importrecordings' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        ),
+    ),
+    
     // Ability to generate live meeting.
-    //'mod/bigbluebuttonbn:meeting' => array(
-    'mod/bigbluebuttonbn:room' => array(
+    'mod/bigbluebuttonbn:meeting' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -81,8 +88,7 @@ $capabilities = array(
     
     
     // Ability to record a meeting.
-    //'mod/bigbluebuttonbn:recording' => array(
-    'mod/bigbluebuttonbn:record' => array(
+    'mod/bigbluebuttonbn:recording' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

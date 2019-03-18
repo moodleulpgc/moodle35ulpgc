@@ -31,7 +31,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__DIR__) . '/locallib.php');
+require_once(__DIR__ . '/../locallib.php');
 
 /**
  * Execute StudentQuiz upgrade from the given old version
@@ -321,7 +321,7 @@ function xmldb_studentquiz_upgrade($oldversion) {
     // Update capabilities list and permission types, to make sure the defaults are set after this upgrade.
     if ($oldversion < 2017112602) {
         // Load current access definition for easier iteration.
-        require_once(dirname(__DIR__) . '/db/access.php');
+        require_once(__DIR__ . '/../db/access.php');
         // Load all contexts this has to be defined.
         // Only system context needed, as by default it's inherited from there.
         // if someone did make an override, it's intentional.
@@ -449,6 +449,20 @@ function xmldb_studentquiz_upgrade($oldversion) {
         $dbman->add_key($table, new xmldb_key('questioniduseridstudentquizid', XMLDB_KEY_UNIQUE, array('questionid', 'userid', 'studentquizid')));
 
         upgrade_mod_savepoint(true, 2018121800, 'studentquiz');
+    }
+
+    if ($oldversion < 2018122500) {
+        $table = new xmldb_table('studentquiz');
+        $fieldnames = ['opensubmissionfrom', 'closesubmissionfrom', 'openansweringfrom', 'closeansweringfrom'];
+
+        foreach ($fieldnames as $fieldname) {
+            $field = new xmldb_field($fieldname, XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, '0');
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2018122500, 'studentquiz');
     }
 
     return true;

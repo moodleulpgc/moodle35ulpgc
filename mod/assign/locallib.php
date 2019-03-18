@@ -1536,7 +1536,7 @@ class assign {
             }
             $mform->setDefault($plugin->get_subtype() . '_' . $plugin->get_type() . '_enabled', $default);
 
-            $plugin->get_settings($mform);
+            $plugin->get_settings($mform, $pluginsenabled); // ecastro ULPGC
 
         }
     }

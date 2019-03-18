@@ -28,7 +28,9 @@ $string['countexams'] = '{$a} exámenes';
 $string['default'] = 'Habilitado por defecto';
 $string['default_help'] = 'Si se activa la opción, este método de envío estará habilitado por omisión para todas las tareas nuevas.';
 $string['enabled'] = 'Envío de Exámenes';
-$string['enabled_help'] = 'Si se habilita, los estudiantes pueden subir uno o más archivos de examen como sus envíos.';
+$string['enabled_help'] = 'Si se habilita, se emplea la Tarea como un Examen. 
+Se utiliza un icono de examen y el profesor puede incluir resultados del Examen, 
+pero los estudiantes no deben subir nada <i>per se</i> (solo si se marcan otros tipo de entrega).';
 $string['event_assessable_uploaded'] = 'Se ha cargado un examen.';
 $string['exam'] = 'Exámenes';
 $string['maxbytes'] = 'Tamaño máximo de archivo de examen';

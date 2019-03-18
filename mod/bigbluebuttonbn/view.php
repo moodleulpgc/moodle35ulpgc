@@ -294,7 +294,7 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     if (isset($bbbsession['bigbluebuttonbn']->type)) {
         $type = $bbbsession['bigbluebuttonbn']->type;
     }
-    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles($bbbsession['context']);
+    $typeprofiles = bigbluebuttonbn_get_instance_type_profiles($bbbsession['context']); // ecastro ULPGC
     
     $enabledfeatures = bigbluebuttonbn_get_enabled_features($typeprofiles, $type);
     
@@ -359,7 +359,9 @@ function bigbluebuttonbn_view_render_recording_section(&$bbbsession, $type, $ena
         $output .= bigbluebuttonbn_view_render_recordings($bbbsession, $enabledfeatures, $jsvars);
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('id' => 'bigbluebuttonbn_view_recordings_footer'));
-        $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
+        if(has_capability('mod/bigbluebuttonbn:importrecordings', $bbbsession['context'])) { // ecastro ULPGC
+            $output .= bigbluebuttonbn_view_render_imported($bbbsession, $enabledfeatures);
+        }
         $output .= html_writer::end_tag('div');
     }
     return $output;
@@ -441,20 +443,20 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
  */
 function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, &$jsvars) {
     $bigbluebuttonbnid = null;
-    if ($enabledfeatures['showrecordings']) {
+    if ($enabledfeatures['showrecordings']) { // ecastro ULPGC
         $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
     }
     
     // Get recordings.
     $recordings = bigbluebuttonbn_get_recordings(
-        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showrecordings'],
+        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showrecordings'],  
         $bbbsession['bigbluebuttonbn']->recordings_deleted
-      );
+      ); // ecastro ULPGC
     if ($enabledfeatures['importrecordings']) {
         // Get recording links.
         $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
             $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showrecordings']
-          );
+          ); // ecastro ULPGC
         /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
          * recordings are not included. */
         if ($bbbsession['bigbluebuttonbn']->recordings_imported) {

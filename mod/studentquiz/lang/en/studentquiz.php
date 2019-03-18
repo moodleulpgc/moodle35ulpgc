@@ -79,19 +79,24 @@ $string['not_approved'] = '✗';
 $string['lastattempt_right'] = '✓';
 $string['lastattempt_wrong'] = '✗';
 $string['slot_of_slot'] = 'Question {$a->slot} of {$a->slots} in this set';
-$string['questions'] = 'questions';
+$string['num_questions'] = '{$a} questions';
 $string['pagesize'] = 'Page size:';
 $string['approve'] = 'Approve';
 $string['unapprove'] = 'Unapprove';
 $string['approve_toggle'] = 'Un/Approve';
 $string['approveselectedscheck'] = 'Are you sure you want to un-/approve the following questions?<br /><br />{$a}';
 $string['questionsinuse'] = '(* Questions marked by an asterisk are already in use in some quizzes.)';
-$string['creator_anonym_firstname'] = 'Anonymous';
-$string['creator_anonym_lastname'] = 'Student';
+$string['creator_anonym_fullname'] = 'Anonymous Student';
 $string['no_questions_selected_message'] = 'Please select at least one question to start the quiz.';
 $string['progress_bar_caption'] = 'Your progress in this StudentQuiz activity';
 $string['no_questions_filter'] = 'None of the questions matched your filter criteria. Reset the filter to see all.';
 $string['no_questions_add'] = 'There are no questions in this StudentQuiz. Feel free to add some questions.';
+$string['before_submission_start_date'] = 'Open for question submission from {$a}.';
+$string['before_submission_end_date'] = 'This StudentQuiz closes for question submission on {$a}.';
+$string['after_submission_end_date'] = 'This StudentQuiz closed for question submission on {$a}.';
+$string['before_answering_start_date'] = 'Open for answering from {$a}.';
+$string['before_answering_end_date'] = 'This StudentQuiz closes for answering on {$a}.';
+$string['after_answering_end_date'] = 'This StudentQuiz closed for answering on {$a}.';
 
 // Blocks.
 $string['statistic_block_title'] = 'My Progress';
@@ -167,10 +172,16 @@ $string['settings_allowallqtypes'] = 'Allow all question types';
 $string['settings_allowedqtypes'] = 'Allowed question types';
 $string['settings_allowedqtypes_help'] = 'Here you specify the type of questions that are allowed';
 $string['settings_qtypes_default_new_activity'] = 'The following are default for a new activity';
+$string['settings_availability_open_submission_from'] = 'Open for question submission from';
+$string['settings_availability_close_submission_from'] = 'Closed for question submission from';
+$string['settings_availability_open_answering_from'] = 'Open for answering from';
+$string['settings_availability_close_answering_from'] = 'Close for answering from';
 
 // Error messages.
 $string['needtoallowatleastoneqtype'] = 'You need to allow at least one question type';
 $string['please_enrole_message'] = 'Please enroll in this course to see your personal progress';
+$string['submissionendbeforestart'] = 'Submissions deadline can not be specified before the open for submissions date';
+$string['answeringndbeforestart'] = 'Answering deadline can not be specified before the open for answering date';
 
 // Admin settings.
 $string['rankingsettingsheader'] = 'Ranking settings';

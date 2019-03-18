@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014050100;
-$plugin->requires  = 2013050100;
+$plugin->version   = 2019021200;
+$plugin->requires  = 2018051700;
 $plugin->component = 'assignfeedback_historic';
