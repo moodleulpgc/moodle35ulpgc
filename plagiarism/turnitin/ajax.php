@@ -26,13 +26,15 @@ $cmid = optional_param('cmid', 0, PARAM_INT);
 $itemid = optional_param('itemid', 0, PARAM_INT);
 if ( !empty( $cmid ) ) {
     $cm = get_coursemodule_from_id('', $cmid);
-    $context = context_course::instance($cm->course);
+    //$context = context_course::instance($cm->course);
+    $context = context_module::instance($cm->id); // ecastro ULPGC
 
     // Work out user role.
     $userrole = '';
     switch ($cm->modname) {
         case "forum":
         case "workshop":
+        case "assign": // ecastro ULPGC
             $userrole = (has_capability('plagiarism/turnitin:viewfullreport', $context)) ? 'Instructor' : 'Learner';
             break;
         default:

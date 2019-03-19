@@ -35,6 +35,7 @@ $string['bigbluebuttonbn:recording'] = 'Record a bigbluebuttonbn meeting';
 $string['bigbluebuttonbn:meeting'] = 'Create a bigbluebuttonbn live meeting';
 $string['bigbluebuttonbn:view'] = 'View a room/activity';
 $string['bigbluebuttonbn:managerecordings'] = 'Manage bigbluebuttonbn recordings';
+$string['bigbluebuttonbn:importrecordings'] = 'Import bigbluebuttonbn recordings';
 $string['bigbluebuttonbn'] = 'BigBlueButton';
 
 $string['privacy:metadata:bigbluebuttonbn'] = 'Stores the configuration for the room or activity that defines the features and general behaviour of the BigBlueButton session.';

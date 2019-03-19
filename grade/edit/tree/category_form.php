@@ -253,9 +253,10 @@ class edit_category_form extends moodleform {
         $categories = grade_category::fetch_all(array('courseid'=>$COURSE->id));
         
         $depth = 0;
+        $canmanage = false;
         if($ulpgc = get_config('local_ulpgccore', 'enabledgradebooklocking')) { // ecastro ULPGC enforce gradebook locking
             $context = context_course::instance($COURSE->id);
-            if(!($depth = get_config('local_ulpgccore', 'gradebooklockingdepth') && !$canmanage = has_capability('local/ulpgccore:manage', $context))) {
+            if(!($depth = get_config('local_ulpgccore', 'gradebooklockingdepth')) || ($canmanage = has_capability('local/ulpgccore:manage', $context))) {
                 $depth = 0;
             }
         }

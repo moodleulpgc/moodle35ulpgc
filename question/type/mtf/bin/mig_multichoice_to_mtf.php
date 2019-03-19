@@ -60,6 +60,7 @@ $fs = get_file_storage();
 $sql = "SELECT q.*
         FROM {question} q
         WHERE q.qtype = 'multichoice'
+          AND q.parent = 0
         ";
  //"and q.id in (select questionid from {qtype_multichoice_options} where single = '0')";
 $params = array();
@@ -205,12 +206,6 @@ foreach ($questions as $question) {
     } else {
         $question_weights = get_weights($question_answers, $multichoice_options->single, $migratesingle);
         $rownumber = $question_weights["rownumber"];
-
-        // *****************************************************
-        // Checking if question has a parent question (Cloze question)
-        if ($question->parent != 0) {
-            $question_weights = array("error"=>true, "message"=>"Question will not be migrated. It is part of a Cloze question.", "notices"=>[]);
-        }
     }
 
     // *****************************************************

@@ -44,7 +44,7 @@ class user_observers {
      */
     public static function synch_exam($event) {
         global $DB;
-        $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']);
+        $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']));
         $exam = examboard_get_exam_with_board($event->objectid); 
         if($examboard && $exam) {
             examboard_synchronize_groups($examboard, $exam);
@@ -59,7 +59,7 @@ class user_observers {
      * @return void
      */
     public static function synch_board($event) {
-        $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']);
+        $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']));
         if($examboard && $exams = examboard_get_board_exams($event->objectid, $event->other['examboardid'], false)) {
             foreach($exams as $exam) {
                 examboard_synchronize_groups($examboard, $exam);

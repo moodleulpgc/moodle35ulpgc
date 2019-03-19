@@ -137,7 +137,7 @@ class user_filter_courserole extends user_filter_type {
         $params = array();
         $list = '';
         if($clist && $value) {
-            $list = filters_list_convert($value, $clist);  // ecastro 
+            $list = $this->filters_list_convert($value, $clist);  // ecastro 
         }
         if (!$list) {
            $value = ($data['value']);

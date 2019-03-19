@@ -434,6 +434,76 @@ function local_ulpgccore_boostnav_get_all_childrenkeys(navigation_node $navigati
 }
 
 
+/**
+ * Gets an obtional global message to display in header
+ *
+ * @return string formatted message
+ */
+function local_ulpgccore_get_alert_message() { 
+        global $COURSE, $OUTPUT, $PAGE, $USER;
+        
+        $startdate = get_config('local_ulpgccore', 'alertstart');
+        $enddate = get_config('local_ulpgccore', 'alertend');
+        $now = time();
+        $startdate = $startdate ? strtotime($startdate) : 0;
+        $enddate = $enddate ? strtotime($enddate) : 0;
+        
+        if(($startdate && $now <= $startdate) || ($enddate && $now > $enddate)) {
+            return '';
+        }
+
+        // check applicable role
+        if($targetroles = get_config('local_ulpgccore', 'alertroles')) {
+            $targetroles = explode(',', $targetroles);
+            $userroles = get_user_roles($PAGE->context, 0, false);
+            $checkrole = false;
+            foreach($targetroles as $roleid) {
+                foreach($userroles as $role) {
+                    if($role->roleid == $roleid) {
+                        $checkrole = true;
+                        break 2;
+                    }
+                }
+            }
+        } else {
+            $checkrole = true;
+        }
+        
+        if(!$checkrole) {
+            return '';
+        }
+        $type = get_config('local_ulpgccore', 'alerttype');
+        $icons = array('info'=>'info-circle',
+                       'warning'=>'warning',
+                       'success'=>'thumbs-up',
+                       'danger'=>'exclamation-circle');
+        $confirmbutton = get_config('local_ulpgccore', 'alertdismiss');
+        
+        if($confirmbutton && $confirmed = optional_param('dismissalert', 0, PARAM_INT)) {
+            set_user_preference('user_read_globalmessage', 1); 
+            return '';
+        }
+    
+        $html = html_writer::start_tag('div', array('class' => 'globalmessage alert alert-'.$type));
+        $dismiss = html_writer::tag('span', '&times;', array('aria-hidden'=>'true'));
+        $html .= html_writer::tag('button', $dismiss, array('class' => 'close', 'type' => 'button',
+                                                            'data-dismiss' => 'alert', 'aria-label' => 'Close'));
+        $html .= html_writer::tag('i', null, array('class' => "fa fa-{$icons[$type]} fa-3x fa-pull-left"));
+        $html .= get_config('local_ulpgccore', 'alertmessage');
+        
+        if($confirmbutton) {
+            $url = clone $PAGE->url;
+            $url->param('dismissalert', 1);
+            $html .= html_writer::div($OUTPUT->single_button($url, get_string('dismissalert', 'local_ulpgccore')));
+        }
+        $html .= html_writer::end_tag('div');
+
+        return $html;
+
+
+}
+
+
 function local_ulpgccore_cron() {
     global $SITE;
     

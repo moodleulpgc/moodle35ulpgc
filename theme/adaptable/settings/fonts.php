@@ -54,12 +54,18 @@ defined('MOODLE_INTERNAL') || die;
     $description = get_string('fontsubsetdesc', 'theme_adaptable');
     $default = '';
     $setting = new admin_setting_configmulticheckbox($name, $title, $description, $default, array(
-        'latin-ext' => "latin-ext",
-        'cyrillic' => "cyrillic",
-        'cyrillic-ext' => "cyrillic-ext",
-        'greek' => "greek",
-        'greek-ext' => "greek-ext",
-        'vietnamese' => "vietnamese",
+        'latin-ext' => "Latin Extended",
+        'cyrillic' => "Cyrillic",
+        'cyrillic-ext' => "Cyrillic Extended",
+        'greek' => "Greek",
+        'greek-ext' => "Greek Extended",
+        'vietnamese' => "Vietnamese",
+        'arabic' => "Arabic",
+        'hebrew' => "Hebrew",
+        'japanese' => "Japanese",
+        'korean' => "Korean",
+        'tamil' => "Tamil",
+        'thai' => "Thai"
     ));
     $setting->set_updatedcallback('theme_reset_all_caches');
     $temp->add($setting);

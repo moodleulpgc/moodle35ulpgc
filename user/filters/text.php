@@ -136,7 +136,7 @@ class user_filter_text extends user_filter_type {
 
         $list = '';
         if($operator == 6 || $operator == 7) {
-            $list = filters_list_convert($value, 1); // ULPGC ecastro user list operators
+            $list = $this->filters_list_convert($value, 1); // ULPGC ecastro user list operators
         }
         if(!$list) {
            $value = ($data['value']);

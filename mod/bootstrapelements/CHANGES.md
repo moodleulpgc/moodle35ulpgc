@@ -1,6 +1,8 @@
 Changes in version 1.3 (2019021200)
 ----------
 - Fix longstanding Javascript issue causing fontawesome-icon picker not to work in most themes other than Adaptable.
+- Add privacy API.
+- Fix install issues due to db install.xml issue.
 
 Changes in version 1.1 (2015010600)
 ----------

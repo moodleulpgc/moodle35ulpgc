@@ -146,6 +146,10 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
     border-color: #bce8f1;
 }
 
+#page-mod-studentquiz-attempt .mod-studentquiz-attempt-nav {
+    margin-bottom: 20px;
+}
+
 #page-mod-studentquiz-attempt .mod-studentquiz-attempt-nav .col-md-4 {
     box-sizing: border-box;
     float: left;
@@ -180,6 +184,7 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
 
 .error {
     color: #f00;
+    font-weight: bold;
 }
 .mod-studentquiz-summary-highlight {
     background-color: #d9edf7;
@@ -197,23 +202,31 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
 .question-unapproved {
     color: #7b1400;
 }
+table#categoryquestions {
+    table-layout: auto;
+}
 #categoryquestions .header {
     text-align: left;
+    white-space: nowrap;
+}
+#categoryquestions th.checkbox,
+#categoryquestions td.checkbox {
+    padding-left: 10px;
+    padding-right: 7px;
+}
+#categoryquestions .qtype {
+    width: auto;
 }
 #categoryquestions .questionname {
-    white-space: normal;
-}
-#categoryquestions .approved {
-    width: 70px;
+    min-width: 180px;
 }
 #categoryquestions .iconcol {
     width: 12px;
 }
 #categoryquestions .rates,
 #categoryquestions .difficultylevel,
-#categoryquestions .practice,
-#categoryquestions .comment {
-    width: 120px;
+#categoryquestions .practice {
+    width: 115px;
 }
 
 #categoryquestions th.practice .sorters,
@@ -222,12 +235,23 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
     font-size: .8em;
     font-weight: 400;
 }
-
-
 #categoryquestions th .sorters {
     font-size: 0.8em;
     font-weight: normal;
 }
+#categoryquestions td.difficultylevel,
+#categoryquestions td.rates {
+    padding-top: 7px;
+}
+#categoryquestions td.questionname,
+#categoryquestions td.creatorname {
+    white-space: normal;
+    line-height: 1em;
+}
+#categoryquestions td.qtype .icon {
+    margin-right: 0;
+}
+
 
 /* behavior */
 .studentquiz_behaviour {
@@ -250,7 +274,7 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
     width: 100%;
 }
 
-.studentquiz_behaviour .comment_list div {
+.studentquiz_behaviour .comment_list > div {
     border-bottom: 1px solid #fff;
     border-top: 1px solid #eee;
     padding: 15px 0;
@@ -262,7 +286,6 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
     position: absolute;
     right: 0;
     text-decoration: underline;
-    top: 0;
 }
 
 .studentquiz_behaviour .comment_list div span.remove_action:hover {
@@ -281,8 +304,6 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
 }
 
 .studentquiz_behaviour .rate .error {
-    color: red;
-    font-weight: bold;
     margin-top: 5px;
 }
 
@@ -318,4 +339,9 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
 #page-mod-studentquiz-view #mod_studentquiz_statblock .report_more_url,
 #page-mod-studentquiz-view #mod_studentquiz_rankingblock .report_more_url {
     text-align: right;
+}
+#mod_studentquiz_statblock .card-text.content > div,
+#mod_studentquiz_rankingblock .card-text.content > div {
+    display: flex;
+    justify-content: space-between;
 }

@@ -29,8 +29,10 @@ function local_ulpgcquiz_extend_settings_navigation(settings_navigation $nav, co
     global $CFG, $PAGE;
     
     if(strpos($PAGE->pagetype, 'mod-quiz') !== false) {
-        if(!get_config('quiz_makeexam', 'enabled')) {
-            if (has_all_capabilities(array('mod/quiz:manage', 'mod/quiz:manageoverrides'), $context)) { // ecastro ULPGC add quiz export ODF/PDF
+        $enabled = get_config('quiz_makeexam', 'enabled');
+        if(!$enabled) {
+            // add quiz export ODF/PDF
+            if (has_all_capabilities(array('mod/quiz:manage', 'mod/quiz:manageoverrides'), $context)) { 
                 if ($settingsnode = $nav->find('modulesettings', navigation_node::TYPE_SETTING)) {
                     $node = navigation_node::create(get_string('exportquiz', 'local_ulpgcquiz'),
                             new moodle_url('/local/ulpgcquiz/export.php', array('cmid'=>$PAGE->cm->id)),
@@ -41,6 +43,7 @@ function local_ulpgcquiz_extend_settings_navigation(settings_navigation $nav, co
             }
         }
         
+        // remove  quiz_report_makeexam link from all quiz pages
         if ($settingsnode = $nav->find('quiz_report_makeexam', navigation_node::TYPE_SETTING)) {
             if ($rootnode = $nav->find('modulesettings', navigation_node::TYPE_SETTING)) {
                 $settingsnode->remove();
@@ -48,9 +51,13 @@ function local_ulpgcquiz_extend_settings_navigation(settings_navigation $nav, co
                 if(!in_array($key, $rootnode->get_children_key_list())) {
                     $key = null;
                 }
-                $rootnode->add_node($settingsnode, $key);
+                // add quiz_report_makeexam link only if enabled
+                if($enabled) {
+                    $rootnode->add_node($settingsnode, $key);
+                }
             }
         }
+        
     }
 }
 

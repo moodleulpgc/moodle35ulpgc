@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 class qtype_essayautograde_test_helper extends question_test_helper {
 
     public function get_test_questions() {
-        return array('editor', 'editorfilepicker', 'plain', 'monospaced', 'responsetemplate', 'noinline');
+        return array('editor', 'editorfilepicker', 'plain', 'monospaced', 'responsetemplate', 'responsesample', 'noinline');
     }
 
     /**
@@ -67,6 +67,8 @@ class qtype_essayautograde_test_helper extends question_test_helper {
         $q->showgradebands = 0;
         $q->addpartialgrades = 0;
         $q->showtargetphrases = 0;
+        $q->errorcmid = 0;
+        $q->errorpercent = 0;
         $q->correctfeedback = 'Correct feedback';
         return $q;
     }
@@ -101,6 +103,7 @@ class qtype_essayautograde_test_helper extends question_test_helper {
         $fromform->attachmentsrequired = 0;
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->responsesample = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->correctfeedback = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->partiallycorrectfeedback = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->incorrectfeedback = array('text' => '', 'format' => FORMAT_HTML);
@@ -143,6 +146,7 @@ class qtype_essayautograde_test_helper extends question_test_helper {
         $fromform->attachmentsrequired = 0;
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->responsesample = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->correctfeedback = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->partiallycorrectfeedback = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->incorrectfeedback = array('text' => '', 'format' => FORMAT_HTML);
@@ -183,6 +187,7 @@ class qtype_essayautograde_test_helper extends question_test_helper {
         $fromform->attachmentsrequired = 0;
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_PLAIN);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_PLAIN);
+        $fromform->responsesample = array('text' => '', 'format' => FORMAT_PLAIN);
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_PLAIN);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_PLAIN);
         $fromform->correctfeedback = array('text' => '', 'format' => FORMAT_PLAIN);
@@ -206,6 +211,13 @@ class qtype_essayautograde_test_helper extends question_test_helper {
         $q = $this->initialise_essayautograde_question();
         $q->responsetemplate = 'Once upon a time';
         $q->responsetemplateformat = FORMAT_HTML;
+        return $q;
+    }
+
+    public function make_essayautograde_question_responsesample() {
+        $q = $this->initialise_essayautograde_question();
+        $q->responsesample = 'Once upon a time';
+        $q->responsesampleformat = FORMAT_HTML;
         return $q;
     }
 
@@ -310,6 +322,8 @@ class qtype_essayautograde_test_helper extends question_test_helper {
         $essay->attachmentsrequired = 0;
         $essay->responsetemplate = '';
         $essay->responsetemplateformat = FORMAT_MOODLE;
+        $essay->responsesample = '';
+        $essay->responsesampleformat = FORMAT_MOODLE;
         $essay->graderinfo = '';
         $essay->graderinfoformat = FORMAT_MOODLE;
         return $essay;

@@ -1428,7 +1428,7 @@ function examboard_process_userassign($examboard, $fromform) {
                         // now tutors, if existing
                         foreach($tutors as $tutor) {
                             $params['tutorid'] = $tutor->tutorid;
-                            if(!$tutor = $DB->record_exists('examboard_tutor', $params)) {
+                            if(!$rec = $DB->record_exists('examboard_tutor', $params)) {
                                 $tutor->userid = $userid;
                                 $tutor->examid = $examid;
                                 $tutor->timecreated = $now;
@@ -3109,11 +3109,10 @@ function examboard_process_allocateboard($examboard, $fromform) {
     global $CFG, $DB, $SESSION;
 
     $context = context_module::instance($fromform->id);
-
     // form arrays of potential members (those that can grade)
     foreach($fromform->choosegroup as $sortorder => $groups) {
         $potential[$sortorder] = array();
-        $groups = explode(', ', $groups);
+        //$groups = explode(',', $groups);
         foreach($groups as $groupid) {
             $users = array_keys(get_enrolled_users($context, 'mod/examboard:grade', $groupid, 'u.id, u.idnumber')); 
             $potential[$sortorder] = array_unique(array_merge($potential[$sortorder], $users));
@@ -3131,15 +3130,34 @@ function examboard_process_allocateboard($examboard, $fromform) {
     
     $examsllocated = 0;
 
-    $allocatedexams =  explode(', ',$fromform->allocatedexams);
+    $allocatedexams =  $fromform->allocatedexams;//$allocatedexams =  explode(',',$fromform->allocatedexams);
     
-    if($fromform->delexisting) {
+    if($fromform->delexisting && $allocatedexams) {
         // delete
         list($insql, $params) = $DB->get_in_or_equal($allocatedexams, SQL_PARAMS_NAMED, 'e');
-        $current = $DB->count_records_select('examboard_examinee', "examid $insql ", $params);
+        $boards = array_unique($DB->get_records_select_menu('examboard_exam', "id $insql ", $params, '', 'id,boardid'));
+        $DB->delete_records_list('examboard_member', 'boardid',  $boards);
+    }
+    
+    if(!$fromform->repeatable) {
+        if($boards = array_unique($DB->get_records_menu('examboard_exam', array('examboardid'=>$examboard->id), '', 'id,boardid'))) {
+            list($insql, $params) = $DB->get_in_or_equal($boards, SQL_PARAMS_NAMED, 'b');
+            if($users = array_unique($DB->get_records_select_menu('examboard_member', "boardid $insql ", $params, '', 'id,userid'))) {
+                foreach($fromform->choosegroup as $sortorder => $groups) {
+                    $potential[$sortorder] = array_diff($potential[$sortorder], $users);
+                }
+            }
+        }
     }
     
     foreach($allocatedexams as $examid) {
+        // if there are no more potential users, stop allocation
+        foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
+            if(!$potential[$sortorder]) {
+                break 2;
+            }
+        }
+    
         $exam = examboard_get_exam_with_board($examid);
         // get existing tutors
         $tutors = array();
@@ -3169,9 +3187,14 @@ function examboard_process_allocateboard($examboard, $fromform) {
                 if(!isset($board[$sortorder][$deputy])) {
                     // not exists, allocate member now
                     // get a potential user
-                    if($key = array_rand($potential[$sortorder])) {
-                        $userid = $potential[$sortorder][$key];
-                        if(!in_array($userid, $excluded)) {
+                    // only if there are potential users NOT excluded (avoid infinite loops)
+                    if($potential[$sortorder] && array_diff($potential[$sortorder], $excluded)) {
+                        $userid = 0;
+                        do {
+                            $key = array_rand($potential[$sortorder]);
+                            $userid = $potential[$sortorder][$key];
+                        } while (in_array($userid, $excluded));
+                        if($userid > 0) {
                             //OK, this is a non-existing user, can be added
                             $added[$sortorder][$deputy] = $userid;
                             $excluded[] = $userid;
@@ -3217,6 +3240,10 @@ function examboard_process_allocateboard($examboard, $fromform) {
                 break 2;
             }
         }
+        
+        
+        
+        
     }
     
     // now call synchronizing as needed

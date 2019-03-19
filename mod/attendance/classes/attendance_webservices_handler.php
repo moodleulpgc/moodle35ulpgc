@@ -51,7 +51,9 @@ class attendance_handler {
             $context = context_course::instance($attendance->course);
             if (has_capability('mod/attendance:takeattendances', $context, $userid)) {
                 $course = $usercourses[$attendance->course];
-                $course->attendance_instance = array();
+                if (!isset($course->attendance_instance)) {
+                    $course->attendance_instance = array();
+                }
 
                 $att = new stdClass();
                 $att->id = $attendance->id;
@@ -109,7 +111,8 @@ class attendance_handler {
         $session->courseid = $DB->get_field('attendance', 'course', array('id' => $session->attendanceid));
         $session->statuses = attendance_get_statuses($session->attendanceid, true, $session->statusset);
         $coursecontext = context_course::instance($session->courseid);
-        $session->users = get_enrolled_users($coursecontext, 'mod/attendance:canbelisted', 0, 'u.id, u.firstname, u.lastname');
+        $session->users = get_enrolled_users($coursecontext, 'mod/attendance:canbelisted',
+                                             $session->groupid, 'u.id, u.firstname, u.lastname');
         $session->attendance_log = array();
 
         if ($attendancelog = $DB->get_records('attendance_log', array('sessionid' => $sessionid),

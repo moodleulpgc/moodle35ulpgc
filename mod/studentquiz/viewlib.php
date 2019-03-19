@@ -25,10 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/editlib.php');
 require_once(__DIR__ . '/locallib.php');
-
-require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-require_once($CFG->dirroot . '/mod/quiz/attemptlib.php');
-
 /**
  * This class loads and represents the state for the main view.
  *
@@ -128,6 +124,8 @@ class mod_studentquiz_view {
         // When there are changes to the required capabilities for different moodles, the capabilities have to be corrected
         // TODO: We should fix these with the updates and restore functions (analog fix question category etc.)
         mod_studentquiz_ensure_question_capabilities($this->context);
+
+        $_POST['cat'] = $this->get_category_id() . ',' . $this->get_context_id();
 
         // Get edit question link setup
         list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars)

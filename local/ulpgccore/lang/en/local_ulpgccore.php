@@ -52,6 +52,9 @@ $string['explaingradebooklocking'] = 'If enabled, custom ULPGC grade lockings on
 $string['gradebooklockingdepth'] = 'Gradebook locking depth';
 $string['explainlockingdepth'] = 'Grade categories up to this depth will be locked for changes. 
 Only users with Manage capability will be able to move or modify name and aggregation settings. ';
+$string['gradebooknocal'] = 'Grade category for Non calificated';
+$string['explaingradebooknocal'] = 'If non-empty then the grade category with this idnumber will be the default one 
+to store grade items of non-categorized items. That\'s it, non categorized items are grouped into this grade category.';
 $string['locknameword'] = 'Grade category locking word';
 $string['explainlocknameword'] = 'If this word is present in Info field then the Grade category is locked and its name and idnumber cannot be modified, 
 except with category edit permissions. ';
@@ -287,3 +290,21 @@ $string['footerblock1'] = 'Footer block 1';
 $string['footerblock2'] = 'Footer block 2';
 $string['footerblock3'] = 'Footer block 3';
 $string['footerblock_desc'] = 'An structured text, with h3 and p tags to list items.';
+
+$string['alerts'] = 'Global alerts';
+$string['showglobalalert'] = 'Show alerts';
+$string['explainshowglobalalert'] = 'If enabled, the message below will be displayed in header for matching pages.';
+$string['alertstart'] = 'Starting on';
+$string['explainalertstart'] = 'Date to start showing alert message. YYYY-mm-dd format. ';
+$string['alertend'] = 'Ending on';
+$string['explainalertend'] = 'Date to end showing alert message. YYYY-mm-dd format. ';
+$string['alertroles'] = 'Show for roles';
+$string['explainalertroles'] = 'The message will be displayed to users with any of this roles in course context.';
+$string['alerttype'] = 'Alert type';
+$string['explainalerttype'] = 'One of the standard Bootstrap alert classes';
+$string['alertdismiss'] = 'Dismiss button';
+$string['explainalertdismiss'] = 'If enabled, a button is shown to permanently dismiss the message by setting a user preference.';
+$string['alertmessage'] = 'Alert message';
+$string['danger'] = 'Danger';
+$string['dismissalert'] = 'Permanent dismiss';
+

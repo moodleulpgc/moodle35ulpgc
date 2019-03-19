@@ -19,7 +19,8 @@
  *
  * @package    qtype
  * @subpackage essayautograde
- * @copyright  2009 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +37,8 @@ require_once($CFG->dirroot.'/question/type/essay/question.php');
  * However, we override "make_behaviour" in case automatic grading is required.
  * Additionally, we implement the methods required for automatic grading.
  *
- * @copyright  2009 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 // interface: question_automatically_gradable
@@ -74,6 +76,14 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
     protected $currentresponse = null;
 
     /**
+     * These variables are only used if needed
+     * to dtect paterns in a student response
+     */
+    private static $aliases = null;
+    private static $metachars = null;
+    private static $flipmetachars = null;
+
+    /**
      * Override "make_behaviour" method in the parent class, "qtype_essay_question",
      * because we may need to autograde the response
      */
@@ -90,7 +100,7 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
      * @return qtype_essay_format_renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
-        return $page->get_renderer('qtype_essayautograde', 'format_' . $this->responseformat);
+        return $page->get_renderer($this->plugin_name(), 'format_' . $this->responseformat);
     }
 
     /**
@@ -109,15 +119,22 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
             return false;
         }
 
-        // If there is no response template, the answer must
-        // be original and therefore it is gradable.
-        if (empty($this->responsetemplate)) {
+        // If there is no response template or sample,
+        // the answer must be original and therefore it is gradable.
+        if (empty($this->responsetemplate) && empty($this->responsesample)) {
             return true;
         }
 
-        // Otherwise, we check that the answer is not simply
-        // the unaltered response template.
-        return ($response['answer']==$this->responsetemplate ? false : true);
+        // Check that the answer is not simply the unaltered response template/sample.
+        if ($response['answer']==$this->responsetemplate) {
+            return false;
+        }
+        if ($response['answer']==$this->responsesample) {
+            return false;
+        }
+
+        // The response can be graded.
+        return true;
     }
 
     /**
@@ -261,10 +278,7 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
 
     public function update_current_response($response, $displayoptions=null) {
 
-        if (empty($response) || empty($response['answer'])) {
-            return true;
-        }
-
+        // Initialize data about this $response
         $count = 0;
         $bands = array();
         $phrases = array();
@@ -280,22 +294,33 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
         $completecount = 0;
         $completepercent = 0;
 
-        $text = question_utils::to_plain_text($response['answer'],
-                                              $response['answerformat'],
-                                              array('para' => false));
+        // Clean the $response text
+        if (empty($response) || empty($response['answer'])) {
+            $text = ''; // No response was entered. 
+        } else if ($response['answer'] == $this->responsetemplate) {
+            $text = ''; 
+        } else if ($response['answer'] == $this->responsesample) {
+            $text = '';
+        } else {
+            $text = question_utils::to_plain_text($response['answer'],
+                                                  $response['answerformat'],
+                                                  array('para' => false));
+            // Standardize white space in $text.
+            // Html-entity for non-breaking space, $nbsp;,
+            // is converted to a unicode character, "\xc2\xa0",
+            // that can be simulated by two ascii chars (194,160)
+            $text = str_replace(chr(194).chr(160), ' ', $text);
+            $text = preg_replace('/[ \t]+/', ' ', trim($text));
+            $text = preg_replace('/ *[\r\n]+ */s', "\n", $text);
+        }
 
-        // Standardize white space in $text.
-        // html-entity for non-breaking space, $nbsp;,
-        // is converted to a unicode character, "\xc2\xa0",
-        // that can be simulated by two ascii chars (194,160)
-        $text = str_replace(chr(194).chr(160), ' ', $text);
-        $text = preg_replace('/[ \t]+/', ' ', trim($text));
-        $text = preg_replace('/ *[\r\n]+ */s', "\n", $text);
+        // detect common errors
+        list($errors, $errorpercent) = $this->get_common_errors($text);
 
-        // get stats for this $text
-        $stats = $this->get_stats($text);
+        // Get stats for this $text.
+        $stats = $this->get_stats($text, $errors);
 
-        // count items in $text
+        // Count items in $text.
         switch ($this->itemtype) {
             case $this->plugin_constant('ITEM_TYPE_CHARS'): $count = $stats->chars; break;
             case $this->plugin_constant('ITEM_TYPE_WORDS'): $count = $stats->words; break;
@@ -303,12 +328,12 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
             case $this->plugin_constant('ITEM_TYPE_PARAGRAPHS'): $count = $stats->paragraphs; break;
         }
 
-        // get records from "question_answers" table
+        // Get records from "question_answers" table.
         $answers = $this->get_answers();
 
         if (empty($answers)) {
 
-            // set fractional grade from number of items
+            // Set fractional grade from number of items.
             if (empty($this->itemcount)) {
                 $rawfraction = 0.0;
             } else {
@@ -317,47 +342,9 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
 
         } else {
 
-            // cache plugin constants
+            // Cache plugin constants.
             $ANSWER_TYPE_BAND = $this->plugin_constant('ANSWER_TYPE_BAND');
             $ANSWER_TYPE_PHRASE = $this->plugin_constant('ANSWER_TYPE_PHRASE');
-
-            // human readable aliases for regexp strings
-            $aliases = array(' OR '  => '|',
-                             ' OR'   => '|',
-                             'OR '   => '|',
-                             ' , '   => '|',
-                             ' ,'    => '|',
-                             ', '    => '|',
-                             ','     => '|',
-                             ' AND ' => '\\b.*\\b',
-                             ' AND'  => '\\b.*\\b',
-                             'AND '  => '\\b.*\\b',
-                             ' ANY ' => '\\b.*\\b',
-                             ' ANY'  => '\\b.*\\b',
-                             'ANY '  => '\\b.*\\b');
-
-            // allowable regexp strings and their internal aliases
-            $metachars = array('^' => 'CARET',
-                               '$' => 'DOLLAR',
-                               '.' => 'DOT',
-                               '?' => 'QUESTION_MARK',
-                               '*' => 'ASTERISK',
-                               '+' => 'PLUS_SIGN',
-                               '|' => 'VERTICAL_BAR',
-                               '-' => 'HYPHEN',
-                               ':' => 'COLON',
-                               '!' => 'EXCLAMATION_MARK',
-                               '=' => 'EQUALS_SIGN',
-                               '(' => 'OPEN_ROUND',
-                               ')' => 'CLOSE_ROUND',
-                               '[' => 'OPEN_SQUARE',
-                               ']' => 'CLOSE_SQUARE',
-                               '{' => 'OPEN_CURLY',
-                               '}' => 'CLOSE_CURLY',
-                               '<' => 'OPEN_ANGLE',
-                               '>' => 'CLOSE_ANGLE',
-                               '\\' => 'BACKSLASH');
-            $flipmetachars = array_flip($metachars);
 
             // override "addpartialgrades" with incoming form data, if necessary
             $addpartialgrades = $this->addpartialgrades;
@@ -385,21 +372,11 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
 
                     case $ANSWER_TYPE_PHRASE:
                         if ($search = trim($answer->feedback)) {
-                            $search = strtr($search, $aliases);
-                            $search = strtr($search, $metachars);
-                            $search = preg_quote($search, '/');
-                            $search = strtr($search, $flipmetachars);
-                            $search = "/$search/isu"; // case-insensitive unicode match
-                            if (preg_match($search, $text, $phrase)) {
-                                if (strlen($phrase[0]) <= strlen($answer->feedback)) {
-                                    $phrase = $phrase[0];
-                                } else {
-                                    $phrase = $answer->feedback;
-                                }
+                            if ($match = $this->search_text($search, $text)) {
                                 $rawfraction += ($answer->feedbackformat / 100);
-                                $myphrases[$phrase] = $answer->feedback;
+                                $myphrases[$match] = $search;
                             }
-                            $phrases[$answer->feedback] = $answer->feedbackformat;
+                            $phrases[$search] = $answer->feedbackformat;
                         }
                         break;
                 }
@@ -430,6 +407,9 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
 
         }
 
+        // deduct penalties for common errors
+        $rawfraction -= ($errorpercent / 100);
+
         // make sure $autofraction is in range 0.0 - 1.0
         $autofraction = min(1.0, max(0.0, $rawfraction));
 
@@ -453,17 +433,191 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
         $this->save_current_response('completecount', $completecount);
         $this->save_current_response('completepercent', $completepercent);
         $this->save_current_response('displayoptions', $displayoptions);
+        $this->save_current_response('errors', $errors);
+        $this->save_current_response('errorpercent', $errorpercent);
+    }
+
+    /**
+     * get_common_errors
+     */
+    protected function get_common_errors($text) {
+        global $DB;
+
+        $errors = array();
+
+        if (empty($this->errorcmid)) {
+            $cm = null;
+        } else {
+            $cm = get_coursemodule_from_id('', $this->errorcmid);
+        }
+
+        if (empty($this->errorpercent)) {
+            $percent = 0;
+        } else {
+            $percent = $this->errorpercent;
+        }
+
+        if ($cm) {
+            $entryids = array();
+            if ($entries = $DB->get_records('glossary_entries', array('glossaryid' => $cm->instance), 'concept')) {
+                foreach ($entries as $entry) {
+                    if ($match = $this->glossary_entry_search_text($entry, $entry->concept, $text)) {
+                        $errors[$match] = $this->glossary_entry_link($cm->name, $entry, $match);
+                    } else {
+                        $entryids[] = $entry->id;
+                    }
+                }
+            }
+            if (count($entryids)) {
+                list($select, $params) = $DB->get_in_or_equal($entryids);
+                if ($aliases = $DB->get_records_select('glossary_alias', "entryid $select", $params)) {
+                    foreach ($aliases as $alias) {
+                        $entry = $entries[$alias->entryid];
+                        if ($match = $this->glossary_entry_search_text($entry, $alias->alias, $text)) {
+                            $errors[$match] = $this->glossary_entry_link($cm->name, $entry, $match);
+                        }
+                    }
+                }
+            }
+
+            // sort the matching errors by length (longest to shortest)
+            // https://stackoverflow.com/questions/3955536/php-sort-hash-array-by-key-length
+            $matches = array_keys($errors);
+            $keys = array_map('core_text::strlen', $matches);
+            array_multisort($keys, SORT_DESC, $matches);
+
+            // remove matches that are substrings of longer matches
+            $keys = array();            
+            foreach ($matches as $match) {
+                $search = '/^'.preg_quote($match, '/').'.+/iu';
+                $search = preg_grep($search, $matches);
+                if (count($search)) {
+                    unset($errors[$match]);
+                } else {
+                    $keys[] = $match;
+                }
+            }
+        }
+
+        return array($errors, count($errors) * $percent);
+    }
+
+    /**
+     * glossary_entry_search_text
+     *
+     * @param object $entry
+     * @param string $match
+     * @param string $text
+     * @return string the matching substring in $text or "" 
+     */
+    protected function glossary_entry_search_text($entry, $search, $text) {
+        return $this->search_text($search, $text, $entry->fullmatch, empty($entry->casesensitive));
+    }
+
+    /**
+     * search_text
+     *
+     * @param string $match
+     * @param string $text
+     * @return boolean TRUE if $text mattches the $match; otherwise FALSE;
+     */
+    protected function search_text($search, $text, $fullmatch=false, $caseinsensitive=false) {
+
+        $text = trim($text);
+        if ($text=='') {
+            return false; // unexpected ?!
+        }
+
+        $search = trim($search);
+        if ($search=='') {
+            return false; // shouldn't happen !!
+        }
+
+        if (self::$aliases===null) {
+            // human readable aliases for regexp strings
+            self::$aliases = array(' OR '  => '|',
+                                   ' OR'   => '|',
+                                   'OR '   => '|',
+                                   ' , '   => '|',
+                                   ' ,'    => '|',
+                                   ', '    => '|',
+                                   ','     => '|',
+                                   ' AND ' => '\\b.*\\b',
+                                   ' AND'  => '\\b.*\\b',
+                                   'AND '  => '\\b.*\\b',
+                                   ' ANY ' => '\\b.*\\b',
+                                   ' ANY'  => '\\b.*\\b',
+                                   'ANY '  => '\\b.*\\b');
+
+            // allowable regexp strings and their internal aliases
+            self::$metachars = array('^' => 'CARET',
+                                     '$' => 'DOLLAR',
+                                     '.' => 'DOT',
+                                     '?' => 'QUESTION_MARK',
+                                     '*' => 'ASTERISK',
+                                     '+' => 'PLUS_SIGN',
+                                     '|' => 'VERTICAL_BAR',
+                                     '-' => 'HYPHEN',
+                                     ':' => 'COLON',
+                                     '!' => 'EXCLAMATION_MARK',
+                                     '=' => 'EQUALS_SIGN',
+                                     '(' => 'OPEN_ROUND',
+                                     ')' => 'CLOSE_ROUND',
+                                     '[' => 'OPEN_SQUARE',
+                                     ']' => 'CLOSE_SQUARE',
+                                     '{' => 'OPEN_CURLY',
+                                     '}' => 'CLOSE_CURLY',
+                                     '<' => 'OPEN_ANGLE',
+                                     '>' => 'CLOSE_ANGLE',
+                                     '\\' => 'BACKSLASH');
+            self::$flipmetachars = array_flip(self::$metachars);
+        }
+
+        $regexp = strtr($search, self::$aliases);
+        $regexp = strtr($regexp, self::$metachars);
+        $regexp = preg_quote($regexp, '/');
+        $regexp = strtr($regexp, self::$flipmetachars);
+        if ($fullmatch) {
+            $regexp = "\\b$regexp\\b";
+        }
+        $regexp = "/$regexp/u"; // unicode match
+        if ($caseinsensitive) {
+            $regexp .= 'i';
+        }
+        if (preg_match($regexp, $text, $match)) {
+            if (core_text::strlen($search) < core_text::strlen($match[0])) {
+                return $search;
+            }
+            return $match[0];
+        } else {
+            return ''; // no matches
+        }
     }
 
     /**
      * Store information about latest response to this question
      *
-     * @param  string  clean response $text
-     * @param  integer number of items in $text
-     * @param  array   applicable grade bands
-     * @param  phrases traget phrases in $text
-     * @param  decimal $fraction grade for $text
-     * @return string
+     * @param  string $name
+     * @param  string $value
+     * @return void, but will update currentresponse property of this object
+     */
+    public function glossary_entry_link($glossaryname, $entry, $text) {
+        $params = array('eid' => $entry->id,
+                        'displayformat' => 'dictionary');
+        $url = new moodle_url('/mod/glossary/showentry.php', $params);
+
+        $params = array('target' => '_blank',
+                        'title' => $glossaryname.': '.$entry->concept,
+                        'class' => 'glossary autolink concept glossaryid'.$entry->glossaryid);
+        return html_writer::link($url, $text, $params);
+    }
+
+    /**
+     * Store information about latest response to this question
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return void, but will update currentresponse property of this object
      */
     public function save_current_response($name, $value) {
         if ($this->currentresponse===null) {
@@ -505,7 +659,7 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
     /**
      * get_stats
      */
-    protected function get_stats($text) {
+    protected function get_stats($text, $errors) {
         $precision = 1;
         $stats = (object)array('chars' => $this->get_stats_chars($text),
                                'words' => $this->get_stats_words($text),
@@ -514,6 +668,7 @@ class qtype_essayautograde_question extends qtype_essay_question implements ques
                                'longwords' => $this->get_stats_longwords($text),
                                'uniquewords' => $this->get_stats_uniquewords($text),
                                'fogindex' => 0,
+                               'commonerrors' => count($errors),
                                'lexicaldensity' => 0,
                                'charspersentence' => 0,
                                'wordspersentence' => 0,

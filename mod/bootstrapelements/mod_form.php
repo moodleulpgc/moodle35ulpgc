@@ -53,7 +53,7 @@ class mod_bootstrapelements_mod_form extends moodleform_mod {
 
         $formhtml = '<link href="'.$CFG->wwwroot.'/mod/bootstrapelements/css/fontawesome-iconpicker.min.css"';
         $formhtml .= ' rel="stylesheet" type="text/css">';
-        $PAGE->requires->js_call_amd('mod_bootstrapelements/bootstrapelementsincludes', 'init');
+        $PAGE->requires->js_call_amd('mod_bootstrapelements/bootstrapelements-includes', 'init');
 
         $mform->addElement('html', $formhtml);
         $this->standard_coursemodule_elements();

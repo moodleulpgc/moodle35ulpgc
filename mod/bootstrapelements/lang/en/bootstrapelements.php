@@ -48,3 +48,5 @@ $string['modal'] = 'Modal';
 $string['toggle'] = 'Toggle';
 $string['enhancedlabel'] = 'Enhanced Label';
 $string['blockquote'] = 'Blockquote';
+
+$string['privacy:metadata'] = 'The boostrapelements activity module does not store any personal data. It stores information about each instance of an activity, such as the course, activity name and icon data, but no personal information.';

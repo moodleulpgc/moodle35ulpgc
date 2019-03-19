@@ -46,6 +46,10 @@ $string['explaingradebooklocking'] = 'Si se activa, If enabled, se podrán en us
 $string['gradebooklockingdepth'] = 'Profundidad del bloqueo de categorías';
 $string['explainlockingdepth'] = 'Las categorías de calificación hasta esta prefundidad serán bloqueadas y no se podrá modificar su nombre, idnumber y agregación, 
 excepto con usuarios con permiso de Gestión del sitio. ';
+$string['gradebooknocal'] = 'Categoría para No Calificados';
+$string['explaingradebooknocal'] = 'Si no está vacío, se intrepreta como el idnumber de una Categoría de calificación. 
+Será la cateoría que se use de forma predeterminada paar colocar los ítems que NO se asocicen explíctamente con una categoría. 
+Esto es, los "no categorizados" se colocarán en esta categoría identificada por este idnumber.';
 $string['locknameword'] = 'Palabra para bloqueo de Categoría';
 $string['explainlocknameword'] = 'Si esta palabra está presente en el campo Info de una Categoría de calificacion, 
 no se podrá modificar su nombre e idnumber salvo con permiso para editar las categorías de calificación. ';
@@ -239,4 +243,24 @@ $string['actv_other'] = 'Otros';
 $string['res_files'] = 'Enlaces y Archivos';
 $string['res_text'] = 'Textos';
 $string['res_structured'] = 'Rec. estructurados';
+
+$string['alerts'] = 'Alertas globales';
+$string['showglobalalert'] = 'Mostrar alertas';
+$string['explainshowglobalalert'] = 'Si se activa, se mostrará el mensaje de más abajo en el cabecero de la páginas concordantes.';
+$string['alertstart'] = 'Fecha de comienzo';
+$string['explainalertstart'] = 'Fecha en la que se empezará a mostrar el mensaje. Vacío para mostrar. En formato AAAA-mm-dd.';
+$string['alertend'] = 'Fecha de terminación';
+$string['explainalertend'] = 'fecha en la que se terminará de mostrar el mensaje. Vacío para mostrar. En formato AAAA-mm-dd.';
+$string['alertroles'] = 'Mostrar para roles';
+$string['explainalertroles'] = 'El mensaje se mostrará para los usuarios que tengan alguno de estos roles en el contexto del curso. Dejar vacío para NO chequear.';
+$string['alerttype'] = 'Tipo de alerta';
+$string['explainalerttype'] = 'Una de las clases de alerta de estandar de Bootstrap.';
+$string['alertdismiss'] = 'Botón de cancelación';
+$string['explainalertdismiss'] = 'Si se activa, se muestra un botón para cancelar permanentemente la visualización de la alerta para ese usuario. 
+Se crea una preferencia de usuario para llevar un registro.';
+$string['alertmessage'] = 'Mensaje global';
+$string['danger'] = 'Aviso';
+$string['dismissalert'] = 'Confirmar visualización';
+
+
 

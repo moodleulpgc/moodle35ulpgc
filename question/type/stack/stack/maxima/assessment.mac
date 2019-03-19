@@ -22,7 +22,7 @@
 /****************************************************************/
 
 MAXIMA_VERSION:map(parse_string, tokens(?\*autoconf\-version\*, 'digitcharp))$
-MAXIMA_VERSION_NUM:float(MAXIMA_VERSION[2]+(if is(length(MAXIMA_VERSION)>2) 
+MAXIMA_VERSION_NUM:float(MAXIMA_VERSION[2]+(if is(length(MAXIMA_VERSION)>2)
   then (if is(MAXIMA_VERSION[3]<10) then MAXIMA_VERSION[3]/10 else 0) else 0))$
 
 /* ********************************** */
@@ -233,22 +233,24 @@ safe_setp(ex) := setp(ex) or safe_op(ex) = "{"$
 /* ********************************** */
 alias(ln, log);
 
-/* Add in support for logarithms to an arbirary base. */
-lg([ex]) := block(
-  if length(ex) = 1 then return(logbase(first(ex), 10)),
-  if length(ex) = 2 then return(logbase(first(ex), second(ex))),
-  error("STACK function 'lg' must have one or two arguments only.")
-)$
+/* Legacy reasons */
+alias(lg,logbase);
 
-logbasetex(ex) := block([n, b],
-  [n, b]:args(ex),
+lgtex(ex) := block([n, b],
+  b:10,
+  if length(args(ex)) = 1 then n:first(args(ex)),
+  if length(args(ex)) = 2 then (n:first(args(ex)), b:second(args(ex))),
   oldsimp:simp,
   return(concat("\\log_{", stack_disp_strip_dollars(tex(b, false)), "}\\left(", stack_disp_strip_dollars(tex(n, false)), "\\right)"))
 )$
-texput(logbase, logbasetex);
+texput(lg, lgtex);
 
 /* Use of radcan to give canonical form. */
-logbasesimp(n,b) := radcan(log(n)/log(b));
+logbasesimp([ex]) := block(
+  if length(ex) = 1 then return(radcan(log(first(ex))/log(10))),
+  if length(ex) = 2 then return(radcan(log(first(ex))/log(second(ex)))),
+  error("STACK function 'lg' must have one or two arguments only.")
+)$
 
 /* Add in a flexible "nth" roots function. */
 root([ex]) := block(
@@ -321,7 +323,7 @@ real_numberp(ex):=
     trigexpand:true,
     logexpand:super,
     keepfloat:true,
-    ex:errcatch(ev(fullratsimp(ex), logbase=logbasesimp, simp)),
+    ex:errcatch(ev(fullratsimp(ex), lg=logbasesimp, simp)),
     if ex=[] then return(false),
     ex:ev(float(ex[1]),simp),
     if listofvars(ex)#[] then return(false),
@@ -342,12 +344,12 @@ complex_exponentialp(ex):=block([ex2],
     if safe_op(ex)="*" then
         if not(is(real_numberp(first(args(ex))))) then
             return(false)
-        else 
+        else
             ex2:second(args(ex)),
     if safe_op(ex)="/" then
         if not(is(real_numberp(second(args(ex))))) then
             return(false)
-        else 
+        else
             ex2:first(args(ex)),
     /* Case of r=1, which is not written, or stripped off by the above code. */
     if safe_op(ex2)="^" then
@@ -470,7 +472,7 @@ remove_displaydp(ex):= block(
 
 /* Write the number ex in n decimal places */
 decimalplacesfun(ex, n, dispdps) := block([ex2],
-    ex2:ev(float(round(10^n*float(ex))/(10^n)), logbase=logbasesimp, simp),
+    ex2:ev(float(round(10^n*float(ex))/(10^n)), lg=logbasesimp, simp),
     if dispdps then ex2:displaydp(ex2, n),
     return(ex2)
     )$
@@ -489,7 +491,7 @@ sigfigsfun(x, n, dispsigfigs) := block([fpprec:128, fpprintprec:16, simp:true, e
         else return(0),
   sign_of_x:signum(x),
   /* Evaluate logarithms to an arbitrary base. */
-  x:ev(bfloat(x), logbase=logbasesimp, simp),
+  x:ev(bfloat(x), lg=logbasesimp, simp),
   /* Check again for a zero.  E.g. cases like cos(0.5*pi). */
   if (is(x = 0) or is(x = 0.0)) then
     if (is(n <= 1)) then return(0)
@@ -523,7 +525,7 @@ dispsf(x, n) := sigfigsfun(x, n, true);
   Evaluate x as a float (with full simplification), and display this in scientific notation
   e*10^k
   displaying the results to n significant figures.
-  
+
   If x is not a real number, then return x without a warning.
 */
 scientific_notation([a]) := block([oldsimp, x, ex, ex2, ex3, exn],
@@ -532,7 +534,7 @@ scientific_notation([a]) := block([oldsimp, x, ex, ex2, ex3, exn],
   if ev(is(length(a)=1), simp) then (x:first(a), exn:false)
   else if ev(is(length(a)=2), simp) then (x:first(a), exn:second(a))
   else error("scientific_notation takes only one or two arguments"),
-  x:ev(float(x), logbase=logbasesimp, simp),
+  x:ev(float(x), lg=logbasesimp, simp),
   if real_numberp(x) then (
       ex:ev(floor(float(log(abs(x))/log(10))), simp),
       ex2:ev(float(x/10^ex), simp),
@@ -642,10 +644,10 @@ algebraic_equivalence(SA, SB) :=
     if not(freeof(displaydp, SB)) then
       SA:remove_displaydp(SB),
     /* Remove logarithms to other bases from expressions. */
-    if not(freeof(logbase, SA)) then
-        SA:ev(SA, logbase=logbasesimp),
-    if not(freeof(logbase, SB)) then
-        SB:ev(SB, logbase=logbasesimp),
+    if not(freeof(lg, SA)) then
+        SA:ev(SA, lg=logbasesimp),
+    if not(freeof(lg, SB)) then
+        SB:ev(SB, lg=logbasesimp),
     /* Try not to expand out: pure numbers. */
     ex:errcatch(ev(SA-SB, simp)),
     if ex=[] then (print("algebraic_equivalence: evaluating the difference of two expressions threw an error."), return(false)),
@@ -1109,6 +1111,7 @@ noun_logic_remove(ex) := block([rex],
 
 nounint([ex]):=apply(nounify(integrate), ex)$
 noundiff([ex]):=apply(nounify(diff), ex)$
+nounlimit([ex]):=apply(nounify(limit), ex)$
 
 /* ********************************** */
 /* Add in a +- operator               */
@@ -1244,7 +1247,7 @@ factor_bag(ex) := block(
   if not(polynomialp(ex, listofvars(ex))) then return([ex]),
   ex:ev(factor(ex), simp),
   /* If we have division here, by a numerical constant being pulled out, we ignore the constant. */
-  if safe_op(ex) = "/" then 
+  if safe_op(ex) = "/" then
       if ev(is(listofvars(second(args(ex)))=[]), simp) then ex:first(args(ex)),
   if safe_op(ex) = "^" then return([first(args(ex))]),
   if safe_op(ex) = "*" then ex:args(ex) else ex:[ex],
@@ -1527,7 +1530,7 @@ stack_eval_arg(ex) := block([eqoutcome, eqoutsymb, eqoutnote, res, id, truthargu
       if is(SA=true) then SA:all,
 
       SA:abs_replace_eq(SA),
-      SA:ev(SA, logbase=logbasesimp),
+      SA:ev(SA, lg=logbasesimp),
       exmod[ev(id, simp)]:SA,
       exmodsolve[ev(id, simp)]:stack_eval_arg_solver(SA),
 
@@ -1748,8 +1751,8 @@ stack_eval_arg(ex) := block([eqoutcome, eqoutsymb, eqoutnote, res, id, truthargu
               if equationp(SAN) then SAN:lhs(SAN)-rhs(SAN),
               if equationp(SBN) then SBN:lhs(SBN)-rhs(SBN),
               if (debug) then print("Calculated values as SA->", string(SAN), ", SB->", string(SBN)),
-              if ev(not(freeof('int, SA)), simp) then (
-                  if (debug) then print("(1) Did the studnet integrate?"),
+              if ev(not(freeof('int, SA)), simp) then block([var],
+                  if (debug) then print("(1) Did the student integrate?"),
                   var:first(ATIntGetVar(SA)),
                   if (debug) then print("START ATInt -----------------"),
                   ATres:ev(ATInt(SBN, SAN, var), simp),
@@ -1768,8 +1771,8 @@ stack_eval_arg(ex) := block([eqoutcome, eqoutsymb, eqoutnote, res, id, truthargu
                       tempnote:sconcat(tempnote, " | ATInt_const. ")
                   )
               ),
-             if ev(not(freeof('int, SB)), simp) then (
-                  if (debug) then print("(2) Did the studnet integrate?"),
+             if ev(not(freeof('int, SB)), simp) then block([var],
+                  if (debug) then print("(2) Did the student integrate?"),
                   var:first(ATIntGetVar(SB)),
                   ATres:ev(ATAlgEquiv(SA, diff(SB, var)), simp),
                   if (debug) then print("Calculated ATInt ", string(ATres)),
@@ -1778,6 +1781,18 @@ stack_eval_arg(ex) := block([eqoutcome, eqoutsymb, eqoutnote, res, id, truthargu
                       eqoutcome[ev(id, simp)]:true,
                       eqoutsymb[ev(id, simp)]:INTCHAR(var),
                       tempnote:sconcat(tempnote, " | Integrated explicitly (2)")
+                  )
+             ),
+             if ev(not(freeof('diff, SB)), simp) then block([var],
+                  if (debug) then print("(3) Did the student differentiate?"),
+                  var:first(ATDiffGetVar(SB)),
+                  ATres:ev(ATAlgEquiv(diff(SA, var), SB), simp),
+                  if (debug) then print("Calculated ATDiff ", string(ATres)),
+                  if second(ATres) then block(
+                      malrulecont:false,
+                      eqoutcome[ev(id, simp)]:true,
+                      eqoutsymb[ev(id, simp)]:DIFFCHAR(var),
+                      tempnote:sconcat(tempnote, " | Differentiated explicitly (1)")
                   )
              )
           ),
@@ -1788,7 +1803,7 @@ stack_eval_arg(ex) := block([eqoutcome, eqoutsymb, eqoutnote, res, id, truthargu
                   print("** Checking for common mistakes **"),
                   print(SA),
                   print(SB)
-              ) else 
+              ) else
                   print("** Not actually checking for common mistakes ... **")
           ),
 
@@ -2101,6 +2116,20 @@ stack_eval_arg_equivalence_reasoningp(L) := block(
 disp_stack_eval_arg(ex, showlogic, showdomain, equivdebug, debuglist) := block([A],
     A:stack_eval_equiv_arg(ex, showlogic, showdomain, equivdebug, debuglist),
     return(second(A))
+)$
+
+/* Find the indices of where ex appears in exl.
+   Notes:
+   (1) Uses ATEqualComAss,
+   (2) Ignores completely if "stackeq" is the first operator.
+   Returns a list of indices.
+   Use emptyp to create a predicate.
+*/
+stack_equiv_find_step(ex, exl) := block(
+  if not(listp(exl)) then error("STACK function stack_equiv_find_step expects its second argument to be a list."),
+  if safe_op(ex)="stackeq" then ex:first(args(ex)),
+  exl:maplist(lambda([ex2], if safe_op(ex2)="stackeq" then first(args(ex2)) else ex2), exl),
+  sublist_indices(exl, lambda([ex2], second(ATEqualComAss(ex, ex2))))
 )$
 
 /* This modifies stack_eval_arg to create something which can be displayed. */

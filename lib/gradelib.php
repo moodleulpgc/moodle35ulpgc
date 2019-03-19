@@ -905,6 +905,11 @@ function grade_get_categories_menu($courseid, $includenew=false) {
         }
         $categories = grade_category::fetch_all(array('courseid'=>$courseid));
     }
+    
+    if($ulpgc = get_config('local_ulpgccore', 'enabledgradebooklocking')) { // ecastro ULPGC enforce gradebook locking
+        $nocalcat = local_ulpgccore_gradecat_menu($categories);
+    }
+    
     foreach ($categories as $key=>$category) {
         if ($category->is_course_category()) {
             $result[$category->id] = get_string('uncategorised', 'grades');
@@ -920,6 +925,10 @@ function grade_get_categories_menu($courseid, $includenew=false) {
     }
     core_collator::asort($cats);
 
+    if($ulpgc && $nocalcat) {
+        $result[$nocalcat->id] = $nocalcat->get_name();
+    }
+    
     return ($result+$cats);
 }
 

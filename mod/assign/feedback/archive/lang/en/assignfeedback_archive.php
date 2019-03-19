@@ -30,7 +30,7 @@ $string['enabled_help'] = 'If enabled, the student will be able to archive the s
 in order to reopen and resubmit a new version after previous assessment.
 
 Only applies if submission confirmation is required. 
-If automatic re-submission until passing is activated then this tool gets disabled autoamatically.';
+If automatic re-submission until passing is activated then this tool gets disabled automatically.';
 $string['pluginname'] = 'Archive submission';
 $string['archive:store'] = 'Archive submission';
 $string['maxattemptsreached'] = 'You have reached the limit of attempts. No more are possible.';
@@ -45,3 +45,5 @@ $string['crontask'] = 'Draft closing after duedate job';
 $string['eventsubmissionarchived'] = 'Submission archived';
 $string['noarchiveallowed'] = 'No more attempts allowed';
 $string['waitgrading'] = 'Submission must be graded for archiving.';
+$string['checked_turnitin'] = 'Automatic grade on Turnitin';
+$string['checked_turnitin_help'] = 'If enabled, then file submission that has been checked by Turnitin will be set as graded automatically.';
