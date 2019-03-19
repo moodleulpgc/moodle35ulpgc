@@ -58,7 +58,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'type', 'name', 'idnumber', 'value', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('elementtype', 'examregistrar'),
                         get_string('itemname', 'examregistrar'),
                         get_string('idnumber', 'examregistrar'),

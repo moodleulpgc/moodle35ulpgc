@@ -92,7 +92,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'bookedsite', 'sessionname', 'examdate', 'locationname', 'locationtypename', 'seats', 'parentname', 'occupancy', 'staffers', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('venue', 'examregistrar'),
                         get_string('examsessionitem', 'examregistrar'),
                         get_string('examdate', 'examregistrar'),

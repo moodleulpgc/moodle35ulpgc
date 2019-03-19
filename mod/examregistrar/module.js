@@ -43,3 +43,30 @@ M.mod_examregistrar.init_tree = function(Y, id, expand_all) {
         tree.render();
     });
 }
+
+M.mod_examregistrar.init_manage_table = function(Y) {
+    Y.use('node', function(Y) {
+        var selectall = Y.one('th.c0 input');
+        if (selectall) {
+            selectall.on('change', function(e) {
+                if (e.currentTarget.get('checked')) {
+                    checkboxes = Y.all('td.c0 input[type="checkbox"]');
+                    checkboxes.each(function(node) {
+                        rowelement = node.get('parentNode').get('parentNode');
+                        node.set('checked', true);
+                        rowelement.removeClass('unselectedrow');
+                        rowelement.addClass('selectedrow');
+                    });
+                } else {
+                    checkboxes = Y.all('td.c0 input[type="checkbox"]');
+                    checkboxes.each(function(node) {
+                        rowelement = node.get('parentNode').get('parentNode');
+                        node.set('checked', false);
+                        rowelement.removeClass('selectedrow');
+                        rowelement.addClass('unselectedrow');
+                    });
+                }
+            });
+        }
+    });
+};

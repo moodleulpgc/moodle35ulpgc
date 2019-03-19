@@ -672,5 +672,6 @@ if($includefile) {
 
 // Finish the page
  if (!$table->is_downloading()) {
+ $PAGE->requires->js_init_call('M.mod_examregistrar.init_manage_table', array());
 echo $output->footer();
 }

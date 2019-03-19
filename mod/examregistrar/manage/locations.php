@@ -75,7 +75,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'locationname', 'locationtypename', 'seats', 'parentname', 'address', 'staffers', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('locationitem', 'examregistrar'),
                         get_string('locationtypeitem', 'examregistrar'),
                         get_string('seats', 'examregistrar'),
