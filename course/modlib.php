@@ -62,9 +62,7 @@ function add_moduleinfo($moduleinfo, $course, $mform = null) {
     $newcm->visible          = $moduleinfo->visible;
     $newcm->visibleold       = $moduleinfo->visible;
     $newcm->score            = (isset($moduleinfo->score) && $moduleinfo->score) ? 1 : 0 ; // ecastro ULPGC to enforce admin restricted mods
-    if (isset($moduleinfo->visibleoncoursepage)) {
-        $newcm->visibleoncoursepage = $moduleinfo->visibleoncoursepage;
-    }
+    $newcm->visibleoncoursepage = $moduleinfo->visibleoncoursepage;
     if (isset($moduleinfo->cmidnumber)) {
         $newcm->idnumber         = $moduleinfo->cmidnumber;
     }
@@ -410,6 +408,9 @@ function set_moduleinfo_defaults($moduleinfo) {
     }
     if (!isset($moduleinfo->conditionfieldgroup)) {
         $moduleinfo->conditionfieldgroup = array();
+    }
+    if (!isset($moduleinfo->visibleoncoursepage)) {
+        $moduleinfo->visibleoncoursepage = 1;
     }
 
     return $moduleinfo;

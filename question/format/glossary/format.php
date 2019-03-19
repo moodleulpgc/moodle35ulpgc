@@ -201,7 +201,7 @@ class qformat_glossary extends qformat_xml {
     }
 
     // Overwrite import methods.
-    protected function readquestions($lines) {
+    public function readquestions($lines) {
         $uncategorizedquestions = array();
         $categorizedquestions = array();
 

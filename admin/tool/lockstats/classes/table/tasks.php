@@ -50,7 +50,7 @@ class tasks extends html_table {
      * Constructor
      */
     public function __construct() {
-        global $CFG;
+        global $DB;
 
         parent::__construct();
 
@@ -73,19 +73,23 @@ class tasks extends html_table {
         $disabledstr = get_string('taskdisabled', 'tool_task');
         $plugindisabledstr = get_string('plugindisabled', 'tool_task');
 
+        $sql = "SELECT taskid, classname
+                  FROM {tool_lockstats_history} his
+                 GROUP BY taskid, classname";
+        $historyall = $DB->get_records_sql_menu($sql);
+
         foreach ($tasks as $task) {
             $key = '\\' . get_class($task);
 
-            $history = $this->task_has_history($key);
-
-            if ($history) {
-                $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $history->taskid]);
+            if (array_key_exists($key, $historyall)) {
+                $url = new moodle_url("/admin/tool/lockstats/detail.php", ['task' => $historyall[$key]]);
                 $link = html_writer::link($url, $task->get_name());
             } else {
                 $link = $task->get_name();
             }
 
-            $namecell = new html_table_cell($link . "\n" . html_writer::tag('span', '\\'.get_class($task), ['class' => 'task-class']));
+            $text = $link . "\n" . html_writer::tag('span', '\\'.get_class($task), ['class' => 'task-class']);
+            $namecell = new html_table_cell($text);
             $namecell->header = true;
 
             $component = $task->get_component();
@@ -118,7 +122,6 @@ class tasks extends html_table {
                 $disabled = true;
                 $nextrun = $disabledstr;
             } else if ($nextrun > time()) {
-                // $nextruntime = $nextrun;
                 $nextrun = userdate($nextrun, '%e %b %l:%M%P');
             } else {
                 $nextrun = $asap;
@@ -139,32 +142,11 @@ class tasks extends html_table {
         }
 
         usort($data, function($a, $b) {
-            // return $b->get_last_run_time() - $a->get_last_run_time();
             $at = $a->attributes['nextruntime'];
             $bt = $b->attributes['nextruntime'];
             return $at - $bt;
         });
 
         $this->data = $data;
-    }
-
-    /**
-     * Returns a record of the if history exists for this task.
-     *
-     * @param string $task
-     * @return false|stdClass
-     */
-    private function task_has_history($task) {
-        global $DB;
-
-        $params = ['task' => $task];
-        $sql = "SELECT *
-                  FROM {tool_lockstats_history} his
-                 WHERE task = :task
-                 LIMIT 1";
-
-        $record = $DB->get_record_sql($sql, $params);
-
-        return $record;
     }
 }

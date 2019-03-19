@@ -220,6 +220,16 @@ class core_renderer extends \theme_boost\output\core_renderer {
         ORIGINAL END. */
 
         // MODIFICATION START:
+        // ULPGC message
+        if (get_config('local_ulpgccore', 'showglobalalert') && !get_user_preferences('user_read_globalmessage') && 
+            $PAGE->has_set_url() && 
+            ($PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE) || 
+             $PAGE->url->compare(new moodle_url('/my/'), URL_MATCH_BASE))) {
+            $html .= local_ulpgccore_get_alert_message();
+        }
+        // MODIFICATION END.
+        
+        // MODIFICATION START:
         // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
         // a hint for the visibility will be shown.
         if (get_config('theme_boost_campus', 'showhintcoursehidden') == 'yes' && $COURSE->visible == false &&
@@ -235,7 +245,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $html .= html_writer::end_tag('div');
         }
         // MODIFICATION END.
-
+        
         // MODIFICATION START:
         // If the setting showhintcourseguestaccess is set, a hint for users that view the course with guest access is shown.
         // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
@@ -287,8 +297,8 @@ class core_renderer extends \theme_boost\output\core_renderer {
         // MODIFICATION END.
         return $html;
     }
-
-
+   
+    
     /**
      * Override to display course settings on every course site for permanent access
      *

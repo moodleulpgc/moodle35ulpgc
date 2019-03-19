@@ -1537,7 +1537,6 @@ class assign {
             $mform->setDefault($plugin->get_subtype() . '_' . $plugin->get_type() . '_enabled', $default);
 
             $plugin->get_settings($mform, $pluginsenabled); // ecastro ULPGC
-
         }
     }
 
@@ -1564,6 +1563,7 @@ class assign {
         foreach ($this->feedbackplugins as $plugin) {
             $this->add_plugin_settings($plugin, $mform, $feedbackpluginsenabled);
         }
+        
         $group->setElements($feedbackpluginsenabled);
         $mform->setExpanded('submissiontypes');
     }
@@ -2294,19 +2294,27 @@ class assign {
         if ($this->get_instance()->teamsubmission) {
 
             $groupsstr = '';
-            if ($currentgroup != 0) {
+            if (1 or $currentgroup != 0) { // ecastro ULPGC to account for unenrolled team members in groups
                 // If there is an active group we should only display the current group users groups.
                 $participants = $this->list_participants($currentgroup, true);
                 $groups = groups_get_all_groups($this->get_course()->id,
                                                 array_keys($participants),
                                                 $this->get_instance()->teamsubmissiongroupingid,
                                                 'DISTINCT g.id, g.name');
+                                                
+                foreach($groups as $key => $group) { // ecastro ULPGC to account for unenrolled team members
+                    if(!count_enrolled_users($this->get_context(), 'mod/assign:submit', $group->id, true)) {
+                        unset($groups[$key]);
+                    }
+                }
+                                                
                 if (empty($groups)) {
                     // If $groups is empty it means it is not part of $this->get_instance()->teamsubmissiongroupingid.
                     // All submissions from students that do not belong to any of teamsubmissiongroupingid groups
                     // count towards groupid = 0. Setting to true as only '0' key matters.
                     $groups = [true];
                 }
+                
                 list($groupssql, $groupsparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
                 $groupsstr = 's.groupid ' . $groupssql . ' AND';
                 $params = $params + $groupsparams;
@@ -2330,7 +2338,6 @@ class assign {
                             s.assignment = :assignid AND
                             s.timemodified IS NOT NULL AND
                             s.status = :submissionstatus';
-
         }
 
         return $DB->count_records_sql($sql, $params);
@@ -5856,7 +5863,7 @@ class assign {
         }
 
         $cm = $this->get_course_module();
-        if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
+        if ((groups_get_activity_groupmode($cm) == SEPARATEGROUPS)) { 
             $sharedgroupmembers = $this->get_shared_group_members($cm, $graderid);
             return in_array($userid, $sharedgroupmembers);
         }

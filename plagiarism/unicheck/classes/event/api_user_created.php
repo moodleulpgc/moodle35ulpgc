@@ -80,6 +80,7 @@ class api_user_created extends base {
      * Create from api user
      *
      * @param object $apiuser
+     *
      * @return base
      */
     public static function create_from_apiuser($apiuser) {

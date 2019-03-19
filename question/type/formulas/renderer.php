@@ -516,9 +516,9 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
      */
     protected function part_general_feedback(question_attempt $qa, question_display_options $options, $part) {
         if ($part->feedback == '') {
-            return '';
+           // return ''; // ecastro ULPGC
         }
-
+        
         $feedback = '';
         $gradingdetails = '';
         $question = $qa->get_question();
@@ -530,8 +530,10 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
             $details = $qa->get_behaviour()->get_part_mark_details($part->partindex);
             $gradingdetails = $renderer->render_adaptive_marks($details, $options);
             $state = $details->state;
+            $options->feedback = question_state::$gradedwrong; // ecastro ULPGC
         }
         $showfeedback = $options->feedback && $state->get_feedback_class() != '';
+        
         if ($showfeedback) {
             $localvars = $question->get_local_variables($part);
             $feedbacktext = $question->formulas_format_text($localvars, $part->feedback, FORMAT_HTML, $qa, 'qtype_formulas', 'answerfeedback', $part->id, false);

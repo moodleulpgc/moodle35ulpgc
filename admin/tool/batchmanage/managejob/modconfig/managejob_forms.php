@@ -89,9 +89,13 @@ class batchmanage_mod_config_form extends batchmanageform {
         
         $oldcourse = clone($COURSE);
         $COURSE = $refcourse;
+        // plagiarism plugins call incompatible JS & other libraries
+        $plagiarism = $CFG->enableplagiarism;
+        $CFG->enableplagiarism = false;
         $configform = new $formclass($modinfo, $modinfo->section, null, $refcourse);
         $configform->set_data($modinfo);
         $COURSE = $oldcourse;
+        $CFG->enableplagiarism = $plagiarism;
         
         $rp = new ReflectionProperty($formclass, '_form');
         $rp->setAccessible(true);

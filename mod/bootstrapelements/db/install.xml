@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/bootstrapelements/db" VERSION="2017121800" COMMENT="XMLDB file for Moodle mod/bootstrapelements"
+<XMLDB PATH="mod/bootstrapelements/db" VERSION="20150106" COMMENT="XMLDB file for Moodle mod/bootstrapelements"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >

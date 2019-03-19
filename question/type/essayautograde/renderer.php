@@ -19,7 +19,8 @@
  *
  * @package    qtype
  * @subpackage essayautograde
- * @copyright  2009 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +31,8 @@ require_once($CFG->dirroot.'/question/type/essay/renderer.php');
 /**
  * Generates the output for essayautograde questions.
  *
- * @copyright  2009 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayautograde_renderer extends qtype_with_combined_feedback_renderer {
@@ -42,6 +44,9 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         $question = $qa->get_question();
         $response = $qa->get_last_qt_data();
         $question->update_current_response($response, $options);
+
+        // format question text
+        $qtext = $question->format_questiontext($qa);
 
         // cache read-only flag
         $readonly = ($options->readonly ? 1 : 0);
@@ -59,6 +64,13 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
 
         if ($readonly) {
             $answer = $renderer->response_area_read_only('answer', $qa, $step, $linecount, $options->context);
+            $answer = preg_replace('/<a[^>]*class="[^">]*autolink[^">]*"[^>]*>(.*?)<\/a>/ius', '$1', $answer);
+            if ($question->errorcmid) {
+                $currentresponse = $question->get_current_response();
+                if (count($currentresponse->errors)) {
+                    $answer = strtr($answer, $currentresponse->errors);
+                }
+            }
         } else {
             $answer = $renderer->response_area_input('answer', $qa, $step, $linecount, $options->context);
         }
@@ -73,7 +85,7 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         }
 
         $result = '';
-        $result .= html_writer::tag('div', $question->format_questiontext($qa), array('class' => 'qtext'));
+        $result .= html_writer::tag('div', $qtext, array('class' => 'qtext'));
         $result .= html_writer::start_tag('div', array('class' => 'ablock'));
         $result .= html_writer::tag('div', $answer, array('class' => 'answer'));
         $result .= html_writer::tag('div', $files, array('class' => 'attachments'));
@@ -91,8 +103,10 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         // e.g. textarea, atto, tinymce
         $editor = editors_get_preferred_editor();
         $editor = substr(get_class($editor), 0, -11);
-
-        $params = array($readonly, $itemtype, $editor);
+        $sample = question_utils::to_plain_text($question->responsesample,
+                                                $question->responsesampleformat,
+                                                array('para' => false));
+        $params = array($readonly, $itemtype, $editor, $sample);
         $PAGE->requires->js_call_amd('qtype_essayautograde/essayautograde', 'init', $params);
 
         return $result;
@@ -127,7 +141,7 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         global $CFG;
         require_once($CFG->dirroot.'/lib/form/filemanager.php');
 
-		$name = 'attachments';
+        $name = 'attachments';
         $itemid = $qa->prepare_response_files_draft_itemid($name, $options->context->id);
         $pickeroptions = (object)array('mainfile' => null,
                                        'maxfiles' => $maxfiles,
@@ -168,8 +182,9 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         $output = '';
 
         // Decide if we should show grade explanation.
-        // This will skip "gaveup" and possibly others
         if ($step = $qa->get_last_step()) {
+            // We are only interested in (mangr|graded)(right|partial|wrong)
+            // For a full list of states, see question/engine/states.php
             $show = preg_match('/(right|partial|wrong)$/', $step->get_state());
         } else {
             $show = false;
@@ -178,16 +193,23 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         // If required, show explanation of grade calculation.
         if ($show) {
 
-            $plugin = $this->plugin_name();
+            $plugin = 'qtype_essayautograde';
             $question = $qa->get_question();
 
+            // Get the current response text and information
             $currentresponse = $question->get_current_response();
-            $displayoptions = $currentresponse->displayoptions;
-            if ($displayoptions && isset($displayoptions->markdp)) {
-                $precision = $displayoptions->markdp;
+
+            // Specify decision for decimal numbers.
+            $options = $currentresponse->displayoptions;
+            if ($options && isset($options->markdp)) {
+                $precision = $options->markdp;
             } else {
                 $precision = 0;
             }
+
+            // cache the maximum grade for this question
+            $maxgrade = $qa->get_max_mark(); // float number
+            $maxgradetext = $qa->format_max_mark($precision);
 
             $gradeband = array_values($currentresponse->bands); // percents
             $gradeband = array_search($currentresponse->completepercent, $gradeband);
@@ -202,17 +224,23 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
             }
             $itemtype = core_text::strtolower($itemtype);
 
-            if ($showteacher = has_capability('mod/quiz:grade', $displayoptions->context)) {
+            if (empty($options->context)) {
+                // Shouldn't happen !!
                 $showstudent = false;
+                $showteacher = false;
             } else {
-                $showstudent = has_capability('mod/quiz:attempt', $displayoptions->context);
+                if ($showteacher = has_capability('mod/quiz:grade', $options->context)) {
+                    $showstudent = false;
+                } else {
+                    $showstudent = has_capability('mod/quiz:attempt', $options->context);
+                }
             }
 
             $show = array(
                 $this->plugin_constant('SHOW_NONE') => false,
                 $this->plugin_constant('SHOW_STUDENTS_ONLY') => $showstudent,
                 $this->plugin_constant('SHOW_TEACHERS_ONLY') => $showteacher,
-                $this->plugin_constant('SHOW_TEACHERS_AND_STUDENTS') => true,
+                $this->plugin_constant('SHOW_TEACHERS_AND_STUDENTS') => ($showstudent || $showteacher),
             );
 
             $showgradebands = ($show[$question->showgradebands] && count($currentresponse->bands));
@@ -256,10 +284,11 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                                        'gradeband' => $gradeband,
                                        'itemtype'  => $itemtype);
                     if ($showgradebands) {
-                        $details[] = get_string('explanationcompleteband', $plugin, $a);
+                        $name = 'explanationcompleteband';
                     } else {
-                        $details[] = get_string('explanationfirstitems', $plugin, $a);
+                        $name = 'explanationfirstitems';
                     }
+                    $details[] = $this->get_calculation_detail($name, $plugin, $a);
                 }
                 if ($currentresponse->partialcount) {
                     $a = (object)array('percent'   => $currentresponse->partialpercent,
@@ -267,11 +296,16 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                                        'gradeband' => ($gradeband + 1),
                                        'itemtype'  => $itemtype);
                     if ($showgradebands) {
-                        $details[] = get_string('explanationpartialband', $plugin, $a);
+                        $name = 'explanationpartialband';
                     } else if (count($details)) {
-                        $details[] = get_string('explanationremainingitems', $plugin, $a);
+                        $name = 'explanationremainingitems';
                     } else if ($currentresponse->partialpercent) {
-                        $details[] = get_string('explanationitems', $plugin, $a);
+                        $name = 'explanationitems';
+                    } else {
+                        $name = '';
+                    }
+                    if ($name) {
+                        $details[] = $this->get_calculation_detail($name, $plugin, $a);
                     }
                 }
 
@@ -279,18 +313,22 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                     $percent = $currentresponse->phrases[$phrase];
                     $a = (object)array('percent' => $percent,
                                        'phrase'  => $myphrase);
-                    $details[] = get_string('explanationtargetphrase', $plugin, $a);
+                    $details[] = $this->get_calculation_detail('explanationtargetphrase', $plugin, $a);
+                }
+
+                foreach ($currentresponse->errors as $error => $link) {
+                    $a = (object)array('percent' => $question->errorpercent,
+                                       'error'   => $error);
+                    $details[] = $this->get_calculation_detail('explanationcommonerror', $plugin, $a, '- ');
                 }
 
                 if (empty($details) && $currentresponse->count) {
                     $a = (object)array('count'    => $currentresponse->count,
                                        'itemtype' => $itemtype);
-                    $details[] = get_string('explanationnotenough', $plugin, $a);
+                    $details[] = $this->get_calculation_detail('explanationnotenough', $plugin, $a);
                 }
 
-                if ($details = implode(')<br /> + (', $details)) {
-
-                    $maxgrade = $qa->format_max_mark($precision);
+                if ($details = implode(html_writer::empty_tag('br'), $details)) {
 
                     $step = $qa->get_last_step_with_behaviour_var('finish');
                     if ($step->get_id()) {
@@ -301,7 +339,7 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                     $rawpercent = $currentresponse->rawpercent;
 
                     $autopercent = $currentresponse->autopercent;
-                    $autograde = format_float($currentresponse->autofraction * $maxgrade, $precision);
+                    $autograde = $currentresponse->autofraction * $maxgrade;
 
                     if ($trypenalty = $question->penalty) {
                         // A "try" is actually a click of the "Check" button
@@ -344,11 +382,11 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                     $finalpercent = max(0, $autopercent - $penaltypercent);
 
                     // numeric values used by explanation strings
-                    $a = (object)array('maxgrade' => $maxgrade,
+                    $a = (object)array('maxgrade' => $maxgradetext,
                                        'rawpercent' => $rawpercent,
                                        'autopercent' => $autopercent,
                                        'penaltytext' => $penaltytext,
-                                       'finalgrade' => $finalgrade,
+                                       'finalgrade' => format_float($finalgrade, $precision),
                                        'finalpercent' => $finalpercent,
                                        'details' => $details);
 
@@ -434,7 +472,7 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                 $output .= html_writer::alist($details);
             }
 
-            // show student feedback, if required
+            // show actionable feedback, if required
             if ($show[$question->showfeedback]) {
                 $hints = array();
 
@@ -442,17 +480,17 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                 $output .= html_writer::start_tag('table', array('class' => 'generaltable essayautograde review feedback'));
 
                 // Overall grade
-                $maxgrade = $qa->format_max_mark($precision);
                 $step = $qa->get_last_step_with_behaviour_var('finish');
                 if ($step->get_id()) {
                     $rawgrade = format_float($step->get_fraction() * $maxgrade, $precision);
                 } else {
                     $rawgrade = $qa->format_mark($precision);
                 }
+                $maxgrade = $qa->format_max_mark($precision);
 
                 $output .= html_writer::start_tag('tr');
                 $output .= html_writer::tag('th', get_string('gradeforthisquestion', $plugin), array('class' => 'cell c0'));
-                $output .= html_writer::tag('td', html_writer::tag('b', $rawgrade.' / '.$maxgrade), array('class' => 'cell c1'));
+                $output .= html_writer::tag('td', html_writer::tag('b', $rawgrade.' / '.$maxgradetext), array('class' => 'cell c1'));
                 $output .= html_writer::end_tag('tr');
 
                 // Item count
@@ -511,6 +549,24 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
                     }
                 }
 
+                if ($maxcount = count($currentresponse->errors)) {
+                    $hints['errors'] = get_string('feedbackhinterrors', $plugin);
+                    $output .= html_writer::start_tag('tr', array('class' => 'errors'));
+                    $output .= html_writer::tag('th', get_string('commonerrors', $plugin), array('class' => 'cell c0'));
+                    $output .= html_writer::tag('td', $maxcount, array('class' => 'cell c1'));
+                    $output .= html_writer::end_tag('tr');
+                    $i = 0;
+                    foreach ($currentresponse->errors as $error => $link) {
+                        $status = $this->feedback_image(0.00).get_string('commonerror', $plugin);
+                        $status = html_writer::tag('span', $status, array('class' => 'error'));
+                        $error = html_writer::alist(array($link), array('start' => (++$i)), 'ol');
+                        $output .= html_writer::start_tag('tr', array('class' => 'commonerror'));
+                        $output .= html_writer::tag('td', $error, array('class' => 'cell c0'));
+                        $output .= html_writer::tag('td', $status, array('class' => 'cell c1'));
+                        $output .= html_writer::end_tag('tr');
+                    }
+                }
+
                 // Hints
                 if (count($hints)) {
                     $hints['rewriteresubmit'] = get_string('rewriteresubmit'.implode('', array_keys($hints)), $plugin);
@@ -530,6 +586,15 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
         }
 
         return $output;
+    }
+
+    protected function get_calculation_detail($name, $plugin, $a, $prefix='+ ') {
+        static $addprefix = false;
+        if ($addprefix==false) {
+            $addprefix = true;
+            $prefix = '';
+        }
+        return $prefix.'('.get_string($name, $plugin, $a).')';
     }
 
     /**
@@ -594,6 +659,16 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
             if (count($phrases)) {
                 $output .= html_writer::alist($phrases, array('class' => 'targetphrases'));
             }
+ 
+            if ($question->errorcmid && ($cm = get_coursemodule_from_id('', $question->errorcmid))) {
+                $url = new moodle_url("/mod/{$cm->modname}/view.php?id={$cm->id}");
+                $a = (object)array(
+                    'href' => $url->out(),
+                    'name' => strip_tags(format_text($cm->name)),
+                );
+                $msg = array(get_string('excludecommonerrors', $plugin, $a));
+                $output .= html_writer::alist($msg, array('class' => 'commonerrors'));
+            }
 
             if ($output) {
                 $name = 'correctresponse';
@@ -639,7 +714,8 @@ class qtype_essayautograde_renderer extends qtype_with_combined_feedback_rendere
  * An essayautograde format renderer for essayautogrades where the student should not enter
  * any inline response.
  *
- * @copyright  2013 Binghamton University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2013 Binghamton University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayautograde_format_noinline_renderer extends qtype_essay_format_noinline_renderer {
@@ -652,7 +728,8 @@ class qtype_essayautograde_format_noinline_renderer extends qtype_essay_format_n
  * An essayautograde format renderer for essayautogrades where the student should use the HTML
  * editor without the file picker.
  *
- * @copyright  2011 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayautograde_format_editor_renderer extends qtype_essay_format_editor_renderer {
@@ -666,7 +743,8 @@ class qtype_essayautograde_format_editor_renderer extends qtype_essay_format_edi
  * An essayautograde format renderer for essayautogrades where the student should use the HTML
  * editor with the file picker.
  *
- * @copyright  2011 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayautograde_format_editorfilepicker_renderer extends qtype_essay_format_editorfilepicker_renderer {
@@ -680,7 +758,8 @@ class qtype_essayautograde_format_editorfilepicker_renderer extends qtype_essay_
  * An essayautograde format renderer for essayautogrades where the student should use a plain
  * input box, but with a normal, proportional font.
  *
- * @copyright  2011 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayautograde_format_plain_renderer extends qtype_essay_format_plain_renderer {
@@ -695,7 +774,8 @@ class qtype_essayautograde_format_plain_renderer extends qtype_essay_format_plai
  * input box with a monospaced font. You might use this, for example, for a
  * question where the students should type computer code.
  *
- * @copyright  2011 The Open University
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_essayautograde_format_monospaced_renderer extends qtype_essay_format_plain_renderer {

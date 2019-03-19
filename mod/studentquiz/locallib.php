@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
-require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
 /** @var string default quiz behaviour */
 const STUDENTQUIZ_BEHAVIOUR = 'studentquiz';
@@ -491,9 +490,50 @@ function mod_studentquiz_add_question_to_attempt(&$questionusage, $studentquiz, 
     question_engine::save_questions_usage_by_activity($questionusage);
 }
 
+/**
+ * Trigger completion.
+ *
+ * @param  stdClass $course     course object
+ * @param  stdClass $cm         course module object
+ */
+function mod_studentquiz_completion($course, $cm) {
+    $completion = new completion_info($course);
+    $completion->set_module_viewed($cm);
+}
 
 /**
- * Trigger Report viewed Event
+ * Trigger overview viewed event.
+ *
+ * @param int      $cmid       course module id
+ * @param stdClass $context    context object
+ */
+function mod_studentquiz_overview_viewed($cmid, $context) {
+    $params = array(
+        'objectid' => $cmid,
+        'context' => $context
+    );
+    $event = \mod_studentquiz\event\course_module_viewed::create($params);
+    $event->trigger();
+}
+
+/**
+ * Trigger instance list viewed event.
+ *
+ * @param stdClass $context    context object
+ */
+function mod_studentquiz_instancelist_viewed($context) {
+    $params = array(
+        'context' => $context
+    );
+    $event = \mod_studentquiz\event\course_module_instance_list_viewed::create($params);
+    $event->trigger();
+}
+
+/**
+ * Trigger report viewed event.
+ *
+ * @param int      $cmid       course module id
+ * @param stdClass $context    context object
  */
 function mod_studentquiz_report_viewed($cmid, $context) {
     // TODO: How about $cmid from $context?
@@ -501,31 +541,23 @@ function mod_studentquiz_report_viewed($cmid, $context) {
         'objectid' => $cmid,
         'context' => $context
     );
-
     $event = \mod_studentquiz\event\studentquiz_report_quiz_viewed::create($params);
     $event->trigger();
 }
 
 /**
- * Trigger Completion api and view Event
+ * Trigger report rank viewed event.
  *
- * @param  stdClass $course     course object
- * @param  stdClass $cm         course module object
- * @param  stdClass $context    context object
+ * @param stdClass $cmid       course module id
+ * @param stdClass $context    context object
  */
-function mod_studentquiz_overview_viewed($course, $cm, $context) {
-
+function mod_studentquiz_reportrank_viewed($cmid, $context) {
     $params = array(
-        'objectid' => $cm->id,
+        'objectid' => $cmid,
         'context' => $context
     );
-
-    $event = \mod_studentquiz\event\course_module_viewed::create($params);
+    $event = \mod_studentquiz\event\studentquiz_report_rank_viewed::create($params);
     $event->trigger();
-
-    // Completion.
-    $completion = new completion_info($course);
-    $completion->set_module_viewed($cm);
 }
 
 /**
@@ -568,12 +600,13 @@ function mod_studentquiz_get_comments_with_creators($questionid) {
  *
  * @param array $comments from studentquiz_coments ordered by comment->created ASC
  * @param int $userid, viewing user id
+ * @param int $cmid, course module id
  * @param bool $anonymize Display or hide other author names
  * @param bool $ismoderator True renders edit buttons to all comments false, only those for createdby userid
  * @return string HTML fragment
  * TODO: Render function should move to renderers!
  */
-function mod_studentquiz_comment_renderer($comments, $userid, $anonymize, $ismoderator) {
+function mod_studentquiz_comment_renderer($comments, $userid, $cmid, $anonymize, $ismoderator) {
 
     $output = '';
 
@@ -586,17 +619,20 @@ function mod_studentquiz_comment_renderer($comments, $userid, $anonymize, $ismod
     $authorids = array();
     $authors = array();
 
-    $num = 0;
+    // Collect distinct anonymous author ids chronologically.
     foreach ($comments as $comment) {
-
-        $canedit = $ismoderator || $comment->userid == $userid;
-        $seename = !$anonymize || $comment->userid == $userid;
-
-        // Collect distinct anonymous author ids chronologically.
         if (!in_array($comment->userid, $authorids)) {
             $authorids[] = $comment->userid;
             $authors[] = user_get_users_by_id(array($comment->userid))[$comment->userid];
         }
+    }
+
+    $num = 0;
+    $showmoreafter = 10;
+    // Output comments in chronically reverse order.
+    foreach (array_reverse($comments) as $comment) {
+        $canedit = $ismoderator || $comment->userid == $userid;
+        $seename = !$anonymize || $comment->userid == $userid;
 
         $date = userdate($comment->created, get_string('strftimedatetime', 'langconfig'));
 
@@ -607,30 +643,33 @@ function mod_studentquiz_comment_renderer($comments, $userid, $anonymize, $ismod
                 . ' #' . (1 + array_search($comment->userid, $authorids));
         }
 
+        $editspan = '';
         if ($canedit) {
             $editspan = html_writer::span('remove', 'remove_action',
                 array(
                     'data-id' => $comment->id,
                     'data-question_id' => $comment->questionid
                 ));
-        } else {
-            $editspan = '';
         }
 
         $output .= html_writer::div( $editspan
             . html_writer::tag('p', $date . ' | ' . $username)
-            . html_writer::tag('p', $comment->comment),
-            ($num >= 2) ? 'hidden' : ''
+            . format_text(
+                $comment->comment,
+                FORMAT_MOODLE,
+                array('context' => $cmid)
+            ),
+            ($num >= $showmoreafter) ? 'hidden' : ''
         );
         $num++;
     }
 
-    if (count($comments) > 2) {
+    if (count($comments) > $showmoreafter) {
         $output .= html_writer::div(
             html_writer::tag('button', get_string('show_more', $modname),
                 array('type' => 'button', 'class' => 'show_more btn btn-secondary'))
             . html_writer::tag('button', get_string('show_less', $modname)
-                , array('type' => 'button', 'class' => 'show_less btn btn-secondary hidden')), 'button_controls'
+            , array('type' => 'button', 'class' => 'show_less btn btn-secondary hidden')), 'button_controls'
         );
     }
 
@@ -854,7 +893,8 @@ function mod_studentquiz_helper_attempt_stat_joins($aggregated) {
                            SUM(1 - lastanswercorrect) AS last_attempt_incorrect
                       FROM {studentquiz_progress} sp
                       JOIN {studentquiz} sq ON sq.id = sp.studentquizid
-                     WHERE sq.coursemodule = :cmid2
+                      JOIN {question} q ON q.id = sp.questionid
+                     WHERE sq.coursemodule = :cmid2 and q.hidden = 0
                   GROUP BY sp.userid
                   ) lastattempt ON lastattempt.userid = u.id
         LEFT JOIN (
@@ -862,7 +902,8 @@ function mod_studentquiz_helper_attempt_stat_joins($aggregated) {
                            SUM(attempts - correctattempts) AS countwrong, sp.userid AS userid
                       FROM {studentquiz_progress} sp
                       JOIN {studentquiz} sq ON sq.id = sp.studentquizid
-                     WHERE sq.coursemodule = :cmid1
+                      JOIN {question} q ON q.id = sp.questionid
+                     WHERE sq.coursemodule = :cmid1 and q.hidden = 0
                   GROUP BY sp.userid
                   ) attempts ON attempts.userid = u.id";
     } else {
@@ -1114,7 +1155,6 @@ function mod_studentquiz_migrate_old_quiz_usage($courseorigid=null) {
             foreach (array_keys($oldquizzes) as $quizid) {
                 // So that quiz doesn't remove the question usages.
                 $DB->delete_records('quiz_attempts', array('quiz' => $quizid));
-                // Quiz deletion over classes/task/delete_quiz_after_migration.php.
             }
 
             // So lookup the last non-empty section first.
@@ -1322,4 +1362,64 @@ function mod_studentquiz_check_availability($openform, $closefrom, $type) {
     }
 
     return [$message, $availabilityallow];
+}
+
+/**
+ * Saves question rating.
+ *
+ * // TODO:
+ * @param  stdClass $data requires userid, questionid, rate
+ * @internal param $course
+ * @internal param $module
+ */
+function mod_studentquiz_save_rate($data) {
+    global $DB, $USER;
+
+    $row = $DB->get_record('studentquiz_rate', array('userid' => $USER->id, 'questionid' => $data->questionid));
+    if ($row === false) {
+        $DB->insert_record('studentquiz_rate', $data);
+    } else {
+        $DB->update_record('studentquiz_rate', $row);
+    }
+}
+
+/**
+ * Saves question comment.
+ *
+ * // TODO:
+ * @param  stdClass $data requires userid, questionid, comment
+ * @param $course
+ * @param $module
+ */
+function mod_studentquiz_save_comment($data, $course, $module) {
+    global $DB;
+
+    $data->created = usertime(time(), usertimezone());
+    $DB->insert_record('studentquiz_comment', $data);
+    mod_studentquiz_notify_comment_added($data, $course, $module);
+}
+
+/**
+ * Deletes question comment.
+ *
+ * // TODO:
+ * @param  stdClass $data requires commentid
+ * @param $course
+ * @param $module
+ * @return bool success
+ */
+function mod_studentquiz_delete_comment($commentid, $course, $module) {
+    global $DB, $USER;
+
+    $success = false;
+    $comment = $DB->get_record('studentquiz_comment', array('id' => $commentid));
+    // The manager is allowed to delete any comment and additionally sends a notification.
+    if (mod_studentquiz_check_created_permission($module->id)) {
+        $success = $DB->delete_records('studentquiz_comment', array('id' => $commentid));
+        mod_studentquiz_notify_comment_deleted($comment, $course, $module);
+    } else {
+        // Only the student can delete his own comment.
+        $success = $DB->delete_records('studentquiz_comment', array('id' => $commentid, 'userid' => $USER->id));
+    }
+    return $success;
 }

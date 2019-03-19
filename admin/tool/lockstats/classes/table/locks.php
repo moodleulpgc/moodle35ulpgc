@@ -31,6 +31,8 @@ if (!defined('MOODLE_INTERNAL')) {
 
 use html_table;
 use html_table_row;
+use moodle_url;
+use html_writer;
 
 /**
  * Proxy lock factory, current list table.
@@ -49,7 +51,8 @@ class locks extends html_table {
 
         $this->attributes['class'] = 'admintable generaltable';
 
-        $headers = [get_string('table_task', 'tool_lockstats')];
+        $headers = [get_string('table_lock_key', 'tool_lockstats'),
+            get_string('table_classname', 'tool_lockstats')];
         $rows = [];
 
         $records = $this->get_current_locks();
@@ -69,9 +72,20 @@ class locks extends html_table {
         }
 
         foreach ($records as $record) {
-            // The first column is the task key.
-            $data = [$record->task];
+            // The first column is the resource key.
+            $url = new moodle_url("/admin/tool/lockstats/locks_detail.php", [
+                'resourcekey' => $record->resourcekey,
+            ]);
 
+            $adhocid = $this::get_adhoc_id_by_task($record->resourcekey);
+            if ($adhocid != null) {
+                $adhocrecord = $this->get_adhoc_record($adhocid);
+                $link = html_writer::link($url, $record->resourcekey);
+                $data = [$link, $adhocrecord->classname];
+            } else {
+                $link = html_writer::link($url, $record->resourcekey);
+                $data = [$link, null];
+            }
             // Add null data for the number of hosts that exist.
             for ($i = 1; $i < count($headers); $i++) {
                 $data[] = '';
@@ -104,5 +118,31 @@ class locks extends html_table {
         $records = $DB->get_records('tool_lockstats_locks', ['released' => null], 'gained ASC');
 
         return $records;
+    }
+
+    /**
+     * Get adhoc record by id.
+     *
+     * @return object
+     */
+    private function get_adhoc_record($adhocid) {
+        global $DB;
+        return $DB->get_record('task_adhoc', array('id' => $adhocid));
+    }
+
+    /**
+     * Extract id of adhoc task
+     *
+     * @return id of adhoc task
+     */
+    public static function get_adhoc_id_by_task($task) {
+        preg_match(" /^adhoc_(\d+)$/", $task, $results);
+
+        if (count($results) > 0) {
+            return (int) $results[1];
+        } else {
+            return null;
+        }
+
     }
 }

@@ -366,7 +366,7 @@ class assign_feedback_archive extends assign_feedback_plugin {
     public function has_user_summary() {
         global $USER;
         
-        // depend on permissos y del plazo
+        // depend on permissos y del plazo    
                     //si fuera de plazo NO pintar nada 
         
         //depende de resubmission y de nº de archivos
@@ -395,13 +395,11 @@ class assign_feedback_archive extends assign_feedback_plugin {
             $maxattemptsreached = !empty($submission) &&
                               $submission->attemptnumber >= ($instance->maxattempts - 1) &&
                               $instance->maxattempts != ASSIGN_UNLIMITED_ATTEMPTS;
-                              
             if($instance->attemptreopenmethod == ASSIGN_ATTEMPT_REOPEN_METHOD_NONE) {
                 $text = get_string('noarchiveallowed', 'assignfeedback_archive');
             } elseif($maxattemptsreached) {
                 $text = get_string('maxattemptsreached', 'assignfeedback_archive');
-                
-            } elseif($grade->grade !== null && $grade->grade >= 0) {
+            } elseif(($grade->grade !== null && $grade->grade >= 0) || $this->check_turnitin($submission)) {
                 $thisurl = new moodle_url('/mod/assign/view.php', array('action'=>'viewpluginpage',
                                                                      'pluginsubtype'=>'assignfeedback',
                                                                      'plugin'=>'archive',
@@ -420,6 +418,28 @@ class assign_feedback_archive extends assign_feedback_plugin {
     }
 
     /**
+     * Is this assignment submission plagiarism checked?
+     *
+     * @param stdClass $submission - Pre-fetched submission record (or false to fetch it)
+     * @return bool
+     */
+    public function check_turnitin($submission) {
+        global $CFG, $DB;
+
+        if(!empty($CFG->enableplagiarism) && $submission  && $plagiarism = get_config('plagiarism')) { 
+            if($plagiarism->turnitin_use && $plagiarism->turnitin_use_mod_assign && get_config('assignfeedback_archive','checked_turnitin')) {
+                $select = "cm = :cm AND userid = :userid AND itemid = :itemid AND similarityscore IS NOT NULL ";
+                $params = array('cm' => $this->assignment->get_course_module()->id, 
+                                'userid' => $submission->userid,
+                                'itemid' => $submission->id );
+                return $DB->record_exists_select('plagiarism_turnitin_files', $select, $params);
+            }
+        }
+         
+        return false;
+    }
+    
+    /**
      * Display the comment in the feedback table.
      *
      * @param stdClass $grade
@@ -435,52 +455,98 @@ class assign_feedback_archive extends assign_feedback_plugin {
     public static function cron_task() {
         global $CFG, $DB;
         
-        if(!get_config('assignfeedback_archive', 'updategraded')) {
+        $config = get_config('assignfeedback_archive');
+        
+        if(!$config->updategraded && !$config->checked_turnitin) {
             return true;
         }
         
         include_once($CFG->dirroot.'/mod/assign/locallib.php');
-        $time = time();    
-        $sql = "SELECT s.id, g.grade
-                FROM {assign} a 
-                JOIN {assign_plugin_config} pc ON pc.assignment = a.id AND pc.plugin = 'archive' AND pc.subtype = 'assignfeedback' AND pc.name = 'enabled' AND pc.value = 1
-                JOIN {assign_submission} s ON a.id = s.assignment
-                LEFT JOIN {assign_user_flags} f ON f.assignment = s.assignment AND f.userid = s.userid
-                LEFT JOIN {assign_grades} g ON g.assignment = s.assignment AND g.userid = s.userid AND g.attemptnumber = s.attemptnumber
-                
-                WHERE a.submissiondrafts = 1 AND a.attemptreopenmethod <> :reopen
-                
-                AND (s.status = :draft) AND (s.timemodified < a.duedate OR (s.timemodified < a.cutoffdate) AND (f.extensionduedate IS NULL OR s.timemodified < f.extensionduedate))
-                AND (a.duedate < :time1 OR (a.cutoffdate > 0 AND a.cutoffdate < :time2) AND (f.extensionduedate IS NULL OR f.extensionduedate < :time3 ))
-                ";
-        $leftover = $DB->get_records_sql_menu($sql, array('reopen'=>ASSIGN_ATTEMPT_REOPEN_METHOD_UNTILPASS, 
-                                                            'draft'=>ASSIGN_SUBMISSION_STATUS_DRAFT,
-                                                            'time1'=>$time,
-                                                            'time2'=>$time,
-                                                            'time3'=>$time));
         
-        $ungraded = array();
-        foreach($leftover as $key => $value) {
-            if(!isset($leftover[$key]) || $value < 0 || $value == '' || $value == null) {
-                $ungraded[] = $key;
+        if($config->updategraded) {
+            $time = time();    
+            $sql = "SELECT s.id, g.grade
+                    FROM {assign} a 
+                    JOIN {assign_plugin_config} pc ON pc.assignment = a.id AND pc.plugin = 'archive' AND pc.subtype = 'assignfeedback' AND pc.name = 'enabled' AND pc.value = 1
+                    JOIN {assign_submission} s ON a.id = s.assignment
+                    LEFT JOIN {assign_user_flags} f ON f.assignment = s.assignment AND f.userid = s.userid
+                    LEFT JOIN {assign_grades} g ON g.assignment = s.assignment AND g.userid = s.userid AND g.attemptnumber = s.attemptnumber
+                    
+                    WHERE a.submissiondrafts = 1 AND a.attemptreopenmethod <> :reopen
+                    
+                    AND (s.status = :draft) AND (s.timemodified < a.duedate OR (s.timemodified < a.cutoffdate) AND (f.extensionduedate IS NULL OR s.timemodified < f.extensionduedate))
+                    AND (a.duedate < :time1 OR (a.cutoffdate > 0 AND a.cutoffdate < :time2) AND (f.extensionduedate IS NULL OR f.extensionduedate < :time3 ))
+                    ";
+            $leftover = $DB->get_records_sql_menu($sql, array('reopen'=>ASSIGN_ATTEMPT_REOPEN_METHOD_UNTILPASS, 
+                                                                'draft'=>ASSIGN_SUBMISSION_STATUS_DRAFT,
+                                                                'time1'=>$time,
+                                                                'time2'=>$time,
+                                                                'time3'=>$time));
+            
+            $ungraded = array();
+            foreach($leftover as $key => $value) {
+                if(!isset($leftover[$key]) || $value < 0 || $value == '' || $value == null) {
+                    $ungraded[] = $key;
+                }
+            }
+            
+            $leftover = array_keys($leftover);
+            $chunks = array_chunk($leftover, 500);
+            foreach($chunks as $chunk) {
+                list($insql, $params) = $DB->get_in_or_equal($chunk);
+                $select = "id $insql";
+                $DB->set_field_select('assign_submission', 'status', ASSIGN_SUBMISSION_STATUS_SUBMITTED, $select, $params);
+                // TODO add event
+            }
+            
+            $chunks = array_chunk($ungraded, 500);
+            foreach($chunks as $chunk) {
+                list($insql, $params) = $DB->get_in_or_equal($chunk);
+                $select = "id $insql";
+                $DB->set_field_select('assign_submission', 'timemodified', $time, $select, $params);
+                // TODO add event
             }
         }
         
-        $leftover = array_keys($leftover);
-        $chunks = array_chunk($leftover, 500);
-        foreach($chunks as $chunk) {
-            list($insql, $params) = $DB->get_in_or_equal($chunk);
-            $select = "id $insql";
-            $DB->set_field_select('assign_submission', 'status', ASSIGN_SUBMISSION_STATUS_SUBMITTED, $select, $params);
-            // TODO add event
-        }
-        
-        $chunks = array_chunk($ungraded, 500);
-        foreach($chunks as $chunk) {
-            list($insql, $params) = $DB->get_in_or_equal($chunk);
-            $select = "id $insql";
-            $DB->set_field_select('assign_submission', 'timemodified', $time, $select, $params);
-            // TODO add event
+        if(0 && $config->checked_turnitin) {
+            $sql = "SELECT s.*, ptf.
+                    FROM {plagiarism_turnitin_files} ptf 
+                    JOIN {assign_submission} s ON s.id = ptf.itemid AND s.latest = 1
+                    JOIN {assign_plugin_config} pc ON pc.assignment = s.assignment 
+                                AND pc.plugin = 'archive' AND pc.subtype = 'assignfeedback' 
+                                AND pc.name = 'enabled' AND pc.value = 1
+                    LEFT JOIN {assign_grades} g ON g.assignment = s.assignment AND g.userid = s.userid AND g.attemptnumber = s.attemptnumber
+                    WHERE s.status = :status AND g.grade IS NULL AND ptf.similarityscore IS NOT NULL
+            
+                    ";
+            $params = array('status'=>ASSIGN_SUBMISSION_STATUS_SUBMITTED); 
+            
+            if($submissions = $DB->get_records_sql($sql, $params)) {
+            
+                $assignmentcache = array();
+                $grades = array();
+            
+                foreach($submissions as $submission) {
+                    $assignid = $submission->assignment;
+                    $attemptnumber = $submission->submissionattempt;
+                    if (empty($assignmentcache[$assignmentid])) {
+                        $cm = get_coursemodule_from_instance('assign', $assignid, 0, false, MUST_EXIST);
+                        $context = context_module::instance($cm->id);
+
+                        $assign = new assign($context, null, null);
+                        $assignmentcache[$assignid] = $assign;
+                    } else {
+                        $assign = $assignmentcache[$assignid];
+                    }
+                    $grade = $assign->get_user_grade($submission->userid, true, $submission->attemptnumber);
+                    $grades[] =  $grade->id;
+                }
+                
+                if($grades) {
+                    list($insql, $params) = $DB->get_in_or_equal($grades);
+                    //$DB->set_field_select('assign_grades', 'grade', 1, "id $insql", $params);
+                }
+            }
         }
         
         return true;

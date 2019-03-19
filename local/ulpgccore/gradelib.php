@@ -128,7 +128,6 @@ function local_ulpgccore_gradecat_deletable($category, $context) {
     return !local_ulpgccore_gradecat_locked($category, $context);
 }
 
-
 function local_ulpgccore_gradecat_locked($category, $context) { 
     $locked = false;
     
@@ -163,7 +162,49 @@ function local_ulpgccore_gradecat_locked($category, $context) {
     return $locked;
 }
 
+/**
+ * Modifies grade category menu for module calification
+ * Called by moodleform_mod and workshop
+ *
+ * @param array $categories An array of grade category objects
+ * @modifies input array
+ * @return grade_category object for NoCal category, if exists.
+ */
+function local_ulpgccore_gradecat_menu(& $categories = null) {
+    $nocalcat = null;
+    if($category = reset($categories)) {
+        $depth = 0;
+        $nocal = '';
+        $context = context_course::instance($category->courseid);
+        if(!($depth = get_config('local_ulpgccore', 'gradebooklockingdepth')) ||
+           !($nocal = get_config('local_ulpgccore', 'gradebooknocal')) ||
+           ($canmanage = has_capability('local/ulpgccore:manage', $context))) {
+           
+            $depth = 0;
+        }
+        
+        $nocalcat = null;
+        if($depth) {
+            foreach($categories as $key=>$category) {
+                if($category->get_idnumber() == $nocal) {
+                    $nocalcat = $category;
+                    break;
+                }
+            } 
+            if(isset($nocalcat)) {
+                $coursecatid = grade_category::fetch_course_category($category->courseid)->id;
+                if(isset($categories[$coursecatid])) {
+                    unset($categories[$coursecatid]);
+                }
+                if(isset($categories[$nocalcat->id])) {
+                    unset($categories[$nocalcat->id]);
+                }
+            }
+        }
+    }
 
+    return $nocalcat;
+}
 
 
 /**

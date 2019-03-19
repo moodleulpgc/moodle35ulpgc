@@ -30,4 +30,10 @@ $settings->add(new admin_setting_configcheckbox('assignfeedback_archive/updategr
                    new lang_string('updategraded', 'assignfeedback_archive'),
                    new lang_string('updategraded_help', 'assignfeedback_archive'), 0));
                    
+if($plagiarism = get_config('plagiarism') && isset($plagiarism->turnitin_use) && 
+    $plagiarism->turnitin_use && $plagiarism->turnitin_use_mod_assign) {
 
+    $settings->add(new admin_setting_configcheckbox('assignfeedback_archive/checked_turnitin',
+                    new lang_string('checked_turnitin', 'assignfeedback_archive'),
+                    new lang_string('checked_turnitin_help', 'assignfeedback_archive'), 0));
+}

@@ -192,6 +192,7 @@ class core_renderer extends \core_renderer {
         return $this->render_custom_menu($custommenu);
     }
 
+    
     /**
      * We want to show the custom menus as a list of links in the footer on small screens.
      * Just return the menu object exported so we can render it differently.
@@ -224,6 +225,10 @@ class core_renderer extends \core_renderer {
         return $custommenu->export_for_template($this);
     }
 
+    
+    
+    
+    
     /*
      * This renders the bootstrap top menu.
      *
@@ -247,6 +252,7 @@ class core_renderer extends \core_renderer {
             } else {
                 $currentlang = $strlang;
             }
+            
             $this->language = $menu->add($currentlang, new moodle_url('#'), $strlang, 10000);
             foreach ($langs as $langtype => $langname) {
                 $this->language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
@@ -390,7 +396,7 @@ class core_renderer extends \core_renderer {
             return '';
         }
         $context = $menu->export_for_template($this);
-
+    
         return $this->render_from_template('core/action_menu', $context);
     }
 
@@ -544,7 +550,7 @@ class core_renderer extends \core_renderer {
                 if ($skipped) {
                     $text = get_string('morenavigationlinks');
                     $url = new moodle_url('/course/admin.php', array('courseid' => $this->page->course->id));
-                    $link = new action_link($url, $text, null, null, new pix_icon('t/edit', $text));
+                    $link = new action_link($url, $text, null, null, new pix_icon('t/edit', ''));
                     $menu->add_secondary_action($link);
                 }
             }
@@ -558,7 +564,7 @@ class core_renderer extends \core_renderer {
                 if ($skipped) {
                     $text = get_string('morenavigationlinks');
                     $url = new moodle_url('/course/admin.php', array('courseid' => $this->page->course->id));
-                    $link = new action_link($url, $text, null, null, new pix_icon('t/edit', $text));
+                    $link = new action_link($url, $text, null, null, new pix_icon('t/edit', ''));
                     $menu->add_secondary_action($link);
                 }
             }

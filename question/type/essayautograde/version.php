@@ -19,7 +19,8 @@
  *
  * @package    qtype
  * @subpackage essayautograde
- * @copyright  2005 Mark Nielsen
+ * @copyright  2018 Gordon Bateson (gordon.bateson@gmail.com)
+ * @copyright  based on work by 2005 Mark Nielsen
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,10 +30,11 @@ $plugin->cron      = 0;
 $plugin->component = 'qtype_essayautograde';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2015111600; // Moodle 3.0
-$plugin->version   = 2018103153;
-$plugin->release   = '2018-10-31 (53)';
+$plugin->version   = 2019031674;
+$plugin->release   = '2019-03-16 (74)';
 
 // https://docs.moodle.org/dev/Releases
+// Moodle 3.6 2018120300  3 Dec 2018
 // Moodle 3.5 2018051700 17 May 2018
 // Moodle 3.4 2017111300 13 Nov 2017
 // Moodle 3.3 2017051500 15 May 2017

@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
     'plagiarism/turnitin:enable' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE, // ecastro ULPGC
          'legacy' => array(
          'editingteacher' => CAP_ALLOW,
          'manager' => CAP_ALLOW
@@ -32,7 +32,7 @@ $capabilities = array(
     ),
     'plagiarism/turnitin:viewfullreport' => array(
         'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE, // ecastro ULPGC
          'legacy' => array(
          'editingteacher' => CAP_ALLOW,
          'manager' => CAP_ALLOW

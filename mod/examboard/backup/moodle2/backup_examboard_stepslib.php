@@ -203,9 +203,9 @@ class backup_examboard_activity_structure_step extends backup_activity_structure
             
             $examinee->set_source_table('examboard_examinee', array('examid' => backup::VAR_PARENTID), 'id ASC');
             $tutor->set_source_table('examboard_tutor', array('examid' => backup::VAR_PARENTID), 'id ASC');
-            $grade->set_source_table('examboard_grade', array('examid' => backup::VAR_PARENTID), 'id ASC');
-            $confirmation->set_source_table('examboard_examinee', array('examid' => backup::VAR_PARENTID), 'id ASC');
-            $notification->set_source_table('examboard_examinee', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $grade->set_source_table('examboard_grades', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $confirmation->set_source_table('examboard_confirmation', array('examid' => backup::VAR_PARENTID), 'id ASC');
+            $notification->set_source_table('examboard_notification', array('examid' => backup::VAR_PARENTID), 'id ASC');
         }
         
         // Define id annotations.

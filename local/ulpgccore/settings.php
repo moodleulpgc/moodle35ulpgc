@@ -49,6 +49,9 @@ if ($hassiteconfig) {
     $temp->add(new \admin_setting_configcheckbox('local_ulpgccore/enabledgradebooklocking', get_string('gradebooklocking','local_ulpgccore'), get_string('explaingradebooklocking','local_ulpgccore'), 0));
     $levels = array(0,1,2,3,4,5,6);
     $temp->add(new \admin_setting_configselect('local_ulpgccore/gradebooklockingdepth', get_string('gradebooklockingdepth', 'local_ulpgccore'), get_string('explainlockingdepth', 'local_ulpgccore'), 0, $levels));
+    
+    $temp->add(new \admin_setting_configtext('local_ulpgccore/gradebooknocal', get_string('gradebooknocal','local_ulpgccore'), get_string('explaingradebooknocal','local_ulpgccore'), 'NoCal'));
+    
     $temp->add(new \admin_setting_configtext('local_ulpgccore/locknameword', get_string('locknameword','local_ulpgccore'), get_string('explainlocknameword','local_ulpgccore'), '#nombre#', PARAM_RAW_TRIMMED));
     $temp->add(new \admin_setting_configtext('local_ulpgccore/lockaggword', get_string('lockaggword','local_ulpgccore'), get_string('explainlockaggword','local_ulpgccore'), '#agreg#', PARAM_RAW_TRIMMED));
 
@@ -100,6 +103,29 @@ if ($hassiteconfig) {
     }
 
     $ADMIN->add('local_ulpgccore_settings', $temp);    
+    
+    $temp = new admin_settingpage('local_ulpgccore_alerts', get_string('alerts','local_ulpgccore')); 
+    
+    $temp->add(new \admin_setting_configcheckbox('local_ulpgccore/showglobalalert', get_string('showglobalalert','local_ulpgccore'), get_string('explainshowglobalalert','local_ulpgccore'), 0));    
+    
+    $temp->add(new \admin_setting_configtext('local_ulpgccore/alertstart', get_string('alertstart','local_ulpgccore'), get_string('explainalertstart','local_ulpgccore'), ''));
+    $temp->add(new \admin_setting_configtext('local_ulpgccore/alertend', get_string('alertend','local_ulpgccore'), get_string('explainalertend','local_ulpgccore'), ''));
+    
+    $temp->add(new \admin_setting_pickroles('local_ulpgccore/alertroles', get_string('alertroles','local_ulpgccore'), get_string('explainalertroles','local_ulpgccore'), array()));
+    
+    $temp->add(new \admin_setting_configselect('local_ulpgccore/alerttype', new lang_string('alerttype', 'local_ulpgccore'),
+                                        new lang_string('explainalerttype', 'local_ulpgccore'), 'warning',
+                                        array('success'   => new lang_string('success'),
+                                              'info'   => new lang_string('info'),
+                                              'warning'=> new lang_string('warning'),
+                                              'danger'=> new lang_string('danger', 'local_ulpgccore')))); 
+    
+    $temp->add(new \admin_setting_configcheckbox('local_ulpgccore/alertdismiss', get_string('alertdismiss','local_ulpgccore'), get_string('explainalertdismiss','local_ulpgccore'), 0));    
+    
+    $temp->add(new admin_setting_confightmleditor('local_ulpgccore/alertmessage', new lang_string('alertmessage', 'local_ulpgccore'),
+                                              '', ''));
+    
+    $ADMIN->add('local_ulpgccore_settings', $temp);   
     
     $temp = new admin_settingpage('local_ulpgccore_footer', get_string('footersettings','local_ulpgccore')); 
 

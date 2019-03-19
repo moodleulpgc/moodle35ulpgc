@@ -329,4 +329,40 @@ class user_filter_type {
     public function get_label($data) {
         print_error('mustbeoveride', 'debug', '', 'get_label');
     }
+    
+    
+    /**
+    * Convert a plain list to a suitable SQL list
+    */
+    public function filters_list_convert($value, $clist=1) { // ecastro ULPGC to allow list filtering
+        $list = '';
+        if($clist && $value) {
+            $quoted = array();
+            $pattern = '/(?U) ".*"/';
+            if($nq = preg_match_all($pattern, $value, $quoted)) {
+                $value = preg_replace($pattern, ' ', $value);
+            }
+            $result = array();
+            if(is_array($quoted[0])) {
+                foreach($quoted[0] as $q) {
+                    if($w = trim(trim($q), '"')) {
+                        $result[] = ($w);
+                    }
+                }
+            }
+            
+            $separators = array(', ', ',', '| ', '|', '; ', ';');
+            if($words = explode(' ', str_replace($separators,' ', $value))) {
+                foreach($words as $word) {
+                    if($w = trim(trim(trim($word), ' ,.:;\'"'))) {
+                        $result[] = ($w);
+                    }
+                }
+            }
+            if(count($result) > 1) {
+                $list = "'".implode("', '", $result)."'";
+            }
+        }
+        return $list;
+    }
 }

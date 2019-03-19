@@ -46,6 +46,8 @@ class attendance_webservices_tests extends advanced_testcase {
     /** @var stdClass */
     protected $teacher;
     /** @var array */
+    protected $students;
+    /** @var array */
     protected $sessions;
 
     /**
@@ -57,20 +59,7 @@ class attendance_webservices_tests extends advanced_testcase {
         $this->category = $this->getDataGenerator()->create_category();
         $this->course = $this->getDataGenerator()->create_course(array('category' => $this->category->id));
 
-        $record = new stdClass();
-        $record->course = $this->course->id;
-        $record->name = "Attendance";
-        $record->grade = 100;
-
-        $DB->insert_record('attendance', $record);
-
-        $this->getDataGenerator()->create_module('attendance', array('course' => $this->course->id));
-
-        $moduleid = $DB->get_field('modules', 'id', array('name' => 'attendance'));
-        $cm = $DB->get_record('course_modules', array('course' => $this->course->id, 'module' => $moduleid));
-        $context = context_course::instance($this->course->id);
-        $att = $DB->get_record('attendance', array('id' => $cm->instance), '*', MUST_EXIST);
-        $this->attendance = new mod_attendance_structure($att, $cm, $this->course, $context);
+        $this->attendance = $this->create_attendance();
 
         $this->create_and_enrol_users();
 
@@ -94,11 +83,21 @@ class attendance_webservices_tests extends advanced_testcase {
         $this->attendance->add_sessions($this->sessions);
     }
 
+    private function create_attendance() {
+        global $DB;
+        $att = $this->getDataGenerator()->create_module('attendance', array('course' => $this->course->id));
+        $cm = $DB->get_record('course_modules', array('id' => $att->cmid));
+        unset($att->cmid);
+        return new mod_attendance_structure($att, $cm, $this->course);
+    }
+
     /** Creating 10 students and 1 teacher. */
     protected function create_and_enrol_users() {
+        $this->students = array();
         for ($i = 0; $i < 10; $i++) {
             $student = $this->getDataGenerator()->create_user();
             $this->getDataGenerator()->enrol_user($student->id, $this->course->id, 5); // Enrol as student.
+            $this->students[] = $student;
         }
 
         $this->teacher = $this->getDataGenerator()->create_user();
@@ -121,6 +120,25 @@ class attendance_webservices_tests extends advanced_testcase {
         $this->assertEquals(count($attendanceinstance['today_sessions']), 2);
     }
 
+    public function test_get_courses_with_today_sessions_multiple_instances() {
+        $this->resetAfterTest(true);
+
+        // Make another attendance.
+        $second = $this->create_attendance();
+
+        // Just add the same session.
+        $secondsession = clone $this->sessions[0];
+        $secondsession->sessdate += 3600;
+
+        $second->add_sessions([$secondsession]);
+
+        $courseswithsessions = attendance_handler::get_courses_with_today_sessions($this->teacher->id);
+        $this->assertTrue(is_array($courseswithsessions));
+        $this->assertEquals(count($courseswithsessions), 1);
+        $course = array_pop($courseswithsessions);
+        $this->assertEquals(count($course->attendance_instances), 2);
+    }
+
     public function test_get_session() {
         $this->resetAfterTest(true);
 
@@ -135,6 +153,40 @@ class attendance_webservices_tests extends advanced_testcase {
         $this->assertEquals($this->attendance->id, $sessioninfo->attendanceid);
         $this->assertEquals($session->id, $sessioninfo->id);
         $this->assertEquals(count($sessioninfo->users), 10);
+    }
+
+    public function test_get_session_with_group() {
+        $this->resetAfterTest(true);
+
+        // Create a group in our course, and add some students to it.
+        $group = new stdClass();
+        $group->courseid = $this->course->id;
+        $group = $this->getDataGenerator()->create_group($group);
+
+        for ($i = 0; $i < 5; $i++) {
+            $member = new stdClass;
+            $member->groupid = $group->id;
+            $member->userid = $this->students[$i]->id;
+            $this->getDataGenerator()->create_group_member($member);
+        }
+
+        // Add a session that's identical to the first, but with a group.
+        $session = clone $this->sessions[0];
+        $session->groupid = $group->id;
+        $session->sessdate += 3600; // Make sure it appears second in the list.
+        $this->attendance->add_sessions([$session]);
+
+        $courseswithsessions = attendance_handler::get_courses_with_today_sessions($this->teacher->id);
+
+        $course = array_pop($courseswithsessions);
+        $attendanceinstance = array_pop($course->attendance_instances);
+        $session = array_pop($attendanceinstance['today_sessions']);
+
+        $sessioninfo = attendance_handler::get_session($session->id);
+
+        $this->assertEquals($session->id, $sessioninfo->id);
+        $this->assertEquals($group->id, $sessioninfo->groupid);
+        $this->assertEquals(count($sessioninfo->users), 5);
     }
 
     public function test_update_user_status() {

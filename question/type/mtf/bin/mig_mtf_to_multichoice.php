@@ -60,7 +60,8 @@ $fs = get_file_storage();
 $sql = "SELECT q.*
         FROM {question} q
         WHERE q.qtype = 'mtf'
-        and q.id in (select questionid from {qtype_mtf_options})
+          AND q.parent = 0
+          AND q.id in (select questionid from {qtype_mtf_options})
         ";
 $params = array();
 
@@ -209,12 +210,6 @@ foreach ($questions as $question) {
         $question_weights = array("error"=>true, "message"=>"Database records incomplete.", "notices"=>[]);
     } else {
         $question_weights = get_weights($mtf_weights, $autoweights, $mtf_columns);
-
-        // *****************************************************
-        // Checking if question has a parent question (Cloze question)
-        if ($question->parent != 0) {
-            $question_weights = array("error"=>true, "message"=>"Question will not be migrated. It is part of a Cloze question.", "notices"=>[]);
-        }
     }        
 
     // *****************************************************
@@ -427,9 +422,10 @@ function get_weights($weights, $autoweights, $columns) {
     // *****************************************************
     // Notice - Case 1: Labels are not matching
     // either "true" or "false"
+    $valid_responsetexts = array("true", "false", "wahr", "falsch");
     foreach ($columns as $record) {
-        !(strtolower($record->responsetext) == "true" || strtolower($record->responsetext) == "false") ? 
-        array_push($notices, 'Label not matching "True" or "False"') : null;
+        (!in_array(strtolower($record->responsetext), $valid_responsetexts)) ? 
+        array_push($notices, 'Judgement option "' . $record->responsetext . '" not matching standard "True"/"False"') : null;
     }
 
     // *****************************************************
