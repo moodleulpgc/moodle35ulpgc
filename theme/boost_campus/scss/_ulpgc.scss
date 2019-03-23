@@ -422,6 +422,20 @@ div.userlist table#participants th.header.c1{min-width: 12rem;}
     box-shadow: none;
 }
 
+#categoryquestions label {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#categoryquestions .checkbox {
+    padding-left: 0px; 
+}
+
+#categoryquestions td.qtype .icon {
+    margin-right: 0;
+    margin-top: -6px;
+}
+
 #page-mod-studentquiz-view input[type="checkbox"].toggle + span, 
 #page-mod-studentquiz-view input[type="checkbox"].toggle + label span {
     background: $gray-300;

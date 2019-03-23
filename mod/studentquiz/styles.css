@@ -202,56 +202,60 @@ body.page-mod-studentquiz-reportquiz table tbody tr.gradedattempt > td {
 .question-unapproved {
     color: #7b1400;
 }
-table#categoryquestions {
+
+/* #page-mod-studentquiz-view  adde ecastro ULPGC */
+#page-mod-studentquiz-view table#categoryquestions {
     table-layout: auto;
 }
-#categoryquestions .header {
+
+#page-mod-studentquiz-view #categoryquestions .header {
     text-align: left;
     white-space: nowrap;
 }
-#categoryquestions th.checkbox,
-#categoryquestions td.checkbox {
+
+#page-mod-studentquiz-view #categoryquestions th.checkbox,
+#page-mod-studentquiz-view #categoryquestions td.checkbox {
     padding-left: 10px;
     padding-right: 7px;
 }
-#categoryquestions .qtype {
+#page-mod-studentquiz-view #categoryquestions .qtype {
     width: auto;
 }
-#categoryquestions .questionname {
+#page-mod-studentquiz-view #categoryquestions .questionname {
     min-width: 180px;
 }
-#categoryquestions .iconcol {
+
+#page-mod-studentquiz-view #categoryquestions .iconcol {
     width: 12px;
 }
-#categoryquestions .rates,
-#categoryquestions .difficultylevel,
-#categoryquestions .practice {
+#page-mod-studentquiz-view #categoryquestions .rates,
+#page-mod-studentquiz-view #categoryquestions .difficultylevel,
+#page-mod-studentquiz-view #categoryquestions .practice {
     width: 115px;
 }
 
-#categoryquestions th.practice .sorters,
-#categoryquestions th.difficultylevel .sorters,
-#categoryquestions th.rates .sorters {
+#page-mod-studentquiz-view #categoryquestions th.practice .sorters,
+#page-mod-studentquiz-view #categoryquestions th.difficultylevel .sorters,
+#page-mod-studentquiz-view #categoryquestions th.rates .sorters {
     font-size: .8em;
     font-weight: 400;
 }
-#categoryquestions th .sorters {
+#page-mod-studentquiz-view #categoryquestions th .sorters {
     font-size: 0.8em;
     font-weight: normal;
 }
-#categoryquestions td.difficultylevel,
-#categoryquestions td.rates {
+#page-mod-studentquiz-view #categoryquestions td.difficultylevel,
+#page-mod-studentquiz-view #categoryquestions td.rates {
     padding-top: 7px;
 }
-#categoryquestions td.questionname,
-#categoryquestions td.creatorname {
+#page-mod-studentquiz-view #categoryquestions td.questionname,
+#page-mod-studentquiz-view #categoryquestions td.creatorname {
     white-space: normal;
     line-height: 1em;
 }
-#categoryquestions td.qtype .icon {
+#page-mod-studentquiz-view #categoryquestions td.qtype .icon {
     margin-right: 0;
 }
-
 
 /* behavior */
 .studentquiz_behaviour {

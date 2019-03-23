@@ -513,10 +513,10 @@ if($allocatedrooms) {
         if($roomexams) {
             $staff = '';
             if($staffers = examregistrar_get_room_staffers($room->id, $session)) {
-                $stafferstr = examregistrar_format_room_staffers($staffers, $baseurl, $examregprimaryid, true);
+                $stafferstr = format_string(examregistrar_format_room_staffers($staffers, $baseurl, $examregprimaryid, true);
                 $stafficon = 'groupn';
             } else {
-                $stafferstr = ' assig staffers ';
+                $stafferstr = get_string('roomstaffers', 'examregistrar');
                 $stafficon = 'assignroles';
             }
             $url = new moodle_url('/mod/examregistrar/manage/assignroomstaffers.php',
@@ -543,7 +543,7 @@ if($allocatedrooms) {
                     $examteachers[$userid][] = $exam->examid;
                     $teachernames[$userid] = $name;
                 }
-                $teachers = $output->pix_icon('i/checkpermissions', $strteachers, 'moodle' , array('title'=>implode(" \n", $exam->teachers),'class'=>'iconmedium'));
+                $teachers = $output->pix_icon('i/groupn', $strteachers, 'moodle' , array('title'=>implode(" \n", $exam->teachers),'class'=>'iconmedium'));
                 $courseurl->param('search', $exam->shortname);
                 $examname = html_writer::link($courseurl,"{$exam->programme}-{$exam->shortname}-{$exam->fullname}");
                 $examitems[] = "({$exam->booked}/[{$exam->totalbooked}]) ".$teachers."$star{$examname}  $icon";
