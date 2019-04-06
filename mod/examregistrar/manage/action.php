@@ -103,6 +103,12 @@ $canmanage = $caneditelements || $canmanageperiods || $canmanageexams || $canman
 ///////////////////////////////////////////////////////////////////////////////
 
 /// redirects
+$session = optional_param('examsession', 0, PARAM_INT);
+if(!$session) {
+    $session = optional_param('session', 0, PARAM_INT);
+}
+$bookedsite   = optional_param('venue', '', PARAM_INT);
+
 $params = array('id'=>$cm->id, 'action' => $action, 'tab'=>$tab, 'session'=>$session, 'venue'=>$bookedsite);
 
 if($action == 'sessionrooms' || $action == 'roomstaffers') {
@@ -111,12 +117,6 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
 }
 
 /// define forms
-
-    $session = optional_param('examsession', 0, PARAM_INT);
-    if(!$session) {
-        $session = optional_param('session', 0, PARAM_INT);
-    }
-    $bookedsite   = optional_param('venue', '', PARAM_INT);
     $examid   = optional_param('exam', '', PARAM_INT);
     $short   = optional_param('examshort', '', PARAM_ALPHANUMEXT);
     $formclass = 'examregistrar_'.$action.'_actionform';

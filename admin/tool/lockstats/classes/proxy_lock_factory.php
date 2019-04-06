@@ -29,11 +29,16 @@ namespace tool_lockstats;
 use core\lock\lock;
 use core\lock\lock_config;
 use core\lock\lock_factory;
+use core\task\manager;
 use stdClass;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
+
+define ('LOCKSTAT_UNKNOWN', 0);
+define ('LOCKSTAT_ADHOC', 1);
+define ('LOCKSTAT_SCHEDULED', 2);
 
 /**
  * Proxy lock factory.
@@ -141,20 +146,25 @@ class proxy_lock_factory implements lock_factory {
         $lock = $this->proxiedlockfactory->get_lock($resourcekey, $timeout, $maxlifetime);
 
         if ($lock) {
-            $proxylock = new lock($resourcekey, $this);
+            $enabled = get_config('tool_lockstats', 'enable');
+            if ($enabled) {
+                $proxylock = new lock($resourcekey, $this);
 
-            $this->openlocks[$proxylock->get_key()][] = $lock;
+                $this->openlocks[$proxylock->get_key()][] = $lock;
 
-            $this->log_lock($proxylock->get_key());
+                $this->log_lock($proxylock->get_key());
 
-            if ($this->debug) {
-                mtrace('tool_lockstats [lock obtained]: ' . $proxylock->get_key());
+                if ($this->debug) {
+                    mtrace('tool_lockstats [lock obtained]: ' . $proxylock->get_key());
+                }
+
+                return $proxylock;
+            } else {
+                return $lock;
             }
-
-            return $proxylock;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -172,14 +182,16 @@ class proxy_lock_factory implements lock_factory {
 
         $lock->release();
 
-        if ($this->debug) {
-            mtrace('tool_lockstats [lock released]: ' . $resourcekey);
+        $enabled = get_config('tool_lockstats', 'enable');
+        if ($enabled) {
+            if ($this->debug) {
+                mtrace('tool_lockstats [lock released]: ' . $resourcekey);
+            }
+
+            $this->log_unlock($resourcekey);
         }
 
-        $this->log_unlock($resourcekey);
-
         unset($lock);
-
         return true;
     }
 
@@ -201,13 +213,7 @@ class proxy_lock_factory implements lock_factory {
     public function auto_release() {
         // Called from the shutdown handler. Must release all open locks.
         foreach ($this->openlocks as $id => $locks) {
-            foreach ($locks as $task => $unused) {
-                $lock = new lock($task, $this);
-
-                $this->log_unlock($task);
-
-                $lock->release();
-            }
+            $this->log_unlock($id);
         }
     }
 
@@ -238,8 +244,10 @@ class proxy_lock_factory implements lock_factory {
             $record->host = gethostname();
             $record->pid = posix_getpid();
             $record = $this->fill_more_for_tasks($record, $resourcekey);
-            if (isset($timequeued)) {
+            if (isset($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
+            } else {
+                $record->latency = 0;
             }
             $DB->insert_record('tool_lockstats_locks', $record);
         } else {
@@ -247,7 +255,7 @@ class proxy_lock_factory implements lock_factory {
             $record->released = null;
             $record->host = gethostname();
             $record->pid = posix_getpid();
-            if (isset($timequeued)) {
+            if (isset($timequeued) && $timequeued->nextruntime > 0) {
                 $record->latency = $record->gained - $timequeued->nextruntime;
             }
             $DB->update_record('tool_lockstats_locks', $record);
@@ -290,12 +298,35 @@ class proxy_lock_factory implements lock_factory {
                 }
             }
 
+            $record->type = LOCKSTAT_UNKNOWN;
+            preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
+            if (count($adhoc) > 0) {
+                $record->type = LOCKSTAT_ADHOC;
+            } else {
+                if ($record->classname) {
+                    $scheduledtask = manager::scheduled_task_from_record($record);
+                    if ($scheduledtask) {
+                        $record->type = LOCKSTAT_SCHEDULED;
+                    }
+                }
+            }
+
             if ($delta > get_config('tool_lockstats', 'threshold')) {
                 // The record is duration is higher than the threshold. Create a new record.
                 $this->log_history($record);
             } else {
                 // Lets update the lock count instead.
                 $this->log_update_count($record);
+            }
+
+            if ($record->type == LOCKSTAT_ADHOC) {
+
+                $adhocid = explode('_', $resourcekey);
+                $faildelay = $DB->get_record('task_adhoc', array('id' => $adhocid[1]), 'faildelay');
+
+                if (!$faildelay) {
+                    $DB->delete_records('tool_lockstats_locks', array('resourcekey' => $record->resourcekey));
+                }
             }
 
         }
@@ -337,7 +368,7 @@ class proxy_lock_factory implements lock_factory {
 
             preg_match(" /^adhoc_(\d+)$/", $record->resourcekey, $adhoc);
             if (count($adhoc) > 0) {
-                $history->latency += $history->latency;
+                $history->latency += $record->latency;
             }
 
             $DB->update_record('tool_lockstats_history', $history);

@@ -1,5 +1,11 @@
 ﻿Version Information
 ===================
+Version 3.5.0.4
+  1. Fix invalid HTML in case of zero section elements - thanks to Mario Wehr for raising this - #47.
+  2. Fix: PHP Unit test failure (due to MDL-62680) - thanks to Anupama Dharmajan for the patch - #52.
+  3. Fix: Two strange input fields remain in teacher view when all capabilities are forbidden - thanks to Tobias Reischmann for the patch - #54.
+  4. Fix: Selecting specific topics breaks a section just above the selected topic - CONTRIB-7607.
+
 Version 3.5.0.3
   1. Fix CONTRIB-7434:
         With reference to 'global_start_keyboard_drag' and 'find_element_text' in /lib/yui/src/dragdrop/js/dragdrop.js
@@ -232,7 +238,7 @@ Version 2.8.2.2
   1. First beta version for Moodle 2.7beta.
 
 17th April 2014 Version 2.6.1.5
-  1. Fixed CONTRIB-4099 with the arrangement of the editing icon and associated functionality such that a better solution is
+  1. Fixed CONTRIB-4999 with the arrangement of the editing icon and associated functionality such that a better solution is
      applied for the specific nature of the format.
 
 28th March 2014 Version 2.6.1.4

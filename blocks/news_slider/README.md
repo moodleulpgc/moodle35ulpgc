@@ -64,7 +64,7 @@ background-color: #0066CC;
 
 # Version number #
 
-Version 1.3 (2017122200)
+Version 1.3.2 (2019032800)
 
 ### How do I get set up? ###
 
@@ -83,7 +83,7 @@ Adaptable Theme version 2017053100 (1.4+)
 
 ### Compatibility ###
 
-- Moodle 3.2, 3.3, 3.4
+- Moodle 3.4, 3.5, 3.6
 - Adaptable version 1.4
 
 ### Contribution ###

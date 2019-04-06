@@ -1,5 +1,5 @@
 /* jshint ignore:start */
-define(['jquery', 'block_news_slider/slick', 'theme_bootstrapbase/bootstrap', 'core/log'], function($, slick, bootstrap, log) {
+define(['jquery', 'block_news_slider/slick', 'core/log'], function($, slick, log) {
 
     "use strict"; // ... jshint ;_;.
 

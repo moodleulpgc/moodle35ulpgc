@@ -237,15 +237,17 @@ class examregistrar_exam_form extends moodleform {
             $courses = array($exam->courseid => $exam->shortname.' - '.$exam->fullname);
         } else {
             $categories = make_categories_options();
+            $degrees = array();
             if(get_config('local_ulpgccore')) {
                 $degrees = $DB->get_records_list('local_ulpgccore_categories', 'categoryid', array_keys($categories), '', 'categoryid, degree');
-                foreach($categories as $id =>$name) {
-                    $key = $degrees[$id]->degree;
-                    if($key) {
-                        $programmes[$key] = $name;
-                    }
+            }
+            foreach($categories as $id =>$name) {
+                $key = isset($degrees[$id]) ? $degrees[$id]->degree : $id;
+                if($key) {
+                    $programmes[$key] = $name;
                 }
             }
+            
             unset($categories);
             $scourses = get_courses("all", "c.shortname ASC", "c.id, c.shortname, c.fullname");
             foreach($scourses as $cid => $course) {

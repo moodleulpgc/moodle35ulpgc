@@ -514,7 +514,8 @@ if($allocatedrooms) {
             $staff = '';
             if($staffers = examregistrar_get_room_staffers($room->id, $session)) {
                 $stafferstr = format_string(examregistrar_format_room_staffers($staffers, $baseurl, $examregprimaryid, true);
-                $stafficon = 'groupn';
+                $stafferstr = trim(format_string(trim($stafferstr)));
+                $stafficon = 'users';
             } else {
                 $stafferstr = get_string('roomstaffers', 'examregistrar');
                 $stafficon = 'assignroles';
@@ -543,7 +544,7 @@ if($allocatedrooms) {
                     $examteachers[$userid][] = $exam->examid;
                     $teachernames[$userid] = $name;
                 }
-                $teachers = $output->pix_icon('i/groupn', $strteachers, 'moodle' , array('title'=>implode(" \n", $exam->teachers),'class'=>'iconmedium'));
+                $teachers = $output->pix_icon('userchecked', $strteachers, 'mod_examregistrar' , array('title'=>implode(" \n", $exam->teachers),'class'=>'iconmedium'));
                 $courseurl->param('search', $exam->shortname);
                 $examname = html_writer::link($courseurl,"{$exam->programme}-{$exam->shortname}-{$exam->fullname}");
                 $examitems[] = "({$exam->booked}/[{$exam->totalbooked}]) ".$teachers."$star{$examname}  $icon";
@@ -571,7 +572,7 @@ if($allocatedrooms) {
                         $star = ($exam->callnum < 0) ? '**' : '';
                         $courseurl->param('search', $exam->shortname);
                         $exam->teachers = examregistrar_get_teachers($exam->courseid);
-                        $teachers = $output->pix_icon('i/checkpermissions', $strteachers, 'moodle', array('title'=>implode(" \n", $exam->teachers), 'class'=>'iconmedium'));
+                        $teachers = $output->pix_icon('userchecked', $strteachers, 'mod_examregistrar', array('title'=>implode(" \n", $exam->teachers), 'class'=>'iconmedium'));
                         $examname = html_writer::link($courseurl,"{$exam->programme}-{$exam->shortname}-{$exam->fullname}");
                         $exams[$exam->examid] = $teachers."$star{$examname}";
                     } else {
@@ -637,7 +638,7 @@ if($unallocatedexams) {
         $courseurl->param('search', $exam->shortname);
         $examname = html_writer::link($courseurl,"{$exam->programme}-{$exam->shortname}-{$exam->fullname}");
         $star = ($exam->callnum < 0) ? '**' : '';
-        $teachers = $output->pix_icon('i/checkpermissions', $strteachers, 'moodle', array('title'=>implode(" \n", $exam->teachers), 'class'=>'iconmedium'));
+        $teachers = $output->pix_icon('userchecked', $strteachers, 'examregistrar', array('title'=>implode(" \n", $exam->teachers), 'class'=>'iconmedium'));
         /// TODO use allocatedexam class and print_collapsible_region of get_formatted teachers() with
         //teachers = print_collapsible_region(get_formmated_teachers, '', 'exam'.$exam->examid, $teachers (icon), '', true, true);
         $examitems[] = $checkbox." ({$exam->allocated} / {$exam->booked} / [{$exam->totalbooked}]) ".$teachers."$star{$examname}$star &nbsp;".$icon;

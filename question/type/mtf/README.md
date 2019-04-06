@@ -1,4 +1,4 @@
-# qtype_mtf Multiple True/False (MTF with multi-answers) ETHz (Seperated from qtype_scmc) question type for moodle 2.6+ to 3.x
+# qtype_mtf Multiple True/False (MTF with multi-answers) ETHz (Seperated from qtype_scmc) question type for moodle
 
 *** Info regarding migration from qtype_multichoice (with Multi Answers Only) to qtype_mtf ***
 

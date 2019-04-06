@@ -1017,7 +1017,7 @@ function moodleoverflow_send_mails() {
                 }
 
                 // Tracing message.
-                mtrace('post ' - $post->id . ': ' . $discussion->name);
+                mtrace('post ' . $post->id . ': ' . $discussion->name);
             }
 
             // Release the memory.
