@@ -18,14 +18,15 @@
  * Atto styles - Version file
  *
  * @package    atto_styles
- * @copyright  2015 Andrew Davidson, Synergy Learning UK <andrew.davidson@synergy-learning.com> on behalf of Alexander Bias, Ulm University <alexander.bias@uni-ulm.de>
+ * @copyright  2015 Andrew Davidson, Synergy Learning UK <andrew.davidson@synergy-learning.com>
+ *             on behalf of Alexander Bias, Ulm University <alexander.bias@uni-ulm.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'atto_styles';
-$plugin->version = 2018092600;
-$plugin->release = 'v3.5-r1';
-$plugin->requires = 2018051700;
+$plugin->version = 2019040902;
+$plugin->release = 'v3.5-r2';
+$plugin->requires = 2018051705; //2018120300; ecastro ULPGC
 $plugin->maturity = MATURITY_STABLE;

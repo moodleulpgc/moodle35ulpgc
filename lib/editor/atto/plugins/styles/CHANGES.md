@@ -6,6 +6,14 @@ Changes
 
 ### Unreleased
 
+* 2019-04-09 - Improvement: Add "Select some text first to apply this style" hint to inline elements.
+* 2019-04-09 - Improvement: Change list item icons to FontAwesome.
+* 2019-04-09 - Improvement: Add preview to dropdown menu.
+* 2019-04-09 - Check compatibility for Moodle 3.6, no functionality change.
+
+### v3.5-r2
+
+* 2019-04-09 - Improvement: Make sure that the dropdown menu does not protrude from the editor.
 * 2018-12-05 - Changed travis.yml due to upstream changes.
 
 ### v3.5-r1
