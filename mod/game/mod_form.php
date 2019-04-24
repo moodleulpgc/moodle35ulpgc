@@ -558,6 +558,10 @@ class mod_game_mod_form extends moodleform_mod {
                 }
             }
         }
+        // Check book.
+        if ($data['gamekind'] == 'bookquiz' && empty( $data['bookid'])) {
+            $errors['bookid'] = get_string('missingbook', 'game');
+        }
 
         return $errors;
     }

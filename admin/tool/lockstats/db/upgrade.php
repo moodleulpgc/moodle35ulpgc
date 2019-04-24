@@ -136,7 +136,9 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         $field = new xmldb_field('latency');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         // Update latency column to use INT instead of CHAR.
-        $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
+        }
 
         upgrade_plugin_savepoint(true, 2019030703, 'tool', 'lockstats');
     }
@@ -166,10 +168,61 @@ function xmldb_tool_lockstats_upgrade($oldversion) {
         $field = new xmldb_field('latency');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         // Update latency column to use INT instead of CHAR.
-        $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field, $continue = true, $feedback = true);
+        }
 
         upgrade_plugin_savepoint(true, 2019032900, 'tool', 'lockstats');
 
+    }
+
+    if ($oldversion < 2019041100) {
+        $table = new xmldb_table('tool_lockstats_locks');
+        $field = new xmldb_field('latency', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'customdata');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('tool_lockstats_history');
+        $field = new xmldb_field('latency', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'customdata');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('tool_lockstats_history');
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2019041100, 'tool', 'lockstats');
+    }
+
+    if ($oldversion < 2019041502) {
+        $table = new xmldb_table('tool_lockstats_locks');
+
+        $field = new xmldb_field('customdata');
+        $field->set_attributes(XMLDB_TYPE_TEXT, 'big');
+
+        $dbman->change_field_precision($table, $field);
+
+        upgrade_plugin_savepoint(true, 2019041502, 'tool', 'lockstats');
+    }
+
+    if ($oldversion < 2019042303) {
+        $table = new xmldb_table('tool_lockstats_locks');
+        $field = new xmldb_field('type');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $sql = "DELETE FROM {tool_lockstats_locks}
+                      WHERE component IS NULL";
+
+        $DB->execute($sql);
+
+        upgrade_plugin_savepoint(true, 2019042303, 'tool', 'lockstats');
     }
 
     return true;

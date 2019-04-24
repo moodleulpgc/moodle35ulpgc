@@ -21,7 +21,7 @@
  * @copyright 2007 Vasilis Daloukas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-require_once( "../../config.php");
+require_once(dirname(__FILE__).'/../../config.php');
 require_once( "lib.php");
 require_once( "locallib.php");
 
@@ -170,7 +170,7 @@ function game_do_attempt( $game, $action, $course, $context, $cm) {
             break;
         case 'sudokucheckn':    // The user tries to guess a number.
             $attempt = game_getattempt( $game, $detail);
-            game_sudoku_check_number( $cm, $game, $attempt, $detail, $pos, $num, $context);
+            game_sudoku_check_number( $cm, $game, $attempt, $detail, $pos, $num, $context, $course);
             $continue = false;
             break;
         case 'cryptexcheck':    // The user tries to guess a question.

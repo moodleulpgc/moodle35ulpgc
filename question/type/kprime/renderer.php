@@ -184,6 +184,9 @@ class qtype_kprime_renderer extends qtype_renderer {
                                                 'feedbacktext', $rowid)),
                                 array('class' => 'kprimespecificfeedback')));
                 $rowdata[] = $cell;
+            } else {
+                $cell = new html_table_cell(html_writer::tag('div', ''));
+                $rowdata[] = $cell;
             }
             $table->data[] = $rowdata;
         }

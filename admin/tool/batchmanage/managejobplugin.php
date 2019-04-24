@@ -381,7 +381,7 @@ abstract class batchmanage_managejob_plugin  {
     }
     
     public function execute($verbose = true) {
-        global $DB, $OUTPUT;
+        global $CFG, $DB, $OUTPUT;
     
         if(!$applicable = $this->has_applicable_action()) {
             return 'noapplicableaction';
@@ -401,6 +401,10 @@ abstract class batchmanage_managejob_plugin  {
         $strcourse = get_string('course');
 
         if($rs_items->valid()) {
+        
+            // plagiarism plugins call incompatible JS & other libraries
+            $plagiarism = $CFG->enableplagiarism;
+            $CFG->enableplagiarism = false;
             foreach($rs_items as $item) {
                 $success = false;
                 $anysuccess = false;
@@ -433,6 +437,7 @@ abstract class batchmanage_managejob_plugin  {
                 $oldcategoryid = $item->category;
             }
             
+            $CFG->enableplagiarism = $plagiarism;            
             if($anysuccess) {
                 // event admin tool
                 $event = $this->get_batchmanage_event();
