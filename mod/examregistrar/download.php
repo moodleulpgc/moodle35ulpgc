@@ -88,6 +88,18 @@ if (function_exists('apache_child_terminate')) {
     @apache_child_terminate();
 }
 
+function examregistrar_explode_header($headtemplate, $replaces) {
+    
+    $header = explode('|', $headtemplate);
+    $header = examregistrar_str_replace($replaces, $header);
+    for($n = 0; $n<=1; $n++) {
+        if(!isset($header[$n])) {
+            $header[$n] = '';
+        }
+    }
+    return $header;
+}
+
 
 function examregistrar_venuezips($examregistrar, $allocations, $params, $output) {
     global $CFG, $DB, $USER;
@@ -282,8 +294,7 @@ function examregistrar_roomsummary_printpdf($examregistrar, $allocations, $param
     $pdf->setPrintHeader(true);
     $pdf->setPrintFooter(true);
     $pdf->SetFont('freeserif', '', 12);
-    $header = explode('|', $pdf->template['header']);
-    $header = examregistrar_str_replace($pdf->replaces, $header);
+    $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
     $pdf->SetHeaderData($pdf->logoimage, $pdf->logowidth, $header[0] , $header[1]);
     $pdf->startPageGroup();
     $pdf->AddPage('', '', true);
@@ -415,8 +426,7 @@ function examregistrar_examallocations_printpdf($examregistrar, $allocations, $p
             $pdf->replaces['teacher'] = html_writer::alist($list);
         }
 
-        $header = explode('|', $pdf->template['header']);
-        $header = examregistrar_str_replace($pdf->replaces, $header);
+        $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
         $main = examregistrar_str_replace($pdf->replaces, $pdf->template['examtitle']);
 
         // add titlepage for exam
@@ -688,8 +698,7 @@ function examregistrar_userallocations_printpdf($examregistrar, $params, $render
         $usertable = $renderer->print_exam_user_table($users, $width, $widths, array(get_string('venue', 'examregistrar'), get_string('room', 'examregistrar')), array('numadditionals'=>'*'), array('venuename'=>'text-align:left;', 'roomname'=>'text-align:left;'));
 
         // add titlepage for userlist
-        $header = explode('|', $pdf->template['header']);
-        $header = examregistrar_str_replace($pdf->replaces, $header);
+        $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
         $pdf->SetHeaderData($pdf->logoimage, $pdf->logowidth, $header[0] , $header[1]);
         $pdf->startPageGroup();
         $pdf->AddPage('', '', true);
@@ -730,8 +739,7 @@ function examregistrar_venueallocations_printpdf($examregistrar, $params, $rende
     $pdf->SetFont('freeserif', '', 12);
 
     // add titlepage for userlist
-    $header = explode('|', $pdf->template['header']);
-    $header = examregistrar_str_replace($pdf->replaces, $header);
+    $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
     $pdf->SetHeaderData($pdf->logoimage, $pdf->logowidth, $header[0] , $header[1]);
     $pdf->startPageGroup();
     $pdf->AddPage('', '', true);
@@ -800,8 +808,7 @@ function examregistrar_venue_fax_binder_printpdf($examregistrar, $params, $rende
     $pdf->SetFont('freeserif', '', 12);
 
     // add titlepage for userlist
-    $header = explode('|', $pdf->template['header']);
-    $header = examregistrar_str_replace($pdf->replaces, $header);
+    $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
     $pdf->SetHeaderData($pdf->logoimage, $pdf->logowidth, $header[0] , $header[1]);
     $pdf->startPageGroup();
     $pdf->AddPage('', '', true);

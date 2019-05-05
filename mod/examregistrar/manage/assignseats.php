@@ -513,7 +513,7 @@ if($allocatedrooms) {
         if($roomexams) {
             $staff = '';
             if($staffers = examregistrar_get_room_staffers($room->id, $session)) {
-                $stafferstr = format_string(examregistrar_format_room_staffers($staffers, $baseurl, $examregprimaryid, true);
+                $stafferstr = format_string(examregistrar_format_room_staffers($staffers, $baseurl, $examregprimaryid, true));
                 $stafferstr = trim(format_string(trim($stafferstr)));
                 $stafficon = 'users';
             } else {
