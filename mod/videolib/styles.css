@@ -1,0 +1,13 @@
+/** General Styles **/
+.path-mod-videolib .card {
+    display: block;
+}
+
+
+.path-mod-videolib .videolibvideo {
+    margin: 0 auto;
+}
+
+.path-mod-videolib iframe {
+    display: block;
+}

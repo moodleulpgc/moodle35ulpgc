@@ -1624,22 +1624,29 @@ function qcreate_check_updates_since(cm_info $cm, $from, $filter = array()) {
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
+ * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return \core_calendar\local\event\entities\action_interface|null
  */
 function mod_qcreate_core_calendar_provide_event_action(calendar_event $event,
-                                                       \core_calendar\action_factory $factory) {
+                                                       \core_calendar\action_factory $factory,
+                                                       $userid = 0) {
 
     global $CFG, $USER;
 
     require_once($CFG->dirroot . '/mod/qcreate/locallib.php');
 
-    $cm = get_fast_modinfo($event->courseid)->instances['qcreate'][$event->instance];
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+
+    $cm = get_fast_modinfo($event->courseid, $userid)->instances['qcreate'][$event->instance];
     $context = context_module::instance($cm->id);
     $qcreateobj = new qcreate($context, $cm, null);
     $instance = $qcreateobj->get_instance();
 
     // Check they have capabilities allowing them to view the qcreate.
-    if (!has_any_capability(array('mod/qcreate:view', 'mod/qcreate:submit'), $qcreateobj->get_context())) {
+    if (!has_any_capability(array('mod/qcreate:view', 'mod/qcreate:submit'),
+            $qcreateobj->get_context(), $userid)) {
         return null;
     }
 
