@@ -45,5 +45,6 @@ $string['crontask'] = 'Draft closing after duedate job';
 $string['eventsubmissionarchived'] = 'Submission archived';
 $string['noarchiveallowed'] = 'No more attempts allowed';
 $string['waitgrading'] = 'Submission must be graded for archiving.';
-$string['checked_turnitin'] = 'Automatic grade on Turnitin';
-$string['checked_turnitin_help'] = 'If enabled, then file submission that has been checked by Turnitin will be set as graded automatically.';
+$string['checked_turnitin'] = 'Archive on Turnitin';
+$string['checked_turnitin_help'] = 'If enabled, then file submission that has been checked by Turnitin will be set as archivable automatically. <br /> 
+This setting onñy works for Assignments without grading, without assessment.';

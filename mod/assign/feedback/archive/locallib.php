@@ -78,19 +78,6 @@ class assign_feedback_archive extends assign_feedback_plugin {
     public function add_attempt() {
         global $USER;
         require_sesskey();
-        /*
-        // this way using reflection to avoid protected method && USER hack to avoid ghas_capability checking
-        $userid = $USER->id;
-        $admin = get_admin(); 
-        $USER->id = $admin->id;
-        
-        $assignment = new assign ($this->assignment->get_context(), $this->assignment->get_course_module(), $this->assignment->get_course());
-        $r = new ReflectionMethod('assign', 'add_attempt');
-        $r->setAccessible(true);
-        $r->invoke($assignment, $userid);
-        $USER->id = $userid;
-        unset($assignment);
-        */
         
         $returnurl = new moodle_url('/mod/assign/view.php',
                                     array('id'=>$this->assignment->get_course_module()->id));
@@ -340,6 +327,7 @@ class assign_feedback_archive extends assign_feedback_plugin {
      */
     public function is_empty(stdClass $grade) {
     
+    
         //si fuera de plazo (antes, después), o si no submission empty
         // only true if there is a submission && (not graded / graded)
         if(empty($grade) || !has_capability('assignfeedback/archive:store', $this->assignment->get_context())) {
@@ -364,19 +352,34 @@ class assign_feedback_archive extends assign_feedback_plugin {
      * @return bool
      */
     public function has_user_summary() {
-        global $USER;
+        global $PAGE, $USER;
         
         // depend on permissos y del plazo    
                     //si fuera de plazo NO pintar nada 
-        
-        //depende de resubmission y de nº de archivos
+            
         $grade = $this->assignment->get_user_grade(0, false);
         
         $context = $this->assignment->get_context();
+       
+        if(!$grade || !has_capability('assignfeedback/archive:store', $context)) {
+            return false;
+        }
         
-        return ($grade && 
-                    !has_capability('mod/assign:grade', $context) && 
-                    has_capability('assignfeedback/archive:store', $context));
+        $cangrade = has_capability('mod/assign:grade', $context);
+        $cansubmit = has_capability('mod/assign:submit', $context);
+        
+        if($cansubmit && !$cangrade) {
+            return true;
+        } 
+        
+        if($cansubmit && $cangrade) {
+            $referer = new moodle_url(qualified_me());
+            if(strpos($referer->get_path(), 'mod/assign/view.php') &&  $referer->get_param('action') != 'grading') {
+                return true;
+            }
+        } 
+        
+        return false;
     }
 
     /**
@@ -388,6 +391,7 @@ class assign_feedback_archive extends assign_feedback_plugin {
      */
     public function view_summary(stdClass $grade, & $showviewlink) {
             $instance = $this->assignment->get_instance();
+            
             $output = $this->assignment->get_renderer();
             
             $submission = $this->assignment->get_user_submission($grade->userid, false);
@@ -399,7 +403,7 @@ class assign_feedback_archive extends assign_feedback_plugin {
                 $text = get_string('noarchiveallowed', 'assignfeedback_archive');
             } elseif($maxattemptsreached) {
                 $text = get_string('maxattemptsreached', 'assignfeedback_archive');
-            } elseif(($grade->grade !== null && $grade->grade >= 0) || $this->check_turnitin($submission)) {
+            } elseif(($grade->grade !== null && $grade->grade >= 0) || (($instance->grade == 0) && $this->check_turnitin($submission))) {
                 $thisurl = new moodle_url('/mod/assign/view.php', array('action'=>'viewpluginpage',
                                                                      'pluginsubtype'=>'assignfeedback',
                                                                      'plugin'=>'archive',
@@ -425,8 +429,8 @@ class assign_feedback_archive extends assign_feedback_plugin {
      */
     public function check_turnitin($submission) {
         global $CFG, $DB;
-
-        if(!empty($CFG->enableplagiarism) && $submission  && $plagiarism = get_config('plagiarism')) { 
+        
+        if(!empty($CFG->enableplagiarism) && $submission  && ($plagiarism = get_config('plagiarism'))) { 
             if($plagiarism->turnitin_use && $plagiarism->turnitin_use_mod_assign && get_config('assignfeedback_archive','checked_turnitin')) {
                 $select = "cm = :cm AND userid = :userid AND itemid = :itemid AND similarityscore IS NOT NULL ";
                 $params = array('cm' => $this->assignment->get_course_module()->id, 
@@ -446,10 +450,22 @@ class assign_feedback_archive extends assign_feedback_plugin {
      * @return string
      */
     public function view(stdClass $grade) {
-            return '';
+            return ' eee ';
     }
     
-    /**
+    /**        /*
+        // this way using reflection to avoid protected method && USER hack to avoid ghas_capability checking
+        $userid = $USER->id;
+        $admin = get_admin(); 
+        $USER->id = $admin->id;
+        
+        $assignment = new assign ($this->assignment->get_context(), $this->assignment->get_course_module(), $this->assignment->get_course());
+        $r = new ReflectionMethod('assign', 'add_attempt');
+        $r->setAccessible(true);
+        $r->invoke($assignment, $userid);
+        $USER->id = $userid;
+        unset($assignment);
+        */
         * Run cron for this plugin
         */
     public static function cron_task() {
@@ -457,7 +473,7 @@ class assign_feedback_archive extends assign_feedback_plugin {
         
         $config = get_config('assignfeedback_archive');
         
-        if(!$config->updategraded && !$config->checked_turnitin) {
+        if(!$config->updategraded) {
             return true;
         }
         
@@ -505,47 +521,6 @@ class assign_feedback_archive extends assign_feedback_plugin {
                 $select = "id $insql";
                 $DB->set_field_select('assign_submission', 'timemodified', $time, $select, $params);
                 // TODO add event
-            }
-        }
-        
-        if(0 && $config->checked_turnitin) {
-            $sql = "SELECT s.*, ptf.
-                    FROM {plagiarism_turnitin_files} ptf 
-                    JOIN {assign_submission} s ON s.id = ptf.itemid AND s.latest = 1
-                    JOIN {assign_plugin_config} pc ON pc.assignment = s.assignment 
-                                AND pc.plugin = 'archive' AND pc.subtype = 'assignfeedback' 
-                                AND pc.name = 'enabled' AND pc.value = 1
-                    LEFT JOIN {assign_grades} g ON g.assignment = s.assignment AND g.userid = s.userid AND g.attemptnumber = s.attemptnumber
-                    WHERE s.status = :status AND g.grade IS NULL AND ptf.similarityscore IS NOT NULL
-            
-                    ";
-            $params = array('status'=>ASSIGN_SUBMISSION_STATUS_SUBMITTED); 
-            
-            if($submissions = $DB->get_records_sql($sql, $params)) {
-            
-                $assignmentcache = array();
-                $grades = array();
-            
-                foreach($submissions as $submission) {
-                    $assignid = $submission->assignment;
-                    $attemptnumber = $submission->submissionattempt;
-                    if (empty($assignmentcache[$assignmentid])) {
-                        $cm = get_coursemodule_from_instance('assign', $assignid, 0, false, MUST_EXIST);
-                        $context = context_module::instance($cm->id);
-
-                        $assign = new assign($context, null, null);
-                        $assignmentcache[$assignid] = $assign;
-                    } else {
-                        $assign = $assignmentcache[$assignid];
-                    }
-                    $grade = $assign->get_user_grade($submission->userid, true, $submission->attemptnumber);
-                    $grades[] =  $grade->id;
-                }
-                
-                if($grades) {
-                    list($insql, $params) = $DB->get_in_or_equal($grades);
-                    //$DB->set_field_select('assign_grades', 'grade', 1, "id $insql", $params);
-                }
             }
         }
         
