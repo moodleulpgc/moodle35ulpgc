@@ -450,24 +450,12 @@ class assign_feedback_archive extends assign_feedback_plugin {
      * @return string
      */
     public function view(stdClass $grade) {
-            return ' eee ';
+            return '';
     }
     
-    /**        /*
-        // this way using reflection to avoid protected method && USER hack to avoid ghas_capability checking
-        $userid = $USER->id;
-        $admin = get_admin(); 
-        $USER->id = $admin->id;
-        
-        $assignment = new assign ($this->assignment->get_context(), $this->assignment->get_course_module(), $this->assignment->get_course());
-        $r = new ReflectionMethod('assign', 'add_attempt');
-        $r->setAccessible(true);
-        $r->invoke($assignment, $userid);
-        $USER->id = $userid;
-        unset($assignment);
-        */
-        * Run cron for this plugin
-        */
+    /**
+     * Run cron for this plugin
+    */
     public static function cron_task() {
         global $CFG, $DB;
         
