@@ -5845,22 +5845,28 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
 
     // ecastro ULPGC to allow mail CC to other secondary emails addressess
-    // First, use it if available when main email is empty
     $sql = "SELECT  uind.data
             FROM {user_info_field} uif  
             LEFT JOIN {user_info_data} uind ON uif.id = uind.fieldid AND uind.userid = :userid 
             WHERE uif.shortname = :field ";
-    if($ccedmails = $DB->get_field_sql($sql, array('userid' => $user->id, 'field' => 'ccedmails'))) {
-        $user->ccedmails = explode(',', $ccedmails);
-    }
-
-    if(isset($user->ccedmails) && $user->ccedmails) {
-        if (empty($user->email)) {
-            if($user->ccedmails) {
-                $user->email = trim(array_shift($user->ccedmails));
-            }
+    $ccedmails = $DB->get_field_sql($sql, array('userid' => $user->id, 'field' => 'ccedmails'));
+    $user->ccedmails = ($ccedmails) ? explode(',', $ccedmails) : null;
+    if(is_array($user->ccedmails)) {
+        $user->ccedmails = array_filter(array_map('trim', $user->ccedmails), 'validate_email');
+        if(count($user->ccedmails) > 5) {
+            $user->ccedmails = array_slice($user->ccedmails, 0, 5);
         }
     }
+
+    // First, use it if available when main email is empty
+    if(isset($user->ccedmails) && $user->ccedmails && (empty($user->email))) {
+        $email = trim(array_shift($user->ccedmails));
+        if($email && validate_email($email)) {
+            $user->email = $email;
+        }
+    }
+    // end ecastro ULPGC modification
+
     
     if (empty($user->email)) {
         debugging('Can not send email to user without email: '.$user->id, DEBUG_DEVELOPER);
