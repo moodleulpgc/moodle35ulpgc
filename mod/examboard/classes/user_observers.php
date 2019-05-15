@@ -59,6 +59,7 @@ class user_observers {
      * @return void
      */
     public static function synch_board($event) {
+        global $DB;
         $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']));
         if($examboard && $exams = examboard_get_board_exams($event->objectid, $event->other['examboardid'], false)) {
             foreach($exams as $exam) {
