@@ -400,7 +400,7 @@ $string['allopen'] = 'Estados abiertos';
 $string['allclosed'] = 'Estados cerrados';
 $string['trackerissuereported'] = '{$a->shortname}: Creada y asignada una entrada en gestor "{$a->name}".';
 $string['trackerissuecommented'] = '{$a->shortname}: Añadido comentario a una entrada en Gestor "{$a->name}".';
-$string['adduserwatch'] = 'Agregar usuariso como observadores en las entradas en las que son seleccionados.';
+$string['adduserwatch'] = 'Agregar usuarios como observadores en las entradas en las que son seleccionados.';
 $string['autofilltype'] = 'Auto rellenado de opciones';
 $string['autofilltype_help'] = 'Establece un tipo de auto-rellenado dinámico de opciones del campo. Las posibilidades de genera opciones son:
 

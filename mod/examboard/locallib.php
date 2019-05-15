@@ -2116,8 +2116,6 @@ function examboard_remove_user_from_exam($examboard, $examid, $userid) {
     return $success;
 }
 
-
-
 function examboard_calculate_grades($grademode, $mingraders, $rawgrades) {
    
     if(!$rawgrades) {
@@ -2757,85 +2755,89 @@ function examboard_export_examinations($examboard, $fromform) {
         $columns['deputy'] = get_string('deputy', 'examboard');
     }
     
-    list($inexams, $params) = $DB->get_in_or_equal($fromform->exportedexams, SQL_PARAMS_NAMED);
-    
-    $index = 'e.id';
-    $fields = '';
-    $join = '';
-    $names = '';
-    if($fromform->exportlistby == EXAMBOARD_USERTYPE_MEMBER) {
-    
-        $includedeputy = '';
-        if(!$fromform->includedeputy) {
-            $includedeputy = ' AND m.deputy = 0 ';
+    if($fromform->exportedexams) {
+        list($inexams, $params) = $DB->get_in_or_equal($fromform->exportedexams, SQL_PARAMS_NAMED);
+        
+        $index = 'e.id';
+        $fields = '';
+        $join = '';
+        $names = '';
+        if($fromform->exportlistby == EXAMBOARD_USERTYPE_MEMBER) {
+        
+            $includedeputy = '';
+            if(!$fromform->includedeputy) {
+                $includedeputy = ' AND m.deputy = 0 ';
+            }
+            $index = "CONCAT_WS('-', e.id, m.id)";
+            $fields = ', m.userid, m.sortorder, m.role, m.deputy, um.idnumber AS memberidnumber, m.userid AS member '; 
+            $join = " LEFT JOIN {examboard_member} m ON m.boardid = e.boardid  $includedeputy 
+                        LEFT JOIN {user} um ON m.userid = um.id  ";
+            $names = 'um';
+                        
+        } elseif($fromform->exportlistby == EXAMBOARD_USERTYPE_USER) {
+            unset($columns['role']);
+            $index = "CONCAT_WS('-', e.id, ee.id)";
+            $fields =  ', ee.userid, ee.sortorder, ee.userlabel, ee.excluded, ue.idnumber AS examineeidnumber, 
+                            t.tutorid, ee.userid AS examinee '; 
+            $join = 'LEFT JOIN {examboard_examinee} ee ON ee.examid = e.id   
+                        LEFT JOIN {user} ue ON ee.userid = ue.id  
+                    LEFT JOIN {examboard_tutor} t ON t.examid = e.id AND t.userid = ee.userid AND t.main = 1 ';
+            $names = 'ue';
         }
-        $index = "CONCAT_WS('-', e.id, m.id)";
-        $fields = ', m.userid, m.sortorder, m.role, m.deputy, um.idnumber AS memberidnumber, m.userid AS member '; 
-        $join = " LEFT JOIN {examboard_member} m ON m.boardid = e.boardid  $includedeputy 
-                    LEFT JOIN {user} um ON m.userid = um.id  ";
-        $names = 'um';
-                    
-    } elseif($fromform->exportlistby == EXAMBOARD_USERTYPE_USER) {
-        unset($columns['role']);
-        $index = "CONCAT_WS('-', e.id, ee.id)";
-        $fields =  ', ee.userid, ee.sortorder, ee.userlabel, ee.excluded, ue.idnumber AS examineeidnumber, 
-                        t.tutorid, ee.userid AS examinee '; 
-        $join = 'LEFT JOIN {examboard_examinee} ee ON ee.examid = e.id   
-                    LEFT JOIN {user} ue ON ee.userid = ue.id  
-                 LEFT JOIN {examboard_tutor} t ON t.examid = e.id AND t.userid = ee.userid AND t.main = 1 ';
-        $names = 'ue';
-    }
-    
-    if($names) {
-        $names = ', '.get_all_user_name_fields(true, $names);
-    }
-    
-    $sql = "SELECT $index AS idx, e.*, e.id AS examid, e.active AS examactive, b.title, b.name, b.idnumber, b.active as boardactive, b.groupid 
-                    $fields $names
-            FROM {examboard_exam} e 
-            JOIN {examboard_board} b ON b.id = e.boardid AND b.examboardid = e.examboardid
-            $join
-            WHERE e.examboardid = :examboardid AND e.id $inexams
-            ORDER BY b.idnumber ASC, e.sessionname ASC, e.examdate ";
-    $params['examboardid'] = $examboard->id;       
-            
-    $rolestr = array();
-    $rolestr[0] = $examboard->chair;
-    $rolestr[1] = $examboard->secretary;
-    foreach(range(2, $examboard->maxboardsize -1 ) as $idx) {
-        $rolestr[$idx] = $examboard->vocal.' '.($idx-1);
-    }
-    
-    $skipped = array('idnumber', 'sessionname', 'title', 'name', 'venue', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
-    $examineefields = array('examinee', 'userlabel', 'tutor', 'othertutors', 'examineesortorder', 'grades', 'excluded', 'approved');
-    $memberfields = array('member', 'role', 'deputy', 'exemption', 'confirmed', 'notifications');  
+        
+        if($names) {
+            $names = ', '.get_all_user_name_fields(true, $names);
+        }
+        
+        $sql = "SELECT $index AS idx, e.*, e.id AS examid, e.active AS examactive, b.title, b.name, b.idnumber, b.active as boardactive, b.groupid 
+                        $fields $names
+                FROM {examboard_exam} e 
+                JOIN {examboard_board} b ON b.id = e.boardid AND b.examboardid = e.examboardid
+                $join
+                WHERE e.examboardid = :examboardid AND e.id $inexams
+                ORDER BY b.idnumber ASC, e.sessionname ASC, e.examdate ";
+        $params['examboardid'] = $examboard->id;       
+                
+        $rolestr = array();
+        $rolestr[0] = $examboard->chair;
+        $rolestr[1] = $examboard->secretary;
+        foreach(range(2, $examboard->maxboardsize -1 ) as $idx) {
+            $rolestr[$idx] = $examboard->vocal.' '.($idx-1);
+        }
+        
+        $skipped = array('idnumber', 'sessionname', 'title', 'name', 'venue', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
+        $examineefields = array('examinee', 'userlabel', 'tutor', 'othertutors', 'examineesortorder', 'grades', 'excluded', 'approved');
+        $memberfields = array('member', 'role', 'deputy', 'exemption', 'confirmed', 'notifications');  
 
-    $SESSION->mod_examboard_export_columns = $columns;
-    $SESSION->mod_examboard_export_listby = $fromform->exportlistby;
-    $SESSION->mod_examboard_export_examid = 0;
-    $SESSION->mod_examboard_export_rolestr = $rolestr;
-    $SESSION->mod_examboard_export_fieldtypes = array($skipped, $examineefields, $memberfields);
-   
-    $rs_exams = $DB->get_recordset_sql($sql, $params); 
-    if($rs_exams->valid() && $columns) {
-        if (!headers_sent() && error_get_last()==NULL ) {
-            download_as_dataformat($filename, $fromform->dataformat, $columns, $rs_exams, 'examboard_export_exam_row');
+        $SESSION->mod_examboard_export_columns = $columns;
+        $SESSION->mod_examboard_export_listby = $fromform->exportlistby;
+        $SESSION->mod_examboard_export_examid = 0;
+        $SESSION->mod_examboard_export_rolestr = $rolestr;
+        $SESSION->mod_examboard_export_fieldtypes = array($skipped, $examineefields, $memberfields);
+    
+        $rs_exams = $DB->get_recordset_sql($sql, $params); 
+        if($rs_exams->valid() && $columns) {
+            if (!headers_sent() && error_get_last()==NULL ) {
+                download_as_dataformat($filename, $fromform->dataformat, $columns, $rs_exams, 'examboard_export_exam_row');
+            } else {
+                $message = get_string('headersent', 'error');
+            }
         } else {
-            $message = get_string('headersent', 'error');
+            if(!$columns) {
+                $message = "No columns";
+            } else {
+                $message = "No valid data";
+            }
         }
+        $rs_exams->close();
+        unset($SESSION->mod_examboard_export_columns);
+        unset($SESSION->mod_examboard_export_listby);
+        unset($SESSION->mod_examboard_export_examid);
+        unset($SESSION->mod_examboard_export_rolestr);
+        unset($SESSION->mod_examboard_export_fieldtypes);
     } else {
-        if(!$columns) {
-            $message = "No columns";
-        } else {
-            $message = "No valid data";
-        }
+        $message = "No valid exams selected";
     }
-    $rs_exams->close();
-    unset($SESSION->mod_examboard_export_columns);
-    unset($SESSION->mod_examboard_export_listby);
-    unset($SESSION->mod_examboard_export_examid);
-    unset($SESSION->mod_examboard_export_rolestr);
-    unset($SESSION->mod_examboard_export_fieldtypes);
 
     return $message;
 }
@@ -2845,7 +2847,7 @@ function examboard_get_exam_userids($exam, $withexaminees = true) {
     global $DB; 
     
     $members = $DB->get_records_menu('examboard_member', 
-                                        array('examboardid' => $exam->examboardid, 'boardid'=> $exam->boardid, 'deputy' => 0),
+                                        array('boardid'=> $exam->boardid, 'deputy' => 0),
                                         '',
                                         'id, userid');
     $members = array_merge($members, $DB->get_records_menu('examboard_tutor', 
@@ -2874,13 +2876,13 @@ function examboard_get_exam_userids($exam, $withexaminees = true) {
  * @return void
 */
 function examboard_synchronize_groups($examboard, $exam = false) {
-    global $CFG;
+    global $CFG, $DB;
 
     if(!$examboard->examgroups) {
         return;
     }
 
-    include_once($CFG->dirroot.'/groups/lib.php');
+    include_once($CFG->dirroot.'/group/lib.php');
     
     $courseid = $examboard->course;
     
@@ -2954,6 +2956,7 @@ function examboard_synchronize_groups($examboard, $exam = false) {
  * @return void
 */
 function examboard_synchronize_gradeables($examboard, $exam = false, $config = true) {
+    global $DB;
 
     if(!$examboard->gradeable && !$examboard->proposal && !$examboard->defense) {
         return;
@@ -3025,9 +3028,13 @@ function examboard_synchronize_gradeables($examboard, $exam = false, $config = t
 function examboard_synchronize_trackers($trackers, $examinees, $members) {
     global $CFG, $DB;
 
-    $tids = array();
+    $tids = array(0 => -1);
     foreach($trackers as $tracker) {
         $tids[$tracker->instance] = $tracker->instance;
+    }
+    
+    if(!$examinees) {
+        $examinees = array(-1);
     }
 
     list($intsql, $tparams) = $DB->get_in_or_equal($tids, SQL_PARAMS_NAMED, 't');
@@ -3064,8 +3071,9 @@ function examboard_config_complementary_assigns($assigns, $groupingid = -1) {
     $update = false;
     
     foreach($assigns as $assignmod) {
-        $modupdate = stdClass();
-        if($groupingid >= 0 && (($assignmod->groupmode != SEPARATEGROUPS) || ($assignmod->grouping != $groupingid))){
+        $modupdate = new stdClass();
+        
+        if($groupingid >= 0 && (($assignmod->groupmode != SEPARATEGROUPS) || ($assignmod->groupingid != $groupingid))){
             $modupdate->groupmode = SEPARATEGROUPS;
             $modupdate->groupingid = $groupingid;
             $modupdate->id = $assignmod->id;
@@ -3074,6 +3082,7 @@ function examboard_config_complementary_assigns($assigns, $groupingid = -1) {
 
         if($instance = $DB->get_record('assign', array('id'=>$assignmod->instance))) {
             $instance->coursemodule = $assignmod->id;
+            $instance->instance = $assignmod->instance;
             if(!$instance->markingworkflow) {
                 $instance->markingworkflow = 1;
                 $instance->markingallocation = 0;
@@ -3082,6 +3091,8 @@ function examboard_config_complementary_assigns($assigns, $groupingid = -1) {
         }
     
         if($update) {
+            print_object($instance);
+        
             assign_update_instance($instance, null);
         }
     }

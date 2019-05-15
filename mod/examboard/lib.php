@@ -140,6 +140,7 @@ function examboard_update_instance($examboard, $mform = null) {
     
     // update associated grouping
     if($examboard->examgroups) {
+        include_once($CFG->dirroot.'/group/lib.php');
         if($examboard->groupingname && ($examboard->groupingname != $oldeb->groupingname)) {
             $grouping = false;
             if($oldeb->groupingname) {
@@ -160,6 +161,9 @@ function examboard_update_instance($examboard, $mform = null) {
         }
         include_once($CFG->dirroot.'/mod/examboard/locallib.php');
         examboard_synchronize_groups($examboard);
+    }
+    
+    if($examboard->gradeable || $examboard->proposal || $examboard->defense) {
         examboard_synchronize_gradeables($examboard);
     }
     
@@ -381,6 +385,11 @@ function examboard_get_grading_instance($examboard, $userid, $grade, $gradingdis
 
 
 function examboard_get_gradeable_cm($courseorid, $idnumber) {
+
+    if(!$idnumber) {
+        return false;
+    }
+    
     $mods = get_fast_modinfo($courseorid)->get_cms();
     $cm = false;
     foreach($mods as $cmid => $cm) {
@@ -409,7 +418,7 @@ function examboard_get_gradeables($courseorid) {
         if (!in_array($cm->module, $gradeables) || !$cm->idnumber || !$cm->uservisible) {
             continue;
         }
-        $options[$cm->idnumber] = format_string($cm->name);
+        $options[$cm->idnumber] = format_string($cm->name.' ('.$cm->idnumber.') ');
     }
     
     if($options) {
