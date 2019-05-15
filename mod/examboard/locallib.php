@@ -556,6 +556,7 @@ function examboard_set_action_form($cm, $context, $examboard, $action, &$mform) 
                     $data = new stdClass();
                     $data->examinee = $userid;
                     $data->userlabel = $DB->get_field('examboard_examinee', 'userlabel', array('examid'=>$examid, 'userid'=>$userid));
+                    $data->excluded = $DB->get_field('examboard_examinee', 'excluded', array('examid'=>$examid, 'userid'=>$userid));
                     foreach($existingtutors as $user) {
                         if(isset($user->tutorid) && $user->main == 1) {
                             $data->tutor = $user->tutorid;
@@ -981,11 +982,13 @@ function examboard_process_updateuser($examboard, $fromform) {
         $user->sortorder = $sortorder;
         $user->userid = $fromform->examinee;
         $user->userlabel = $fromform->userlabel;
+        $user->excluded = $fromform->excluded;
         $eid = $DB->insert_record('examboard_examinee', $user);
         $success = $success && $eid;
         //$userid = $fromform->examinee;
     } else {
         $oldexaminee->userlabel = $fromform->userlabel;
+        $oldexaminee->excluded = $fromform->excluded;
         $oldexaminee->timemodified = $now;
         $eid = $DB->update_record('examboard_examinee', $oldexaminee);
         $success = $success && $eid;
@@ -2112,6 +2115,8 @@ function examboard_remove_user_from_exam($examboard, $examid, $userid) {
     
     return $success;
 }
+
+
 
 function examboard_calculate_grades($grademode, $mingraders, $rawgrades) {
    

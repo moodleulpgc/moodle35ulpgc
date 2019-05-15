@@ -108,6 +108,10 @@ class examboard_examinee_form extends moodleform {
         $mform->setDefault('userorder', EXAMBOARD_ORDER_KEEP);
         $mform->addHelpButton('userorder', 'allocmemberorder', 'examboard');
         
+        $mform->addElement('advcheckbox', 'excluded', get_string('excluded', 'examboard'));
+        $mform->setDefault('excluded', 0);
+        $mform->addHelpButton('excluded', 'excluded', 'examboard');
+        
         $mform->addElement('hidden', 'id', $cmid);
         $mform->setType('id', PARAM_INT);
         

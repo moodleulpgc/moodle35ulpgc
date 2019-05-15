@@ -25,12 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['assessment'] = 'Evaluación';
 $string['board'] = 'Tribunal';
 $string['member'] = 'Miembro del tribunal';
 $string['exemption'] = 'Eximido';
 $string['exempted'] = 'Eximido';
 $string['exempted_help'] = 'Marcar si este usuario ha sido eximido de sus deberes como miembro del Tribunal.';
 $string['excluded'] = 'Excluido';
+$string['excluded_help'] = 'El estudiante excluído es mostrado pero no puede ser calificado';
 $string['approved'] = 'Conformidad';
 $string['examboard:addinstance'] = 'Añadir una instancia de Tribunal';
 $string['examboard:view'] = 'Ver actividades Tribunal';

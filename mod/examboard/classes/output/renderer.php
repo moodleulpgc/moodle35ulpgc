@@ -1190,7 +1190,6 @@ class renderer extends plugin_renderer_base {
             $deleteaction = new \confirm_action(get_string('userdeleteconfirm', 'examboard'));
             // Confirmation JS.
             $PAGE->requires->strings_for_js(array('deleteallconfirm', 'userdeleteconfirm'), 'examboard');
-
             $url->param('action', 'deleteuser');
             $icon = new pix_icon('i/delete', get_string('deleteuser', 'examboard'), 'core', $attributes);
             $action .=  '&nbsp; '.$this->output->action_icon($url, $icon, $deleteaction);
@@ -1407,7 +1406,7 @@ class renderer extends plugin_renderer_base {
                     $url->param('view', 'exam');
                     $url->param('item', $exam->id);
 //                    $icon = new pix_icon('i/grades', get_string('gradeusers', 'examboard'));
-                    $gradeicon = html_writer::link($url, get_string('grade', 'examboard'), array('class' =>'btn btn-primary'));
+                    $gradeicon = html_writer::link($url, get_string('assessment', 'examboard'), array('class' =>'btn btn-primary'));
                 }
                 $row[] =  $grades.$gradeicon;
             }
