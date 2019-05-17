@@ -2862,6 +2862,11 @@ function examboard_get_exam_userids($exam, $withexaminees = true) {
     }
                                         
     $members = array_unique($members);
+    
+    $k = array_search($members, 0);
+    if($k !== false) {
+        unset($members[$k]);
+    }
 
     return $members;
 }

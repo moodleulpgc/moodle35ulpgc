@@ -239,6 +239,7 @@ function examboard_synchronize_groups($examboard, $exam = false) {
     }
 
     include_once($CFG->dirroot.'/group/lib.php');
+    include_once($CFG->dirroot.'/mod/examboard/locallib.php');
     
     $courseid = $examboard->course;
     
@@ -318,7 +319,6 @@ function examboard_synchronize_gradeables($examboard, $exam = false, $config = t
         return;
     }
 
-    
     include_once($CFG->dirroot.'/mod/examboard/locallib.php');
     $trackers = array();
     $assigns = array();
