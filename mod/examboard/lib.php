@@ -159,7 +159,6 @@ function examboard_update_instance($examboard, $mform = null) {
                 $grouping->id = groups_create_grouping($grouping); 
             }
         }
-        include_once($CFG->dirroot.'/mod/examboard/locallib.php');
         examboard_synchronize_groups($examboard);
     }
     
@@ -219,6 +218,160 @@ function examboard_delete_instance($id) {
     examboard_grade_item_delete($examboard);
     
     return true;
+}
+
+
+
+
+/**
+ * Makes sure there is a group for each examination and 
+ * synchronizes members (board members, examinees, tutors)
+ *
+ * @param object $examboard record conting examboard data
+ * @param object $exam examination to be synchonized, false means all
+ * @return void
+*/
+function examboard_synchronize_groups($examboard, $exam = false) {
+    global $CFG, $DB;
+
+    if(!$examboard->examgroups) {
+        return;
+    }
+
+    include_once($CFG->dirroot.'/group/lib.php');
+    
+    $courseid = $examboard->course;
+    
+    if($exam) {
+        $exams = array($exam->id => $exam);
+    } else {
+        $exams = examboard_get_user_exams($examboard, true, 0, 0, 'e.active DESC, b.title ASC, b.idnumber ASC');
+    }
+    
+    $now = time();
+    
+    // ensure grouping exists
+    if(!$grouping = groups_get_grouping_by_idnumber($examboard->course, $examboard->groupingname)) {
+        $grouping = new stdClass();
+        $grouping->courseid = $examboard->course;
+        $grouping->name = $examboard->groupingname;
+        $grouping->idnumber = $examboard->groupingname;
+        
+        $grouping->id = groups_create_grouping($grouping); 
+    }
+
+    foreach($exams as $eid => $exam) {
+        // get group idnumber & check group exists or create
+        $idnumber = $exam->title.'_'.$exam->idnumber;
+        $name = $exam->title.' '.$exam->idnumber.' ('.$exam->sessionname.')';
+        if(!$group = groups_get_group_by_idnumber($courseid, $idnumber)) {
+            $group = new stdClass();
+            $group->courseid = $courseid;
+            $group->name = $name;
+            $group->idnumber = $idnumber;
+            $group->timecreated = $now;
+            $group->timemodified = $now;
+            $group->id = groups_create_group($group);
+        } elseif($group->name != $name) {
+            $group->name = $name;
+            groups_update_group($group);
+        }
+        groups_assign_grouping($grouping->id, $group->id);
+        
+        // now check people that must be in the group
+        $currentusers =  $DB->get_records_menu('groups_members', 
+                                            array('groupid' => $group->id, 'component' => 'mod_examboard', 'itemid' => $examboard->id),
+                                            '',
+                                            'id, userid');
+        $members = examboard_get_exam_userids($exam);
+                                    
+        $user = new stdclass();
+        $user->id = 0;
+        $user->delete = 0;
+        if($add = array_diff($members, $currentusers)) {
+            foreach($add as $userid) {
+                $user->id = $userid;
+                groups_add_member($group, $user, 'mod_examboard', $examboard->id) ;
+            }
+        }
+        if($delete = array_diff($currentusers, $members)) {
+            foreach($delete as $userid) {
+                groups_remove_member($group, $userid);
+            }
+        }
+    }
+
+}
+
+/**
+ * Finds complementary course modules and enforce rules to allow/restrict access
+ * to those modules by graders & students
+ *
+ * @param object $examboard record conting examboard data
+ * @param object $exam examination to be synchonized, false means all
+ * @return void
+*/
+function examboard_synchronize_gradeables($examboard, $exam = false, $config = true) {
+    global $DB;
+
+    if(!$examboard->gradeable && !$examboard->proposal && !$examboard->defense) {
+        return;
+    }
+
+    
+    include_once($CFG->dirroot.'/mod/examboard/locallib.php');
+    $trackers = array();
+    $assigns = array();
+    
+    foreach(array('gradeable', 'proposal', 'defense') as $field) {
+        if($cm = examboard_get_gradeable_cm($examboard->course, $examboard->$field)) {
+            if($cm->modname == 'tracker') {
+                $trackers[$cm->idnumber] = $cm;
+            } elseif($cm->modname == 'assign') {
+                $assigns[$cm->idnumber] = $cm;
+            }
+        }
+    }
+    
+    // configuration need to be changes only once, not for each exam
+    if($assigns && $config) {
+        $groupingid = -1;
+        if($examboard->examgroups && $examboard->groupingname) {
+            if($grouping = $grouping = groups_get_grouping_by_idnumber($examboard->course, $examboard->groupingname)) {
+                $groupingid = $grouping->id;
+            }
+        }
+        examboard_config_complementary_assigns($assigns, $groupingid);
+    }
+    
+    if($exam) {
+        $exams = array($exam->id => $exam);
+    } else {
+        $exams = examboard_get_user_exams($examboard, true, 0, 0, 'e.active DESC, b.title ASC, b.idnumber ASC');
+    }
+    
+    foreach($exams as $eid => $exam) {
+        if($trackers) {
+            $members = examboard_get_exam_userids($exam, false);
+            $examinees = array_merge($members, $DB->get_records_menu('examboard_examinee', 
+                                            array('examid' => $exam->id),
+                                            '',
+                                            'id, userid'));
+            examboard_synchronize_trackers($trackers, $examinees, $members);
+        }
+    
+        // Not using tutors for allocatedmarking, 
+        if($assigns) {
+            /*
+            $tutors = array_merge($members, $DB->get_records_menu('examboard_tutor', 
+                                        array('examid' => $exam->id, 'main' => 1),
+                                        '',
+                                        'userid, tutorid'));
+            */
+            //examboard_allocate_assign_graders($assigns, $tutors);
+        }
+    }
+
 }
 
 /**

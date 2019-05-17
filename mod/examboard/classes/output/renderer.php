@@ -1013,11 +1013,13 @@ class renderer extends plugin_renderer_base {
                                 $submitflag = $DB->record_exists_select('assign_submission', $select, array('assignment' => $cminfo->instance, 'userid'=>$userid));
                         break;
 
-            case 'tracker'  :   $url->param('view','view'); 
+            case 'tracker'  :   $url->param('view','view');
+                                $url->param('screen','mywork'); 
                                 $select = "trackerid = :trackerid AND reportedby = :userid AND status > 0 AND status <> 5 ";
                                 $params = array('trackerid' => $cminfo->instance, 'userid'=>$userid);
                                 if($submitflag = $DB->record_exists_select('tracker_issue', $select, $params)) {
                                     $issue = reset($DB->get_records_select('tracker_issue', $select, $params, 'datereported DESC', 0, 1));
+                                    $url->param('screen','viewanissue'); 
                                     $url->param('issueid', $issue->id);
                                 }
                         break;        
