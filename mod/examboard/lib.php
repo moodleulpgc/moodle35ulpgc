@@ -221,8 +221,6 @@ function examboard_delete_instance($id) {
 }
 
 
-
-
 /**
  * Makes sure there is a group for each examination and 
  * synchronizes members (board members, examinees, tutors)
@@ -301,8 +299,8 @@ function examboard_synchronize_groups($examboard, $exam = false) {
             }
         }
     }
-
 }
+
 
 /**
  * Finds complementary course modules and enforce rules to allow/restrict access
@@ -313,7 +311,7 @@ function examboard_synchronize_groups($examboard, $exam = false) {
  * @return void
 */
 function examboard_synchronize_gradeables($examboard, $exam = false, $config = true) {
-    global $DB;
+    global $CFG, $DB;
 
     if(!$examboard->gradeable && !$examboard->proposal && !$examboard->defense) {
         return;
@@ -352,12 +350,15 @@ function examboard_synchronize_gradeables($examboard, $exam = false, $config = t
     
     foreach($exams as $eid => $exam) {
         if($trackers) {
-            $members = examboard_get_exam_userids($exam, false);
+            $members = examboard_get_exam_userids($exam, false, false);
+            $examinees = examboard_get_exam_tutors($exam->id); 
+            /*
             $examinees = array_merge($members, $DB->get_records_menu('examboard_examinee', 
                                             array('examid' => $exam->id),
                                             '',
                                             'id, userid'));
-            examboard_synchronize_trackers($trackers, $examinees, $members);
+                                            */
+            examboard_synchronize_trackers($trackers, $exam);
         }
     
         // Not using tutors for allocatedmarking, 
@@ -371,7 +372,6 @@ function examboard_synchronize_gradeables($examboard, $exam = false, $config = t
             //examboard_allocate_assign_graders($assigns, $tutors);
         }
     }
-
 }
 
 /**

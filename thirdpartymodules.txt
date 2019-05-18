@@ -41,6 +41,7 @@ git submodule add https://github.com/troywilliams/moodle-mod_dialogue.git       
 git submodule add https://github.com/bdaloukas/moodle-mod_game.git                      mod/game
 git submodule add https://github.com/projectestac/moodle-mod_geogebra.git               mod/geogebra
 git submodule add https://github.com/BLC-HTWChur/moodle-mod_groupselect.git             mod/groupselect
+git submodule add https://github.com/h5p/h5p-moodle-plugin.git                          mod/hvp
 git submodule add https://github.com/gbateson/moodle-mod_hotpot.git                     mod/hotpot
 git submodule add https://github.com/netspotau/moodle-mod_lightboxgallery.git           mod/lightboxgallery
 git submodule add https://github.com/Edunao/moodle-mod_masks.git                        mod/masks

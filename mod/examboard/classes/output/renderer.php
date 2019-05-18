@@ -1013,20 +1013,24 @@ class renderer extends plugin_renderer_base {
                                 $submitflag = $DB->record_exists_select('assign_submission', $select, array('assignment' => $cminfo->instance, 'userid'=>$userid));
                         break;
 
-            case 'tracker'  :   $url->param('view','view');
+            case 'tracker'  :   $url->param('view','view'); 
                                 $url->param('screen','mywork'); 
                                 $select = "trackerid = :trackerid AND reportedby = :userid AND status > 0 AND status <> 5 ";
                                 $params = array('trackerid' => $cminfo->instance, 'userid'=>$userid);
                                 if($submitflag = $DB->record_exists_select('tracker_issue', $select, $params)) {
-                                    $issue = reset($DB->get_records_select('tracker_issue', $select, $params, 'datereported DESC', 0, 1));
+                                    $issue = $DB->get_records_select('tracker_issue', $select, $params, 'datereported DESC', 'id, trackerid, reportedby, assignedto', 0, 1);
+                                    $issue = reset($issue);
                                     $url->param('screen','viewanissue'); 
                                     $url->param('issueid', $issue->id);
                                 }
                         break;        
 
-            case 'data'  :
-                        break;        
-        
+            case 'data'     :
+                        break;  
+                        
+            case 'datalynx' :
+            
+                        break;  
         }
     
         if($submitflag) {
@@ -1192,6 +1196,7 @@ class renderer extends plugin_renderer_base {
             $deleteaction = new \confirm_action(get_string('userdeleteconfirm', 'examboard'));
             // Confirmation JS.
             $PAGE->requires->strings_for_js(array('deleteallconfirm', 'userdeleteconfirm'), 'examboard');
+
             $url->param('action', 'deleteuser');
             $icon = new pix_icon('i/delete', get_string('deleteuser', 'examboard'), 'core', $attributes);
             $action .=  '&nbsp; '.$this->output->action_icon($url, $icon, $deleteaction);
@@ -1401,7 +1406,7 @@ class renderer extends plugin_renderer_base {
                     $grades .= html_writer::div($this->display_user_grades($userstable, $uid), 'usergrades');
                 }
 
-                // add grade button if usr can grade those students
+                // add grade button if user can grade those students
                 $gradeicon = '';
                 if(($isgrader && $examinee_list->users) && !$viewer->is_downloading()) {
                     $url = clone $viewer->baseurl;
@@ -1453,7 +1458,6 @@ class renderer extends plugin_renderer_base {
             $url->param('action', 'exam'.$name);
             $icon = new pix_icon('t/'.$name, get_string($name), 'core', $attributes);
             $action .=  '&nbsp; '.$this->output->action_icon($url, $icon);
-            
             
         // delete
             $deleteaction = new \confirm_action(get_string('examdeleteconfirm', 'examboard'));

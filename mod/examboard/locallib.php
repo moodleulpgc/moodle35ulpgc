@@ -1273,7 +1273,7 @@ function examboard_get_user_exams($examboard, $viewall, $onlyuser = 0, $groupid 
 
 
 /**
- * Retrieve tutors of a given exa,id as array indexed by userid
+ * Retrieve tutors of a given examid as array indexed by userid
  *
  * @param int $examid the exam id in BD
  * @return object a mix of exam and board records
@@ -1281,7 +1281,7 @@ function examboard_get_user_exams($examboard, $viewall, $onlyuser = 0, $groupid 
 function examboard_get_exam_tutors($examid) {
     global $DB;
     
-    return $DB->get_records_menu('examboard_tutor', array('examid' => $examid), 'id', 'userid, tutorid');
+    return $DB->get_records_menu('examboard_tutor', array('examid' => $examid, 'main' => 1), 'id', 'userid, tutorid');
 }
 
 
@@ -2843,30 +2843,29 @@ function examboard_export_examinations($examboard, $fromform) {
 }
 
 
-function examboard_get_exam_userids($exam, $withexaminees = true) {
+function examboard_get_exam_userids($exam, $withtutors = true,  $withexaminees = true) {
     global $DB; 
     
     $members = $DB->get_records_menu('examboard_member', 
                                         array('boardid'=> $exam->boardid, 'deputy' => 0),
                                         '',
                                         'id, userid');
-    $members = array_merge($members, $DB->get_records_menu('examboard_tutor', 
-                                        array('examid'=> $exam->id),
-                                        '',
-                                        'id, tutorid'));
+
+    if($withtutors) {
+        $members = array_merge($members, $DB->get_records_menu('examboard_tutor', 
+                                                                array('examid'=> $exam->id),
+                                                                '',
+                                                                'id, tutorid'));
+    }
+    
     if($withexaminees) {
         $members = array_merge($members, $DB->get_records_menu('examboard_examinee', 
-                                        array('examid'=> $exam->id),
-                                        '',
-                                        'id, userid'));
+                                                                array('examid'=> $exam->id),
+                                                                '',
+                                                                'id, userid'));
     }
                                         
-    $members = array_unique($members);
-    
-    $k = array_search($members, 0);
-    if($k !== false) {
-        unset($members[$k]);
-    }
+    $members = array_filter(array_unique($members));
 
     return $members;
 }
@@ -2877,35 +2876,57 @@ function examboard_get_exam_userids($exam, $withexaminees = true) {
  * to those modules by graders & students
  *
  * @param array $trackers collection of $cm_info objects to synchronize
- * @param array $examinees user ids for reportedby
- * @param array $members user ids for watches
+ * @param stdclass $exam 
  * @return void
 */
-function examboard_synchronize_trackers($trackers, $examinees, $members) {
+function examboard_synchronize_trackers($trackers, $exam) {
     global $CFG, $DB;
 
-    $tids = array(0 => -1);
+    if(!$trackers) {
+        return;
+    }
+    
+    $members = examboard_get_exam_userids($exam, false, false);
+    $examinees = examboard_get_exam_tutors($exam->id); 
+    $others = array();
+    
+    if(!$examinees || !$members) {
+        return;
+    }
+    
+    include_once($CFG->dirroot.'/mod/tracker/locallib.php');
+    
     foreach($trackers as $tracker) {
         $tids[$tracker->instance] = $tracker->instance;
     }
-    
-    if(!$examinees) {
-        $examinees = array(-1);
-    }
 
     list($intsql, $tparams) = $DB->get_in_or_equal($tids, SQL_PARAMS_NAMED, 't');
-    list($inusql, $uparams) = $DB->get_in_or_equal($examinees, SQL_PARAMS_NAMED, 'u');
+    list($inusql, $uparams) = $DB->get_in_or_equal(array_keys($examinees), SQL_PARAMS_NAMED, 'u');
     
     $select = " trackerid $intsql AND reportedby $inusql ";
     if($issues = $DB->get_records_select('tracker_issue', $select, $tparams + $uparams)) {
-    
-        include_once($CFG->dirroot.'/mod/tracker/locallib.php');
         $tracker = new stdClass();
         foreach($issues as $issue) {
             $tracker->id = $issue->trackerid;
-            foreach($members as $userid) {
+            $issueccs = $DB->get_records_menu('tracker_issuecc', 
+                                                array('issueid' => $issue->id, 'trackerid' => $issue->trackerid),
+                                                '', 'id,userid');
+            $others = $DB->get_records_menu('examboard_tutor', array('examid' => $exam->id, 'userid' =>$issue->reportedby, 'main' => 0), 
+                                                'id', 'id, tutorid') + array($examinees[$issue->reportedby]);
+            if($deletes = array_diff($issueccs, $members, $others)) {
+                list($insql, $params) = $DB->get_in_or_equal($deletes, SQL_PARAMS_NAMED, 'd');
+                $params['trackerid'] = $issue->trackerid;
+                $params['issueid'] = $issue->id;
+                $select = "trackerid = :trackerid AND issueid = :issueid AND userid $insql";
+                $DB->delete_records_select('tracker_issuecc', $select, $params);
+            }
+            $adds = array_diff($members + $others, $issueccs);
+            foreach($adds as $userid) {
                 tracker_register_cc($tracker, $issue, $userid); 
             }
+            $DB->set_field('tracker_issue', 'assignedto', $examinees[$issue->reportedby], 
+                                array('id' => $issue->id, 'trackerid' => $tracker->id, 'reportedby' => $issue->reportedby));
+            
         }
     }
 }
