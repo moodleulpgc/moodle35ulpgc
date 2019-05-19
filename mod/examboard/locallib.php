@@ -1868,7 +1868,6 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
             $messagetext = html_to_text($messagehtmluser);
         
             if(email_to_user($user, $noreplyuser, $subject, $messagetext, $messagehtmluser, $attachment, $attachname)) {
-                print_object($user);
                 $notification->examid = $exam->id;
                 $notification->userid = $user->id;
                 $notification->role = $role;
@@ -2206,19 +2205,20 @@ function examboard_import_export_fields($examboard, $export = false) {
     $mandatory = array('idnumber'       => get_string('boardidnumber', 'examboard'),
                         'sessionname'   => get_string('examsession', 'examboard'), );
     
-    $optional = array('title'       => get_string('boardtitle', 'examboard'),
-                        'name'      => get_string('boardname', 'examboard'),
-                        'group'     => get_string('accessgroup', 'examboard'),
-                        'venue'     => get_string('examvenue', 'examboard'),
-                        'examdate'  => get_string('examdate', 'examboard'),
-                        'duration'  => get_string('examduration', 'examboard'),
-                        'member'    => get_string('member', 'examboard'),
-                        'role'      => get_string('memberrole', 'examboard'),
-                        'deputy'    => get_string('deputy', 'examboard'),
-                        'examinee'  => $examboard->examinee,
-                        'userlabel' => get_string('userlabel', 'examboard'),
-                        'tutor'     => $examboard->tutor,
-                        'othertutors' => get_string('othertutors', 'examboard'),
+    $optional = array('title'           => get_string('boardtitle', 'examboard'),
+                        'name'          => get_string('boardname', 'examboard'),
+                        'group'         => get_string('accessgroup', 'examboard'),
+                        'venue'         => get_string('examvenue', 'examboard'),
+                        'examdate'      => get_string('examdate', 'examboard'),
+                        'duration'      => get_string('examduration', 'examboard'),
+                        'member'        => get_string('member', 'examboard'),
+                        'role'          => get_string('memberrole', 'examboard'),
+                        'deputy'        => get_string('deputy', 'examboard'),
+                        'examinee'      => $examboard->examinee,
+                        'userlabel'     => get_string('userlabel', 'examboard'),
+                        'tutor'         => $examboard->tutor,
+                        'othertutors'   => get_string('othertutors', 'examboard'),
+                        'excluded'      => get_string('excluded', 'examboard'),
                         );
 
     if($export) {
@@ -2430,8 +2430,11 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
             $fields = array();
             if($user = $DB->get_record('examboard_examinee', $params)) {
                 if($fromform->ignoremodified) {
-                    if($record->userlabel && ($record->userlabel != $user->userlabel)) {
+                    if(isset($record->userlabel) && $record->userlabel && ($record->userlabel != $user->userlabel)) {
                         $fields[] = 'userlabel';
+                    }
+                    if(isset($record->excluded) && $record->excluded && ($record->excluded != $user->excluded)) {
+                        $fields[] = 'excluded';
                     }
                 }
             } else {
@@ -2443,6 +2446,9 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
                 $user->examid = $exam->id;
                 $user->userid = $record->examinee;
                 $user->sortorder = $sortorder;
+                if(isset($record->excluded)) {
+                    $fields[] = 'excluded';
+                }
                 if(isset($record->userlabel)) {
                     $fields[] = 'userlabel';
                 }
@@ -2968,8 +2974,6 @@ function examboard_config_complementary_assigns($assigns, $groupingid = -1) {
         }
     
         if($update) {
-            print_object($instance);
-        
             assign_update_instance($instance, null);
         }
     }

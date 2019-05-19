@@ -84,3 +84,13 @@
 .content-upgrade-log {
   color: red;
 }
+
+/*ecastro ULPGC */
+.activity.hvp.modtype_hvp .activityinstance .iconlarge.activityicon {
+    height: 34px;
+    width: auto;
+    margin: 0 -8px;
+    display: inline;
+    margin-left: -22px;
+    vertical-align: middle;
+}

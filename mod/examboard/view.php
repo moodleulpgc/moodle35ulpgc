@@ -133,8 +133,9 @@ echo $renderer->header();
 $strnorallowed = get_string('nopermissiontoviewpage', 'error');
 
 
-
-
+if((($view == 'exam') || ($view == 'grading'))   && ($cangrade || $canmanage)) {
+    $examination = \mod_examboard\examination::get_from_id($itemid);
+}
 
 if($view == 'board' && ($cangrade || $canmanage)) {
 
@@ -155,8 +156,7 @@ if($view == 'board' && ($cangrade || $canmanage)) {
     $event = \mod_examboard\event\board_viewed::create_from_object($eventparams, $board);
     $event->trigger();
 
-} elseif($view == 'exam' && ($cangrade || $canmanage)) {
-    $examination = \mod_examboard\examination::get_from_id($itemid);
+} elseif($view == 'exam' && $examination && ($cangrade || $canmanage)) {
     // regular users should acces only their own exam   
     if($canviewall || $canmanage || $examination->is_grader($USER->id)) {
         $examinees_table = new \mod_examboard\output\examinees_table($url, $examination, $examboard);
@@ -173,10 +173,9 @@ if($view == 'board' && ($cangrade || $canmanage)) {
         echo $OUTPUT->continue_button($url);
         //echo $OUTPUT->notice($strnorallowed, $url, $course); 
     }
-} elseif($view == 'grading' && ($cangrade || $canmanage)) {
+} elseif($view == 'grading' && $examination && ($cangrade || $canmanage)) {
     // we are about to grade a singleuser
     $userid = optional_param('user', 0, PARAM_INT);
-    $examination = \mod_examboard\examination::get_from_id($itemid);
     $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
     echo $renderer->view_user_grade_page($examboard, $examination, $user);
     

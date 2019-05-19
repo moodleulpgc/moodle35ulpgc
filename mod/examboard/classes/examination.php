@@ -124,9 +124,11 @@ class examination {
                 FROM {examboard_exam} e
                 JOIN {examboard_board} b ON e.examboardid = b.examboardid AND e.boardid = b.id
                 WHERE e.id = :examid ";
-        $examrec = $DB->get_record_sql($sql, $params); 
+        if($examrec = $DB->get_record_sql($sql, $params)) {
+            return new examination($examrec);
+        }
         
-        return new examination($examrec);
+        return false;
     }
     
     

@@ -386,3 +386,31 @@ function hvp_update_grades($hvp=null, $userid=0, $nullifnone=true) {
         hvp_grade_item_update($hvp);
     }
 }
+
+
+/**
+ * Sets dynamic information about a course module
+ *
+ * This function is called from cm_info when displaying the module
+ * mod_folder can be displayed inline on course page and therefore have no course link
+ *
+ * @param cm_info $cm
+ */
+function hvp_cm_info_dynamic(cm_info $cm) { // ecastro ULPGC
+    global $CFG, $DB;
+    
+    if($cm->modname != 'hvp') {
+        return;
+    }
+    
+    $sql = "SELECT hl.machine_name
+            FROM {hvp} h 
+            JOIN {hvp_libraries} hl ON h.main_library_id = hl.id 
+            WHERE h.id = ? ";
+    $lname = $DB->get_field_sql($sql, array($cm->instance));
+    $name = '/mod/hvp/pix/'.substr(strtolower($lname), 4).'-icon.svg';
+    if(file_exists($CFG->dirroot.$name)) {
+        $url = new moodle_url($name);
+        $cm->set_icon_url($url);
+    }
+}

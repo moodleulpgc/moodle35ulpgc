@@ -214,6 +214,7 @@ if(is_subclass_of($mform, 'moodleform')) {
         } elseif(($action == 'deleteexam') && ($fromform->confirmed == 'deleteexam')) {
             // OK, delete it
             $message = examboard_remove_exam($fromform->exam, $fromform->withboard);
+            $returnurl->remove_params(array('view', 'item'));
             
         } elseif(($action == 'deleteuser') && ($fromform->confirmed == 'deleteuser')) {
             // OK, delete it
@@ -301,7 +302,7 @@ if(is_subclass_of($mform, 'moodleform')) {
 } else {
     /// Print error message
     echo $OUTPUT->header();
-    print_object($_POST);
+//    print_object($_POST);
     
     echo notice(get_string('invalidaction', 'error', $action), $returnurl, $course); 
 
