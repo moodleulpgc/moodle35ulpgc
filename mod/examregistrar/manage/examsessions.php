@@ -82,7 +82,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'annualityname', 'sessionname', 'periodname', 'examdate', 'timeslot', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('annualityitem', 'examregistrar'),
                         get_string('itemname', 'examregistrar'),
                         get_string('perioditem', 'examregistrar'),

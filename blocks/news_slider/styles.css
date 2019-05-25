@@ -12,7 +12,8 @@
     visibility: visible;
 }
 
-.news-slider .slick-dots button, .slick-dots button:active {
+.news-slider .slick-dots button,
+.slick-dots button:active {
 
     border: none;
     box-shadow: none;
@@ -47,7 +48,7 @@
     font-weight: 400;
     line-height: normal;
     font-size: 95%;
-    color: #333333 !important;
+    color: #333 !important;
 }
 
 
@@ -56,7 +57,7 @@
 }
 
 .slider .newscontent a:hover {
-    color: #333333 !important;
+    color: #333 !important;
 }
 
 .slider-banner-col {
@@ -72,7 +73,7 @@
 
 .slider-col {
     padding: 8px 15px 10px 15px;
-    background-color: #EEEEEE;
+    background-color: #eee;
     height: 100%;
     width: 100%;
     float: none;
@@ -100,7 +101,7 @@
 }
 
 .slider-message {
-    padding: 4px 0px 3px 0px;
+    padding: 4px 0 3px 0;
     display: none;
 }
 
@@ -109,7 +110,7 @@
         width: 12%; /* 20%;   ecastro ULPGC */
         max-width: 1250px;
         height: 100%;
-        background-color: #F15C22;
+        background-color: #f15c22;
         float: left;
         position: relative;
 
@@ -136,7 +137,7 @@
 
     .slider-col {
         padding: 8px 15px 10px 15px;
-        background-color: #EEEEEE;
+        background-color: #eee;
         height: 100%;
         width: 88%; /* 80%; ecastro ULPGC */
         float: left;
@@ -180,7 +181,7 @@
 
     .slider-col-date {
         font-size: 14px;
-        padding: 0px 5px;
+        padding: 0 5px;
     }
 
 }

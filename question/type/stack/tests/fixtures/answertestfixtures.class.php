@@ -66,6 +66,8 @@ class stack_answertest_test_data {
         array('AlgEquiv', '', 'lowesttermsp((x^2-1)/(x-1))', 'true', 0, '', ''),
         array('AlgEquiv', '', 'lowesttermsp((x^2-1)/(x+2))', 'true', 1, 'ATLogic_True', ''),
         array('AlgEquiv', '', 'X', 'x', 0, 'ATAlgEquiv_WrongCase.', 'Case sensitivity'),
+        array('AlgEquiv', '', 'exdowncase(X)', 'x', 1, '', ''),
+        array('AlgEquiv', '', 'exdowncase((X-1)^2)', 'x^2-2*x+1', 1, '', ''),
         array('AlgEquiv', '', 'Y=1+X', 'y=1+x', 0, 'ATEquation_default',
             'Permutations of variables (To do: a dedicated answer test with feedback)'),
         array('AlgEquiv', '', 'v+w+x+y+z', 'a+b+c+A+B', 0, '', ''),
@@ -141,6 +143,7 @@ class stack_answertest_test_data {
         array('AlgEquiv', '', 'sin(x+-y)', 'sin(x)*cos(y)+-cos(x)*sin(y)', 1, 'ATLogic_True', ''),
         array('AlgEquiv', '', 'sin(x+-y)', 'cos(x)*sin(y)+-sin(x)*cos(y)', 0, '', ''),
         array('AlgEquiv', '', '2*cos(x)^2-1', 'cos(2*x)', 1, '', ''),
+        array('AlgEquiv', '', '1.0*cos(1200*%pi*x)', 'cos(1200*%pi*x)', 1, '', ''),
         array('AlgEquiv', '', 'diff(tan(10*x)^2,x)', 'cos(6*x)', 0, '', ''),
         array('AlgEquiv', '', 'exp(%i*%pi)', '-1', 1, '', ''),
         array('AlgEquiv', '', '2*cos(2*x)+x+1', '-sin(x)^2+3*cos(x)^2+x', 1, '', ''),
@@ -158,6 +161,8 @@ class stack_answertest_test_data {
             '-(6*cos(6*x)*sin(7*x)-7*sin(6*x)*cos(7*x))/sin(6*x)^2', 1, '', ''),
         array('AlgEquiv', '', 'csc(6*x)^2*(7*sin(6*x)*cos(7*x)-6*cos(6*x)*sin(7*x))',
             '(6*cos(6*x)*sin(7*x)-7*sin(6*x)*cos(7*x))/sin(6*x)^2', 0, '', ''),
+        array('AlgEquiv', '', '-(7*x^6+4*x^3)/sin(7*y+x^7+x^4+1)^2',
+            '-(7*x^6+4*x^3)*csc(7*y+x^7+x^4+1)^2', 1, '', ''),
         array('AlgEquiv', '', 'log(a^2*b)', '2*log(a)+log(b)', 1, '', 'Logarithms'),
         array('AlgEquiv', '', '(2*log(2*x)+x)/(2*x)', '(log(2*x)+2)/(2*sqrt(x))', 0, '', ''),
         array('AlgEquiv', '', 'log(abs((x^2-9)))', 'log(abs(x-3))+log(abs(x+3))', 0, '', ''),
@@ -206,6 +211,8 @@ class stack_answertest_test_data {
             'ATSet_wrongentries.', ''),
         array('AlgEquiv', '', 'ev(radcan({-sqrt(2)/sqrt(3)}),simp)', 'ev(radcan({-2/sqrt(6)}),simp)', 1, '', ''),
         array('AlgEquiv', '', 'ev(radcan(ratsimp({(-sqrt(10)/2)-2,sqrt(10)/2-2},algebraic:true)),simp)', 'ev(radcan(ratsimp({(-sqrt(5)/sqrt(2))-2,sqrt(5)/sqrt(2)-2},algebraic:true)),simp)', 1, '', ''),
+        array('AlgEquiv', '', '{(2-2^(5/2))/2,(2^(5/2)+2)/2}', '{1-2^(3/2),2^(3/2)+1}', 0, 'ATSet_wrongentries.', ''),
+        array('AlgEquiv', '', 'ev(radcan({(2-2^(5/2))/2,(2^(5/2)+2)/2}),simp)', '{1-2^(3/2),2^(3/2)+1}', 1, '', ''),
         array('AlgEquiv', '', '{(x-a)^6000}', '{(a-x)^6000}', -3, 'ATSet_wrongentries.', ''),
         array('AlgEquiv', '', '{(k+8)/(k^2+4*k-12),-(2*k+6)/(k^2+4*k-12)}', '{(k+8)/(k^2+4*k-12),-(2*k+6)/(k^2+4*k-12)}',
             1, '', ''),
@@ -383,6 +390,9 @@ class stack_answertest_test_data {
         array('AlgEquiv', '', 'cos(x)*cos(2*x)*cos(3*x)', 'product(cos(k*x),k,1,3)', 1, '', ''),
         array('AlgEquiv', '', 'cos(x)*cos(2*x)', 'product(cos(k*x),k,1,3)', 0, '', ''),
         array('AlgEquiv', '', '9.81*m/s^2', 'stackunits(9.81,m/s^2)', 1, '', 'Scientific units are ignored'),
+        array('AlgEquiv', '', '6*stackunits(1,m)', 'stackunits(6,m)', 1, '', ''),
+        array('AlgEquiv', '', 'stackunits(2,m)^2', 'stackunits(4,m^2)', 1, '', ''),
+        array('AlgEquiv', '', 'stackunits(2,s)^2', 'stackunits(4,m^2)', 0, '', ''),
         array('AlgEquiv', '', '2/%i*ln(sqrt((1+z)/2)+%i*sqrt((1-z)/2))', '-%i*ln(z+i*sqrt(1-z^2))', -3,
             '', 'These currently fail'),
         array('AlgEquiv', '', '(-1)^n*cos(x)^n', '(-cos(x))^n', -3, '', ''),
@@ -407,7 +417,7 @@ class stack_answertest_test_data {
         array('AlgEquiv', '', '"Hello"', '"Hello"', 1, 'ATAlgEquiv_String', 'Basic support for strings'),
         array('AlgEquiv', '', '"hello"', '"Hello"', 0, 'ATAlgEquiv_String', ''),
         array('AlgEquiv', '', 'W', '"Hello"', 0, 'ATAlgEquiv_SA_not_string.', ''),
-        array('AlgEquiv', '', '"Hello"', 'x^2', 0, '', ''),
+        array('AlgEquiv', '', '"Hello"', 'x^2', 0, 'ATAlgEquiv_SA_not_expression.', ''),
 
         array('SubstEquiv', '', '1/0', 'x^2-2*x+1', -1, 'CASError: Division by zero.', ''),
         array('SubstEquiv', '', 'x^2+1', 'x^2+1', 1, '', ''),
@@ -453,6 +463,10 @@ class stack_answertest_test_data {
         array('EqualComAss', '', '2*2^(1/2)', 'sqrt(8)', 0, 'ATEqualComAss: (AlgEquiv:true).', ''),
         array('EqualComAss', '', 'sqrt(2)/4', '1/sqrt(8)', 0, 'ATEqualComAss: (AlgEquiv:true).', ''),
         array('EqualComAss', '', '1/sqrt(2)', '2^(1/2)/2', 0, 'ATEqualComAss: (AlgEquiv:true).', ''),
+        array('EqualComAss', '', 'X', 'x', 0, 'ATEqualComAss: (AlgEquiv:false)ATAlgEquiv_WrongCase.', 'Case sensitivity'),
+        array('EqualComAss', '', 'exdowncase(X)', 'x', 1, '', ''),
+        array('EqualComAss', '', 'exdowncase((X-1)^2)', 'x^2-2*x+1', 0, 'ATEqualComAss: (AlgEquiv:true).', ''),
+        array('EqualComAss', '', 'exdowncase(X^2-2*X+1)', 'x^2-2*x+1', 1, '', ''),
         array('EqualComAss', '', 'a^2/b^3', 'a^2*b^(-3)', 0, 'ATEqualComAss: (AlgEquiv:true).', 'Powers'),
         array('EqualComAss', '', 'lg(a^x,a)', 'x', 0,
             'ATEqualComAss: (AlgEquiv:true).', ''),
@@ -542,6 +556,7 @@ class stack_answertest_test_data {
         array('CasEqual', 'x', '0.5', '1/2', 0, 'ATCASEqual: (AlgEquiv:true).', ''),
         array('CasEqual', '', 'x=1', '1', 0, 'ATCASEqual: ATAlgEquiv_TA_not_equation.', ''),
         array('CasEqual', '', 'a', 'A', 0, 'ATCASEqual_false.', 'Case sensitivity'),
+        array('CasEqual', '', 'exdowncase(X^2-2*X+1)', 'x^2-2*x+1', 1, 'ATCASEqual_true.', ''),
         array('CasEqual', '', '4^(-1/2)', '1/2', 0, 'ATCASEqual: (AlgEquiv:true).', 'Numbers'),
         array('CasEqual', '', 'ev(4^(-1/2),simp)', 'ev(1/2,simp)', 1, 'ATCASEqual_true.', ''),
         array('CasEqual', '', '2^2', '4', 0, 'ATCASEqual: (AlgEquiv:true).', ''),
@@ -773,6 +788,7 @@ class stack_answertest_test_data {
             '[EMPTYCHAR,EQUIVCHAR,EQUIVCHAR,EQUIVCHAR]', ''),
         array('Equiv', '', '[x^2=4,x= +-2, x=2 or x=-2]', '[x^2=4,x=2 or x=-2]', 1,
             '[EMPTYCHAR,EQUIVCHAR,EQUIVCHAR]', ''),
+        array('Equiv', '', '[x^2-6*x+9=0,x=3]', '[x^2-6*x+9=0,x=3]', 1, '[EMPTYCHAR,SAMEROOTS]', ''),
 
         array('EquivFirst', '', 'x', '[x^2=4,x=2 or x=-2]', -1, 'CASError: TEST_FAILED | ATEquivFirst_SA_not_list.', ''),
         array('EquivFirst', '', '[x^2=4,x=2 or x=-2]', 'x',  -1, 'CASError: TEST_FAILED | ATEquivFirst_SB_not_list.', ''),
@@ -787,6 +803,7 @@ class stack_answertest_test_data {
             '[EMPTYCHAR,EQUIVCHAR,EQUIVCHAR,EQUIVCHAR]', ''),
         array('EquivFirst', '', '[x^2=4,x= +-2, x=2 or x=-2]', '[x^2=4,x=2 or x=-2]', 1,
             '[EMPTYCHAR,EQUIVCHAR,EQUIVCHAR]', ''),
+        array('EquivFirst', '', '[x^2-6*x+9=0,x=3]', '[x^2-6*x+9=0,x=3]', 1, '[EMPTYCHAR,SAMEROOTS]', ''),
 
         array('SingleFrac', '', '1/0', '1/n', -1, 'CASError: Division by zero. | ATSingleFrac_STACKERROR_SAns.', ''),
         array('SingleFrac', '', '0', '1/0', -1, 'CASError: Division by zero. | ATSingleFrac_STACKERROR_TAns.', ''),
@@ -1680,6 +1697,7 @@ class stack_answertest_test_data {
             $ansnote  = '';
         }
 
+        $trace = $anst->get_trace(false);
         $anomalynote = array();
         $passed = true;
         if ($test->expectedscore >= 0) {
@@ -1729,6 +1747,6 @@ class stack_answertest_test_data {
         }
 
         $anomalynote = implode($anomalynote, ' | ');
-        return array($passed, $errors, $rawmark, $feedback, $ansnote, $anomalynote);
+        return array($passed, $errors, $rawmark, $feedback, $ansnote, $anomalynote, $trace);
     }
 }

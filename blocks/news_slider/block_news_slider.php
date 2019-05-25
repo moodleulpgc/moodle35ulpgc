@@ -199,7 +199,7 @@ class block_news_slider extends block_base {
             $showdots = false;
         }
 
-        if(!$PAGE->user_is_editing()) { // ecastro ULPGC
+        if(1 || !$PAGE->user_is_editing()) { // ecastro ULPGC
             $PAGE->requires->js_call_amd($this->blockname . '/slider', 'init', array($showdots));
         }
         
@@ -338,10 +338,8 @@ class block_news_slider extends block_base {
             }
         }
 
-        if (empty($coursenews)) {
-            $coursenews = array();
+        if (!empty($coursenews)) {
 
-        } else {
             // Sort course news items.
 
             // Sory by pinned posts and date by creating sort keys.

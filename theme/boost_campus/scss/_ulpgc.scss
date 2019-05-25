@@ -416,6 +416,26 @@ div.userlist table#participants th.header.c1{min-width: 12rem;}
     color: $success;
 }
 
+.que.ddwtos .qtext .drop {background-color: transparent;}
+.que.ddwtos .drop.yui3-dd-drop-over.yui3-dd-drop-active-valid {
+    border-color: #000;
+    box-shadow: none;
+}
+
+#categoryquestions label {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#categoryquestions .checkbox {
+    padding-left: 0px; 
+}
+
+#categoryquestions td.qtype .icon {
+    margin-right: 0;
+    margin-top: -6px;
+}
+
 #page-mod-studentquiz-view input[type="checkbox"].toggle + span, 
 #page-mod-studentquiz-view input[type="checkbox"].toggle + label span {
     background: $gray-300;

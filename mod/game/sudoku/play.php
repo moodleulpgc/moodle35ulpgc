@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once( "../../lib/questionlib.php");
+require_once(dirname(__FILE__).'/../../../lib/questionlib.php');
 
 /**
  * Plays the game Sudoku
@@ -757,13 +757,14 @@ function game_sudoku_check_last( $cm, $game, $attempt, $sudoku, $finishattempt, 
  * @param int $pos
  * @param int $num
  * @param stdClass $context
+ * @param stdClass $course
  */
-function game_sudoku_check_number( $id, $game, $attempt, $sudoku, $pos, $num, $context) {
+function game_sudoku_check_number( $id, $game, $attempt, $sudoku, $pos, $num, $context, $course) {
     global $DB;
 
     $correct = game_substr( $sudoku->data, $pos - 1, 1);
     if ($correct != $num) {
-        game_sudoku_play( $id, $game, $attempt, $sudoku, false, false, $context);
+        game_sudoku_play( $id, $game, $attempt, $sudoku, false, false, $context, $course);
         return;
     }
 
@@ -778,5 +779,5 @@ function game_sudoku_check_number( $id, $game, $attempt, $sudoku, $pos, $num, $c
         print_error( 'game_sudoku_check_number: Cannot update table game_sudoku');
     }
 
-    game_sudoku_play( $id, $game, $attempt, $sudoku, false, false, $context);
+    game_sudoku_play( $id, $game, $attempt, $sudoku, false, false, $context, $course);
 }

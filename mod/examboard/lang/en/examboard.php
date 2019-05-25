@@ -26,12 +26,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['areanotification'] = 'Notifications';
+$string['assessment'] = 'Assessment';
 $string['board'] = 'Exam board';
 $string['member'] = 'Board member';
 $string['exemption'] = 'Exemption';
 $string['exempted'] = 'Exempted';
 $string['exempted_help'] = 'Check if this user has been exempted of duties as board member';
 $string['excluded'] = 'Excluded';
+$string['excluded_help'] = 'The excluded user is shown but cannot be graded';
 $string['approved'] = 'Approved';
 $string['examboard:addinstance'] = 'Add an instance of Examboard';
 $string['examboard:view'] = 'View exam boards';

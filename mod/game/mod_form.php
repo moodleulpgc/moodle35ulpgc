@@ -82,6 +82,9 @@ class mod_game_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
+        // Introduction.
+        $this->standard_intro_elements(get_string('introduction', 'game'));
+
         $hasglossary = ($gamekind == 'hangman' || $gamekind == 'cross' ||
                 $gamekind == 'cryptex' || $gamekind == 'sudoku' ||
                 $gamekind == 'hiddenpicture' || $gamekind == 'snakes');
@@ -554,6 +557,10 @@ class mod_game_mod_form extends moodleform_mod {
                     $errors['gradepass'] = get_string('gradetopassmustbeset', 'quiz');
                 }
             }
+        }
+        // Check book.
+        if ($data['gamekind'] == 'bookquiz' && empty( $data['bookid'])) {
+            $errors['bookid'] = get_string('missingbook', 'game');
         }
 
         return $errors;

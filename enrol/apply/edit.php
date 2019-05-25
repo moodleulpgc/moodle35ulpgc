@@ -63,13 +63,13 @@ if ($instanceid) {
 
 // Process notify setting for editing...
 // Convert to array for use with multi-select element.
-$notify = array('$@NONE@$');
+//$notify = array('$@NONE@$');
 /*
 if ($instance->customtext2 != '') {
     $notify = explode(',', $instance->customtext2);
 }
 */
-$instance->notify = $notify;
+//$instance->notify = $notify;
 
 $mform = new enrol_apply_edit_form(null, array($instance, $plugin, $context));
 
@@ -90,11 +90,14 @@ if ($mform->is_cancelled()) {
     }
     // Convert back to string for storing in enrol table.
     //$data->customtext2 = implode(',', $notify);
+    $notify = implode(",", $notify);
+
     if ($instance->id) {
         $instance->status           = $data->status;
         $instance->name             = $data->name;
         $instance->customtext1      = $data->customtext1;
         $instance->customtext2      = $data->customtext2;
+        $instance->customtext3      = $notify;
         $instance->customint1       = $data->customint1;
         $instance->customint2       = $data->customint2;
         $instance->customint3       = $data->customint3;
@@ -114,6 +117,7 @@ if ($mform->is_cancelled()) {
             'customint6'        => $data->customint6,
             'customtext1'       => $data->customtext1,
             'customtext2'       => $data->customtext2,
+            'customtext3'       => $notify,
             'enrolperiod'       => $data->enrolperiod
         );
         $plugin->add_instance($course, $fields);

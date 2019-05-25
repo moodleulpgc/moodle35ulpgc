@@ -67,8 +67,17 @@ function news_slider_get_course_news($course, $getsitenews = false, $sliderconfi
         $totalpoststoshow = $sliderconfig->siteitemstoshow;
         $postsupdatedsince = $sliderconfig->siteitemsperiod * 86400;
         $postsupdatedsince = time() - $postsupdatedsince;
-        $sort = forum_get_default_sort_order(true, 'p.modified', 'd', true); // Last parameter set to true to include pinned posts.
-        $discussions = forum_get_discussions($cm, "", true, null, $totalpoststoshow, null, null, null, null, $postsupdatedsince);
+
+        // Optionally get the posts based on when a user either created a post or edited an existing post.
+        // Ref: https://bitbucket.org/covuni/moodle-block_news_slider/issues/36/allow-ordering-of-posts-by-last-post-date.
+        $sort = '';
+        $config = get_config("block_news_slider");
+        if (!empty($config->orderbylastpostoredit)) {
+            // Last parameter set to true to include pinned posts.
+            $sort = forum_get_default_sort_order(true, 'p.modified', 'd', true);
+        }
+        $discussions = forum_get_discussions($cm, $sort, true, null, $totalpoststoshow, null, null, null, null, $postsupdatedsince);
+        // added by ULPGC
         $unread = forum_get_discussions_unread($cm); // ecastro ULPGC
         $discussions = array_intersect_key($discussions, $unread);
     } else {
@@ -90,7 +99,13 @@ function news_slider_get_course_news($course, $getsitenews = false, $sliderconfi
         $newsforum = forum_get_course_forum($course->id, 'news');
         $cm = get_coursemodule_from_instance('forum', $newsforum->id, $newsforum->course);
 
-        $discussions = forum_get_discussions($cm, "", true, null, $totalpoststoshow, null, null, null, null, $postsupdatedsince);
+        $sort = '';
+        $config = get_config("block_news_slider");
+        if (!empty($config->orderbylastpostoredit)) {
+            // Last parameter set to true to include pinned posts.
+            $sort = forum_get_default_sort_order(true, 'p.modified', 'd', true);
+        }
+        $discussions = forum_get_discussions($cm, $sort, true, null, $totalpoststoshow, null, null, null, null, $postsupdatedsince);
         $unread = forum_get_discussions_unread($cm); // ecastro ULPGC
         $discussions = array_intersect_key($discussions, $unread);
 
@@ -108,7 +123,6 @@ function news_slider_get_course_news($course, $getsitenews = false, $sliderconfi
     }
 
     foreach ($discussions as $discussion) {
-
         // Get user profile picture.
 
         // Build an object that represents the posting user.

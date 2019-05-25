@@ -43,4 +43,8 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('block_news_slider/cachingttl',
             get_string('cachingttl', 'block_news_slider'),
             get_string('cachingttldesc', 'block_news_slider'), NEWS_SLIDER_CACHING_TTL, PARAM_INT));
+
+    $settings->add(new admin_setting_configcheckbox('block_news_slider/orderbylastpostoredit',
+            get_string('orderbylastpostoredit', 'block_news_slider'),
+            get_string('orderbylastpostoreditdesc', 'block_news_slider'), 0));
 }

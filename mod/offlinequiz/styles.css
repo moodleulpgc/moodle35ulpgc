@@ -830,12 +830,17 @@ input#showviewbutton {
 }
 
 
+/* #page-mod-studentquiz-edit  removed  ecastro ULPGC  */
+/*
+
 #categoryquestions > tbody > tr:nth-of-type(even) {
     background: #e4e4e4;
 }
+
 #categoryquestions > tbody > tr:nth-of-type(even).highlight {
     background-color: #AAFFAA;
 }
+
 #categoryquestions .header {
     text-align: center;
     padding: 0 2px;
@@ -846,6 +851,7 @@ input#showviewbutton {
     font-weight: normal;
     font-size: 0.8em;
 }
+
 table#categoryquestions {
     width: 100%;
     overflow: hidden;
@@ -876,16 +882,12 @@ table#categoryquestions {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-#page-mod-offlinequiz-edit #categoryquestions .questionnametext .greyed,
-#page-mod-offlinequiz-edit #categoryquestions .addtoofflinequizaction .greyed,
-#page-mod-offlinequiz-edit #categoryquestions .qtype .greyed {
-    opacity: 0.4;
-}
 
 .dir-rtl #categoryquestions .questiontext {
     padding-left: 0;
     padding-right: 0.3em;
 }
+
 #categoryquestions .questionname {
     white-space: nowrap;
     overflow: hidden;
@@ -895,12 +897,20 @@ table#categoryquestions {
 #categoryquestions .questiontext p {
     margin: 0;
 }
+*/
+
+#page-mod-offlinequiz-edit #categoryquestions .questionnametext .greyed,
+#page-mod-offlinequiz-edit #categoryquestions .addtoofflinequizaction .greyed,
+#page-mod-offlinequiz-edit #categoryquestions .qtype .greyed {
+    opacity: 0.4;
+}
 
 #page-mod-offlinequiz-edit table#categoryquestions td,
 #page-mod-offlinequiz-edit table#categoryquestions th {
     overflow: hidden;
     white-space: nowrap;
 }
+
 .mod_offlinequiz_qbank_dialogue {
     width: 80%;
     min-height: 200px;

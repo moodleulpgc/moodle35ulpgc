@@ -896,11 +896,11 @@ function report_trackertools_send_email($course, $tracker, $fromform, $issue, &$
     
     $messagetext = html_to_text($messagehtml);
     
-    $names = get_all_user_name_fields(false, '');
+    $namefields = 'id, username, idnumber, email, mailformat, '.implode(', ', $usernames);
    
     if($fromform->mailtouser) {
         $userstruser = tracker_getstring('reportedby', 'tracker');
-        if($user = $DB->get_record('user', array('id'=>$issue->reportedby), 'id, email, mailformat, '.implode(', ', $usernames))) {
+        if($user = $DB->get_record('user', array('id'=>$issue->reportedby), $namefields)) {
             if(!email_to_user($user, $noreplyuser, $subject, $messagetext, $messagehtml)) {
                 $flag =  ' - '.$errorstr;
             }  
@@ -909,7 +909,7 @@ function report_trackertools_send_email($course, $tracker, $fromform, $issue, &$
     }
     if($fromform->mailtodev) {
         $userstrdev = tracker_getstring('assignedto', 'tracker');
-        if($user = $DB->get_record('user', array('id'=>$issue->assignedto), 'id, email, mailformat, '.implode(', ', $usernames))) {
+        if($user = $DB->get_record('user', array('id'=>$issue->assignedto), $namefields)) {
             if(!email_to_user($user, $noreplyuser, $subject, $messagetext, $messagehtml)) {
                 $flag =  ' - '.$errorstr;
             }
@@ -934,7 +934,7 @@ function report_trackertools_send_control_email($course, $tracker, $sent, $useri
     if(!$userid) {
         $user = $USER;
     } else {
-        $user = $DB->ger_record('user', array('id'=>$user), 'id, idnumber, mail, mailformat, '.implode(', ', $usernames));
+        $user = $DB->ger_record('user', array('id'=>$user), 'id, username, idnumber, email, mailformat, '.implode(', ', $usernames));
     }
     
     $subject = $course->shortname.': '.get_string('controlemailsubject', 'report_trackertools');
@@ -979,7 +979,7 @@ function report_trackertools_warning_issues($course, $tracker, $fromform, $issue
             $issueswarn++;
         }
         
-        if($fromform->mailtouser || $fromform->mailtostaff) {   
+        if($fromform->mailtouser || $fromform->mailtodev) {   
             report_trackertools_send_control_email($course, $tracker, $mails);
         }
     }

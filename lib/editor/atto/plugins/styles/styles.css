@@ -1,6 +1,26 @@
+/* Prevent the menu from protruding from the editor if really many styles are added to the menu. */
+.editor_atto_menu .atto_styles_button .dropdown-menu {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
 /* Prevent the menu from wrapping the menu items */
 .editor_atto_menu .atto_styles_button .dropdown-menu > li {
     white-space: nowrap;
+}
+
+/* Separate the style list menu items more clearly. */
+.editor_atto_menu .atto_styles_button .dropdown-menu > li {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+/* Separate the style list menu items more clearly. */
+.editor_atto_menu .atto_styles_button .dropdown-menu > li {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    padding-top: 10px;
 }
 
 /* Position menu item icons */
@@ -8,14 +28,7 @@
     display: inline-block;
     height: 15px;
     margin-right: 10px;
-    vertical-align: sub;
     width: 15px;
-}
-.editor_atto_menu .atto_styles_button .dropdown-menu > li > a i.inlineelement:before {
-    content: url([[pix:atto_styles|inline]]);
-}
-.editor_atto_menu .atto_styles_button .dropdown-menu > li > a i.blockelement:before {
-    content: url([[pix:atto_styles|block]]);
 }
 
 /* Override Atto core paddings for menu items to prevent the disabled inline menu items from showing a hand cursor */
@@ -25,12 +38,23 @@
     padding: 0;
     text-decoration: none;
 }
-.editor_atto_menu .atto_styles_button .dropdown-menu > li > a span {
-    padding: 3px 14px;
+.editor_atto_menu .atto_styles_button .dropdown-menu > li > a span.preview,
+.editor_atto_menu .atto_styles_button .dropdown-menu > li > a span.title {
+    display: inline-block;
+    /* stylelint-disable-next-line declaration-no-important */
+    max-width: calc(100% - 55px) !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    margin: 0 !important;
 }
 
 /* Disabled inline style menu item visually */
 .editor_atto_menu .disableinline .atto_styles_button .inlinestyle {
-    color: #ccc;
     cursor: default;
+}
+.editor_atto_menu .atto_styles_button .inlinehint {
+    display: none;
+}
+.editor_atto_menu .disableinline .atto_styles_button .inlinehint {
+    display: inline-block;
+    margin-left: 39px;
 }

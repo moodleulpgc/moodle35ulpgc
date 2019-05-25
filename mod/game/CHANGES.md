@@ -1,3 +1,20 @@
+Changes in version 2019-04-26 (2019042600)
+- CONTRIB-7699 Problem with upgrading game plugin
+
+Changes in version 2019-04-23 (2019042311)
+- New: Supports test
+- CONTRIB-7692 Module Game: Intro fields definition inconsistency
+
+Changes in version 2019-04-22-01 (2019042201)
+- Snakes and Laders: Fix problem at ending.
+
+Changes in version 2019-03-30 (20190330)
+- Adds intro text.
+
+Changes in version 2019-03-24 (20190324)
+- Fixes problem on hangman on incorrect answer
+- Removes some bad words from cryptex
+
 Changes in version 2018-12-01 (20181201)
 - Book with questions works again
 
@@ -28,103 +45,39 @@ Changes in version 2018-07-04 (2018070402)
 - New image set on "Snakes and Ladders"
 - New language string header_footer_options
 
-Changes in version 2017-08-11 (2017081103)
-- New: High score
-
-Changes in version 2017-08-08 (2017080601)
-- New: check params of crossword/cryptex
-
-Changes in version 2017-07-19 (2017071902)
-- Fix: Completion support
-
-Changes in version 2017-07-18 (2017071801)
-- New: icon.png and icon.svg
-
-Changes in version 2017-07-16 (2017071601)
-- Fix: Cloning a game
-
-Changes in version 2017-07-06 (2017070606)
-- New: Global glossaries
-
-Changes in version 2017-07-05 (2017070502)
-- Fix: Problems on backup/restore
-
-Changes in version 2017-07-03 (2017070301)
-- New: Auto check for common problem (mod_form.php and view.php for teachers)
-
-Changes in version 2017-06-30 (2017063002)
-- in mod_form.php shows the correct numbers of correspondings questions/glossaryentries
-- in showanswrs.php shows the correspondings questions/glossaryentries
-
-Changes in version 2017-06-27 (20170627)
-- Fix conversation of columns (cols,rows) from string to int
-
-Changes in version 2017-06-20 (20170620)
-- Fix conversation of columns (cols,rows) from string to int
-
-Changes in version 2017-06-19 (20170619)
-- Change field name game_snakes_database.cols => usedcols
-- Change field name game_snakes_database.rows => usedrows
-
-Changes in version 2017-06-10 (20170610)
-- Fix phpdocs problems
-
-Changes in version 2017-06-09 (20170609)
+Change for year 2017
+------------------------------------------------------------------
 - Fix Moodle 3.4 compatibility problems
 - Fix stylings problems
+- Fix phpdocs problems
+- Change field name game_snakes_database.cols => usedcols
+- Change field name game_snakes_database.rows => usedrows
+- Fix conversation of columns (cols,rows) from string to int
+- in mod_form.php shows the correct numbers of correspondings questions/glossaryentries
+- in showanswrs.php shows the correspondings questions/glossaryentries
+- New: Auto check for common problem (mod_form.php and view.php for teachers)
+- Fix: Problems on backup/restore
+- New: Global glossaries
+- Fix conversation of columns (cols,rows) from string to int
+- Fix: Cloning a game
+- New: icon.png and icon.svg
+- Fix: Completion support
+- New: check params of crossword/cryptex
+- New: High score
 
-Changes in version 2016-08-19 (20160819)
-- New string (millionaire_lettersall) that will be used to Deutsch language
 
-Changes in version 2016-06-26 (20160626)
-- Change type of game_cross.createscore to double
-
-Changes in version 2016-06-14 (20160614)
-- Fix Moodle 31 compatibility
-
-Changes in version 2016-09-17 (20160917)
-----------------------------------------
-- Fix Moodle 3.1 compatibility problems
-
-Changes in version 2016-04-26 (20160426)
-----------------------------------------
-- Fix Use get_types or get_shortcuts depended on version of Moodle
-
-Changes in version 2016-03-03 (20160302)
-------------------------------------------------------------------
-- New: Max compute time in crossword and cryptex
-
-Changes in version 2016-02-14 (20160214)
+Change for year 2016
 ------------------------------------------------------------------
 - Fix syntax error (missed fullstop for concatenation)
 - Merge pull request #10 from grigory-catalyst/MOODLE_20_STABLE
 - Fix missing string gameopenclose at lang/en/game.php
 - Fix compatibility with Moodle 2.5
-
-Changes in version 2015-12-31 (4) (2015123104)
-------------------------------------------------------------------
-- Fix translations check at translate.php
-
-Changes in version 2015-12-31 (3) (2015123103)
-------------------------------------------------------------------
-- Fix at backup.
-- Fix not to show how many correct letters are when printing the crossword.
-- Moodle 3.1 compatibility.
-- Fixing how is shows multichoice question on show answers.
-
-Changes in version 3.36.30.1 (2015123001)
-------------------------------------------------------------------
-- New: Disable summarize of attempts.
-- CONTRIB-5605: Quotation marks breaks the js-code in game Cryptex.
-- Prevent Style Override of Crossword.
-- Add missing language string game:addinstance.
-- More RTL fixes.
-- Fixing problems on Millionaire with quiz.
-- Fixing in crossword no horizontal legend and print button.
-
-Changes in version 3.36.29.1 (2015122901)
-------------------------------------------------------------------
-- Fixing coding style.
+- New: Max compute time in crossword and cryptex
+- Fix Use get_types or get_shortcuts depended on version of Moodle
+- Fix Moodle 3.1 compatibility problems
+- Fix Moodle 31 compatibility
+- Change type of game_cross.createscore to double
+- New string (millionaire_lettersall) that will be used to Deutsch language
 
 
 Change for year 2015
@@ -142,7 +95,19 @@ Change for year 2015
 - Fix: Cryptex - Show grade while game continues
 - CONTRIB-5816: Question bank category not retrieved when Crossword is …
 - CONTRIB-5816: Question bank category not retrieved when Crossword is …
-
+- Fixing coding style.
+- New: Disable summarize of attempts.
+- CONTRIB-5605: Quotation marks breaks the js-code in game Cryptex.
+- Prevent Style Override of Crossword.
+- Add missing language string game:addinstance.
+- More RTL fixes.
+- Fixing problems on Millionaire with quiz.
+- Fixing in crossword no horizontal legend and print button.
+- Fix at backup.
+- Fix not to show how many correct letters are when printing the crossword.
+- Moodle 3.1 compatibility.
+- Fixing how is shows multichoice question on show answers.
+- Fix translations check at translate.php
 
 Changes for year 2014
 -----------------------

@@ -92,7 +92,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'bookedsite', 'sessionname', 'examdate', 'locationname', 'locationtypename', 'seats', 'parentname', 'occupancy', 'staffers', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('venue', 'examregistrar'),
                         get_string('examsessionitem', 'examregistrar'),
                         get_string('examdate', 'examregistrar'),
@@ -272,7 +272,7 @@ if($elements) {
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
             $url = new moodle_url($manageurl, array('del'=>$element->id));
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
-            $buttons[] = '<br />&nbsp;&nbsp;';
+            //$buttons[] = '<br />&nbsp;&nbsp;';
             $url = new moodle_url('/mod/examregistrar/manage/assignseats.php',
                                   array('id'=>$cm->id, 'edit'=>'session_rooms', 'session'=>$element->examsession, 'room'=>$element->roomid));
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('contextmenu', $strseats, 'mod_examregistrar', array('class'=>'iconsmall', 'title'=>$strseats)));
@@ -280,7 +280,7 @@ if($elements) {
             //$buttons[] = '&nbsp;&nbsp;';
             $url = new moodle_url('/mod/examregistrar/manage/assignroomstaffers.php',
                                   array('id'=>$cm->id, 'action'=>'roomstaffers', 'edit'=>$edit, 'session'=>$element->examsession, 'room'=>$element->roomid));
-            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/assignroles', $strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
+            $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('i/assignroles', $strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
 
             $action = implode('&nbsp;&nbsp;', $buttons);
         }

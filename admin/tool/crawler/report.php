@@ -93,6 +93,7 @@ if ($report == 'broken') {
                                           b.url target,
                                           b.httpcode,
                                           b.httpmsg,
+                                          b.errormsg,
                                           b.lastcrawled,
                                           b.id AS toid,
                                           l.id linkid,
@@ -126,19 +127,24 @@ if ($report == 'broken') {
     $table->data = array();
     foreach ($data as $row) {
         $text = trim($row->text);
-        if (!$text || $text == "") {
+        if ($text == "") {
             $text = get_string('missing', 'tool_crawler');
+            $text = htmlspecialchars($text, ENT_NOQUOTES | ENT_HTML401);
+            // May add a bit of markup here so that the user can differentiate the "missing" message from an equal link text.
+        } else {
+            $text = htmlspecialchars($text, ENT_NOQUOTES | ENT_HTML401);
         }
         $data = array(
             html_writer::link(new moodle_url($baseurl, array('retryid' => $row->toid )),
                 get_string('retry', 'tool_crawler')),
             userdate($row->lastcrawled, $datetimeformat),
             tool_crawler_http_code($row),
-            tool_crawler_link($row->target, $text, $row->redirect),
+            tool_crawler_link($row->target, $text, $row->redirect, true),
             tool_crawler_link($row->url, $row->title, $row->redirect)
         );
         if (!$courseid) {
-            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $row->shortname) );
+            $escapedshortname = htmlspecialchars($row->shortname, ENT_NOQUOTES | ENT_HTML401);
+            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $escapedshortname) );
         }
         $table->data[] = $data;
     }
@@ -181,16 +187,17 @@ if ($report == 'broken') {
     }
     $table->data = array();
     foreach ($data as $row) {
-        $text = trim($row->title);
-        if (!$text || $text == "") {
-            $text = get_string('notyetknown', 'tool_crawler');
+        $title = trim($row->title);
+        if ($title == "") {
+            $title = get_string('notyetknown', 'tool_crawler');
         }
         $data = array(
             userdate($row->needscrawl, $datetimeformat),
-            tool_crawler_link($row->target, $text, $row->redirect)
+            tool_crawler_link($row->target, $title, $row->redirect)
         );
         if (!$courseid) {
-            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $row->shortname) );
+            $escapedshortname = htmlspecialchars($row->shortname, ENT_NOQUOTES | ENT_HTML401);
+            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $escapedshortname) );
         }
         $table->data[] = $data;
     }
@@ -209,6 +216,7 @@ if ($report == 'broken') {
                                           b.filesize,
                                           b.httpcode,
                                           b.httpmsg,
+                                          b.errormsg,
                                           b.title,
                                           b.redirect,
                                           b.mimetype,
@@ -237,9 +245,9 @@ if ($report == 'broken') {
     }
     $table->data = array();
     foreach ($data as $row) {
-        $text = trim($row->title);
-        if (!$text || $text == "") {
-            $text = get_string('unknown', 'tool_crawler');
+        $title = trim($row->title);
+        if ($title == "") {
+            $title = get_string('unknown', 'tool_crawler');
         }
         $code = tool_crawler_http_code($row);
         $size = $row->filesize * 1;
@@ -247,11 +255,12 @@ if ($report == 'broken') {
             userdate($row->lastcrawled, $datetimeformat),
             $code,
             display_size($size),
-            tool_crawler_link($row->target, $text, $row->redirect),
-            $row->mimetype,
+            tool_crawler_link($row->target, $title, $row->redirect),
+            htmlspecialchars($row->mimetype, ENT_NOQUOTES | ENT_HTML401),
         );
         if (!$courseid) {
-            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $row->shortname) );
+            $escapedshortname = htmlspecialchars($row->shortname, ENT_NOQUOTES | ENT_HTML401);
+            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $escapedshortname) );
         }
         $table->data[] = $data;
     }
@@ -308,18 +317,23 @@ if ($report == 'broken') {
     foreach ($data as $row) {
         $size = $row->filesize * 1;
         $text = trim($row->text);
-        if (!$text || $text == "") {
+        if ($text == "") {
             $text = get_string('missing', 'tool_crawler');
+            $text = htmlspecialchars($text, ENT_NOQUOTES | ENT_HTML401);
+            // May add a bit of markup here so that the user can differentiate the "missing" message from an equal link text.
+        } else {
+            $text = htmlspecialchars($text, ENT_NOQUOTES | ENT_HTML401);
         }
         $data = array(
             userdate($row->lastcrawled, $datetimeformat),
             display_size($size),
-            tool_crawler_link($row->target, $text, $row->redirect),
-            $row->mimetype,
+            tool_crawler_link($row->target, $text, $row->redirect, true),
+            htmlspecialchars($row->mimetype, ENT_NOQUOTES | ENT_HTML401),
             tool_crawler_link($row->url, $row->title, $row->redirect)
         );
         if (!$courseid) {
-            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $row->shortname) );
+            $escapedshortname = htmlspecialchars($row->shortname, ENT_NOQUOTES | ENT_HTML401);
+            array_push($data, html_writer::link('/course/view.php?id='.$row->courseid, $escapedshortname) );
         }
         $table->data[] = $data;
     }
@@ -329,7 +343,7 @@ if ($report == 'broken') {
 echo $OUTPUT->heading(get_string('numberurlsfound', 'tool_crawler',
     array(
         'reports_number' => $count,
-        'repoprt_type' => $report
+        'report_type' => $report
     )
 ));
 echo get_string($report . '_header', 'tool_crawler');

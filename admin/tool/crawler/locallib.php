@@ -25,21 +25,35 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Render a link
+ * Renders a link as HTML.
  *
- * @param string $url a URL link
- * @param string $label the a tag label
- * @param string $redirect The final URL if a redirect was served
- * @return html output
+ * Outputs a link from the given link text to the URL detail page, with an added arrow linked to the link target itself. These are
+ * followed by the URL in text form (intended for the user).
+ *
+ * If a redirect link is passed, renders this as well in an additional separate line, as a link to the redirection URL.
+ *
+ * The link text can be given either as plain text (which will then be properly escaped for HTML output) or as an HTML snippet (in
+ * which case the caller must already have ensured that everything is properly escaped if necessary).
+ *
+ * @param string $url The URL to which the link points.
+ * @param string $label The link text. Can be plain text or an HTML snippet; select mode with parameter $labelishtml.
+ * @param string $redirect The final URL if a redirect was served.
+ * @param string $labelishtml Whether the $label parameter contains an HTML snippet (if true) or plain text (if false). Defaults to
+ *               plain text.
+ * @return string HTML snippet which can be used in output.
  */
-function tool_crawler_link($url, $label, $redirect = '') {
+function tool_crawler_link($url, $label, $redirect = '', $labelishtml = false) {
+    if (!$labelishtml) {
+        $label = htmlspecialchars($label, ENT_NOQUOTES | ENT_HTML401);
+    }
+
     $html = html_writer::link(new moodle_url('url.php', array('url' => $url)), $label) .
             ' ' .
             html_writer::link($url, '↗', array('target' => 'link')) .
-            '<br><small>' . htmlspecialchars($url) . '</small>';
+            '<br><small>' . htmlspecialchars($url, ENT_NOQUOTES | ENT_HTML401) . '</small>';
 
     if ($redirect) {
-        $linkhtmlsnippet = html_writer::link($redirect, htmlspecialchars($redirect, ENT_NOQUOTES | ENT_HTML5));
+        $linkhtmlsnippet = html_writer::link($redirect, htmlspecialchars($redirect, ENT_NOQUOTES | ENT_HTML401));
         $html .= "<br>" . get_string('redirect', 'tool_crawler', array('redirectlink' => $linkhtmlsnippet));
     }
 
@@ -53,7 +67,13 @@ function tool_crawler_link($url, $label, $redirect = '') {
  * @return html chunk
  */
 function tool_crawler_http_code($row) {
-    $msg = isset($row->httpmsg) ? $row->httpmsg : '?';
+    if (isset($row->errormsg)) {
+        $msg = get_string('fetcherror', 'tool_crawler', ['errormessage' => $row->errormsg]);
+    } else {
+        $msg = isset($row->httpmsg) ? $row->httpmsg : '?';
+    }
+    $msg = htmlspecialchars($msg, ENT_NOQUOTES | ENT_HTML401);
+
     $code = $row->httpcode;
     $cc = substr($code, 0, 1);
     $code = "$msg<br><small class='link-$cc"."xx'>$code</small>";
@@ -94,20 +114,21 @@ function tool_crawler_url_gen_table($data) {
     $datetimeformat = get_string('strftimerecentsecondshtml', 'tool_crawler');
     $table->data = array();
     foreach ($data as $row) {
-        $text = trim($row->title);
-        if (!$text || $text == "") {
-            $text = get_string('unknown', 'tool_crawler');
+        $title = trim($row->title);
+        if ($title == "") {
+            $title = get_string('unknown', 'tool_crawler');
         }
         $code = tool_crawler_http_code($row);
         $size = $row->filesize * 1;
+        $idattr = htmlspecialchars($row->idattr, ENT_NOQUOTES | ENT_HTML401);
         $data = array(
             userdate($row->lastcrawled, $datetimeformat),
-            $row->text,
-            str_replace(' #', '<br>#', $row->idattr),
+            htmlspecialchars($row->text, ENT_NOQUOTES | ENT_HTML401),
+            str_replace(' #', '<br>#', $idattr),
             $code,
             display_size($size),
-            tool_crawler_link($row->target, $text, $row->redirect),
-            $row->mimetype,
+            tool_crawler_link($row->target, $title, $row->redirect),
+            htmlspecialchars($row->mimetype, ENT_NOQUOTES | ENT_HTML401),
         );
         $table->data[] = $data;
     }
@@ -146,7 +167,7 @@ function tool_crawler_url_create_page($url) {
     $urlrec = $DB->get_record('tool_crawler_url', array('url' => $url));
     $page .= '<h2>' . tool_crawler_link($url, $urlrec->title, $urlrec->redirect) . '</h2>';
 
-    $page .= '<h3>' . get_string('outgoingurls', 'tool_crawler') . '</h3>';
+    $page .= '<h3>' . htmlspecialchars(get_string('outgoingurls', 'tool_crawler'), ENT_NOQUOTES | ENT_HTML401) . '</h3>';
 
     $data  = $DB->get_records_sql("
          SELECT concat(l.a, '-', l.b) AS id,
@@ -156,6 +177,7 @@ function tool_crawler_url_create_page($url) {
                 t.title,
                 t.redirect,
                 t.httpmsg,
+                t.errormsg,
                 t.httpcode,
                 t.filesize,
                 t.lastcrawled,
@@ -173,7 +195,7 @@ function tool_crawler_url_create_page($url) {
 
     $page .= tool_crawler_url_gen_table($data);
 
-    $page .= '<h3>' . get_string('incomingurls', 'tool_crawler') . '</h3>';
+    $page .= '<h3>' . htmlspecialchars(get_string('incomingurls', 'tool_crawler'), ENT_NOQUOTES | ENT_HTML401) . '</h3>';
 
     $data  = $DB->get_records_sql("
          SELECT concat(l.a, '-', l.b) AS id,
@@ -183,6 +205,7 @@ function tool_crawler_url_create_page($url) {
                 f.title,
                 f.redirect,
                 f.httpmsg,
+                f.errormsg,
                 f.httpcode,
                 f.filesize,
                 f.lastcrawled,

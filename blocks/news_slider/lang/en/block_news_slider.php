@@ -51,3 +51,5 @@ $string['usecachingdesc'] = 'Switch on caching (uses Moodle cache API)';
 $string['cachingttl'] = 'Caching Expiry time';
 $string['cachingttldesc'] = 'Caching expiry time in seconds (TTL)';
 $string['showdots'] = 'Show bullet (dots) navigation on bottom part of slider';
+$string['orderbylastpostoredit'] = 'Get posts based on the last reply or edit of an existing post';
+$string['orderbylastpostoreditdesc'] = 'Get posts based on any time a post is created or edited. Leave this off to show posts in the same order that you see discussions on a forum page.';

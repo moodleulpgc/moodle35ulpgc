@@ -423,7 +423,7 @@ class qcreate {
                 unset($event->id);
             }
             // The method calendar_event::create will reuse a db record if the id field is set.
-            calendar_event::create($event);
+            calendar_event::create($event, false);
         }
 
         // Qcreate close calendar event.
@@ -448,7 +448,7 @@ class qcreate {
                 unset($event->id);
             }
             // The method calendar_event::create will reuse a db record if the id field is set.
-            calendar_event::create($event);
+            calendar_event::create($event, false);
         }
 
         // Delete any leftover events.

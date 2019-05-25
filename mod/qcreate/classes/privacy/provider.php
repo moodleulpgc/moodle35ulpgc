@@ -264,7 +264,7 @@ class provider implements
             'question' => $grade->questiongraded,
             'gradecomment' => $grade->teachercomment,
         ];
-        writer::with_context($context)
-            ->export_data(array_merge($currentpath, [get_string('privacy:gradepath', 'mod_qcreate')]), $gradedata);
+        writer::with_context($context)->export_data(
+                array_merge($currentpath, [get_string('privacy:gradepath', 'mod_qcreate')]), $gradedata);
     }
 }

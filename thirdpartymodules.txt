@@ -36,6 +36,7 @@ git submodule add https://bitbucket.org/covuni/moodle-mod_bootstrapelements.git 
 git submodule add https://github.com/oohoo/moodle-mod_chairman.git                      mod/chairman
 git submodule add https://github.com/davosmith/moodle-checklist.git                     mod/checklist
 git submodule add https://github.com/markn86/moodle-mod_customcert.git                  mod/customcert
+git submodule add https://github.com/dasistwas/moodle-mod_datalynx.git                  mod/datalynx
 git submodule add https://github.com/troywilliams/moodle-mod_dialogue.git               mod/dialogue
 git submodule add https://github.com/bdaloukas/moodle-mod_game.git                      mod/game
 git submodule add https://github.com/projectestac/moodle-mod_geogebra.git               mod/geogebra

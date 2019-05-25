@@ -96,7 +96,7 @@ class qtype_mtf_renderer extends qtype_renderer {
         if ($displayoptions->readonly) {
             $inputattributes['disabled'] = 'disabled';
         }
-        $this->page->requires->js(new moodle_url($CFG->wwwroot . '/question/type/mtf/js/jquery.js'));
+        
         $this->page->requires->js(
                 new moodle_url($CFG->wwwroot . '/question/type/mtf/js/attempt.js'));
 
@@ -140,7 +140,6 @@ class qtype_mtf_renderer extends qtype_renderer {
 
             // Add the response radio buttons to the table.
             foreach ($question->columns as $column) {
-
                 $buttonname = $qa->get_field_prefix() . $field;
                 $buttonid = 'qtype_mtf_' . $qa->get_field_prefix() . $field;
                 $qtypemtfid = 'qtype_mtf_' . $question->id;

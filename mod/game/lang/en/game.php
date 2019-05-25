@@ -309,6 +309,10 @@ $string[ 'reset_game_deleted_course'] = 'Delete tries from deleted courses';
 $string[ 'results'] = 'Results';
 $string[ 'showanswers'] = 'Show answers';
 $string[ 'showattempts'] = 'Show attempts';
+$string[ 'viewbook'] = 'View book <b>{$a}</b>';
+$string[ 'viewglossary'] = 'View glossary <b>{$a}</b>';
+$string[ 'viewquiz'] = 'View quiz <b>{$a}</b>';
+$string[ 'viewquestions'] = 'View questions';
 
 // File locallib.php.
 $string[ 'attemptfirst'] = 'First attempt';
@@ -361,6 +365,7 @@ $string[ 'hiddenpicture_height'] = 'Set height of picture to (in pixels)';
 $string[ 'hiddenpicture_options'] = '\'Hidden Picture\' options';
 $string[ 'hiddenpicture_pictureglossary'] = 'The glossary for main question and picture';
 $string[ 'hiddenpicture_width'] = 'Set width of picture to (in pixels)';
+$string[ 'introduction'] = 'Description';
 $string[ 'millionaire_background'] = 'Background color';
 $string[ 'millionaire_options'] = 'Millionaire\' options';
 $string[ 'millionaire_shuffle'] = 'Randomize questions';
@@ -390,7 +395,7 @@ $string[ 'toptext'] = 'Text at the top of page';
 $string[ 'userdefined'] = 'User defined';
 $string[ 'different_glossary_category'] = "The selected category doesn't corespond to selected glossary";
 $string[ 'highscore'] = 'Show high score (number of students)';
-$string[ 'headerfooteroptions'] = 'Header/Footer options';
+$string[ 'missingbook'] = 'Missing book';
 
 // File preview.php.
 $string[ 'only_teachers'] = 'Only teacher can see this page';

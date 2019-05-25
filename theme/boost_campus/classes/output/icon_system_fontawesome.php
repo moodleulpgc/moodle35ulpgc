@@ -37,6 +37,7 @@ class icon_system_fontawesome extends \core\output\icon_system_fontawesome {
 
         $iconmap['core:t/go'] = 'fa-circle text-success';
         $iconmap['core:t/stop'] = 'fa-circle text-danger';
+        $iconmap['core:i/manual_item'] = 'fa-edit';
 
         return $iconmap;
     }

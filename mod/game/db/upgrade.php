@@ -1213,7 +1213,7 @@ function xmldb_game_upgrade($oldversion) {
         $table = new xmldb_table('game_sudoku');
         $field = new xmldb_field('level', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, null, null, '0');
 
-        $dbman->cchange_field_precision($table, $field);
+        $dbman->change_field_precision($table, $field);
         upgrade_mod_savepoint(true, 2008101106, 'game');
     }
 
@@ -1820,6 +1820,30 @@ function xmldb_game_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, $ver, 'game');
     }
+
+    if ($oldversion < ($ver = 2019042411)) {
+        $table = new xmldb_table('game');
+        $field = new xmldb_field('intro', XMLDB_TYPE_TEXT, null, null, false, null, null, 'course');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        } else {
+            $dbman->change_field_notnull($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'game');
+    }
+
+    if ($oldversion < ($ver = 2019042600)) {
+        // Define field timeclose to be added to game.
+        $table = new xmldb_table('game');
+        $field = new xmldb_field('introformat', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, null, null, '0', 'intro');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, $ver, 'game');
+    }
+    
     return true;
 }
 

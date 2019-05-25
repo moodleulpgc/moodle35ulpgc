@@ -675,6 +675,8 @@ function game_questions_shortanswer( $game) {
         case 'question';
             $recs = game_questions_shortanswer_question( $game);
             break;
+        default:
+            print_error( 'No sourcemodule '.$game->sourcemodule);
     }
 
     return $recs;
@@ -847,17 +849,7 @@ function game_insert_record( $table, $rec) {
         }
     }
 
-    if (isset( $rec->question)) {
-        $temp = $rec->question;
-        $rec->question = addslashes( $rec->question);
-    }
-    $ret = $DB->update_record( $table, $rec);
-
-    if (isset( $rec->question)) {
-        $rec->question = $temp;
-    }
-
-    return $ret;
+    return $DB->update_record( $table, $rec);
 }
 
 /**
@@ -911,6 +903,7 @@ function game_updateattempts( $game, $attempt, $score, $finished, $cm, $course) 
 
     // Update completion state.
     $completion = new completion_info( $course);
+
     if ($completion->is_enabled($cm) && ($game->completionattemptsexhausted || $game->completionpass)) {
         if (!$finished) {
             game_save_best_score( $game);

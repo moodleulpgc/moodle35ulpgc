@@ -75,7 +75,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'locationname', 'locationtypename', 'seats', 'parentname', 'address', 'staffers', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('locationitem', 'examregistrar'),
                         get_string('locationtypeitem', 'examregistrar'),
                         get_string('seats', 'examregistrar'),
@@ -198,11 +198,11 @@ if($elements) {
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
             $url = new moodle_url($manageurl, array('del'=>$element->id));
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
-            $buttons[] = '&nbsp;&nbsp;';
             //$url = new moodle_url($manageurl, array('staffers'=>$element->id));
             //$buttons[] = html_writer::link($url, html_writer::empty_tag('img', array('src'=>$OUTPUT->pix_url('t/assignroles'), 'alt'=>$strstaffers, 'class'=>'iconsmall')), array('title'=>$strstaffers));
             $staffurl->param('room', $element->id);
-            $buttons[] = html_writer::link($staffurl, $OUTPUT->pix_icon('t/assignroles', $strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
+            $buttons[] = html_writer::link($staffurl, $OUTPUT->pix_icon('i/assignroles', $strstaffers, 'moodle', array('class'=>'iconsmall', 'title'=>$strstaffers)));
+            
             $action = implode('&nbsp;&nbsp;', $buttons);
         }
         $data[] = $action;

@@ -179,10 +179,6 @@ class examregistar_management_table extends flexible_table {
         }
 
         echo '<div id="tablecommands">';
-        echo '<a href="javascript:select_all_in(\'DIV\', null, \'exregtablecontainer\');">' .
-                get_string('selectall', 'examregistrar') . '</a> / ';
-        echo '<a href="javascript:deselect_all_in(\'DIV\', null, \'exregtablecontainer\');">' .
-                get_string('selectnone', 'examregistrar') . '</a> ';
         echo '<br />&nbsp;&nbsp;';
         $this->submit_buttons();
         echo '</div>';

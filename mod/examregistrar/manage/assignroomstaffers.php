@@ -245,7 +245,7 @@ if ($potentialmembers) {
     $potentialmemberscount = count($potentialmembersoptions);
     $potentialmembersoptions = implode("\n", $potentialmembersoptions);
 } else {
-    $potentialmembersoptions .= '<option>&nbsp;</option>';
+    $potentialmembersoptions = '<option>&nbsp;</option>';
 }
 
 echo $output->header();

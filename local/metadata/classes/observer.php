@@ -48,46 +48,13 @@ class observer {
     }
 
     /**
-     * Triggered via course_deleted event.
-     * - Removes course metadata
-     *
-     * @param \core\event\course_deleted $event
-     * @return bool true on success
-     */
-    public static function course_deleted(\core\event\course_deleted $event) {
-        return self::delete_metadata(CONTEXT_COURSE, $event->objectid);
-    }
-
-    /**
-     * Triggered via user_deleted event.
-     * - Removes user metadata
-     *
-     * @param \core\event\user_deleted $event
-     * @return bool true on success
-     */
-    public static function user_deleted(\core\event\user_deleted $event) {
-        return self::delete_metadata(CONTEXT_USER, $event->objectid);
-    }
-
-    /**
-     * Triggered via module_deleted event.
-     * - Removes module metadata
-     *
-     * @param \core\event\course_module_deleted $event
-     * @return bool true on success
-     */
-    public static function course_module_deleted(\core\event\course_module_deleted $event) {
-        return self::delete_metadata(CONTEXT_MODULE, $event->objectid);
-    }
-
-    /**
      * Delete metadata for appropriate contextlevel fields.
      * - Removes user metadata
      *
      * @param \core\event\user_deleted $event
      * @return bool true on success
      */
-    protected static function delete_metadata($contextlevel, $instanceid) {
+    public static function delete_metadata($contextlevel, $instanceid) {
         global $DB;
 
         if (!empty($fields = $DB->get_records_select('local_metadata_field', 'contextlevel = ?', [$contextlevel], '', 'id'))) {

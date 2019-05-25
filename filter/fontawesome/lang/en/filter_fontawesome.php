@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['filtername'] = 'FontAwesome Icon Filter.';
+$string['pluginname'] = 'FontAwesome icons';
+$string['filtername'] = 'FontAwesome icons';
 $string['settingformats'] = 'Apply to formats';
 $string['settingformats_desc'] = 'The filter will be applied only if the original text was inserted in one of the selected formats.';
+$string['privacy:metadata'] = 'The filter fontawesome does not store any personal data.';

@@ -58,7 +58,7 @@ if (!$table->is_downloading()) {
 }
 
 $tablecolumns = array('checkbox', 'type', 'name', 'idnumber', 'value', 'action');
-$tableheaders = array('&nbsp;',
+$tableheaders = array(html_writer::checkbox('selectall', 1, false, '', array('id'=>'selectall')),
                         get_string('elementtype', 'examregistrar'),
                         get_string('itemname', 'examregistrar'),
                         get_string('idnumber', 'examregistrar'),
@@ -143,14 +143,7 @@ if($elements) {
 
         if (!$table->is_downloading()) {
             $buttons = array();
-            
-            $icon = $OUTPUT->pix_icon('contextmenu', $strsent, 'mod_examregistrar', array('class'=>'icon', 'title'=>$strsent));
-            
-            
             $url = new moodle_url($baseurl, array('show'=>$visible));
-            
-            $buttons[] = $icon;
-            
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/'.$visicon, $strvisible, 'moodle', array('class'=>'iconsmall', 'title'=>$strvisible)));
             $url = new moodle_url($baseurl, array('item'=>$element->id));
             $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));

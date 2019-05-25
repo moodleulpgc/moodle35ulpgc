@@ -131,7 +131,9 @@ body#page-question-type-mtf div.optionbox {
     display:flex;
 }
 body#page-question-type-mtf div.option_question {
+    flex: 1;
     flex-grow: 1;
+    word-break: break-word;
 }
 body#page-question-type-mtf div.option_answer {
     flex-shrink: 1;
@@ -273,4 +275,36 @@ body#page-question-type-mtf div[id^=fgroup_id_weightsarray] {
     padding-top: 5px;
     border: 1px solid #BBB;
     border-top: 0;
+}
+
+/* Fixes EMDL-355 */
+.que.mtf table .c0, 
+.que.mtf table .c1 {
+    width: 1%;
+}
+
+#page-mod-quiz-review .que.mtf table .c2, 
+#page-mod-quiz-review .que.mtf table .c4 {
+    width: 40%;
+}
+
+/* Microsoft Edge */
+@supports (display:-ms-grid) {
+    body#page-question-type-mtf #id_questiontexteditable,
+    body#page-question-type-mtf #id_generalfeedbackeditable,
+    body#page-question-type-mtf .optionbox,
+    .que.mtf .optiontext,
+    .mtfspecificfeedback {
+        word-break: break-all;
+    }
+}
+
+/* Chrome, Opera, Firefox, ... */
+body#page-question-type-mtf #id_questiontexteditable,
+body#page-question-type-mtf #id_generalfeedbackeditable,
+body#page-question-type-mtf .optionbox,
+.que.mtf .optiontext,
+.mtfspecificfeedback {
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }

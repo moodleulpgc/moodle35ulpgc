@@ -60,7 +60,7 @@ class crawler {
     /**
      * Checks that the bot user exists and password works etc
      *
-     * @return mixed true or a error string
+     * @return null|string On success, null. In the case of failure, an error string (which is an HTML snippet).
      */
     public function is_bot_valid() {
 
@@ -83,7 +83,7 @@ class crawler {
         }
         if ($result->redirect) {
             return get_string('bottestpageredirected', 'tool_crawler',
-                array('resredirect' => $result->redirect));
+                array('resredirect' => htmlspecialchars($result->redirect, ENT_NOQUOTES | ENT_HTML401)));
         }
 
         // When the bot successfully scraped the test page (see above), it was logged in and used its own language. So we have to
@@ -158,15 +158,27 @@ class crawler {
         }
         $host = $parts['host'];
 
+        if (isset($parts['port'])) {
+            $port = $parts['port'];
+        }
+
         if ($rel && $rel[0] == '/') {
-            $abs = $host . $rel;
+            if (isset($port)) {
+                $abs = $host . ':' . $port . $rel;
+            } else {
+                $abs = $host . $rel;
+            }
         } else {
 
             // Remove non-directory element from path.
             $path = preg_replace('#/[^/]*$#', '', $path);
 
             // Dirty absolute URL.
-            $abs = "$host$path/$rel";
+            if (isset($port)) {
+                $abs = $host . ':' . $port . $path . '/' . $rel;
+            } else {
+                $abs = $host . $path . '/' . $rel;
+            }
         }
 
         // Replace '//' or '/./' or '/foo/../' with '/' */.
@@ -326,7 +338,7 @@ class crawler {
                 $shortname = $course->shortname;
             }
         }
-        if ($shortname) {
+        if ($shortname !== '' && $shortname !== null) {
             $bad = 0;
             $excludes = str_replace("\r", '', self::get_config()->excludecourses);
             $excludes = explode("\n", $excludes);
@@ -602,6 +614,52 @@ class crawler {
 
     }
 
+    /**
+     * Decodes HTML character entity references in a given text and returns the text with them replaced. Intended to be used on
+     * texts obtained from simple_html_dom, because they are returned with entity references intact.
+     *
+     * @param string $text The text which may contain HTML character entity references, in UTF-8 encoding.
+     * @return string The text with all character entity references resolved, in UTF-8 encoding.
+     */
+    protected static function dom_text_decode_entities($text) {
+        return html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    /**
+     * Converts an HTML DOM node to a plain text form. This is done by removing script and style elements, and by replacing images
+     * with their alternative text. Can be used to clean HTML from unwanted and potentially unsafe user-provided content.
+     *
+     * @param simple_html_dom_node $node The DOM node to convert.
+     * @return string The string representation of the DOM node. May be the empty string.
+     */
+    protected static function clean_html_node_content($node) {
+        if (!$node) {
+            return '';
+        }
+
+        if ($node->nodetype !== HDOM_TYPE_ELEMENT) {
+            return self::dom_text_decode_entities($node->plaintext);
+        }
+
+        $elementname = mb_strtolower($node->tag, 'UTF-8');
+
+        $ignoredelements = array('script', 'style');
+        if (in_array($elementname, $ignoredelements)) {
+            return '';
+        } else if ($elementname == 'img') {
+            return $node->alt ? self::dom_text_decode_entities($node->alt) : '';
+        }
+
+        if (!$node->nodes) {
+            return '';
+        }
+
+        $content = '';
+        foreach ($node->nodes as $sub) {
+            $content .= self::clean_html_node_content($sub);
+        }
+        return $content;
+    }
 
     /**
      * Given a recently crawled node, extract links to other pages
@@ -633,14 +691,15 @@ class crawler {
             return;
         }
 
-        if (isset($html->find('title', 0)->plaintext)) {
-            $node->title = $html->find('title', 0)->plaintext;
+        $titlenode = $html->find('title', 0);
+        if (isset($titlenode)) {
+            $node->title = self::dom_text_decode_entities($titlenode->plaintext);
             if ($verbose) {
                 echo " - Found title of: '$node->title'\n";
             }
         } else {
             if ($verbose) {
-                echo "Did not find a title.  \n";
+                echo "Did not find a title.\n";
             }
         }
 
@@ -684,7 +743,7 @@ class crawler {
                 // If this page does not have a course specified in it's classes, don't parse the html.
                 if ($hascourse === false) {
                     if ($verbose) {
-                        echo "No course specified in the html, stopping here. \n";
+                        echo "No course specified in the html, stopping here.\n";
                     }
                     return $node;
                 }
@@ -693,9 +752,9 @@ class crawler {
                 if (!in_array($node->courseid, $recentcourses)) {
                     if ($verbose) {
                         if ($node->courseid == 1) {
-                            echo "Ignore index.php page. \n";
+                            echo "Ignore index.php page.\n";
                         } else {
-                            echo "Course with id " . $node->courseid . " has not been viewed recently, skipping. \n";
+                            echo "Course with id " . $node->courseid . " has not been viewed recently, skipping.\n";
                         }
                     }
                     return $node;
@@ -727,16 +786,24 @@ class crawler {
             $idattr = '';
             $walk = $e;
             do {
-                if ($walk->id) {
-                    $idattr = '#' . $walk->id . ' ' . $idattr;
+                $id = $walk->id;
+                if (isset($id)) {
+                    $id = self::dom_text_decode_entities($id);
+                    if ($id != '') {
+                        // Ensure that no disallowed characters creep in. See HTML 5.2 about the id attribute.
+                        if (preg_match('/[ \\t\\n\\x0C\\r]/', $id) === 0) {
+                            $idattr = '#' . $id . ' ' . $idattr;
+                        }
+                    }
                 }
                 $walk = $walk->parent;
             } while ($walk);
 
+            $text = self::clean_html_node_content($e);
             if ($verbose > 1) {
-                printf (" - Found link to: %-20s / %-50s => %-50s\n", format_string($e->innertext), $e->href, $href);
+                printf (" - Found link to: %-20s / %-50s => %-50s\n", $text, $e->href, $href);
             }
-            $this->link_from_node_to_url($node, $href, $e->innertext, $idattr);
+            $this->link_from_node_to_url($node, $href, $text, $idattr);
         }
         return $node;
     }
@@ -836,15 +903,18 @@ class crawler {
         }
 
         if (empty($raw)) {
-            $result->httpmsg          = 'Curl Error: ' . curl_errno($s);
+            $result->errormsg         = (string)curl_errno($s);
             $result->title            = curl_error($s); // We do not try to translate Curl error messages.
             $result->contents         = '';
             $result->httpcode         = '500';
         } else {
             $headersize = curl_getinfo($s, CURLINFO_HEADER_SIZE);
             $headers = substr($raw, 0, $headersize);
-            $header = strtok($headers, "\n");
-            $result->httpmsg          = explode(" ", $header, 3)[2];
+            if (preg_match_all('@(^|[\r\n])(HTTP/[^ ]+) ([0-9]+) ([^\r\n]+|$)@', $headers, $httplines, PREG_SET_ORDER)) {
+                $result->httpmsg = array_pop($httplines)[4];
+            } else {
+                $result->httpmsg = '';
+            }
 
             $ishtml = (strpos($contenttype, 'text/html') === 0); // Related to Issue #13.
             $data = $ishtml ? substr($raw, $headersize) : '';
