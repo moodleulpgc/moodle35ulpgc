@@ -52,7 +52,7 @@ function videolib_get_variable_options($config) {
     $options[get_string('category')] = array(
         'category'     => 'id',
         'catname'      => get_string('name'),
-        'catidnumber'  => get_string('idnumbercat'),
+        'catidnumber'  => get_string('idnumbercat', 'videolib'),
     );
     
     $options[get_string('modulename', 'videolib')] = array(
@@ -117,6 +117,7 @@ function videolib_get_variable_values($videolib, $cm, $course, $config) {
     $site = get_site();
 
     $coursecontext = context_course::instance($course->id);
+    $category = coursecat::get($course->category);
 
     $values = array (
         'courseid'        => $course->id,
@@ -132,11 +133,13 @@ function videolib_get_variable_values($videolib, $cm, $course, $config) {
         'modcmid'         => $cm->id,
         'modname'         => format_string($videolib->name),
         'modidnumber'     => $cm->idnumber,
-        
-        
-        
+        'category'        => $course->category,
+        'catname'         => $category->name,
+        'catidnumber'     => $category->idnumber,
     );
-
+    //// TODO TODO add ulpgc customs category/course data
+    
+    
     if (isloggedin()) {
         $values['userid']          = $USER->id;
         $values['userusername']    = $USER->username;
@@ -182,10 +185,9 @@ function videolib_get_variable_values($videolib, $cm, $course, $config) {
  * @param object $videolib module instance
  * @param object $cm
  * @param object $course
- * @param object $config module config options
  * @return array of parameter values
  */
-function videolib_parameter_value_mapping($videolib, $cm, $course, $config) {
+function videolib_parameter_value_mapping($videolib, $cm, $course) {
     global $USER, $CFG;
     
     $parameters = array();

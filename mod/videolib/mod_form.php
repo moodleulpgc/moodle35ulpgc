@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+include_once($CFG->dirroot.'/mod/videolib/locallib.php');
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 /**
@@ -42,6 +43,13 @@ class mod_videolib_mod_form extends moodleform_mod {
         global $CFG;
 
         $mform = $this->_form;
+        
+        //print_object($this->current);
+        //print_object($this->_course);
+        //print_object($this->_cm);
+        //print_object($this->context);
+        
+
         
         $config = get_config('videolib');
 
@@ -88,13 +96,18 @@ class mod_videolib_mod_form extends moodleform_mod {
         $mform->setType('searchpattern', PARAM_TEXT);
         $mform->addHelpButton('searchpattern', 'searchpattern', 'videolib');
         $mform->addRule('searchpattern', null, 'required', null, 'client');
+        if(!$canmanage = has_capability('mod/videolib:manage', $this->context)) {
+            $mform->disabledIf('searchpattern', 'searchtype', 'eq', 1);
+        }
+        
+        
 
         $mform->addElement('header', 'parameterssection', get_string('parametersheader', 'videolib'));
         $mform->addElement('static', 'parametersinfo', '', get_string('parametersheader_help', 'videolib'));
 
         $parcount = 5;
-        include_once($CFG->dirroot.'/mod/url/locallib.php');
-        $options = url_get_variable_options($config);
+        
+        $options = videolib_get_variable_options($config);
         for ($i=0; $i < $parcount; $i++) {
             $parameter = "parameter_$i";
             $variable  = "variable_$i";
@@ -183,4 +196,34 @@ class mod_videolib_mod_form extends moodleform_mod {
         }
     }
 
+    function definition_after_data() {
+        parent::definition_after_data();
+        $mform    =& $this->_form;
+        $canmanage = has_capability('mod/videolib:manage', $this->context);
+        
+        if(!$canmanage) {
+            $parcount = 5;
+            $elements = array();
+            for ($i=0; $i < $parcount; $i++) {
+                $elements[] = "parameter_$i";
+                $elements[]  = "variable_$i";
+                $elements[] = "pargoup_$i";
+            }
+            $elements[] = 'searchtype';
+                        
+            foreach($elements as $name) {
+                if($mform->elementExists($name)) {
+                    $el =& $mform->getElement($name);
+                    $el->freeze();
+                    $el->setPersistantFreeze(true);
+                }
+            }
+            
+            $mform->disabledIf('searchpattern', 'searchtype', 'noteq', 0);
+            
+        }
+
+
+    }
+    
 }

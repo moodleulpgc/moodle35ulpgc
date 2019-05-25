@@ -17,16 +17,16 @@
 /**
  * This file defines the admin settings for this plugin
  *
- * @package   videolibsource_archive
+ * @package   videolibsource_bustreaming
  * @copyright 2016 Enrique Castro @ ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$settings->add(new admin_setting_configcheckbox('videolibsource_archive/default',
-                   new lang_string('default', 'videolibsource_archive'),
-                   new lang_string('default_help', 'videolibsource_archive'), 0));
+$settings->add(new admin_setting_configcheckbox('videolibsource_bustreaming/default',
+                   new lang_string('default', 'videolibsource_bustreaming'),
+                   new lang_string('default_help', 'videolibsource_bustreaming'), 0));
                    
-$settings->add(new admin_setting_configcheckbox('videolibsource_archive/updategraded',
-                   new lang_string('updategraded', 'videolibsource_archive'),
-                   new lang_string('updategraded_help', 'videolibsource_archive'), 0));
+$settings->add(new admin_setting_configcheckbox('videolibsource_bustreaming/updategraded',
+                   new lang_string('updategraded', 'videolibsource_bustreaming'),
+                   new lang_string('updategraded_help', 'videolibsource_bustreaming'), 0));
 

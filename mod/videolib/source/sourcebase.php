@@ -57,7 +57,7 @@ abstract class videolib_source_base {
      * Create an instance of this source for a particular videolib.
      * @param $videolib record from the database.
      */
-    public function __construct($videolib) {
+    public function __construct($videolib, $parameters = null) {
         $this->source = $videolib->source;
         $this->searchtype = $videolib->searchtype;
         $this->searchpattern = $videolib->searchpattern;
@@ -73,12 +73,11 @@ abstract class videolib_source_base {
      * @param $parameters associative array with param names and values
      */
     public function get_processed_searchpattern($parameters) {
-        $pattern = '';
         if($this->searchtype &&  $parameters) {
-            $pattern = str_replace(array_keys($parameters),array_values($parameters), $this->searchpattern);
+            $this->searchpattern = str_replace(array_keys($parameters),array_values($parameters), $this->searchpattern);
         }
         
-        return $pattern;
+        return $this->searchpattern;
     }
     
     /**

@@ -42,6 +42,7 @@ $string['displayselect_help'] = 'This setting, together with the URL file type a
 * In frame - The URL is displayed within a frame below the navigation bar and URL description
 * New window - The URL is displayed in a new browser window with menus and an address bar';
 $string['displayselectexplain'] = 'Select display type.';
+$string['idnumbercat'] = 'Category idnumber';
 $string['managevideolibsources'] = 'Manage Video sources';
 $string['modulename'] = 'Video library';
 $string['modulename_help'] = 'The Video library module enables a teacher to provide a video stored in a library  as a course resource. 
@@ -69,7 +70,20 @@ $string['rolesinparams'] = 'Include role names in parameters';
 $string['searchpattern'] = 'Search pattern';
 $string['searchpattern_help'] = 'Search pattern';
 $string['searchtype'] = 'Search type';
-$string['searchtype_help'] = 'Search type';
+$string['searchtype_help'] = 'How the video will be located within the library. 
+May be one of:
+
+ * Instance ID: a single number or code that uniquely identifies the video in the library.
+
+ * Pattern: a pattern constructed with some variables than take values form course paramenters below.
+
+';
+$string['searchtype_id'] = 'Instance ID';
+$string['searchtype_pattern'] = 'Pattern';
+
+$string['separator'] = 'Separator';
+$string['separatorexplain'] = 'A character that encloses the variable parameter name, for instance #shortname#';
+$string['serverurl'] = 'Server url';
 $string['settings'] = 'General settings';
 $string['source'] = 'Video library';
 $string['source_help'] = 'Video library';

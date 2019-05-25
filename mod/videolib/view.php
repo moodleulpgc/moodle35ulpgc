@@ -76,7 +76,9 @@ if (!empty($options['printintro'])) {
     }
 }
 
-$source = videolib_get_source_plugin($videolib);
+$parameters = $videolib->searchtype ? videolib_parameter_value_mapping($videolib, $cm, $course) : null;
+
+$source = videolib_get_source_plugin($videolib, $parameters);
 
 $source->make_instance_url();
 

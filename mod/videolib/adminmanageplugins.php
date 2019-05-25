@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Allows the admin to manage assignment plugins
+ * Allows the admin to manage videolibment plugins
  *
- * @package    mod_assign
+ * @package    mod_videolib
  * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ if (!empty($plugin)) {
 }
 
 // Create the class for this controller.
-//$pluginmanager = new assign_plugin_manager($subtype);
+//$pluginmanager = new videolib_plugin_manager($subtype);
 $pluginmanager = core_plugin_manager::instance();
 
 $PAGE->set_context(context_system::instance());
