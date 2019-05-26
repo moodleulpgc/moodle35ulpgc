@@ -81,7 +81,7 @@ $settings = null;
 $ADMIN->add('modvideolibfolder', new admin_category('videolibsourceplugins',
     new lang_string('videolibsourceplugins', 'videolib'), !$module->is_enabled()));
 $ADMIN->add('videolibsourceplugins', new admin_externalpage('managevideolibsources', get_string('managevideolibsources', 'videolib'), 
-                                                            new moodle_url('/mod/videolib/adminmanageplugins.php', array('subtype'=>'videlibsource'))));
+                                                            new moodle_url('/mod/videolib/adminmanageplugins.php', array('subtype'=>'videolibsource'))));
 
 foreach (core_plugin_manager::instance()->get_plugins_of_type('videolibsource') as $plugin) {
     /** @var \mod_videolib\plugininfo\videlolibsource $plugin */

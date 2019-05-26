@@ -28,4 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'BUStreaming Videolib source';
 $string['privacy:metadata'] = 'The BUStreaming Videolib source plugin does not store any personal data.';
-
+$string['default'] = 'Enabled by default';
+$string['default_help'] = 'If checked, this video source will be used as default in all new video library instances';
+$string['updategraded'] = 'Update graded';
+$string['updategraded_help'] = 'Update graded';
