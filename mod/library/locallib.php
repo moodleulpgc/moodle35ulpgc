@@ -31,6 +31,180 @@ require_once("$CFG->dirroot/mod/library/lib.php");
 
 
 /**
+ * Get the parameters that may be appended to URL
+ * @param object $config library module config options
+ * @return array array describing opt groups
+ */
+function library_get_variable_options($config) {
+    global $CFG;
+
+    $options = array();
+    $options[''] = array('' => get_string('chooseavariable', 'library'));
+
+    $options[get_string('course')] = array(
+        'courseid'        => 'id',
+        'coursefullname'  => get_string('fullnamecourse'),
+        'courseshortname' => get_string('shortnamecourse'),
+        'courseidnumber'  => get_string('idnumbercourse'),
+        'courseformat'    => get_string('format'),
+    );
+
+    $options[get_string('category')] = array(
+        'category'     => 'id',
+        'catname'      => get_string('name'),
+        'catidnumber'  => get_string('idnumbercat', 'library'),
+    );
+    
+    $options[get_string('modulename', 'library')] = array(
+        'modinstance'     => 'id',
+        'modcmid'         => 'cmid',
+        'modname'         => get_string('name'),
+        'modidnumber'     => get_string('idnumbermod'),
+    );
+
+    $options[get_string('miscellaneous')] = array(
+        'sitename'        => get_string('fullsitename'),
+        'serverurl'       => get_string('serverurl', 'library'),
+        'currenttime'     => get_string('time'),
+        'lang'            => get_string('language'),
+    );
+    if (!empty($config->secretphrase)) {
+        $options[get_string('miscellaneous')]['encryptedcode'] = get_string('encryptedcode');
+    }
+
+    $options[get_string('user')] = array(
+        'userid'          => 'id',
+        'userusername'    => get_string('username'),
+        'useridnumber'    => get_string('idnumber'),
+        'userfirstname'   => get_string('firstname'),
+        'userlastname'    => get_string('lastname'),
+        'userfullname'    => get_string('fullnameuser'),
+        'useremail'       => get_string('email'),
+        'usericq'         => get_string('icqnumber'),
+        'userphone1'      => get_string('phone1'),
+        'userphone2'      => get_string('phone2'),
+        'userinstitution' => get_string('institution'),
+        'userdepartment'  => get_string('department'),
+        'useraddress'     => get_string('address'),
+        'usercity'        => get_string('city'),
+        'usertimezone'    => get_string('timezone'),
+        'userurl'         => get_string('webpage'),
+    );
+
+    if ($config->rolesinparams) {
+        $roles = role_fix_names(get_all_roles());
+        $roleoptions = array();
+        foreach ($roles as $role) {
+            $roleoptions['course'.$role->shortname] = get_string('yourwordforx', '', $role->localname);
+        }
+        $options[get_string('roles')] = $roleoptions;
+    }
+
+    return $options;
+}
+
+/**
+ * Get the parameter values that may be appended to URL
+ * @param object $library module instance
+ * @param object $cm
+ * @param object $course
+ * @param object $config module config options
+ * @return array of parameter values
+ */
+function library_get_variable_values($library, $cm, $course, $config) {
+    global $USER, $CFG;
+
+    $site = get_site();
+
+    $coursecontext = context_course::instance($course->id);
+    $category = coursecat::get($course->category);
+
+    $values = array (
+        'courseid'        => $course->id,
+        'coursefullname'  => format_string($course->fullname),
+        'courseshortname' => format_string($course->shortname, true, array('context' => $coursecontext)),
+        'courseidnumber'  => $course->idnumber,
+        'courseformat'    => $course->format,
+        'lang'            => current_language(),
+        'sitename'        => format_string($site->fullname),
+        'serverurl'       => $CFG->wwwroot,
+        'currenttime'     => time(),
+        'modinstance'     => $library->id,
+        'modcmid'         => $cm->id,
+        'modname'         => format_string($library->name),
+        'modidnumber'     => $cm->idnumber,
+        'category'        => $course->category,
+        'catname'         => $category->name,
+        'catidnumber'     => $category->idnumber,
+    );
+    //// TODO TODO add ulpgc customs category/course data
+    
+    
+    if (isloggedin()) {
+        $values['userid']          = $USER->id;
+        $values['userusername']    = $USER->username;
+        $values['useridnumber']    = $USER->idnumber;
+        $values['userfirstname']   = $USER->firstname;
+        $values['userlastname']    = $USER->lastname;
+        $values['userfullname']    = fullname($USER);
+        $values['useremail']       = $USER->email;
+        $values['usericq']         = $USER->icq;
+        $values['userphone1']      = $USER->phone1;
+        $values['userphone2']      = $USER->phone2;
+        $values['userinstitution'] = $USER->institution;
+        $values['userdepartment']  = $USER->department;
+        $values['useraddress']     = $USER->address;
+        $values['usercity']        = $USER->city;
+        $now = new DateTime('now', core_date::get_user_timezone_object());
+        $values['usertimezone']    = $now->getOffset() / 3600.0; // Value in hours for BC.
+        $values['userurl']         = $USER->url;
+    }
+
+    // weak imitation of Single-Sign-On, for backwards compatibility only
+    // NOTE: login hack is not included in 2.0 any more, new contrib auth plugin
+    //       needs to be createed if somebody needs the old functionality!
+    if (!empty($config->secretphrase)) {
+        $values['encryptedcode'] = library_get_encrypted_parameter($library, $config);
+    }
+
+    //hmm, this is pretty fragile and slow, why do we need it here??
+    if ($config->rolesinparams) {
+        $coursecontext = context_course::instance($course->id);
+        $roles = role_fix_names(get_all_roles($coursecontext), $coursecontext, ROLENAME_ALIAS);
+        foreach ($roles as $role) {
+            $values['course'.$role->shortname] = $role->localname;
+        }
+    }
+
+    return $values;
+}
+
+
+/**
+ * Get the parameter values that may be substituted in searchpattern
+ * @param object $library module instance
+ * @param object $cm
+ * @param object $course
+ * @return array of parameter values
+ */
+function library_parameter_value_mapping($library, $cm, $course) {
+    global $USER, $CFG;
+    
+    $parameters = array();
+    
+    if($variables = empty($library->parameters) ? array() : unserialize($library->parameters)) { 
+        $config = get_config('library');
+        $parvalues = library_get_variable_values($library, $cm, $course, $config);
+        foreach($variables as $name => $param) {
+            $paramenters[$config->separator.$name.$config->separator] = $parvalues[$param];
+        }
+    }
+    
+    return $paramenters;
+}
+
+
+/**
  * Display embedded library file.
  * @param object $library
  * @param object $cm
@@ -419,15 +593,10 @@ function library_print_intro($library, $cm, $course, $ignoresettings=false) {
 function library_print_filenotfound($library, $cm, $course) {
     global $DB, $OUTPUT;
 
-    $library_old = $DB->get_record('library_old', array('oldid'=>$library->id));
     library_print_header($library, $cm, $course);
     library_print_heading($library, $cm, $course);
     library_print_intro($library, $cm, $course);
-    if ($library_old) {
-        echo $OUTPUT->notification(get_string('notmigrated', 'library', $library_old->type));
-    } else {
         echo $OUTPUT->notification(get_string('filenotfound', 'library'));
-    }
     echo $OUTPUT->footer();
     die;
 }
@@ -461,6 +630,8 @@ function library_get_final_display_type($library) {
     return RESOURCELIB_DISPLAY_OPEN;
 }
 
+
+
 /**
  * File browsing support class
  */
@@ -476,27 +647,5 @@ class library_content_file_info extends file_info_stored {
             return $this->topvisiblename;
         }
         return parent::get_visible_name();
-    }
-}
-
-function library_set_mainfile($data) {
-    global $DB;
-    $fs = get_file_storage();
-    $cmid = $data->coursemodule;
-    $draftitemid = $data->files;
-
-    $context = context_module::instance($cmid);
-    if ($draftitemid) {
-        $options = array('subdirs' => true, 'embed' => false);
-        if ($data->display == RESOURCELIB_DISPLAY_EMBED) {
-            $options['embed'] = true;
-        }
-        file_save_draft_area_files($draftitemid, $context->id, 'mod_library', 'content', 0, $options);
-    }
-    $files = $fs->get_area_files($context->id, 'mod_library', 'content', 0, 'sortorder', false);
-    if (count($files) == 1) {
-        // only one file attached, set it as main file automatically
-        $file = reset($files);
-        file_set_sortorder($context->id, 'mod_library', 'content', 0, $file->get_filepath(), $file->get_filename(), 1);
     }
 }

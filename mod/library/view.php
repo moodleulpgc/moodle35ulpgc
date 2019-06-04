@@ -23,7 +23,7 @@
  */
 
 require(__DIR__.'/../../config.php');
-require_once($CFG->dirroot.'/mod/library/lib.php');
+require_once($CFG->dirroot.'/mod/library/locallib.php');
 
 // Course_module ID, or
 $id = optional_param('id', 0, PARAM_INT);
@@ -58,17 +58,17 @@ $PAGE->set_context($context);
 //echo $OUTPUT->footer();
 
 $fs = get_file_storage();
-$files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false); // TODO: this is not very efficient!!
+$files = $fs->get_area_files($context->id, 'mod_library', 'content', 0, 'sortorder DESC, id ASC', false); // TODO: this is not very efficient!!
 if (count($files) < 1) {
-    resource_print_filenotfound($resource, $cm, $course);
+    library_print_filenotfound($library, $cm, $course);
     die;
 } else {
     $file = reset($files);
     unset($files);
 }
 
-$resource->mainfile = $file->get_filename();
-$displaytype = resource_get_final_display_type($resource);
+$library->mainfile = $file->get_filename();
+$displaytype = library_get_final_display_type($library);
 if ($displaytype == RESOURCELIB_DISPLAY_OPEN || $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD) {
     $redirect = true;
 }
@@ -83,20 +83,20 @@ if ($redirect && !course_get_format($course)->has_view_page() &&
 if ($redirect && !$forceview) {
     // coming from course page or url index page
     // this redirect trick solves caching problems when tracking views ;-)
-    $path = '/'.$context->id.'/mod_resource/content/'.$resource->revision.$file->get_filepath().$file->get_filename();
+    $path = '/'.$context->id.'/mod_library/content/'.$library->revision.$file->get_filepath().$file->get_filename();
     $fullurl = moodle_url::make_file_url('/pluginfile.php', $path, $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD);
     redirect($fullurl);
 }
 
 switch ($displaytype) {
     case RESOURCELIB_DISPLAY_EMBED:
-        resource_display_embed($resource, $cm, $course, $file);
+        library_display_embed($library, $cm, $course, $file);
         break;
     case RESOURCELIB_DISPLAY_FRAME:
-        resource_display_frame($resource, $cm, $course, $file);
+        library_display_frame($library, $cm, $course, $file);
         break;
     default:
-        resource_print_workaround($resource, $cm, $course, $file);
+        library_print_workaround($library, $cm, $course, $file);
         break;
 }
 

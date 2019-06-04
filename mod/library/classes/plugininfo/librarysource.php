@@ -82,7 +82,7 @@ class librarysource extends base {
     public function uninstall_cleanup() {
         global $DB;
 
-        $DB->delete_records('library_plugin_config', array('plugin'=>$this->name, 'subtype'=>'librarysource'));
+        //$DB->delete_records('config_plugins', array('plugin'=>$this->name));
 
         parent::uninstall_cleanup();
     }

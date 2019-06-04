@@ -44,8 +44,8 @@ class backup_library_activity_structure_step extends backup_activity_structure_s
 
         // Replace with the attributes and final elements that the element will handle.
         $elements = array('name', 'intro', 'introformat',
-                        'source', 'display', 'displayoptions', 
-                        'searchpattern', 'parameters',
+                        'displaymode', 'source', 'reponame', 'pathname', 'searchpattern', 
+                        'display', 'displayoptions', 'parameters',
                         'filterfiles', 'revision', 'timemodified');
         $library = new backup_nested_element('library', array('id'), $elements);
 

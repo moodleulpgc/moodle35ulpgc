@@ -37,7 +37,7 @@ define('LIBRARY_DISPLAYMODE_TREE', 2);
  * @param string $feature Constant representing the feature.
  * @return true | null True if the feature is supported, null otherwise.
  */
-function mod_library_supports($feature) {
+function library_supports($feature) {
     switch($feature) {
         case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
         case FEATURE_GROUPS:                  return false;
@@ -77,7 +77,7 @@ function library_reset_userdata($data) {
  * @param mod_library_mod_form $mform The form.
  * @return int The id of the newly inserted record.
  */
-function mod_library_add_instance($data, $mform = null) {
+function library_add_instance($data, $mform = null) {
     global $DB;
 
     $cmid = $data->coursemodule;
@@ -92,7 +92,9 @@ function mod_library_add_instance($data, $mform = null) {
 
     // we need to use context now, so we need to make sure all needed info is already in db
     $DB->set_field('course_modules', 'instance', $data->id, array('id'=>$cmid));
-    library_set_mainfile($data);
+    if(isset($data->files)) {
+        library_set_mainfile($data);
+    }
 
     $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
     \core_completion\api::update_completion_date_event($cmid, 'library', $data->id, $completiontimeexpected);
@@ -109,7 +111,7 @@ function mod_library_add_instance($data, $mform = null) {
  * @param mod_library_mod_form $mform The form.
  * @return bool True if successful, false otherwise.
  */
-function mod_library_update_instance($data, $mform = null) {
+function library_update_instance($data, $mform = null) {
     global $DB;
 
     $data->timemodified = time();
@@ -121,7 +123,10 @@ function mod_library_update_instance($data, $mform = null) {
     $data->parameters = library_set_parameters($data);
 
     $DB->update_record('library', $data);
-    library_set_mainfile($data);
+    if(isset($data->files)) {
+        library_set_mainfile($data);
+    }
+
 
     $completiontimeexpected = !empty($data->completionexpected) ? $data->completionexpected : null;
     \core_completion\api::update_completion_date_event($data->coursemodule, 'library', $data->id, $completiontimeexpected);
@@ -178,7 +183,7 @@ function library_set_parameters($data) {
 }
 
 
-function resource_set_mainfile($data) {
+function library_set_mainfile($data) {
     global $DB;
     
     $cmid = $data->coursemodule;
@@ -190,13 +195,13 @@ function resource_set_mainfile($data) {
         if ($data->display == RESOURCELIB_DISPLAY_EMBED) {
             $options['embed'] = true;
         }
-        file_save_draft_area_files($draftitemid, $context->id, 'mod_resource', 'content', 0, $options);
+        file_save_draft_area_files($draftitemid, $context->id, 'mod_library', 'content', 0, $options);
 
-        $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder', false);
+        $files = $fs->get_area_files($context->id, 'mod_library', 'content', 0, 'sortorder', false);
         if (count($files) == 1) {
             // only one file attached, set it as main file automatically
             $file = reset($files);
-            file_set_sortorder($context->id, 'mod_resource', 'content', 0, $file->get_filepath(), $file->get_filename(), 1);
+            file_set_sortorder($context->id, 'mod_library', 'content', 0, $file->get_filepath(), $file->get_filename(), 1);
         }
     }
 }
@@ -208,7 +213,7 @@ function resource_set_mainfile($data) {
  * @param int $id Id of the module instance.
  * @return bool True if successful, false on failure.
  */
-function mod_library_delete_instance($id) {
+function library_delete_instance($id) {
     global $DB;
 
     if (!$library = $DB->get_record('library', array('id'=>$id))) {
@@ -257,7 +262,7 @@ function library_cm_info_view(cm_info $cm) {
  * @param stdClass $context.
  * @return string[].
  */
-function mod_library_get_file_areas($course, $cm, $context) {
+function library_get_file_areas($course, $cm, $context) {
     $areas = array();
     $areas['content'] = get_string('librarycontent', 'library');
     return $areas;
@@ -280,7 +285,7 @@ function mod_library_get_file_areas($course, $cm, $context) {
  * @param string $filename.
  * @return file_info Instance or null if not found.
  */
-function mod_library_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+function library_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     return null;
 }
 
@@ -410,7 +415,7 @@ function mod_library_core_calendar_provide_event_action(calendar_event $event,
  * @param stdClass $module.
  * @param cm_info $cm.
  */
-function mod_library_extend_navigation($librarynode, $course, $module, $cm) {
+function library_extend_navigation($librarynode, $course, $module, $cm) {
 }
 
 /**
@@ -422,5 +427,5 @@ function mod_library_extend_navigation($librarynode, $course, $module, $cm) {
  * @param settings_navigation $settingsnav {@link settings_navigation}
  * @param navigation_node $librarynode {@link navigation_node}
  */
-function mod_library_extend_settings_navigation($settingsnav, $librarynode = null) {
+function library_extend_settings_navigation($settingsnav, $librarynode = null) {
 }
