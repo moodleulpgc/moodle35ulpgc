@@ -63,26 +63,37 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Show all lines with content, get rid of all after that.
         $lastlinewithcontent = -1;
+        $subfieldnames = [];
 
         for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
                 $subfielddefinition['name'] = $subfield->field->name;
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
-
+                $subfieldnames[] = $subfield->field->name;
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
             $completedispl['line'][] = $linedispl;
             $linedispl = array(); // Reset.
 
         }
+        $subfieldnames = array_unique($subfieldnames);
+        foreach ($subfieldnames as $name) {
+            $names[] = ['name' => $name];
+        }
+        $completedispl['header'] = $names;
 
         // We need this construct to make sure intermittent empty lines are shown.
         for ($line = $lastlinewithcontent + 1; $line <= $maxlines; $line++) {
             unset($completedispl['line'][$line]);
         }
+        $viewtype = '';
+        if ($view = $this->_field->df->get_current_view()) {
+            // Special mustache template for pdf rendering of fieldgroups.
+            $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
+        }
 
-        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
     }
 
     /**
@@ -95,10 +106,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldgroupfields = $this->get_subfields();
 
         // Field id.
-        $fieldid = $this->_field->id();
+        $fgfieldid = $this->_field->id();
 
         // Fieldname is special for the fieldgroup not including entryid as other fields.
-        $fieldname = "fieldgroup_{$fieldid}";
+        $fieldname = "fieldgroup_{$fgfieldid}";
 
         // Number of lines to show and generate.
         $defaultlines = isset($this->_field->field->param3) ? $this->_field->field->param3 : 3;
@@ -131,6 +142,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 }
                 $counter++;
                 $mform->addElement('html', '<div class="col">');
+
+                // Keep contentid in _id for later.
+                $resetcontentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : false;
+
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
@@ -139,13 +154,16 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $entry->id . "_{$fieldname}_" . $line; // Add iterator to each line of fieldgroup.
                 $mform->addElement('static', $entry->id, $subfield->field->name . ': ');
                 // Entry has an tmp id for rendering the subfields.
-                $subfield->renderer()->render_edit_mode($mform, $entry, $options);
+                $subfield->renderer()->prerender_edit_mode($mform, $entry, $options);
 
-                // Restore entryid to prior state.
+                // Restore relevant parts of entry to prior state.
                 $entry->id = $tempentryid;
+                if ($resetcontentid) {
+                    $entry->{"c{$fieldid}_id"} = $resetcontentid;
+                }
                 $mform->addElement('html', '</div>');
             }
-            $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger" type="button" data-removeline="' . $thisline. '">
+            $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="' . $thisline. '">
                 ' . get_string('delete') . '</button></div>');
             // End of row.
             $mform->addElement('html', '</div>');
@@ -155,10 +173,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         if ($lastlinewithcontent > $defaultlines) {
             $defaultlines = $lastlinewithcontent + 1;
         }
-
-        // Pass along how many lines are visible to the user.
-        $mform->addElement('hidden', 'visiblelines', $defaultlines);
-        $mform->setType('visiblelines', PARAM_INT);
 
         // Hide unused lines.
         global $PAGE;
@@ -233,6 +247,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      */
     public static function renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent) {
         // Retrieve only relevant part of content and hand it over.
+
         // Loop through all possible contents. content, content1, ...
         for ($i = 0; $i <= 4; $i++) {
             if ($i == 0) {
@@ -242,12 +257,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
 
             // If we render a fieldgroup we assume there is fieldgroup content in the $entry.
-            if ( isset ( $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"}) ) {
+            if (isset($entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"})) {
                 $tempcontent = $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"};
                 $tempid = $entry->{"c{$subfieldid}_id_fieldgroup"};
             } else {
                 // If we have exactly one content, show this and leave the rest blank.
-                if (isset( $entry->{"c{$subfieldid}_content{$contentid}"} )) {
+                if (isset($entry->{"c{$subfieldid}_content{$contentid}"})) {
                     $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
                     $tempid = array( $entry->{"c{$subfieldid}_id"} );
                 } else {
@@ -267,13 +282,15 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             } else {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = null;
             }
-            // We need to pass content ids too.
-            if (isset($tempid[$line])) {
-                $entry->{"c{$subfieldid}_id"} = $tempid[$line];
-            } else {
-                $entry->{"c{$subfieldid}_id"} = null;
-            }
         }
+
+        // We need to pass content ids too.
+        if (isset($tempid[$line])) {
+            $entry->{"c{$subfieldid}_id"} = $tempid[$line];
+        } else {
+            $entry->{"c{$subfieldid}_id"} = null;
+        }
+
         return $lastlinewithcontent;
     }
 

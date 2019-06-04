@@ -2902,11 +2902,11 @@ function examboard_synchronize_trackers($trackers, $exam) {
     
     include_once($CFG->dirroot.'/mod/tracker/locallib.php');
     
-    foreach($trackers as $tracker) {
-        $tids[$tracker->instance] = $tracker->instance;
+    foreach($trackers as $key => $cm) {
+        $tids[$cm->instance] = $key;
     }
 
-    list($intsql, $tparams) = $DB->get_in_or_equal($tids, SQL_PARAMS_NAMED, 't');
+    list($intsql, $tparams) = $DB->get_in_or_equal(array_keys($tids), SQL_PARAMS_NAMED, 't');
     list($inusql, $uparams) = $DB->get_in_or_equal(array_keys($examinees), SQL_PARAMS_NAMED, 'u');
     
     $select = " trackerid $intsql AND reportedby $inusql ";
@@ -2930,9 +2930,14 @@ function examboard_synchronize_trackers($trackers, $exam) {
             foreach($adds as $userid) {
                 tracker_register_cc($tracker, $issue, $userid); 
             }
-            $DB->set_field('tracker_issue', 'assignedto', $examinees[$issue->reportedby], 
-                                array('id' => $issue->id, 'trackerid' => $tracker->id, 'reportedby' => $issue->reportedby));
             
+            if(($tids[$issue->trackerid] == 'gradeable' ) && 
+                ($issue->assignedto != $examinees[$issue->reportedby])){
+            
+                $DB->set_field('tracker_issue', 'assignedto', $examinees[$issue->reportedby], 
+                                    array('id' => $issue->id, 'trackerid' => $tracker->id, 'reportedby' => $issue->reportedby));
+
+            }
         }
     }
 }

@@ -270,7 +270,13 @@ function examboard_synchronize_groups($examboard, $exam = false) {
             $group->idnumber = $idnumber;
             $group->timecreated = $now;
             $group->timemodified = $now;
+            $group->descriptionformat = 0;
+            foreach(array('description', 'descriptionformat', 'enrolmentkey', 'picture', 'hidepicture') as $field) {
+                $group->$field = '';
+            }
             $group->id = groups_create_group($group);
+            
+            
         } elseif($group->name != $name) {
             $group->name = $name;
             groups_update_group($group);
@@ -324,9 +330,9 @@ function examboard_synchronize_gradeables($examboard, $exam = false, $config = t
     foreach(array('gradeable', 'proposal', 'defense') as $field) {
         if($cm = examboard_get_gradeable_cm($examboard->course, $examboard->$field)) {
             if($cm->modname == 'tracker') {
-                $trackers[$cm->idnumber] = $cm;
+                $trackers[$field] = $cm;
             } elseif($cm->modname == 'assign') {
-                $assigns[$cm->idnumber] = $cm;
+                $assigns[$field] = $cm;
             }
         }
     }
@@ -350,14 +356,6 @@ function examboard_synchronize_gradeables($examboard, $exam = false, $config = t
     
     foreach($exams as $eid => $exam) {
         if($trackers) {
-            $members = examboard_get_exam_userids($exam, false, false);
-            $examinees = examboard_get_exam_tutors($exam->id); 
-            /*
-            $examinees = array_merge($members, $DB->get_records_menu('examboard_examinee', 
-                                            array('examid' => $exam->id),
-                                            '',
-                                            'id, userid'));
-                                            */
             examboard_synchronize_trackers($trackers, $exam);
         }
     

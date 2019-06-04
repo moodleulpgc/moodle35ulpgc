@@ -632,7 +632,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 if (has_capability('mod/tracker:report', $context)) {
                     $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=view&amp;screen=mytickets", $myticketsstr);
                 }
-                if (tracker_has_assigned($tracker, false) || $cced=tracker_has_cced($tracker, false)) {
+                if ($cced = tracker_has_cced($tracker, false) || tracker_has_assigned($tracker, false)) {
                     $name = $cced ? 'mycced' : 'mywork'; // ecastro ULPGC
                     $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", tracker_getstring($name, 'tracker'));
                 }

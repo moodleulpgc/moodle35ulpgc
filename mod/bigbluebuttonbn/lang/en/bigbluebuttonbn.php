@@ -228,9 +228,7 @@ $string['modulename'] = 'BigBlueButtonBN';
 $string['modulenameplural'] = 'BigBlueButtonBN';
 $string['modulename_help'] = 'BigBlueButtonBN lets you create from within Moodle links to real-time on-line classrooms using BigBlueButton, an open source web conferencing system for distance education.
 
-Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.
-
-To view later recordings, add a RecordingsBN resource to this course.';
+Using BigBlueButtonBN you can specify for the title, description, calendar entry (which gives a date range for joining the session), groups, and details about the recording of the on-line session.';
 $string['modulename_link'] = 'BigBlueButtonBN/view';
 $string['starts_at'] = 'Starts';
 $string['started_at'] = 'Started';
@@ -238,7 +236,18 @@ $string['ends_at'] = 'Ends';
 $string['calendarstarts'] = '{$a} is scheduled for';
 $string['pluginadministration'] = 'BigBlueButton administration';
 $string['pluginname'] = 'BigBlueButtonBN';
-$string['serverhost'] = 'Server Name';
+
+$string['removedevents'] = 'Deleted events';
+$string['removedtags'] = 'Deleted tags';
+$string['removedlogs'] = 'Deleted custom logs';
+$string['removedrecordings'] = 'Deleted recordings';
+$string['resetevents'] = 'Delete events';
+$string['resettags'] = 'Delete tags';
+$string['resetlogs'] = 'Delete custom logs';
+$string['resetrecordings'] = 'Delete recordings';
+$string['resetlogs_help'] = 'Deleting the logs will cause the lost of references to recordings';
+$string['resetrecordings_help'] = 'Deleting the recordings will make them inaccessible from anywhere and it can not be undone';
+
 $string['view_error_no_group_student'] = 'You have not been enrolled in a group. Please contact your Teacher or the Administrator.';
 $string['view_error_no_group_teacher'] = 'There are no groups configured yet. Please set up groups or contact the Administrator.';
 $string['view_error_no_group'] = 'There are no groups configured yet. Please set up groups before trying to join the meeting.';
@@ -317,6 +326,7 @@ $string['view_message_session_has_user'] = 'There is';
 $string['view_message_session_has_users'] = 'There are';
 $string['view_message_session_for'] = 'the session for';
 $string['view_message_times'] = 'times';
+$string['view_message_and'] = 'and';
 
 $string['view_message_room_closed'] = 'This room is closed.';
 $string['view_message_room_ready'] = 'This room is ready.';

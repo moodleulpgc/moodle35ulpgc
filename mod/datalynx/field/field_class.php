@@ -359,7 +359,8 @@ abstract class datalynxfield_base {
             foreach ($contents as $key => $content) {
                 if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                     $rec->id = $contentid; // MUST_EXIST.
-                    return $DB->update_record('datalynx_contents', $rec);
+                    $DB->update_record('datalynx_contents', $rec);
+                    return $rec->id;
                 }
             }
         }
@@ -792,6 +793,17 @@ abstract class datalynxfield_base {
      * @return bool
      */
     public static function is_customfilterfield() {
+        return false;
+    }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value == '') {
+            return true;
+        }
         return false;
     }
 }

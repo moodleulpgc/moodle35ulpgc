@@ -281,6 +281,7 @@ body#page-question-type-mtf div[id^=fgroup_id_weightsarray] {
 .que.mtf table .c0, 
 .que.mtf table .c1 {
     width: 1%;
+    min-width: 65px;
 }
 
 #page-mod-quiz-review .que.mtf table .c2, 

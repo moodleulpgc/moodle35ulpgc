@@ -23,6 +23,10 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright 2017, onwards Poet
  */
 
+// Group context was dropped between 1.8 and 1.9. Use the old definition here.
+define('CONTEXT_GROUP', 60);
+// moved here from metadata/context/group/classes/context_handler.php by ecastro ULPGC 
+ 
 function local_metadata_supports($feature) {
     switch($feature) {
         case FEATURE_BACKUP_MOODLE2:

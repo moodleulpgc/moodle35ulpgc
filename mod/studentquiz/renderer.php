@@ -108,10 +108,6 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
                 .html_writer::span(
                     '<b class="stat never-answered">' . ($unansweredquestions) .'</b>',
                     '', array('style' => 'float: right;color:#f0ad4e;')))
-            . html_writer::div(
-                get_string('statistic_block_progress_available', 'studentquiz')
-                .html_writer::span('<b class="stat questions-available">' .$sqstats->questions_available .'</b>', '',
-                    array('style' => 'float: right;')))
             . html_writer::div($this->render_progress_bar($info2), '', array('style' => 'width:inherit'))
             . html_writer::div(get_string('statistic_block_approvals', 'studentquiz')
                 .html_writer::span('<b>' .$userstats->questions_approved .'</b>', '',
@@ -929,8 +925,8 @@ class mod_studentquiz_overview_renderer extends mod_studentquiz_renderer {
         $output = '';
 
         $output .= html_writer::start_tag('form', [
-                'method' => 'post',
-                'action' => 'view.php'
+                'method' => 'get',
+                'action' => ''
         ]);
         $output .= html_writer::empty_tag('input', ['type' => 'submit', 'style' => 'display:none;']);
         $output .= $questionslist;
@@ -1152,54 +1148,65 @@ EOT;
      * @param $page
      * @param $perpage
      * @param $pageurl
+     * @param $showperpageselection
      * @return string
      */
-    public function render_pagination_bar($pagevars, $baseurl, $totalnumber, $page, $perpage, $pageurl) {
-        $showall = $pagevars['showall'];
-        $pageingurl = new \moodle_url('view.php');
-        $pageingurl->params($baseurl->params());
-        $pagingbar = new \paging_bar($totalnumber, $page, $perpage, $pageingurl);
+    public function render_pagination_bar($pagevars, $baseurl, $totalnumber, $page, $perpage, $showperpageselection) {
+        $pagingbar = new \paging_bar($totalnumber, $page, $perpage, $baseurl);
         $pagingbar->pagevar = 'qpage';
 
-        $pagingbaroutput = '';
-        if (!$showall) {
-            $url = new \moodle_url('view.php', array_merge($pageurl->params(),
-                    ['showall' => true]));
+        $shouldshownavigation = false;
+        $shouldshowall = false;
+        $shouldshowpaging = false;
+        if (!$pagevars['showall']) {
             if ($totalnumber > $perpage) {
-                if (empty($pagevars['showallprinted'])) {
-                    $content = \html_writer::empty_tag('input', [
-                            'type' => 'submit',
-                            'value' => get_string('pagesize', 'studentquiz'),
-                            'class' => 'btn'
-                    ]);
-                    $content .= \html_writer::empty_tag('input', [
-                            'type' => 'text',
-                            'name' => 'qperpage',
-                            'value' => $perpage,
-                            'class' => 'form-control'
-                    ]);
-                    $pagingbaroutput .= \html_writer::div($content, 'pull-right form-inline pagination');
-                    $pagevars['showallprinted'] = true;
-                }
-                $showalllink = html_writer::link($url, get_string('showall', 'moodle', $totalnumber));
-                $pagingshowall = html_writer::div($showalllink, 'paging');
-                $pagingbaroutput .= html_writer::start_div('categorypagingbarcontainer');
-                $pagingbaroutput .= $this->output->render($pagingbar);
-                $pagingbaroutput .= $pagingshowall;
-                $pagingbaroutput .= html_writer::end_div();
+                $shouldshownavigation = true;
+                $shouldshowall = true;
+                $shouldshowpaging = true;
             } else {
                 if ($perpage > DEFAULT_QUESTIONS_PER_PAGE) {
-                    $url = new \moodle_url('view.php', array_merge($pageurl->params(), ['qperpage' => DEFAULT_QUESTIONS_PER_PAGE]));
-                    $showalllink = html_writer::link($url, get_string('showperpage', 'moodle', DEFAULT_QUESTIONS_PER_PAGE));
-                    $pagingshowall = html_writer::div($showalllink, 'paging');
-                    $pagingbaroutput .= $pagingshowall;
+                    $shouldshownavigation = true;
+                    $perpage = 20;
                 }
             }
         } else {
-            $url = new \moodle_url('view.php', array_merge($pageurl->params(), ['qperpage' => $perpage]));
-            $showalllink = html_writer::link($url, get_string('showperpage', 'moodle', $perpage));
-            $pagingshowall = html_writer::div($showalllink, 'paging');
-            $pagingbaroutput .= $pagingshowall;
+            $shouldshownavigation = true;
+        }
+
+        $pagingbaroutput = '';
+        if ($shouldshownavigation) {
+            if ($shouldshowpaging) {
+                $pagingbaroutput .= html_writer::start_div('categorypagingbarcontainer');
+                if ($showperpageselection) {
+                    $selectionperpage = \html_writer::empty_tag('input', [
+                        'type' => 'submit',
+                        'value' => get_string('pagesize', 'studentquiz'),
+                        'class' => 'btn'
+                    ]);
+                    $selectionperpage .= \html_writer::empty_tag('input', [
+                        'type' => 'text',
+                        'name' => 'qperpage',
+                        'value' => $perpage,
+                        'class' => 'form-control'
+                    ]);
+                    $pagingbaroutput .= \html_writer::div($selectionperpage, 'pull-right form-inline pagination m-t-1');
+                }
+                $pagingbaroutput .= $this->output->render($pagingbar);
+                $pagingbaroutput .= html_writer::end_div();
+            }
+            if ($showperpageselection) {
+                $showalllink = '';
+                if ($shouldshowall) {
+                    $linktext = get_string('showall', 'moodle', $totalnumber);
+                    $url = new \moodle_url('view.php', array_merge($baseurl->params(), ['showall' => 1]));
+                    $showalllink = html_writer::link($url, $linktext);
+                } else {
+                    $linktext = get_string('showperpage', 'moodle', $perpage);
+                    $url = new \moodle_url('view.php', array_merge($baseurl->params(), ['showall' => 0, 'qperpage' => $perpage]));
+                    $showalllink = html_writer::link($url, $linktext);
+                }
+                $pagingbaroutput .= html_writer::div($showalllink, 'paging');
+            }
         }
 
         return $pagingbaroutput;
@@ -1379,15 +1386,14 @@ class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
     public function render_rate($questionid) {
         global $DB, $USER;
 
-        $value = -1; $readonly = false;
+        $value = -1;
         $rate = $DB->get_record('studentquiz_rate', array('questionid' => $questionid, 'userid' => $USER->id));
         if ($rate !== false) {
             $value = $rate->rate;
-            $readonly = true;
         }
 
         return html_writer::div(
-            html_writer::div($this->rate_choices($questionid, $value , $readonly), 'rate'),
+            html_writer::div($this->rate_choices($questionid, $value , false), 'rate'),
             'studentquiz_behaviour'
         );
     }

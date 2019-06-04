@@ -36,12 +36,10 @@ define(["jquery"], function($) {
                         });
                         // Remove data from input fields.
                         $(this).closest('.lines').find('input').each(function () {
-                            $(this).val('');
-                        });
-                        // Deactivate the time/date field and remove team members.
-                        $(this).closest('.lines').find('[id$=enabled]:checked,' +
-                            ' .form-autocomplete-selection .tag').each(function () {
-                            $(this).trigger('click');
+                            // Do not affect hidden inputs.
+                            if ($(this).attr('type') != 'hidden') {
+                                $(this).val('');
+                            }
                         });
                         // Remove atto editor content.
                         $(this).closest('.lines').find('.editor_atto_content').each(function () {
@@ -51,8 +49,19 @@ define(["jquery"], function($) {
                         $(this).closest('.lines').find('textarea').each(function () {
                             $(this).val('');
                         });
+                        // Remove single select content.
+                        $(this).closest('.lines').find('select').each(function () {
+                            $(this).find('option[value=""]').prop('selected', true);
+                        });
+                        // Deactivate the time/date field and remove team members.
+                        $(this).closest('.lines').find('[id$=enabled]:checked,' +
+                            ' .form-autocomplete-selection .tag').each(function () {
+                            $(this).trigger('click');
+                        });
+
                         // Hide the empty lines if not required or the only line remaining.
-                        if(lineid > requiredlines && lineid > 1) {
+                        // TODO: Changed this to >= so people can remove the first line as well.
+                        if(lineid > requiredlines && lineid >= 1) {
                             thisline.hide();
                             // Alter DOM: Reorder lines and make content ordered properly.
                             // Strategy: The deleted line should be moved under the last
@@ -82,9 +91,11 @@ define(["jquery"], function($) {
                                 parentcontainer.prepend(newcontentorder[i]);
                             }
                         }
+
                     });
             });
 
         }
+
     };
 });

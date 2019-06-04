@@ -96,10 +96,6 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
-        if (empty($values)) {
-            return true;
-        }
-
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
@@ -119,7 +115,10 @@ class datalynxfield_editor extends datalynxfield_base {
         $rec->content = $data->content;
         $rec->content1 = $data->contentformat;
 
-        return $DB->update_record('datalynx_contents', $rec);
+        $DB->update_record('datalynx_contents', $rec);
+
+        // We need the contentid as return value.
+        return $rec->id;
     }
 
     /**
@@ -156,5 +155,16 @@ class datalynxfield_editor extends datalynxfield_base {
     public function get_supported_search_operators() {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx'));
+    }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value['text'] == '') {
+            return true;
+        }
+        return false;
     }
 }

@@ -745,6 +745,10 @@ class datalynx_entries {
                                 }
 
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
+
+                                    $emptycontent = array(); // Array with lines and deleted contentids.
+                                    $countfgfields = 0; // Store how many fields exist per line.
+
                                     // Variable $eid should be different from $entryid only in new entries.
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
@@ -752,6 +756,7 @@ class datalynx_entries {
                                         // If we see a fieldgroup we split and reset the content.
                                         $fieldgroup = array_search(true, $content);
                                         if (strpos($fieldgroup, "fieldgroup") === 0) {
+                                            $countfgfields++;
                                             // TODO: Rewrite this for fieldgroup_id instead of fieldgroup. Use $fieldgroup.
                                             // How many lines were visible to the user, store only those.
 
@@ -759,15 +764,24 @@ class datalynx_entries {
                                             // Split $content and generate temporary content.
                                             // Look for all content_names like _url or _alt.
                                             $tempcontent = array();
+
                                             foreach ($content as $key => $value) {
+
                                                 // Only add keys that start with our expected pattern to tempcontent.
                                                 // Pattern of submitted field content.
                                                 if (strpos($key, 'fieldgroup_') === 0) {
                                                     continue;
                                                 }
+
+                                                // Skip _alt from url, this does corrupt updating.
+                                                if (!substr_compare($key, "_alt", -4, 4)) {
+                                                    continue;
+                                                }
+
                                                 $getlinenumber = explode("_", $key);
                                                 // Line number is the 6th element of the array.
                                                 $i = $getlinenumber[5];
+
                                                 $fieldcontentpattern = "{$fieldname}_{$fieldgroup}_{$i}";
                                                 if (0 === strpos($key, $fieldcontentpattern)) {
                                                     // If we found sth. relevant, split it up and rebuild key.
@@ -775,11 +789,17 @@ class datalynx_entries {
                                                     $contentname = explode("{$fieldcontentpattern}_", $key);
                                                     if (isset($contentname[1])) {
                                                         $tempcontent[$contentname[1]] = $value; // No need for fieldname.
-                                                        // $tempcontent[$fieldname . "_" . $contentname[4]] = $value;
                                                     } else {
                                                         $tempcontent[$fieldname] = $value;
                                                     }
                                                 }
+
+                                                // We know this is a fieldgroup but there is only one line set.
+                                                if (!isset($entry->{"c{$fieldid}_id_fieldgroup"})
+                                                    && isset($entry->{"c{$fieldid}_id"})) {
+                                                    $entry->{"c{$fieldid}_id_fieldgroup"}[0] = $entry->{"c{$fieldid}_id"};
+                                                }
+
                                                 // Split $entry and overwrite entry content.
                                                 $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_content"} = null;
                                                 if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
@@ -800,13 +820,41 @@ class datalynx_entries {
                                                     }
                                                 }
                                                 // Pass tempstuff to updatecontent.
-                                                $fields[$fieldid]->update_content($entry, $tempcontent);
+                                                // TODO: This relies on the correctness of the field classes update content.
+                                                $newcontentid = $fields[$fieldid]->update_content($entry, $tempcontent);
+
+                                                // In case this field has no content mark and check deletion later.
+                                                // TODO: Needs to be extended for all field classes in function.
+                                                if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
+
+                                                    if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
+                                                        $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                    } else {
+                                                        $emptycontent[$i][] = $newcontentid;
+                                                    }
+                                                }
                                             }
                                         } else {
                                             // Keep behaviour if no fieldgroup is detected.
                                             $fields[$fieldid]->update_content($entry, $content);
                                         }
 
+                                    }
+
+                                    // Remove contentids that we have collected.
+                                    if ($emptycontent) {
+                                        $deletedcontentids = array();
+                                        foreach ($emptycontent as $line => $contentids) {
+                                            // Check if every field is empty, only then remove line.
+                                            if (count($contentids) != $countfgfields) {
+                                                continue;
+                                            }
+                                            $deletedcontentids = array_merge($deletedcontentids, $contentids);
+                                        }
+                                        if ($deletedcontentids) {
+                                            $in = implode(',', $deletedcontentids);
+                                            $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
+                                        }
                                     }
                                     $processed[$entry->id] = $entry;
 

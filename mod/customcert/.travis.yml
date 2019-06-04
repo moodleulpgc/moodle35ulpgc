@@ -2,6 +2,7 @@ language: php
 
 # For javascript behat tests we need sudo
 sudo: true
+dist: trusty
 
 cache:
   directories:
@@ -17,8 +18,7 @@ addons:
  postgresql: 9.3
  apt:
    packages:
-   - oracle-java8-installer
-   - oracle-java8-set-default
+    - openjdk-8-jre-headless
 
 env:
  global:

@@ -1155,6 +1155,8 @@ class edit_renderer extends \plugin_renderer_base {
 
         $this->page->requires->strings_for_js(array(
                 'addpagebreak',
+                'cannotremoveallsectionslots',
+                'cannotremoveslots',
                 'confirmremovesectionheading',
                 'confirmremovequestion',
                 'dragtoafter',

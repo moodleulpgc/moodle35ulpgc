@@ -208,7 +208,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      * Update a teammemberselectfield when editing an entry and notify teammembers of changes
      */
     public function update_content($entry, array $values = null) {
-        parent::update_content($entry, $values);
+        $newcontentid = parent::update_content($entry, $values);
 
         // TODO: All this is only to notify team members. Check if we really need this here.
         global $DB;
@@ -232,7 +232,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
         $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
 
-        return true;
+        return $newcontentid;
     }
 
     /**
@@ -427,14 +427,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $selected = !empty($first) ? $first : array();
 
         if (!empty($selected)) {
-
             // Remove Dummy value.
             if (isset($selected[0]) && $selected[0] == -999) {
                 array_shift($selected);
             }
-
-            $contents[] = json_encode($selected);
         }
+
+        $contents[] = json_encode($selected); // Empty values are kept.
         return array($contents, $oldcontents);
     }
 
@@ -506,5 +505,23 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      */
     public static function is_customfilterfield() {
         return true;
+    }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+
+        if (empty($value)) {
+            return true;
+        }
+
+        // Backwards compatible, we added -999 to pass empty values.
+        if (count($value) === 1 && isset($value[0]) && $value[0] == -999) {
+            return true;
+        }
+
+        return false;
     }
 }

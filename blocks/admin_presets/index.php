@@ -18,7 +18,7 @@
  * Admin presets block main controller
  *
  * @package          blocks/admin_presets
- * @copyright        2017 Digidago <contact@digidago.com><www.digidago.com>
+ * @copyright        2019 Pimenko <support@pimenko.com><pimenko.com>
  * @author           Jordan Kesraoui | DigiDago
  * @orignalauthor    David Monllaó <david.monllao@urv.cat>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,7 +39,7 @@ if (!$context = context_system::instance()) {
 require_capability('moodle/site:config', $context);
 
 
-// Loads the required action class and form
+// Loads the required action class and form.
 $classname = 'admin_presets_'.$action;
 $formname = $classname.'_form';
 $formpath = $CFG->dirroot.'/blocks/admin_presets/forms/'.$formname.'.php';
@@ -60,13 +60,13 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_context($context);
 
 
-// Executes the required action
+// Executes the required action.
 $instance = new $classname();
 if (!method_exists($instance, $mode)) {
     print_error('falsemode', 'block_admin_presets', $mode);
 }
 
-// Executes the required method and displays output
+// Executes the required method and displays output.
 $instance->$mode();
 $instance->log();
 $instance->display();

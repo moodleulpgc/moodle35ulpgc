@@ -286,6 +286,7 @@ body#page-question-type-kprime div[id^=fgroup_id_weightsarray] {
 .que.kprime table .c1, 
 .que.kprime table .c2 {
     width: 1%;
+    min-width: 65px;
 }
 
 #page-mod-quiz-review .que.kprime table .c0, 
@@ -299,7 +300,7 @@ body#page-question-type-kprime div[id^=fgroup_id_weightsarray] {
 	body#page-question-type-kprime #id_generalfeedbackeditable,
 	body#page-question-type-kprime .optionbox,
 	.que.kprime .optiontext,
-	.kprimespecificfeedback  {
+	.kprimespecificfeedback {
 		word-break: break-all;
 	}
 }

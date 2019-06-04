@@ -30,15 +30,20 @@
 
     Example context (json):
     {
-        "name" : "textfield",
-        "content" : "testtext"
+        "line":[
+            {"subfield":[{"name":"a","content":"a0"},{"name":"b","content":"b0"}]},
+            {"subfield":[{"name":"a","content":"a1"},{"name":"b","content":"b1"}]}
+        ],
+        "header":[
+            {"name":"a"},{"name":"b"}
+        ]
     }
 }}
 
 {{#line}}
 <div class="row">
     {{#subfield}}
-        <div class="col">{{name}}: {{{content}}}</div>
+        <div class="col" data-field-name="{{name}}">{{name}}: {{{content}}}</div>
     {{/subfield}}
 </div>
 {{/line}}

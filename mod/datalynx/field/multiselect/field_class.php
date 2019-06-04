@@ -88,4 +88,16 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         }
         return $defaults;
     }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        // If array > 1 entry we see actual input from the user, next to -999.
+        if (count($value) < 2) {
+            return true;
+        }
+        return false;
+    }
 }

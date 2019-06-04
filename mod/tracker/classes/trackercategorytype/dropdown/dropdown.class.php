@@ -149,13 +149,13 @@ class dropdownelement extends trackerelement {
         }
 
         $elmname = 'element'.$this->name;
-
+        
         if (!$this->multiple) {
             $value = optional_param($elmname, '', PARAM_TEXT);
             $attribute->elementitemid = $value;
         } else {
-            $valuearr = optional_param_array($elmname, '', PARAM_TEXT);
-            if (is_array($data->$elmname)) {
+            $valuearr = optional_param($elmname, '', PARAM_TEXT);
+            if (is_array($valuearr)) {
                 $attribute->elementitemid = implode(',', $valuearr);
             } else {
                 $attribute->elementitemid = $this->getvalue($attribute->issueid);
@@ -163,7 +163,6 @@ class dropdownelement extends trackerelement {
         }
         
         if(!array_key_exists($attribute->elementitemid, $this->options)) {
-        
             if($attribute->elementitemid === '') {
                 return;
             }

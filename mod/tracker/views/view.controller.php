@@ -58,6 +58,7 @@ elseif ($action == 'updateanissue') {
     if(!$issue->summary) {
         unset($issue->summary);
     }
+    
     //$issue->description_editor = required_param_array('description_editor', PARAM_CLEANHTML);
     $editoroptions = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
     $issue->description_editor = optional_param_array('description_editor', '', PARAM_CLEANHTML); // ecastro ULPGC non-updateable if not fulledit
@@ -68,12 +69,13 @@ elseif ($action == 'updateanissue') {
     
     $issue->resolution_editor = required_param_array('resolution_editor', PARAM_CLEANHTML);
     $issue->resolutionformat = $issue->resolution_editor['format'];
-    $issue->resolution = file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker', 'issueresolution', $issue->id, $editoroptions, $issue->resolution_editor['text']);
+    $issue->resolution = $issue->resolution_editor['text'] ? file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker', 'issueresolution', $issue->id, $editoroptions, $issue->resolution_editor['text']) : '';
 
     $issue->datereported = required_param('datereported', PARAM_INT);
 
     $issue->trackerid = $tracker->id;
 
+    
     // if ownership has changed, prepare logging
     $oldrecord = $DB->get_record('tracker_issue', array('id' => $issue->id));
     if ($oldrecord->assignedto != $issue->assignedto) {
