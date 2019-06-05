@@ -52,9 +52,14 @@ class attendance_tabs implements renderable {
     /** Update tab */
     const TAB_UPDATE        = 7;
     /** Warnings tab */
-    const TAB_WARNINGS = 8;
+    const TAB_WARNINGS      = 8;
     /** Absentee tab */
     const TAB_ABSENTEE      = 9;
+    
+    /** milista tab */
+    const TAB_MILISTA       = 10;
+    
+    
     /** @var int current tab */
     public $currenttab;
 
@@ -129,6 +134,13 @@ class attendance_tabs implements renderable {
                             $this->att->url_sessions()->out(true,
                                 array('action' => mod_attendance_sessions_page_params::ACTION_UPDATE)),
                                 get_string('changesession', 'attendance'));
+        }
+        
+        // ecastro ULPGC add milista access
+        if(has_any_capability($capabilities, $context) && $ulpgc = get_config('local_ulpgccore')) {
+            $url = new moodle_url('https://www.milista.ulpgc.es/moodle.php', array('c'=>'profesor', 'shortname'=>$this->att->course->shortname));
+            $toprow[] = new tabobject(self::TAB_MILISTA, $url->out(),
+                            get_string('milista', 'attendance'));
         }
 
         return array($toprow);

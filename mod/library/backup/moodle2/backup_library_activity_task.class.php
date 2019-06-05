@@ -59,14 +59,13 @@ class backup_library_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/library','#');
-
+        $base = preg_quote($CFG->wwwroot, "/");
         // Link to the list of choices
-        $search="/(".$base."\//mod\/library\/index.php\?id\=)([0-9]+)/";
+        $search="/(".$base."\/mod\/library\/index.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@LIBRARYINDEX*$2@$', $content);
 
         // Link to choice view by moduleid
-        $search="/(".$base."\//mod\/library\/view.php\?id\=)([0-9]+)/";
+        $search="/(".$base."\/mod\/library\/view.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@LIBRARYVIEWBYID*$2@$', $content);
 
         return $content;

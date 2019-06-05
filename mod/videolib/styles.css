@@ -10,4 +10,5 @@
 
 .path-mod-videolib iframe {
     display: block;
+    height: 100vh;
 }

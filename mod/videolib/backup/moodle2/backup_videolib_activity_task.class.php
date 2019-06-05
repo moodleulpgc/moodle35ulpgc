@@ -59,14 +59,14 @@ class backup_videolib_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/videolib',"/");
+        $base = preg_quote($CFG->wwwroot, "/");
 
         // Link to the list of choices
-        $search="/(".$base."\//mod\/videolib\/index.php\?id\=)([0-9]+)/";
+        $search="/(".$base."\/mod\/videolib\/index.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@VIDEOLIBINDEX*$2@$', $content);
 
         // Link to choice view by moduleid
-        $search="/(".$base."\//mod\/videolib\/view.php\?id\=)([0-9]+)/";
+        $search="/(".$base."\/mod\/videolib\/view.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@VIDEOLIBVIEWBYID*$2@$', $content);
 
         return $content;

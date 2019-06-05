@@ -27,7 +27,9 @@ namespace metadatacontext_group;
 defined('MOODLE_INTERNAL') || die();
 
 // Group context was dropped between 1.8 and 1.9. Use the old definition here.
-define('CONTEXT_GROUP', 60); // ecastro ULPGC
+if(!defined('CONTEXT_GROUP')) {
+    define('CONTEXT_GROUP', 60); // ecastro ULPGC
+}
 
 /**
  * Local metadatacontext_group event handler.

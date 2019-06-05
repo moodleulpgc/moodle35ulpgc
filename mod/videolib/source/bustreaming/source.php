@@ -59,7 +59,7 @@ class videolibsource_bustreaming extends videolib_source_base {
                 'src' => $this->videourl,
                 'height' => '100%',
                 'width' => '100%',
-                'style' => 'border: 0px; border-style: none; max-width: 100%; max-height: 100vh ',
+                'style' => 'border: 0px; border-style: none; max-width: 100%; max-height: 100vh; ',
                 'allowfullscreen' => 'true',
                 'webkitallowfullscreen' => 'true',
                 'mozallowfullscreen' => 'true',
