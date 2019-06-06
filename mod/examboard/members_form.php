@@ -132,18 +132,24 @@ class examboard_members_form extends moodleform {
 
         if(isset($data['memberids']) && is_array($data['memberids']) && 
                         (count($data['memberids']) - count(array_unique($data['memberids'])))) {
-            $errors['memberids'] = get_string('memberduplicatedname', 'examboard'); 
+            $users = array_filter($data['memberids']);
+            if(count($users) - count(array_unique($users))) {
+                $errors['memberids'] = get_string('memberduplicatedname', 'examboard'); 
+            }
         }
         
         if(isset($data['deputyids']) && is_array($data['deputyids']) && 
-                        (count($data['memberids']) - count(array_unique($data['memberids'])))) {
-            $errors['deputyids'] = get_string('deputyduplicatedname', 'examboard'); 
+                        (count($data['deputyids']) - count(array_unique($data['deputyids'])))) {
+            $users = array_filter($data['deputyids']);
+            if(count($users) - count(array_unique($users))) {
+                $errors['deputyids'] = get_string('deputyduplicatedname', 'examboard'); 
+            }
         }
 
         if(isset($data['memberids']) && is_array($data['memberids']) &&
                                     isset($data['deputyids']) && is_array($data['deputyids'])) {
             foreach($data['memberids'] as $k => $user) {
-                if(in_array($user, $data['deputyids'])) {
+                if($user && in_array($user, $data['deputyids'])) {
                     $errors['memberids'] = get_string('memberasdeputy', 'examboard'); 
                 }
             }

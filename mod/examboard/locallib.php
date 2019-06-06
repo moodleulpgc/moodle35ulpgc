@@ -861,10 +861,18 @@ function examboard_process_editmembers($examboard, $fromform) {
         'other' => array('examboardid'=>$examboard->id),
     );
     
-    
     foreach(range(0, $examboard->maxboardsize -1) as $index) {
+        if($index === 0) {
+            $member->role = $examboard->chair;
+        } elseif($index === 1) {
+            $member->role = $examboard->secretary;
+        } else { 
+            $member->role = $examboard->vocal;
+        }
+    
         $params['sortorder'] = $index;
         $member->sortorder = $index;
+        
         $eventparams['other']['sortorder'] = $index;
         
         $params['deputy'] = 0;
@@ -886,6 +894,7 @@ function examboard_process_editmembers($examboard, $fromform) {
         $eventparams['other']['deputy'] = 1;
         $event = \mod_examboard\event\member_updated::create($eventparams);
         $event->trigger();
+        $member->role = '';
     }
 
     list($assignedexams, $otherexams) = examboard_get_board_exams($fromform->board, $examboard->id, false);
