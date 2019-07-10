@@ -135,8 +135,6 @@ if ($mform->is_cancelled()) {
     } elseif($action == 'fieldcomply') {
         $records = report_trackertools_field_compliance_list($tracker, $fromform);
         
-        print_object($records);
-        
         $complianceform = $fromform->fillstatus ? 'report_trackertools_noncompliant_form' : 'report_trackertools_checked_form';
         $mform = new $complianceform(null, array('cmid'=>$id, 'tracker'=>$tracker, 'issues'=>$records));
         

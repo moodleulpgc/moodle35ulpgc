@@ -93,8 +93,8 @@ function moodleoverflow_supports($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;
             // ecastro ULPGC implement completion
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_COMPLETION_HAS_RULES:    return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
+        case FEATURE_COMPLETION_HAS_RULES:    return false;
 
             
         default:
@@ -1181,7 +1181,7 @@ function moodleoverflow_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, intro, introformat, completiondiscussions, completionanswers, completioncomments';
+    $fields = 'id, name, intro, introformat, ratingpreference, coursewidereputation';
     if (!$moodleoverflow = $DB->get_record('moodleoverflow', $dbparams, $fields)) {
         return false;
     }
@@ -1196,9 +1196,9 @@ function moodleoverflow_get_coursemodule_info($coursemodule) {
 
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        $result->customdata['customcompletionrules']['completiondiscussions'] = $moodleoverflow->completiondiscussions;
-        $result->customdata['customcompletionrules']['completionanswers'] = $moodleoverflow->completionanswers;
-        $result->customdata['customcompletionrules']['completioncomments'] = $moodleoverflow->completioncomments;
+        //$result->customdata['customcompletionrules']['completiondiscussions'] = $moodleoverflow->completiondiscussions;
+        //$result->customdata['customcompletionrules']['completionanswers'] = $moodleoverflow->completionanswers;
+        //$result->customdata['customcompletionrules']['completioncomments'] = $moodleoverflow->completioncomments;
     }
 
     return $result;

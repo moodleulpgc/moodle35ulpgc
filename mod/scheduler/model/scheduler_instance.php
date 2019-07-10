@@ -421,10 +421,11 @@ class scheduler_instance extends mvc_record_model {
 
         if($this->shared_slots_enabled()) { // ecastro ULPGC
             $context = $this->get_context();
-            $attenders = array_keys(get_users_by_capability($context, 'mod/scheduler:attend', 'u.id, u.id', '', '', '', '', '', false));
-            list($insql, $inparams) = $DB->get_in_or_equal($attenders, SQL_PARAMS_NAMED, 'host_');
-            $where = " WHERE ( schedulerid = :schedulerid  OR ((shared > 0 ) AND (teacherid $insql ))) ";  // ecastro ULPGC
-            $params = $params + $inparams;
+            if($attenders = array_keys(get_users_by_capability($context, 'mod/scheduler:attend', 'u.id, u.id', '', '', '', '', '', false))) {
+                list($insql, $inparams) = $DB->get_in_or_equal($attenders, SQL_PARAMS_NAMED, 'host_');
+                $where = " WHERE ( schedulerid = :schedulerid  OR ((shared > 0 ) AND (teacherid $insql ))) ";  // ecastro ULPGC
+                $params = $params + $inparams;
+            }
         }
 
         if ($wherecond) {

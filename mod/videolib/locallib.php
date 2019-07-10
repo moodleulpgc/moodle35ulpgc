@@ -204,7 +204,7 @@ function videolib_parameter_value_mapping($videolib, $cm, $course) {
 }
 
 /**
- * BC internal function
+ * 
  * @param object $videolib
  * @param object $config
  * @return string
@@ -222,10 +222,9 @@ function videolib_get_encrypted_parameter($videolib, $config) {
 }
 
 /**
- * BC internal function
+ * 
  * @param object $videolib
- * @param object $config
- * @return string
+ * @return plugin videolibsource class subtype
  */
 function videolib_get_source_plugin($videolib) {
     global $CFG;
@@ -234,3 +233,349 @@ function videolib_get_source_plugin($videolib) {
     
     return new $classname($videolib);
 }
+
+
+/**
+ * 
+ * @param object $fromform 
+ * @return string errro message
+ */
+function videolib_export_mapping($fromform) {
+    global $CFG, $DB;
+    require_once($CFG->libdir . '/dataformatlib.php');
+    
+    $message = '';
+    
+    $filename = clean_filename($fromform->filename);
+    
+    $columns = array_keys($DB->get_columns('videolib_source_mapping'));
+    $columns = array_combine($columns, $columns);
+    
+    list($where, $params) = videolib_sql_search_mapping($fromform);
+    /*
+    $params = array();
+    $select = '1';
+    if($fromform->source) {
+        $select .= ' AND source = :source';
+        $params['source'] = $fromform->source;
+    }
+    if($fromform->annuality) {
+        $select .= ' AND '.$DB->sql_like('annuality', ':annuality');
+        $params['annuality'] = $fromform->annuality;
+    }
+    if($fromform->videolibkey) {
+        $select .= ' AND '.$DB->sql_like('videolibkey', ':videolibkey');
+        $params['videolibkey'] = $fromform->videolibkey;
+    }*/
+    if(!$where) {
+        $where = 1;
+    }
+    
+   
+    $rs_entries = $DB->get_recordset_select('videolib_source_mapping', $where, $params, 'id'); 
+    if($rs_entries->valid() && $columns) {
+        if (!headers_sent() && error_get_last()==NULL ) {
+            download_as_dataformat($filename, $fromform->dataformat, $columns, $rs_entries);
+            
+        } else {
+            $message = get_string('errorheaderssent', 'videolib');
+        }
+    }
+    $rs_entries->close();
+
+    return $message;
+}
+
+function videolib_get_mapping_table($cmid, $filter = array(), $perpage = 50) {
+    global $CFG, $DB, $OUTPUT;
+
+    if((int)$perpage < 10) {
+        $perpage = 10;
+    }
+    
+    $params = array('id'=>$cmid, 'a' => 'view', 'p'=>$perpage);
+    foreach($filter as $field => $value) { 
+        $params[substr($field,0,2)] = $value;
+    }
+    $manageurl = new moodle_url('/mod/videolib/manage.php', $params);
+    $viewurl = new moodle_url('/mod/videolib/view.php');
+
+    $table = new flexible_table('videolib-manage-edit-'.$cmid);
+    
+    $tablecolumns = array('id', 'videolibkey', 'annuality', 'source', 'remoteid',
+                            'cmids', 'timemodified', 'action');
+    $tableheaders = array(get_string('rownum', 'videolib'),
+                            get_string('videolibkey', 'videolib'),
+                            get_string('annuality', 'videolib'),
+                            get_string('source', 'videolib'),
+                            get_string('remoteid', 'videolib'),
+                            get_string('mapping', 'videolib'),
+                            get_string('datechanged'),
+                            get_string('action'),
+                            );
+    $table->define_columns($tablecolumns);
+    $table->define_headers($tableheaders);
+    $table->define_baseurl($manageurl->out(false));
+    $table->sortable(true, 'videolibkey', SORT_ASC);
+    $table->no_sorting('action');
+
+    $table->set_attribute('id', 'videolib_sources_mapping');
+    $table->set_attribute('cellspacing', '0');
+    $table->set_attribute('class', 'flexible generaltable videolibsourcestable');
+
+    $table->setup();
+/*
+    $params = array();
+    $where = 1;
+    if(isset($filter->source) && $filter->source) {
+        $where[] = ' AND source = :source';
+        $params['source'] = $filter->source;
+    }
+    if(isset($filter->annuality) && $filter->annuality) {
+        $where[] = ' AND '.$DB->sql_like('annuality', ':annuality');
+        $params['annuality'] = $annuality;
+    }
+    if(isset($filter->videolibkey) && $filter->videolibkey) {
+        $where[] = ' AND '.$DB->sql_like('videolibkey', ':videolibkey');
+        $params['videolibkey'] = $videolibkey;
+    }
+    */
+    list($where, $params) = videolib_sql_search_mapping($filter);
+    
+    //print_object($where);
+    //print_object($params);
+    
+
+    $totalcount = $DB->count_records_select('videolib_source_mapping', $where, $params);
+
+    $table->initialbars(false);
+    $table->pagesize($perpage, $totalcount);
+
+    if ($table->get_sql_sort()) {
+        $sort = $table->get_sql_sort();
+    } else {
+        $sort = ' videolibkey ASC, annuality DESC ';
+    }
+
+    $stredit   = get_string('edit');
+    $strdelete = get_string('delete');
+
+    if($elements = $DB->get_records_select('videolib_source_mapping', $where, $params, $sort, '*', $table->get_page_start(), $table->get_page_size())) {
+        foreach($elements as $element) {
+            $data = array();
+            $data[] = $element->id;
+            $data[] = $element->videolibkey;
+            $data[] = $element->annuality;
+            $data[] = $element->source;
+            $data[] = $element->remoteid;
+            if($cmids = explode(',', $element->cmids)) {
+                foreach($cmids as $k => $value) {
+                    $viewurl->param('ìd', $value); 
+                    $cmids[$k] = html_writer::link($viewurl, $value);
+                }
+                $element->cmids = implode(',',$cmids);
+            }
+            $data[] = $element->cmids;
+            $data[] = userdate($element->timemodified, get_string('strftimedatetimeshort'));
+            
+            $action = '';
+            if (!$table->is_downloading()) {
+                $buttons = array();
+                $url = new moodle_url($manageurl, array('a'=>'update', 'item'=>$element->id));
+                $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'moodle', array('class'=>'iconsmall', 'title'=>$stredit)));
+                $url = new moodle_url($manageurl, array('a'=>'del', 'item'=>$element->id));
+                $buttons[] = html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'moodle', array('class'=>'iconsmall', 'title'=>$strdelete)));
+                $action = implode('&nbsp;&nbsp;', $buttons);
+            }
+            $data[] = $action;
+
+            $table->add_data($data);
+        }
+    }
+    
+    $table->finish_output();
+}
+
+/**
+ * 
+ * @param object $fromform 
+ * @return void
+ */
+function videolib_saveupdate_mapping($fromform) {
+    global $DB;
+    
+    $success = false;
+    
+    $data = new stdClass();
+    $data->videolibkey = $fromform->videolibkey;
+    $data->annuality = $fromform->annuality;
+    $data->source = $fromform->source;
+    if(isset($fromform->itemid) && $fromform->itemid) {
+        $params['id'] = $fromform->itemid;
+        $action = 'entryupdated';
+    } else {
+        $params = get_object_vars($data);
+        $action = 'entryadded';
+    }
+    $data->remoteid = $fromform->remoteid;
+    $data->timemodified = time();
+    
+    if($rec = $DB->get_record('videolib_source_mapping', $params)) {
+        // we are updating
+        $data->id = $rec->id;
+        if($DB->update_record('videolib_source_mapping', $data)) {
+            $success = true;;
+        }
+    } else {
+        //we are adding
+        if($newid = $DB->insert_record('videolib_source_mapping', $data)) {
+            $success = true;
+        }
+    }
+    
+    if($success) {
+        \core\notification::add(get_string($action, 'videolib'), \core\output\notification::NOTIFY_SUCCESS);
+    } else {
+        \core\notification::add(get_string('dberror', 'videolib'), \core\output\notification::NOTIFY_ERROR);
+    }
+}
+
+
+/**
+ * 
+ * @param object $filter object with search terms
+ * @return void
+ */
+function videolib_sql_search_mapping($filter) {
+    global $DB;
+    
+    $params = array();
+    $where = array();
+    if(isset($filter->itemid) && $filter->itemid) {
+        $where[] = 'id = :itemid';
+        $params['itemid'] = $filter->itemid;
+    }
+    if(isset($filter->source) && $filter->source) {
+        $where[] = 'source = :source';
+        $params['source'] = $filter->source;
+    }
+    if(isset($filter->annuality) && $filter->annuality) {
+        $where[] = $DB->sql_like('annuality', ':annuality');
+        $params['annuality'] = $filter->annuality;
+    }
+    if(isset($filter->videolibkey) && $filter->videolibkey) {
+        $where[] = $DB->sql_like('videolibkey', ':videolibkey');
+        $params['videolibkey'] = $filter->videolibkey;
+    }
+    if(isset($filter->remoteid) && $filter->remoteid) {
+        $where[] = $DB->sql_like('remoteid', ':remoteid');
+        $params['remoteid'] = $filter->remoteid;
+    }
+    
+    if($where) {
+        $where = implode(' AND ', $where);
+    } else {
+        $where = '';
+    }
+    
+    return array($where, $params);
+}
+
+/**
+ * 
+ * @param object $fromform 
+ * @return void
+ */
+function videolib_delete_mapping($fromform) {
+    global $DB;
+    
+    $success = false;
+    foreach($fromform as $key => $value) {
+        if(strpos($key, '_confirmed')) {
+            $key = strstr($key, '_confirmed', true); 
+            $fromform->$key = $value;
+        } 
+    }
+    
+    if(isset($fromform->itemid) && $fromform->itemid) {
+        $count = 1;
+    }
+    if(isset($fromform->count) && $fromform->count) {
+        $count = $fromform->count;
+    }
+    
+    list($where, $params) = videolib_sql_search_mapping($fromform);
+    
+    //print_object($where);
+    //print_object($params);
+    if(!$where) { 
+        $where = 0;
+    }
+    
+    if($DB->delete_records_select('videolib_source_mapping', $where, $params)) {
+        \core\notification::add(get_string('mappingdeleted', 'videolib', $count), \core\output\notification::NOTIFY_SUCCESS);
+    } else {
+        \core\notification::add(get_string('dberror', 'videolib'), \core\output\notification::NOTIFY_ERROR);
+    }
+
+}
+
+
+/**
+ * 
+ * @param object $fromform 
+ * @return void
+ */
+function videolib_import_mapping($csvreader, $fromform) {
+    global $CFG, $DB;
+    
+    $recordsadded = 0;
+    
+    $columns = $csvreader->get_columns();
+    $now = time();
+    
+    $keys = array('source', 'annuality', 'videolibkey');
+    
+    $csvreader->init();
+    while ($record = $csvreader->next()) {
+    
+        $record = array_combine($columns, $record);
+    
+        $filter = new stdClass();
+        foreach($keys as $key) {
+            $filter->{$key} = $record[$key];
+        }
+        
+        list($where, $params) = videolib_sql_search_mapping($filter);
+        
+        print_object($record);
+        print_object($params);
+        
+        if(!array_diff($keys, array_keys($params))) {
+            // all mandatory keys are present
+            $record['timemodified'] = $now;
+            if($rec = $DB->get_record('videolib_source_mapping', $params)) {
+                // The records class_exists
+                if($fromform->updateonimport) {
+                    $record['id'] = $rec->id;
+                    //if(1) {
+                    if($DB->update_record('videolib_source_mapping', $record)) {
+                        $success = true;
+                        $recordsadded++;
+                        print_object("update");
+                    }
+                }
+            } else {
+                //we are adding
+                //if(1) {
+                if($newid = $DB->insert_record('videolib_source_mapping', $record)) {
+                    $success = true;
+                    $recordsadded++;
+                    print_object("adding");
+                }
+            }
+        }
+    }
+    
+}
+

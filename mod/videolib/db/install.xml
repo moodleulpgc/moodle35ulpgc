@@ -26,5 +26,22 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="videolib_source_mapping" COMMENT="Stores mapping from module instance to source ID.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="videolibkey" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="annuality" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="annuality of historic data"/>
+        <FIELD NAME="remoteid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The remote id for video"/>
+        <FIELD NAME="cmids" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Unique id for this mapping value."/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="videolibkey" UNIQUE="false" FIELDS="videolibkey" COMMENT="The moodle video intance."/>
+        <INDEX NAME="keysourceannuality" UNIQUE="true" FIELDS="videolibkey,source,annuality" COMMENT="The unique combination for each remote video ID"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

@@ -36,12 +36,36 @@ function xmldb_videolib_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // For further information please read the Upgrade API documentation:
-    // https://docs.moodle.org/dev/Upgrade_API
-    //
-    // You will also have to create the db/install.xml file by using the XMLDB Editor.
-    // Documentation for the XMLDB Editor can be found at:
-    // https://docs.moodle.org/dev/XMLDB_editor
+    if ($oldversion < 2019061700) {
+
+        // Define table videolib_source_mapping to be created.
+        $table = new xmldb_table('videolib_source_mapping');
+
+        // Adding fields to table videolib_source_mapping.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('videolibkey', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('source', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('annuality', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('remoteid', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('cmids', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table videolib_source_mapping.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        
+        // Define indexes 
+        $table->add_index('videolibkey', XMLDB_INDEX_NOTUNIQUE, array('videolibkey'));
+        $table->add_index('keysourceannuality', XMLDB_INDEX_UNIQUE, array('videolibkey,source,annuality'));
+        
+        // Conditionally launch create table for videolib_source_mapping.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Assign savepoint reached.
+        upgrade_mod_savepoint(true, 2019061700, 'videolib');
+    }
+
 
     return true;
 }

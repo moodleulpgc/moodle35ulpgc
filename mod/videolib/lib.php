@@ -374,7 +374,39 @@ function videolib_extend_navigation($videolibnode, $course, $module, $cm) {
  * This is not called by AJAX so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node $videolibnode {@link navigation_node}
+ * @param navigation_node $navref {@link navigation_node}
  */
-function videolib_extend_settings_navigation($settingsnav, $videolibnode = null) {
+function videolib_extend_settings_navigation(settings_navigation $settings, navigation_node $navref) {
+    global $PAGE, $DB;
+
+    $cm = $PAGE->cm;
+    if (!$cm) {
+        return;
+    }
+
+    $context = $cm->context;
+    $course = $PAGE->course;
+
+    if (!$course) {
+        return;
+    }
+
+    if (has_capability('mod/videolib:manage', $context)) {
+        $node = $navref->add(get_string('managevideolibsources', 'videolib'), null, navigation_node::TYPE_CONTAINER, null, 'videolib_managesources');
+
+        $node->add(get_string('manageview', 'videolib'), new moodle_url('/mod/videolib/manage.php', array('id' => $cm->id, 'a'=>'view')), 
+                            navigation_node::TYPE_SETTING, null, 'videolib_view_sources', new pix_icon('i/edit', ''));
+
+        $node->add(get_string('mapping', 'videolib'), new moodle_url('/mod/videolib/manage.php', array('id' => $cm->id, 'a'=>'map')), 
+                            navigation_node::TYPE_SETTING, null, 'videolib_mapping_sources', new pix_icon('i/info', ''));
+                            
+        $node->add(get_string('import', 'videolib'), new moodle_url('/mod/videolib/manage.php', array('id' => $cm->id, 'a'=>'import')), 
+                            navigation_node::TYPE_SETTING, null, 'videolib_import_sources', new pix_icon('i/import', ''));
+    }
+    
+    if (has_capability('mod/videolib:download', $context)) {
+            $node->add(get_string('export', 'videolib'), new moodle_url('/mod/videolib/manage.php', array('id' => $cm->id, 'a'=>'export')), 
+                            navigation_node::TYPE_SETTING, null, 'videolib_export_sources', new pix_icon('i/export', ''));
+    }
+
 }

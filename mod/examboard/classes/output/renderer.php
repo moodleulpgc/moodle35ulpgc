@@ -599,7 +599,6 @@ class renderer extends plugin_renderer_base {
         foreach($list->users as $uid => $user) {
             $name = $this->format_name($user, $list->is_downloading); 
             $examinee = html_writer::div($name, 'examineename');
-            
             $tutor = '';
             $other = '';
             if(isset($list->tutors[$uid][0]) && $list->tutors[$uid][0]->main) {
@@ -621,13 +620,15 @@ class renderer extends plugin_renderer_base {
                 }
             }
             
+            $examinees[$uid] = $user->userlabel ? html_writer::span($user->userlabel, 'userlabel') : '';
+            
             if($content = $tutor.$other) {
-                $examinees[$uid] = print_collapsible_region($content, 'tutors', 
+                $examinees[$uid] .= print_collapsible_region($content, 'tutors', 
                                                                 'tutorlist_'.$list->examid.'_'.$uid, 
                                                                 $examinee.'&nbsp;', 
                                                                 'tutorlist_'.$list->examid, true, true); 
             } else {
-                $examinees[$uid] = html_writer::div($examinee, 'collapsibleregion');
+                $examinees[$uid] .= html_writer::div($examinee, 'collapsibleregion');
             }
             
             

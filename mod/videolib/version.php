@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_videolib';
-$plugin->release = '0.1.0';
-$plugin->version = 2019041400;
+$plugin->release = '1.0';
+$plugin->version = 2019061700; //2019061400 //2019041400; 
 $plugin->requires = 2018051700;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_STABLE;

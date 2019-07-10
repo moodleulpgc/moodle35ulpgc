@@ -74,9 +74,9 @@ class enrol_multicohort_handler {
     }
 
     
-    protected static function add_group_member($instance, $userid, $cohortid) {
+    protected static function add_group_member($instance, $userid, $cohortidnumber) {
         global $DB, $CFG;
-        if ($syncgroup = enrol_multicohort_update_syncgroup($instance, $cohortid)) {
+        if ($syncgroup = enrol_multicohort_update_syncgroup($instance, $cohortidnumber)) {
             if (!groups_is_member($syncgroup, $userid)) {
                 if ($group = $DB->get_record('groups', array('id'=>$syncgroup, 'courseid'=>$instance->courseid))) {
                     groups_add_member($group->id, $userid, 'enrol_multicohort', $instance->id);
@@ -85,9 +85,9 @@ class enrol_multicohort_handler {
         }
     }
     
-    protected static function remove_group_member($instance, $userid, $cohortid) {
+    protected static function remove_group_member($instance, $userid, $cohortidnumber) {
         global $DB, $CFG;
-        if ($syncgroup = enrol_multicohort_update_syncgroup($instance, $cohortid)) {
+        if ($syncgroup = enrol_multicohort_update_syncgroup($instance, $cohortidnumber)) {
             if (groups_is_member($syncgroup, $userid)) {
                 if ($group = $DB->get_record('groups', array('id'=>$syncgroup, 'courseid'=>$instance->courseid))) {
                     groups_remove_member($group->id, $userid);
@@ -108,12 +108,12 @@ class enrol_multicohort_handler {
         list($muticohortwhere, $params) = enrol_multicohort_where_sql($instance);
         $params['user'] = $userid;
         
-        $sql = "SELECT id, cohortid
+        $sql = "SELECT cm.id, cm.cohortid, c.name, c.idnumber
                 FROM {cohort_members} cm
+                JOIN {cohort} c ON c,id = cm.cohortid
                 WHERE cm.userid = :user AND $muticohortwhere ";
         
-        return $DB->get_records_sql_menu($sql, $params);
-        //return $DB->get_records_select_menu('cohort_members', $select, $params, '', 'id, cohortid');
+        return $DB->get_records_sql($sql, $params);
     }
     
     
@@ -143,8 +143,8 @@ class enrol_multicohort_handler {
                 continue;
             }
             $cohorts =  self::get_user_cohorts($instance, $event->relateduserid);
-            foreach($cohorts as $cohortid) {
-                self::add_group_member($instance, $event->relateduserid, $cohortid);
+            foreach($cohorts as $cohort) {
+                self::add_group_member($instance, $event->relateduserid, $cohort->idnumber);
             }
         }
     }
@@ -172,8 +172,8 @@ class enrol_multicohort_handler {
                 continue;
             }
             $cohorts =  self::get_user_cohorts($instance, $event->relateduserid);
-            foreach($cohorts as $cohortid) {
-                self::add_group_member($instance, $event->relateduserid, $cohortid);
+            foreach($cohorts as $cohort) {
+                self::add_group_member($instance, $event->relateduserid, $cohort->idnumber);
             }
         }
     }
@@ -202,8 +202,8 @@ class enrol_multicohort_handler {
                 continue;
             }
             $cohorts =  self::get_user_cohorts($instance, $event->relateduserid);
-            foreach($cohorts as $cohortid) {
-                self::remove_group_member($instance, $event->relateduserid, $cohortid);
+            foreach($cohorts as $cohort) {
+                self::remove_group_member($instance, $event->relateduserid, $cohort->idnumber);
             }
         }
     }    
@@ -495,7 +495,6 @@ function enrol_multicohort_sync(progress_trace $trace, $courseid = NULL) {
     $trace->output("added $users users to $groups groups ", 1);
 
     $trace->output('...user enrolment synchronisation finished.');
-
     return 0;
 }
 
@@ -506,7 +505,7 @@ function enrol_multicohort_sync(progress_trace $trace, $courseid = NULL) {
     * @param stdClass $instance
     * @return false/groupid
     */
-function enrol_multicohort_update_syncgroup($instance, $cohortid = null) {
+function enrol_multicohort_update_syncgroup($instance, $cohortidnumber = null) {
     global $DB;
 
     $syncgroup = $instance->customint2;
@@ -518,14 +517,16 @@ function enrol_multicohort_update_syncgroup($instance, $cohortid = null) {
     $groupid = 0;
     if($syncgroup < 0) {
         if($syncgroup == MULTICOHORT_MULTIPLE_GROUP) { // sync multiple groups is not applied here
-            $idnumber = 'multicohort_'.$instance->id.'_cohort_'.$cohortid;
+            //$idnumber = 'multicohort_'.$instance->id.'_cohort_'.$cohortid;
+            $idnumber = enrol_multicohort_group_idnumber($instance, $cohortidnumber);
             if($group = groups_get_group_by_idnumber($instance->courseid, $idnumber)) {
                 $groupid = $group->id;
             }
             return $groupid;
         } elseif($syncgroup == MULTICOHORT_CREATE_GROUP ) { // sync group by name of enrol
             $groupdata->name = $instance->name;
-            $groupdata->idnumber = 'multicohort_'.$instance->id.'_cohort_pooled';
+            //$groupdata->idnumber = 'multicohort_'.$instance->id.'_cohort_pooled';
+            $groupdata->idnumber = enrol_multicohort_group_idnumber($instance, 'pooled');
         }
         if(!$group = groups_get_group_by_idnumber($instance->courseid, $groupdata->idnumber)) {
             if($groupdata->idnumber) {
@@ -658,7 +659,8 @@ function enrol_multicohort_multiple_groups_sync($instance, $singlegroup = 0) {
         $groupwhere = " AND g.id = :gid ";
         $params['gid'] = $singlegroup;
     } else {
-        $idnumber = 'multicohort\_'.$instance->id.'\_cohort%';
+        //$idnumber = 'multicohort\_'.$instance->id.'\_cohort%';
+        $idnumber = enrol_multicohort_group_idnumber($instance, '', true);
         $select = $DB->sql_like('g.idnumber', ':idnumber');
         $params['idnumber'] = $idnumber;
         $groupwhere = " AND $select ";
@@ -669,12 +671,15 @@ function enrol_multicohort_multiple_groups_sync($instance, $singlegroup = 0) {
     $params = array_merge($params, $anyparams);
     list($inany2, $anyparams) = $DB->get_in_or_equal(explode(',', $instance->customtext1), SQL_PARAMS_NAMED, 'any2');
     $params = array_merge($params, $anyparams);
-    $sql = "SELECT ue.id, ue.userid, ue.enrolid, g.courseid, g.id AS groupid, g.name AS groupname, g.idnumber, cm.cohortid, gm.id AS gmid
+    $sql = "SELECT ue.id, ue.userid, ue.enrolid, g.courseid, g.id AS groupid, g.name AS groupname, g.idnumber, 
+                        cm.cohortid, ch.idnumber AS cohortidnumber, gm.id AS gmid
               FROM {groups_members} gm
               JOIN {groups} g ON (g.id = gm.groupid AND g.courseid = :courseid $groupwhere )
               JOIN {user_enrolments} ue ON (ue.userid = gm.userid $enrolmentwhere)
               $rolejoin
               LEFT JOIN {cohort_members} cm ON (ue.userid = cm.userid AND cm.userid = gm.userid AND cm.cohortid $inany) 
+              LEFT JOIN {cohort} ch ON ch.id = cm.cohortid              
+
             WHERE gm.component='enrol_multicohort' AND gm.itemid = ue.enrolid  
             AND NOT EXISTS (SELECT 1
                                FROM {groups_members} gm2 
@@ -684,11 +689,13 @@ function enrol_multicohort_multiple_groups_sync($instance, $singlegroup = 0) {
                             )";
             // NOT EXISTS to eliminate users that are members of several cohorts
     $params = array_merge($params, $anyparams);
-    
+  
     $rs = $DB->get_recordset_sql($sql, $params);
+    
     foreach ($rs as $gm) {
-        $parts = explode('_', $gm->idnumber);
-        if(!$gm->cohortid || !isset($parts[3]) || $parts[3] != $gm->cohortid) {
+        //$parts = explode('_', $gm->idnumber);
+        $parts = explode('-ch:', $gm->idnumber);
+        if(!$gm->cohortid || !isset($parts[1]) || $parts[1] != $gm->cohortid) {
             groups_remove_member($gm->groupid, $gm->userid);
             $affectedusers['removed'][] = $gm;
         }
@@ -705,19 +712,24 @@ function enrol_multicohort_multiple_groups_sync($instance, $singlegroup = 0) {
             list($ingroups, $gparams) = $DB->get_in_or_equal(explode(',', $instance->customtext4), SQL_PARAMS_NAMED, 'g');
         }
     }
-    $sql = "SELECT ue.id, ue.userid, ue.enrolid, g.courseid, g.id AS groupid, g.name AS groupname, g.idnumber, cm.cohortid, gm.id AS memberid
+    $sql = "SELECT ue.id, ue.userid, ue.enrolid, g.courseid, g.id AS groupid, g.name AS groupname, g.idnumber, 
+                    cm.cohortid, ch.idnumber AS cohortidnumber, gm.id AS memberid
               FROM {user_enrolments} ue
               JOIN {groups} g ON (g.courseid = :courseid AND g.id $ingroups)
               JOIN {user} u ON (u.id = ue.userid AND u.deleted = 0)
               JOIN {cohort_members} cm ON (cm.userid = ue.userid AND cm.cohortid $inany)
+              JOIN {cohort} ch ON ch.id = cm.cohortid
               $rolejoin
          LEFT JOIN {groups_members} gm ON (gm.groupid = g.id AND gm.userid = ue.userid AND gm.userid = cm.userid)
              WHERE 1 $enrolmentwhere $muticohortwhere ";
     $params = array_merge($params, $gparams);
+    
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach ($rs as $ue) {
-        $parts = explode('_', $ue->idnumber);
-        if(!$ue->memberid && $ue->cohortid && isset($parts[3]) && $parts[3] == $ue->cohortid) {
+        //$parts = explode('_', $ue->idnumber);
+        //if(!$ue->memberid && $ue->cohortid && isset($parts[3]) && $parts[3] == $ue->cohortid) {
+        $parts = explode('-ch:', $ue->idnumber);
+        if(!$ue->memberid && $ue->cohortid && isset($parts[1]) && $parts[1] == $ue->cohortidnumber) {
             groups_add_member($ue->groupid, $ue->userid, 'enrol_multicohort', $ue->enrolid);
             $affectedusers['added'][] = $ue;
         }

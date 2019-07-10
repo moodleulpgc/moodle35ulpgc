@@ -200,7 +200,8 @@ class enrol_multicohort_plugin extends enrol_plugin {
         //parent::delete_instance($instance);
         
         // now delete all instance-created groups
-        $idnumber = 'multicohort\_'.$instance->id.'\_cohort%';
+        //$idnumber = 'multicohort\_'.$instance->id.'\_cohort%';
+        $idnumber = enrol_multicohort_group_idnumber($instance, '', true).'%';
         
         $select = $DB->sql_like('idnumber', ':idnumber');
         $params = array('idnumber'=>$idnumber);
@@ -739,19 +740,20 @@ function enrol_multicohort_create_multiple_groups($instance) {
 
     $groupdata = new stdClass();
     $groupdata->courseid = $courseid;
-    $groupdata->idnumber = 'multicohort_'.$instance->id;
-    
+   
     $groups = array();
     if($multiple) {
         $cohorts = $DB->get_records_list('cohort', 'id', explode(',', $multiple), '', 'id, name, idnumber');
         foreach($cohorts as $cohort) {
             $groupdata->name = $cohort->name;
-            $groupdata->idnumber = 'multicohort_'.$instance->id.'_cohort_'.$cohort->id;
+            $groupdata->idnumber = enrol_multicohort_group_idnumber($instance, $cohort->idnumber);
+            //$groupdata->idnumber = 'multicohort_'.$instance->id.'_cohort_'.$cohort->id;
             $groups[] = clone($groupdata);
         }
     } else {
         $groupdata->name = $instance->name;
-        $groupdata->idnumber = 'multicohort_'.$instance->id.'_cohort_pooled';
+        $groupdata->idnumber = enrol_multicohort_group_idnumber($instance, 'pooled');
+        //$groupdata->idnumber = 'multicohort_'.$instance->id.'_cohort_pooled';
         $groups[] = clone($groupdata);
     }
     
@@ -794,4 +796,25 @@ function enrol_multicohort_create_multiple_groups($instance) {
     }
 
     return implode(',', $groupids);
+}
+
+
+/**
+ * Create a base group idnumber from instance name
+ *
+ * @param stdclass $instance
+ * @param string $suffix last part, usually cohort idnumber
+ * @param bool $escaped if chars must be escaped
+ * @return int $groupid Group ID for this multicohort.
+ */
+function enrol_multicohort_group_idnumber($instance, $suffix = '', $escaped = false) {
+    global $DB;
+    $idnumber = 'mcohort-'.str_replace(' ', '_', $instance->name);
+    if(!empty($suffix)) { 
+        $idnumber .= '-ch:'.$suffix;
+    }
+    if($escaped) {
+        $idnumber = $DB->sql_like_escape($idnumber);
+    }
+    return $idnumber;
 }

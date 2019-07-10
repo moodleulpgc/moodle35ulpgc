@@ -44,6 +44,7 @@ class restore_videolib_activity_structure_step extends restore_activity_structur
         $userinfo = $this->get_setting_value('userinfo');
 
         $paths[] = new restore_path_element('videolib', '/activity/videolib');
+        $paths[] = new restore_path_element('sourcekey', '/activity/videolib/sourcekeys/sourcekey');
 
         return $this->prepare_activity_structure($paths);
     }
@@ -60,9 +61,6 @@ class restore_videolib_activity_structure_step extends restore_activity_structur
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
-        // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
-        // See MDL-9367.
-
         // insert the resource record
         $newitemid = $DB->insert_record('videolib', $data);
         // immediately after inserting "activity" record, call this
@@ -71,6 +69,32 @@ class restore_videolib_activity_structure_step extends restore_activity_structur
         return;
     }
 
+    /**
+     * Processes the videolib restore data.
+     *
+     * @param array $data Parsed element data.
+     */
+    protected function process_sourcekey($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $data->cmids = null;
+        $oldid = $data->id;
+        unset($data->id);
+
+        // insert the resource record
+        $params = array('videolibkey'=>$data->videolibkey, 'annuality'=>$data->annuality, 'source'=>$data->source);
+        if($rec = $DB->get_record('videolib_source_mapping', $params, 'id, videolibkey')) {
+            $data->id = $rec->id;
+        } else {
+            $newitemid = $DB->insert_record('videolib_source_mapping', $data);
+        }
+
+        return;
+    }
+    
+    
+    
     /**
      * Defines post-execution actions.
      */

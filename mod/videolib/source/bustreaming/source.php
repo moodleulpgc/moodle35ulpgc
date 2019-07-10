@@ -49,8 +49,19 @@ class videolibsource_bustreaming extends videolib_source_base {
         $this->videourl = 'https://bustreaming.ulpgc.es/reproducirEmbed/'.$videoid;
     }
     
-    public function get_busid_from_pattern() {    
-    
+    public function get_busid_from_pattern($pattern = null) { 
+        global $DB;
+        if(!$pattern) {
+            $pattern = $this->searchpattern;
+        }
+        $params = array('source' => $this->source, 'videolibkey' => $pattern);
+        
+        $annuality = '';
+        if($annuality) {
+            $params['annuality'] = $annuality;
+        }
+        
+        return $DB->get_field('videolib_source_mapping', 'remoteid', $params);
     }
     
     public function show() {

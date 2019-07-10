@@ -35,8 +35,8 @@ $inpopup = optional_param('inpopup', 0, PARAM_BOOL);
 if ($id) {
     list($course, $cm) = get_course_and_cm_from_cmid($id, '');
     $videolib = $DB->get_record('videolib', array('id' => $cm->instance), '*', MUST_EXIST);
-} else if ($l) {
-    $videolib = $DB->get_record('videolib', array('id' => $n), '*', MUST_EXIST);
+} elseif ($v) {
+    $videolib = $DB->get_record('videolib', array('id' => $v), '*', MUST_EXIST);
     list($course, $cm) = get_course_and_cm_from_instance($videolib, 'videolib');
 } else {
     print_error(get_string('missingidandcmid'));

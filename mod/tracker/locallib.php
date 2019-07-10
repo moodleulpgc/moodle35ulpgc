@@ -1207,6 +1207,7 @@ function tracker_getownedissuesforresolve($trackerid, $userid = null) {
 function tracker_recordelements(&$issue, &$data) {
     global $CFG, $COURSE, $DB , $PAGE;
 
+
     $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
 
     $cm = get_coursemodule_from_instance('tracker', $tracker->id, $tracker->course, false, MUST_EXIST);
@@ -1850,12 +1851,11 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
 
 /**
 * sends required notifications by the watchers when first submit
-* @uses $COURSE
 * @param int $issueid
 * @param object $tracker
 */
 function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $SITE, $CFG, $USER, $DB;
 
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     if (empty($tracker)) { // database access optimization in case we have a tracker from somewhere else
@@ -1863,28 +1863,34 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
     }
 
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
+    
     if (!empty($issueccs)) {
-        $vars = array('COURSE_SHORT' => $COURSE->shortname,
-                      'COURSENAME' => format_string($COURSE->fullname),
+        include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
+        list($course, $cm) = get_course_and_cm_from_instance($tracker, 'tracker');  
+        $context = context_module::instance($cm->id);
+        $vars = array('COURSE_SHORT' => $course->shortname,
+                      'COURSENAME' => format_string($course->fullname),
                       'TRACKERNAME' => format_string($tracker->name),
                       'ISSUE' => $tracker->ticketprefix.$issue->id,
                       'SUMMARY' => $issue->summary,
                       'COMMENT' => format_string(stripslashes($comment)),
                       'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
-        include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
+                      
         foreach ($issueccs as $cc) {
-            $ccuser = $DB->get_record('user', array('id' => $cc->userid));
-            if ($cc->events & ON_COMMENT) {
-                $vars['CONTRIBUTOR'] = fullname($USER);
-                $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-                $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
-                $notification = tracker_compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
-                $notification_html = tracker_compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
-                if ($CFG->debugsmtp) echo "Sending Comment Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
-                $tracker->shortname = $COURSE->shortname;
-                $tracker->name = format_string($tracker->name);
-                email_to_user($ccuser, $USER, tracker_getstring('trackerissuecommented', 'tracker', $tracker), $notification, $notification_html); // ecastro ULPGC
+            if(($cc->userid != $USER->id) && has_capability('mod/tracker:otherscomments', $context, $cc->userid)) {
+                $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+                if ($cc->events & ON_COMMENT) {
+                    $vars['CONTRIBUTOR'] = fullname($USER);
+                    $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+                    $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+                    $notification = tracker_compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
+                    $notification_html = tracker_compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
+                    if ($CFG->debugsmtp) echo "Sending Comment Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
+                    $tracker->shortname = $course->shortname;
+                    $tracker->name = format_string($tracker->name);
+                    email_to_user($ccuser, $USER, tracker_getstring('trackerissuecommented', 'tracker', $tracker), $notification, $notification_html); // ecastro ULPGC
+                }
             }
         }
     }
