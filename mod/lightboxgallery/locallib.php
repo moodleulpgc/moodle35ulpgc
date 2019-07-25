@@ -28,7 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__.'/lib.php');
+require_once(dirname(__FILE__).'/lib.php');
 require_once("$CFG->libdir/filelib.php");
 
 define('THUMB_WIDTH', 150);
@@ -52,7 +52,7 @@ define('AUTO_RESIZE_BOTH', 3);
  * @return void
  */
 function lightboxgallery_add_images($files, $context, $cm, $gallery, $resize = 0) {
-    require_once(__DIR__.'/imageclass.php');
+    require_once(dirname(__FILE__).'/imageclass.php');
 
     $fs = get_file_storage();
 
@@ -166,7 +166,7 @@ function lightboxgallery_resize_options() {
 function lightboxgallery_index_thumbnail($courseid, $gallery, $newimage = null) {
     global $CFG;
 
-    require_once(__DIR__.'/imageclass.php');
+    require_once(dirname(__FILE__).'/imageclass.php');
     $cm = get_coursemodule_from_instance("lightboxgallery", $gallery->id, $courseid);
     $context = context_module::instance($cm->id);
 

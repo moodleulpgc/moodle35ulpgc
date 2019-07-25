@@ -8,11 +8,11 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
@@ -252,11 +252,11 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
      */
     public function summarise_response(array $response) {
         $result = array();
-        
+
         foreach ($this->order as $key => $rowid) {
             $field = $this->field($key);
             $row = $this->rows[$rowid];
-            
+
             if (isset($response[$field])) {
                 foreach ($this->columns as $column) {
                     if ($column->number == $response[$field]) {
@@ -392,7 +392,7 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
         $type = $this->scoringmethod;
         $gradingclass = 'qtype_kprime_grading_' . $type;
 
-        require_once ($CFG->dirroot . '/question/type/kprime/grading/' . $gradingclass . '.class.php');
+        require_once($CFG->dirroot . '/question/type/kprime/grading/' . $gradingclass . '.class.php');
 
         return new $gradingclass();
     }
@@ -492,9 +492,9 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
      * @param int $totaltries Not needed
      */
     public function compute_final_grade($responses, $totaltries) {
-        $last_response = sizeOf($responses) - 1;
-        $num_points = isset($responses[$last_response]) ? $this->grading()->grade_question($this, $responses[$last_response]) : 0;
-        return max(0, $num_points - max(0, $last_response) * $this->penalty);
+        $lastresponse = count($responses) - 1;
+        $numpoints = isset($responses[$lastresponse]) ? $this->grading()->grade_question($this, $responses[$lastresponse]) : 0;
+        return max(0, $numpoints - max(0, $lastresponse) * $this->penalty);
     }
 
     /**

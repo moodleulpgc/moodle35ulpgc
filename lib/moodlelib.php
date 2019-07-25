@@ -4737,7 +4737,12 @@ function get_complete_user_data($field, $value, $mnethostid = null, $throwexcept
     $field = core_text::strtolower($field);
 
     // List of case insensitive fields.
-    $caseinsensitivefields = ['username', 'email'];
+    $caseinsensitivefields = ['email'];
+
+    // Username input is forced to lowercase and should be case sensitive.
+    if ($field == 'username') {
+        $value = core_text::strtolower($value);
+    }
 
     // Build the WHERE clause for an SQL query.
     $params = array('fieldval' => $value);
@@ -5699,7 +5704,7 @@ function get_mailer($action='get') {
         } else {
             // Use SMTP directly.
             $mailer->isSMTP();
-            if (!empty($CFG->debugsmtp)) {
+            if (!empty($CFG->debugsmtp) && (!empty($CFG->debugdeveloper))) {
                 $mailer->SMTPDebug = 3;
             }
             // Specify main and backup servers.
@@ -5867,7 +5872,6 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
     }
     // end ecastro ULPGC modification
 
-    
     if (empty($user->email)) {
         debugging('Can not send email to user without email: '.$user->id, DEBUG_DEVELOPER);
         return false;
@@ -5889,6 +5893,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         return true;
     }
 
+    
     if (email_should_be_diverted($user->email)) {
         $subject = "[DIVERTED {$user->email}] $subject";
         $user = clone($user);

@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
  * @group qtype_mtf
  */
 class qtype_mtf_question_test extends advanced_testcase {
-    
+
     public function make_a_mtf_question() {
         question_bank::load_question_definition_classes('mtf');
         $mtf = new qtype_mtf_question();
@@ -46,7 +46,7 @@ class qtype_mtf_question_test extends advanced_testcase {
         $mtf->options = new stdClass();
         $mtf->shuffleanswers = 0;
         $mtf->numberofrows = 2;
-		$mtf->numberofcolumns = 2;
+        $mtf->numberofcolumns = 2;
         $mtf->rows = array(
             5 => (object) array(
                 "id" => 5,
@@ -150,15 +150,15 @@ class qtype_mtf_question_test extends advanced_testcase {
         $question = $this->make_a_mtf_question();
         $this->assertFalse($question->is_complete_response(array()));
         $this->assertFalse($question->is_complete_response(array('option0' => '1')));
-        $this->assertTrue($question->is_complete_response(array('option0' => '1','option1' => '1')));
+        $this->assertTrue($question->is_complete_response(array('option0' => '1', 'option1' => '1')));
     }
 
     public function test_is_gradable_response() {
         $question = $this->make_a_mtf_question();
         $this->assertFalse($question->is_gradable_response(array()));
         $this->assertTrue($question->is_gradable_response(array('option0' => '1')));
-        $this->assertTrue($question->is_gradable_response(array('option0' => '1','option1' => '1')));
-        $this->assertTrue($question->is_gradable_response(array('option0' => '1','option1' => '2')));
+        $this->assertTrue($question->is_gradable_response(array('option0' => '1', 'option1' => '1')));
+        $this->assertTrue($question->is_gradable_response(array('option0' => '1', 'option1' => '2')));
     }
 
     public function test_get_order() {
@@ -200,23 +200,23 @@ class qtype_mtf_question_test extends advanced_testcase {
             array('option0' => '2')));
         $this->assertFalse($question->is_same_response(
             array('option0' => '1'),
-            array('option1' => '1','option2' => '1')));
+            array('option1' => '1', 'option2' => '1')));
         $this->assertFalse($question->is_same_response(
-            array('option0' => '1','option2' => '1'),
-            array('option1' => '1','option2' => '2')));
+            array('option0' => '1', 'option2' => '1'),
+            array('option1' => '1', 'option2' => '2')));
     }
 
     public function test_grading() {
         $question = $this->make_a_mtf_question();
         $question->start_attempt(new question_attempt_step(), 1);
-        $this->assertEquals(array('option0' => '1','option1' => '2'), 
+        $this->assertEquals(array('option0' => '1', 'option1' => '2'),
         $question->get_correct_response());
     }
 
     public function test_summarise_response() {
         $question = $this->make_a_mtf_question();
         $question->start_attempt(new question_attempt_step(), 1);
-        $summary = $question->summarise_response(array('option0' => '1','option1' => '2'),
+        $summary = $question->summarise_response(array('option0' => '1', 'option1' => '2'),
         test_question_maker::get_a_qa($question));
         $this->assertEquals('option text 1: True; option text 2: False', $summary);
     }
@@ -224,12 +224,14 @@ class qtype_mtf_question_test extends advanced_testcase {
     public function test_classify_response() {
         $question = $this->make_a_mtf_question();
         $question->start_attempt(new question_attempt_step(), 1);
-        $this->assertEquals(array('5' => new question_classified_response(3, 'True', 0.5),
-        '6' => new question_classified_response(4, 'False', 0.5)),
-        $question->classify_response(array('option0' => '1','option1' => '2')));
-       $this->assertEquals(array('5' => question_classified_response::no_response(),
-       '6' => question_classified_response::no_response()),
-        $question->classify_response(array()));
+        $this->assertEquals(array(
+            '5' => new question_classified_response(3, 'True', 0.5),
+            '6' => new question_classified_response(4, 'False', 0.5)),
+            $question->classify_response(array('option0' => '1', 'option1' => '2')));
+        $this->assertEquals(
+            array('5' => question_classified_response::no_response(),
+            '6' => question_classified_response::no_response()),
+            $question->classify_response(array()));
     }
 
     public function test_make_html_inline() {
@@ -255,29 +257,29 @@ class qtype_mtf_question_test extends advanced_testcase {
         $question = $this->make_a_mtf_question();
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals('1.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '2')),
+            0 => array('option0' => '1', 'option1' => '2')),
             1));
         $this->assertEquals('0.5', $question->compute_final_grade(array(
             0 => array('option0' => '1')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '2','option1' => '1')),
+            0 => array('option0' => '2', 'option1' => '1')),
             1));
         $this->assertEquals('0.6666667', $question->compute_final_grade(array(
             0 => array(),
-            1 => array('option0' => '1','option1' => '2')), 
+            1 => array('option0' => '1', 'option1' => '2')),
             1));
         $this->assertEquals('0.3333334', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
-            2 => array('option0' => '1','option1' => '2')), 
+            2 => array('option0' => '1', 'option1' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
             2 => array(),
             3 => array(),
-            4 => array('option0' => '1','option1' => '2')), 
+            4 => array('option0' => '1', 'option1' => '2')),
             1));
     }
 
@@ -286,7 +288,7 @@ class qtype_mtf_question_test extends advanced_testcase {
         $question->scoringmethod = 'mtfonezero';
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals('1.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '2')),
+            0 => array('option0' => '1', 'option1' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array('option0' => '1')),
@@ -305,19 +307,19 @@ class qtype_mtf_question_test extends advanced_testcase {
             1));
         $this->assertEquals('0.6666667', $question->compute_final_grade(array(
             0 => array(),
-            1 => array('option0' => '1','option1' => '2')),
+            1 => array('option0' => '1', 'option1' => '2')),
             1));
         $this->assertEquals('0.3333334', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
-            2 => array('option0' => '1','option1' => '2')),
+            2 => array('option0' => '1', 'option1' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
             2 => array(),
             3 => array(),
-            4 => array('option0' => '1','option1' => '2')),
+            4 => array('option0' => '1', 'option1' => '2')),
             1));
     }
 
@@ -325,13 +327,13 @@ class qtype_mtf_question_test extends advanced_testcase {
         $question = $this->make_a_mtf_question();
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals(
-            "1.0", $question->grade_response(array('option0' => '1','option1' => '2'))[0]);
+            "1.0", $question->grade_response(array('option0' => '1', 'option1' => '2'))[0]);
         $this->assertEquals(
-            "0.5", $question->grade_response(array('option0' => '1','option1' => '1'))[0]);
+            "0.5", $question->grade_response(array('option0' => '1', 'option1' => '1'))[0]);
         $this->assertEquals(
             "0.5", $question->grade_response(array('option0' => '1'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '2','option1' => '1'))[0]);
+            "0.0", $question->grade_response(array('option0' => '2', 'option1' => '1'))[0]);
     }
 
     public function test_grade_response_mtfonezero() {
@@ -339,9 +341,9 @@ class qtype_mtf_question_test extends advanced_testcase {
         $question->scoringmethod = 'mtfonezero';
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals(
-            "1.0", $question->grade_response(array('option0' => '1','option1' => '2'))[0]);
+            "1.0", $question->grade_response(array('option0' => '1', 'option1' => '2'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '1','option1' => '1'))[0]);
+            "0.0", $question->grade_response(array('option0' => '1', 'option1' => '1'))[0]);
         $this->assertEquals(
             "0.0", $question->grade_response(array('option0' => '1'))[0]);
     }

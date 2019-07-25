@@ -19,6 +19,9 @@
  * @author Amr Hourani amr.hourani@id.ethz.ch
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
+
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/type/kprime/grading/qtype_kprime_grading.class.php');
 
 

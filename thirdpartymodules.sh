@@ -43,10 +43,12 @@ git submodule add https://github.com/projectestac/moodle-mod_geogebra.git       
 git submodule add https://github.com/BLC-HTWChur/moodle-mod_groupselect.git             mod/groupselect
 git submodule add https://github.com/h5p/h5p-moodle-plugin.git                          mod/hvp
 git submodule add https://github.com/gbateson/moodle-mod_hotpot.git                     mod/hotpot
+git submodule add https://github.com/drachels/moodle-mod_hotquestion.git                mod/hotquestion
 git submodule add https://github.com/netspotau/moodle-mod_lightboxgallery.git           mod/lightboxgallery
 git submodule add https://github.com/Edunao/moodle-mod_masks.git                        mod/masks
 git submodule add https://github.com/learnweb/moodle-mod_moodleoverflow.git             mod/moodleoverflow
 git submodule add https://github.com/academic-moodle-cooperation/moodle-mod_offlinequiz.git  mod/offlinequiz
+git submodule add https://github.com/rwthmoodle/moodle-mod_pdfannotator.git             mod/pdfannotator
 git submodule add https://github.com/jmvedrine/moodle-mod_qcreate.git                   mod/qcreate
 git submodule add https://github.com/learnweb/moodle-mod_ratingallocate.git             mod/ratingallocate
 git submodule add https://github.com/bostelm/moodle-mod_scheduler.git                   mod/scheduler
@@ -143,17 +145,20 @@ git submodule add https://github.com/catalyst/moodle-auth_basic.git auth/basic
 #required by admin/tool/crawler
 
 #Availability conditions 
-git submodule add https://github.com/ewallah/moodle-availability_coursecompleted.git  availability/condition/coursecompleted
-git submodule add https://github.com/ewallah/moodle-availability_language.git  availability/condition/language
+git submodule add https://github.com/tlock/moodle-availability_badge.git                availability/condition/badge
+git submodule add https://github.com/moodleuulm/moodle-availability_cohort.git          availability/condition/cohort
+git submodule add https://github.com/ewallah/moodle-availability_coursecompleted.git    availability/condition/coursecompleted
+git submodule add https://github.com/ewallah/moodle-availability_language.git           availability/condition/language
 
 #Blocks
 git submodule add https://github.com/jleyva/moodle-block_configurablereports.git  blocks/configurable_reports
 #Branch MOODLE_30_STABLE
 cd blocks/configurable_reports && git checkout MOODLE_30_STABLE && cd ../../
-git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git      blocks/admin_presets
-git submodule add  https://bitbucket.org/covuni/moodle-block_news_slider.git      blocks/news_slider
-git submodule add https://github.com/deraadt/moodle-block_simple_clock.git        blocks/simple_clock
-git submodule add https://github.com/mudrd8mz/moodle-block_todo.git               blocks/todo
+git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git        blocks/admin_presets
+git submodule add https://github.com/moodleuulm/moodle-block_cohortspecifichtml.git blocks/cohortspecifichtml
+git submodule add  https://bitbucket.org/covuni/moodle-block_news_slider.git        blocks/news_slider
+git submodule add https://github.com/deraadt/moodle-block_simple_clock.git          blocks/simple_clock
+git submodule add https://github.com/mudrd8mz/moodle-block_todo.git                 blocks/todo
 
 #Course formats
 git submodule add https://github.com/brandaorodrigo/moodle-format_board.git         course/format/board
@@ -236,6 +241,7 @@ git submodule add https://github.com/lechunche/type_calc_sheet.git          ques
 #need to be upgraded v 2013061200 + backup ULPGC 
 
 #Reports
+git submodule add https://github.com/thepurpleblob/moodle-report_assign.git             report/assign
 git submodule add https://github.com/mikasmart/benchmark.git                            report/benchmark
 git submodule add https://github.com/pauln/moodle-report_componentgrades.git            report/componentgrades
 git submodule add https://github.com/moodleou/moodle-report_customsql.git               report/customsql

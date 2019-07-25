@@ -206,11 +206,15 @@ class datalynx_filter {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
 
+                                $addthefield = true;
+
                                 // The operator "" means we look for empty fields, don't add fieldids.
                                 if ($option[1] == "") {
                                     $addthefield = false;
-                                } else {
-                                    $addthefield = true;
+                                }
+                                // Exclude tags because they use an intermediate db query.
+                                if ($field->type == 'tag') {
+                                    $addthefield = false;
                                 }
 
                                 // If we use values from content we make it an implied AND statement.
@@ -786,6 +790,9 @@ class datalynx_filter_manager {
                                 }
                                 // Update cached filters.
                                 $this->_filters[$filter->id] = $filter;
+                            } else {
+                                // Form validation failed so return to form.
+                                $this->display_filter_form($filterform, $filter);
                             }
                         }
 
@@ -1680,5 +1687,3 @@ class datalynx_filter_manager {
     } // End function.
 
 }
-
-

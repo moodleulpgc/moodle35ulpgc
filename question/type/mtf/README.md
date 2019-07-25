@@ -1,19 +1,19 @@
-# qtype_mtf Multiple True/False (MTF with multi-answers) ETHz (Seperated from qtype_scmc) question type for moodle
+# MTF (ETH)
 
-*** Info regarding migration from qtype_multichoice (with Multi Answers Only) to qtype_mtf ***
+## What it is:
+Multi True false in one stem (question). Brief: The MC question type as it exists in Moodle is not very ideal, since you can only configure questions which are not very well designed regarding best practices of MC questions. Teachers can have more than one true/false question in same stem. this saves creating new questions for each stem. especially when it comes to an essay followed by many questions.
 
-You should specify either:
-- 'courseid' or
-- 'categoryid' or
-- set the parameter 'all' to 1.
+## Installation:
+1. Extract the contents of the downloaded zip to `question/type/`.
+1. Rename the extracted folder to `mtf`.
+1. Start the Moodle upgrade procedure.
 
-Note: No migration will be done without restrictions!
-
-Examples:
-	
-- Specific Course: MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?courseid=55
-- Specific Question Category: MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?categoryid=1
-- All Multi question: MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?all=1
-- DRY RUN: MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?all=1&dryrun=1
-
-Script should be run in SSH / Shell Command Line unless the number of questions is less than 1K to avoid interruption by browser.
+## Further information:
+### Behat- and Unit tests:
+Behat tests are included but scenarios are designed explicitly for ETH Zürich testcases.
+Some of the included test steps are designed to work with the ETH Zürich Moodle setup.
+However unit tests can be used in combination with any Moodle setup.
+ 
+## Contributors:
+ETH Zürich (Lead maintainer)
+Thomas Korner (Service owner, thomas.korner@let.ethz.ch)

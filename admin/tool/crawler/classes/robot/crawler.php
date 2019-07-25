@@ -27,6 +27,7 @@ namespace tool_crawler\robot;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/admin/tool/crawler/lib.php');
+require_once($CFG->dirroot.'/admin/tool/crawler/locallib.php');
 require_once($CFG->dirroot.'/admin/tool/crawler/extlib/simple_html_dom.php');
 require_once($CFG->dirroot.'/user/lib.php');
 
@@ -474,10 +475,13 @@ class crawler {
     public function get_num_oversize() {
         global $DB;
 
+        $oversizesqlfilter = tool_crawler_sql_oversize_filter();
+
         return $DB->get_field_sql("
                 SELECT COUNT(*)
                   FROM {tool_crawler_url}
-                 WHERE filesize > ?", array(self::get_config()->bigfilesize * 1000000));
+                 WHERE {$oversizesqlfilter['wherecondition']}
+                ", $oversizesqlfilter['params']);
     }
 
     /**
@@ -576,6 +580,13 @@ class crawler {
         if ($verbose) {
             echo "Crawling $node->url ";
         }
+
+        // Function scrape writes to the title property only if there has been a download error. The title may be set by function
+        // parse_html later. If it is not, we do not have a valid title. In order to have the _proper_ title (set or null) stored in
+        // the database in the end in case of recrawls, we must clear the existing title here (only to maybe re-add it in a few
+        // fractions of a second).
+        $node->title = null;
+
         // Scraping returns info about the URL. Not info about the courseid and context, just the URL itself.
         $result = $this->scrape($node->url);
         $result = (object) array_merge((array) $node, (array) $result);
@@ -864,12 +875,13 @@ class crawler {
     }
 
     /**
-     * Scrapes a fully qualified URL and returns details about it
+     * Scrapes a fully qualified URL and returns details about it.
      *
-     * The format returns is ready to directly insert into the DB queue
+     * The returned object has thus format (properties) that it is ready to be directly inserted into the crawler URL table in the
+     * database.
      *
-     * @param string $url current URL
-     * @return the result object
+     * @param string $url HTTP/HTTPS URI of the resource which is to be retrieved from the web.
+     * @return object The result object.
      */
     public function scrape($url) {
 
@@ -921,7 +933,10 @@ class crawler {
             $result->title            = curl_error($s); // We do not try to translate Curl error messages.
             $result->contents         = '';
             $result->httpcode         = '500';
+            $result->httpmsg          = null;
         } else {
+            $result->errormsg = null;  // Important in case of repeated scraping in order to reset error status.
+
             $headersize = curl_getinfo($s, CURLINFO_HEADER_SIZE);
             $headers = substr($raw, 0, $headersize);
             if (preg_match_all('@(^|[\r\n])(HTTP/[^ ]+) ([0-9]+) ([^\r\n]+|$)@', $headers, $httplines, PREG_SET_ORDER)) {
@@ -932,7 +947,9 @@ class crawler {
 
             $ishtml = (strpos($contenttype, 'text/html') === 0);
             if ($ishtml) { // Related to Issue #13.
+                // May need a significant amount of memory as the data is temporarily stored twice.
                 $data = substr($raw, $headersize);
+                unset($raw); // Allow to free memory.
 
                 /* Convert it if it is anything but UTF-8 */
                 $charset = $this->detect_encoding($contenttype, $data);

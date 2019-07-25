@@ -47,7 +47,7 @@ class unicheck_exception extends \Exception {
     /**
      * ARCHIVE_CANT_BE_OPEN
      */
-    const ARCHIVE_CANT_BE_OPEN = 'Can\'t open archive';
+    const ARCHIVE_CANT_BE_OPEN = 'Can not open archive';
     /**
      * UNSUPPORTED_MIMETYPE
      */
@@ -60,4 +60,8 @@ class unicheck_exception extends \Exception {
      * FILE_IS_TOO_LARGE
      */
     const FILE_IS_TOO_LARGE = 'File is too large for similarity checking';
+    /**
+     * CAN_NOT_READ_FILE
+     */
+    const CAN_NOT_READ_FILE = 'File does not exist or there is a permission problem';
 }

@@ -18,19 +18,18 @@
  * Unit tests for the language condition.
  *
  * @package availability_language
- * @copyright 2017 eWallah.net (info@eWallah.net)
+ * @copyright 2017 eWallah.net <info@eWallah.net>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 use availability_language\condition;
 
 /**
  * Unit tests for the language condition.
  *
  * @package availability_language
- * @copyright 2017 eWallah.net (info@eWallah.net)
+ * @copyright 2017 eWallah.net <info@eWallah.net>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass availability_language
  */
@@ -58,6 +57,7 @@ class availability_language_condition_testcase extends advanced_testcase {
         $course = $generator->create_course();
         $user1 = $generator->create_user(['lang' => 'nl']);
         $user2 = $generator->create_user();
+
         $info1 = new \core_availability\mock_info($course, $user1->id);
         $info2 = new \core_availability\mock_info($course, $user2->id);
 
@@ -68,6 +68,7 @@ class availability_language_condition_testcase extends advanced_testcase {
 
         // Initial check.
         $this->setAdminUser();
+        $this->assertTrue($tree1->check_available(false, $info1, true, null)->is_available());
         $this->assertFalse($tree1->check_available(false, $info1, true, $user1->id)->is_available());
         $this->assertTrue($tree2->check_available(false, $info1, true, $user1->id)->is_available());
         $this->assertTrue($tree1->check_available(false, $info1, true, $user2->id)->is_available());
@@ -195,13 +196,16 @@ class availability_language_condition_testcase extends advanced_testcase {
      */
     public function test_frontend() {
         global $CFG;
+        require_once($CFG->dirroot.'/mod/lesson/locallib.php');
         $this->resetAfterTest();
         $this->setAdminUser();
         $CFG->enableavailability = true;
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
+        $les = new lesson($generator->get_plugin_generator('mod_lesson')->create_instance(['course' => $course, 'section' => 0]));
         $user = $generator->create_user();
         $modinfo = get_fast_modinfo($course);
+        $cm = $modinfo->get_cm($les->cmid);
         $sections = $modinfo->get_section_info_all();
         $generator->enrol_user($user->id, $course->id);
 
@@ -216,6 +220,7 @@ class availability_language_condition_testcase extends advanced_testcase {
         $method = $class->getMethod('allow_add');
         $method->setAccessible(true);
         $this->assertFalse($method->invokeArgs($frontend, [$course]));
+        $this->assertFalse($method->invokeArgs($frontend, [$course, $cm, null]));
         $this->assertFalse($method->invokeArgs($frontend, [$course, null, $sections[0]]));
         $this->assertFalse($method->invokeArgs($frontend, [$course, null, $sections[1]]));
         $coursenl = $generator->create_course(['lang' => 'nl']);

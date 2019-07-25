@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__.'/../../config.php');
-require_once(__DIR__.'/imageclass.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/imageclass.php');
 
 require_once($CFG->libdir.'/filelib.php');
 

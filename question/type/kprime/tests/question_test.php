@@ -46,16 +46,16 @@ class qtype_kprime_question_test extends advanced_testcase {
         $kprime->scoringmethod = "subpoints";
         $kprime->numberofrows = 4;
         $kprime->rows = array(
-            1 => (object) array( 
-                "id" => 1, 
-                "questionid" => 1, 
+            1 => (object) array(
+                "id" => 1,
+                "questionid" => 1,
                 "number" => 1,
                 "optiontext" => "option text 1",
                 "optiontextformat" => 1,
                 "optionfeedback" => "feedback to option 1",
                 "optionfeedbackformat" => 1
             ),
-            2 => (object) array( 
+            2 => (object) array(
                 "id" => 2,
                 "questionid" => 1,
                 "number" => 2,
@@ -64,8 +64,8 @@ class qtype_kprime_question_test extends advanced_testcase {
                 "optionfeedback" => "feedback to option 2",
                 "optionfeedbackformat" => 1
             ),
-            3 => (object) array( 
-                "id" => 3, 
+            3 => (object) array(
+                "id" => 3,
                 "questionid" => 1,
                 "number" => 3,
                 "optiontext" => "option text 3",
@@ -127,23 +127,42 @@ class qtype_kprime_question_test extends advanced_testcase {
     public function test_get_expected_data() {
         $question = $this->make_a_kprime_question();
         $question->order = array_keys($question->rows);
-        $this->assertEquals(array('option0' => PARAM_INT, 'option1' => PARAM_INT, 'option2' => PARAM_INT, 'option3' => PARAM_INT), $question->get_expected_data());
+        $this->assertEquals(array('option0' => PARAM_INT, 'option1' => PARAM_INT, 'option2' => PARAM_INT, 'option3' => PARAM_INT),
+            $question->get_expected_data());
     }
 
     public function test_is_complete_response() {
         $question = $this->make_a_kprime_question();
         $this->assertFalse($question->is_complete_response(array()));
-        $this->assertTrue($question->is_complete_response(array('option0' => '1','option1' => '1','option2' => '1','option3' => '1')));
-        $this->assertTrue($question->is_complete_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')));
+        $this->assertTrue($question->is_complete_response(array(
+            'option0' => '1',
+            'option1' => '1',
+            'option2' => '1',
+            'option3' => '1')));
+        $this->assertTrue($question->is_complete_response(array(
+            'option0' => '1',
+            'option1' => '1',
+            'option2' => '2',
+            'option3' => '2')));
     }
 
     public function test_is_gradable_response() {
         $question = $this->make_a_kprime_question();
         $this->assertFalse($question->is_gradable_response(array()));
-        $this->assertTrue($question->is_gradable_response(array('option0' => '1')));
-        $this->assertTrue($question->is_gradable_response(array('option0' => '1','option1' => '1')));
-        $this->assertTrue($question->is_gradable_response(array('option0' => '1','option1' => '1','option2' => '1')));
-        $this->assertTrue($question->is_gradable_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')));
+        $this->assertTrue($question->is_gradable_response(array(
+            'option0' => '1')));
+        $this->assertTrue($question->is_gradable_response(array(
+            'option0' => '1',
+            'option1' => '1')));
+        $this->assertTrue($question->is_gradable_response(array(
+            'option0' => '1',
+            'option1' => '1',
+            'option2' => '1')));
+        $this->assertTrue($question->is_gradable_response(array(
+            'option0' => '1',
+            'option1' => '1',
+            'option2' => '2',
+            'option3' => '2')));
     }
 
     public function test_get_order() {
@@ -204,14 +223,14 @@ class qtype_kprime_question_test extends advanced_testcase {
     public function test_grading() {
         $question = $this->make_a_kprime_question();
         $question->start_attempt(new question_attempt_step(), 1);
-        $this->assertEquals(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2'), 
+        $this->assertEquals(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2'),
         $question->get_correct_response());
     }
 
     public function test_summarise_response() {
         $question = $this->make_a_kprime_question();
         $question->start_attempt(new question_attempt_step(), 1);
-        $summary = $question->summarise_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2'),
+        $summary = $question->summarise_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2'),
         test_question_maker::get_a_qa($question));
         $this->assertEquals('option text 1: True; option text 2: True; option text 3: False; option text 4: False', $summary);
     }
@@ -219,16 +238,17 @@ class qtype_kprime_question_test extends advanced_testcase {
     public function test_classify_response() {
         $question = $this->make_a_kprime_question();
         $question->start_attempt(new question_attempt_step(), 1);
+
         $this->assertEquals(array('1' => new question_classified_response(1, 'True', 0.25),
-        '2' => new question_classified_response(1, 'True', 0.25),
-        '3' => new question_classified_response(2, 'False', 0.25),
-        '4' => new question_classified_response(2, 'False', 0.25)),
-        $question->classify_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')));
-       $this->assertEquals(array('1' => question_classified_response::no_response(),
-       '2' => question_classified_response::no_response(),
-       '3' => question_classified_response::no_response(),
-       '4' => question_classified_response::no_response()),
-        $question->classify_response(array()));
+            '2' => new question_classified_response(1, 'True', 0.25),
+            '3' => new question_classified_response(2, 'False', 0.25),
+            '4' => new question_classified_response(2, 'False', 0.25)),
+            $question->classify_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')));
+        $this->assertEquals(array('1' => question_classified_response::no_response(),
+            '2' => question_classified_response::no_response(),
+            '3' => question_classified_response::no_response(),
+            '4' => question_classified_response::no_response()),
+            $question->classify_response(array()));
     }
 
     public function test_make_html_inline() {
@@ -254,29 +274,29 @@ class qtype_kprime_question_test extends advanced_testcase {
         $question = $this->make_a_kprime_question();
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals('1.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.5', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1')),
+            0 => array('option0' => '1', 'option1' => '1')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '2','option1' => '2','option2' => '1','option3' => '1')),
+            0 => array('option0' => '2', 'option1' => '2', 'option2' => '1', 'option3' => '1')),
             1));
         $this->assertEquals('0.6666667', $question->compute_final_grade(array(
             0 => array(),
-            1 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')), 
+            1 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.3333334', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
-            2 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')), 
+            2 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
             2 => array(),
             3 => array(),
-            4 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')), 
+            4 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
     }
 
@@ -285,53 +305,53 @@ class qtype_kprime_question_test extends advanced_testcase {
         $question->scoringmethod = 'kprime';
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals('1.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.5', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '1')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '1')),
             1));
         $this->assertEquals('0.5', $question->compute_final_grade(array(
-            0 => array('option0' => '2','option1' => '1','option2' => '2','option3' => '2')),
+            0 => array('option0' => '2', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '1','option3' => '1')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '1', 'option3' => '1')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '2','option2' => '1','option3' => '1')),
+            0 => array('option0' => '1', 'option1' => '2', 'option2' => '1', 'option3' => '1')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '2','option1' => '2','option2' => '1','option3' => '1')),
+            0 => array('option0' => '2', 'option1' => '2', 'option2' => '1', 'option3' => '1')),
             1));
         $this->assertEquals('0.5', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '1')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '1')),
             1));
         $this->assertEquals('0.6666667', $question->compute_final_grade(array(
             0 => array(),
-            1 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            1 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.3333334', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
-            2 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            2 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
             2 => array(),
             3 => array(),
-            4 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            4 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.1666667', $question->compute_final_grade(array(
             0 => array(),
-            1 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '1')),
+            1 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '1')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
-            2 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '1')),
+            2 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '1')),
             1));
     }
 
@@ -340,29 +360,29 @@ class qtype_kprime_question_test extends advanced_testcase {
         $question->scoringmethod = 'kprimeonezero';
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals('1.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '1')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '1')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
-            0 => array('option0' => '1','option1' => '1','option2' => '2')),
+            0 => array('option0' => '1', 'option1' => '1', 'option2' => '2')),
             1));
         $this->assertEquals('0.6666667', $question->compute_final_grade(array(
             0 => array(),
-            1 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            1 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.3333334', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
-            2 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            2 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
         $this->assertEquals('0.0', $question->compute_final_grade(array(
             0 => array(),
             1 => array(),
             2 => array(),
             3 => array(),
-            4 => array('option0' => '1','option1' => '1','option2' => '2','option3' => '2')),
+            4 => array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2')),
             1));
     }
 
@@ -370,13 +390,13 @@ class qtype_kprime_question_test extends advanced_testcase {
         $question = $this->make_a_kprime_question();
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals(
-            "1.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2'))[0]);
+            "1.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2'))[0]);
         $this->assertEquals(
-            "0.75", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '1','option3' => '2'))[0]);
+            "0.75", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '1', 'option3' => '2'))[0]);
         $this->assertEquals(
-            "0.75", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2'))[0]);
+            "0.75", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '2','option1' => '2','option2' => '1', 'option3' => '1'))[0]);
+            "0.0", $question->grade_response(array('option0' => '2', 'option1' => '2', 'option2' => '1', 'option3' => '1'))[0]);
     }
 
     public function test_grade_response_kprime() {
@@ -384,15 +404,15 @@ class qtype_kprime_question_test extends advanced_testcase {
         $question->scoringmethod = 'kprime';
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals(
-            "1.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2'))[0]);
+            "1.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2'))[0]);
         $this->assertEquals(
-            "0.5", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '1'))[0]);
+            "0.5", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '1'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '1','option3' => '1'))[0]);
+            "0.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '1', 'option3' => '1'))[0]);
         $this->assertEquals(
-            "0.5", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2'))[0]);
+            "0.5", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '1'))[0]);
+            "0.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '1'))[0]);
     }
 
     public function test_grade_response_kprimeonezero() {
@@ -400,10 +420,10 @@ class qtype_kprime_question_test extends advanced_testcase {
         $question->scoringmethod = 'kprimeonezero';
         $question->start_attempt(new question_attempt_step(), 1);
         $this->assertEquals(
-            "1.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '2'))[0]);
+            "1.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '2'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2','option3' => '1'))[0]);
+            "0.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2', 'option3' => '1'))[0]);
         $this->assertEquals(
-            "0.0", $question->grade_response(array('option0' => '1','option1' => '1','option2' => '2'))[0]);
+            "0.0", $question->grade_response(array('option0' => '1', 'option1' => '1', 'option2' => '2'))[0]);
     }
 }

@@ -189,7 +189,7 @@ function examboard_delete_instance($id) {
     if($exams = $DB->get_records_menu('examboard_exam', array('examboardid'=>$id), 'id,boardid')) {
         $exams = array_keys($exams);
         
-        foreach(array('examinee', 'tutor', 'grade', 'confirmation', 'notification') as $field) {
+        foreach(array('examinee', 'tutor', 'grades', 'confirmation', 'notification') as $field) {
             $DB->delete_records_list('examboard_'.$field, 'examid', $exams);
         }
     }

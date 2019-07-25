@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,18 +23,18 @@
  */
 
 namespace qtype_mtf\privacy;
-     
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Privacy Subsystem for PATH_PLUGINNAME implementing null_provider.
- * 
- * 
+ * Privacy Subsystem for qtype_mtf implementing null_provider.
+ *
+ *
  */
 
 class provider implements \core_privacy\local\metadata\null_provider {
 
     public static function get_reason() : string {
-    return 'privacy:metadata';
+        return 'privacy:metadata';
     }
 }

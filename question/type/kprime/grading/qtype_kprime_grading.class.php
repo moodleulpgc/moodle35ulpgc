@@ -19,6 +19,9 @@
  * @author Amr Hourani amr.hourani@id.ethz.ch
  * @copyright ETHz 2016 amr.hourani@id.ethz.ch
  */
+
+defined('MOODLE_INTERNAL') || die();
+
 abstract class qtype_kprime_grading {
 
     abstract public function get_name();

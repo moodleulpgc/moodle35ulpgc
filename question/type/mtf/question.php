@@ -491,9 +491,9 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
      * @param int $totaltries Not needed
      */
     public function compute_final_grade($responses, $totaltries) {
-        $last_response = sizeOf($responses) - 1;
-        $num_points = isset($responses[$last_response]) ? $this->grading()->grade_question($this, $responses[$last_response]) : 0;
-        return max(0, $num_points - max(0, $last_response) * $this->penalty);
+        $lastresponse = count($responses) - 1;
+        $numpoints = isset($responses[$lastresponse]) ? $this->grading()->grade_question($this, $responses[$lastresponse]) : 0;
+        return max(0, $numpoints - max(0, $lastresponse) * $this->penalty);
     }
 
     /**

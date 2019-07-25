@@ -832,6 +832,11 @@ class stack_answertest_test_data {
         array('SingleFrac', '', '(1/2)/(3/4)', '2/3', 0, 'ATSingleFrac_div.', 'Fractions within fractions'),
         array('SingleFrac', '', '(x-2)/4/(2/x^2)', '(x-2)*x^2/8', 0, 'ATSingleFrac_div.', ''),
         array('SingleFrac', '', '1/(1-1/x)', 'x/(x-1)', 0, 'ATSingleFrac_div.', ''),
+        array('SingleFrac', '', '(1+1/a)/a', '(1+a)/a^2', 0, 'ATSingleFrac_div.', ''),
+        array('SingleFrac', '', 'a/(1+1/a)', 'a^2/(1+a)', 0, 'ATSingleFrac_div.', ''),
+        array('SingleFrac', '', '(1+2*b/a)/c', '(a+2*b)/(a*c)', 0, 'ATSingleFrac_div.', ''),
+        array('SingleFrac', '', 'c/(1+2*b/a)', 'a*c/(a+2*b)', 0, 'ATSingleFrac_div.', ''),
+        array('SingleFrac', '', 'a*c/(a+2*b)', 'a*c/(a+2*b)', 1, 'ATSingleFrac_true.', ''),
         array('SingleFrac', '', '-1/2', '-1/2', 1, 'ATSingleFrac_true.', 'Negative cases'),
         array('SingleFrac', '', '-1/2', '-1/3', 0, 'ATSingleFrac_true. ATSingleFrac_ret_exp.', ''),
         array('SingleFrac', '', '-(1/2)', '-1/2', 1, 'ATSingleFrac_true.', ''),
@@ -840,8 +845,12 @@ class stack_answertest_test_data {
         array('SingleFrac', '', 'a/(-b)', '-a/b', 1, 'ATSingleFrac_true.', ''),
         array('SingleFrac', '', '-(a/b)', '-a/b', 1, 'ATSingleFrac_true.', ''),
         array('SingleFrac', '', '-(1/(n-1))', '1/(1-n)', 1, 'ATSingleFrac_true.', ''),
+        array('SingleFrac', '', 'a/(-1-1/a)', '-a^2/(1+a)', 0, 'ATSingleFrac_div.', ''),
+        array('SingleFrac', '', '((sqrt(5))^3 +6)/15', '((sqrt(5))^3 +6)/15', 1, 'ATSingleFrac_true.', 'Surds in answers'),
         // Use the LowestTerms test for this distinction.
         array('SingleFrac', '', '1/(1-sqrt(2))', '1/(1-sqrt(2))', 1, 'ATSingleFrac_true.', ''),
+        array('SingleFrac', '', '((sqrt(5))^3+6)/15', '((sqrt(5))^3+6)/15', 1, 'ATSingleFrac_true.', ''),
+        array('SingleFrac', '', '(5^(3/2)+6)/15', '((sqrt(5))^3+6)/15', 1, 'ATSingleFrac_true.', ''),
 
         array('PartFrac', '', '1/0', '3*x^2', -1, 'STACKERROR_OPTION.', ''),
         array('PartFrac', 'x', '1/0', '3*x^2', -1, 'ATPartFrac_STACKERROR_SAns.', ''),
@@ -1309,6 +1318,7 @@ class stack_answertest_test_data {
         array('NumSigFigs', '6', '1.73205', 'sqrt(3)', 1, '', ''),
         array('NumSigFigs', '2', 'matrix([0.33,1],[1,1])', 'matrix([0.333,1],[1,1])', 0, 'ATNumSigFigs_NotDecimal.',
                 'No support for matrices!'),
+        array('NumSigFigs', '3', '1.50', 'dispsf(1.500,3)', 1, '', 'Teacher uses dispsf'),
 
         array('NumDecPlaces', '', '3.141', '3.1415927', -1, 'ATNumDecPlaces_STACKERROR_Option.', 'Basic tests'),
         array('NumDecPlaces', '2', '1/0', '3', -1, 'ATNumDecPlaces_Wrong_DPs. ATNumDecPlaces_STACKERROR_SAns.', ''),
@@ -1340,6 +1350,8 @@ class stack_answertest_test_data {
             'Both wrong DPs and inaccurate.'),
         array('NumDecPlaces', '3', '4.000', '3.99999', 1, 'ATNumDecPlaces_Correct. ATNumDecPlaces_Equiv.',
             'Teacher needs to round their answer.'),
+        array('NumDecPlaces', '2', '0.10', 'displaydp(0.1,2)', 1, 'ATNumDecPlaces_Correct. ATNumDecPlaces_Equiv.',
+            'Teacher uses displaydp'),
 
         array('NumDecPlacesWrong', '', '3.141', '3.1415927', -1,
             'ATNumDecPlacesWrong_STACKERROR_Option.', 'Basic tests'),
@@ -1366,6 +1378,8 @@ class stack_answertest_test_data {
         array('NumDecPlacesWrong', '3', '0.1001', '1.00', 1, 'ATNumDecPlacesWrong_Correct.', ''),
         array('NumDecPlacesWrong', '4', '0.100', '1.0', 1, 'ATNumDecPlacesWrong_Correct.', 'Condone lack of trailing zeros'),
         array('NumDecPlacesWrong', '4', '1', '1.00', 1, 'ATNumDecPlacesWrong_Correct.', ''),
+        array('NumDecPlacesWrong', '3', '0.101', 'displaydp(101,3)', 1, 'ATNumDecPlacesWrong_Correct.',
+                'Teacher uses displaydp'),
 
         array('SigFigsStrict', '', '3.141', 'null', -1, 'STACKERROR_OPTION.', 'Basic tests'),
         array('SigFigsStrict', 'x^2', '3.141', 'null', -1, 'STACKERROR_OPTION.', ''),

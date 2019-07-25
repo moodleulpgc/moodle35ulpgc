@@ -40,18 +40,18 @@
     }
 }}
 
-<table class="table table-striped" style="width: 100%;" cellpadding="5" cellspacing="0">
+<table class="table table-striped" style="width: 100%;">
     {{#header.0}}
     <tr>
         {{#header}}
-        <th><b>{{{name}}}</b></th>
+        <th style="padding: 5px;"><b>{{{name}}}</b></th>
         {{/header}}
     </tr>
     {{/header.0}}
     {{#line}}
     <tr>
         {{#subfield}}
-        <td>{{{content}}}</td>
+        <td style="padding: 5px;">{{{content}}}</td>
         {{/subfield}}
     </tr>
     {{/line}}

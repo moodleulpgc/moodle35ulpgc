@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_studentquiz\local\studentquiz_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -91,7 +93,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         $info1->one = $userstats->last_attempt_correct;
         $info2 = new stdClass();
         $info2->total = $userstats->questions_created;
-        $info2->group = 0;
+        $info2->group = $userstats->questions_approved + $userstats->questions_disapproved;
         $info2->one = $userstats->questions_approved;
         $unansweredquestions = $sqstats->questions_available - $userstats->last_attempt_exists;
         $bc->content = html_writer::div($this->render_progress_bar($info1), '', array('style' => 'width:inherit'))
@@ -112,9 +114,13 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             . html_writer::div(get_string('statistic_block_approvals', 'studentquiz')
                 .html_writer::span('<b>' .$userstats->questions_approved .'</b>', '',
                     array('style' => 'float: right;color:#28A745;')))
-            . html_writer::div(get_string('statistic_block_created', 'studentquiz')
-                .html_writer::span('<b>' .$userstats->questions_created .'</b>', '',
-                    array('style' => 'float: right;')));
+            . html_writer::div(get_string('statistic_block_disapprovals', 'studentquiz')
+                        . html_writer::span('<b>' . $userstats->questions_disapproved . '</b>', '',
+                                ['style' => 'float: right;color:#d9534f;']))
+                . html_writer::div(get_string('statistic_block_new_changed', 'studentquiz')
+                        . html_writer::span('<b>' . ($userstats->questions_created - $userstats->questions_approved -
+                                        $userstats->questions_disapproved) . '</b>', '',
+                                ['style' => 'float: right;color:#f0ad4e;']));
 
         // Add More link to Stat block.
         $reporturl = new moodle_url('/mod/studentquiz/reportstat.php', ['id' => $cmid]);
@@ -174,7 +180,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         return $row;
     }
 
-    public function render_table($data, $size, $align, $head, $caption) {
+    public function render_table($data, $size, $align, $head, $caption, $class='') {
         $table = new html_table();
         if (!empty($caption)) {
             $table->caption = $caption;
@@ -183,6 +189,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
         $table->align = $align;
         $table->size = $size;
         $table->data = $data;
+        $table->attributes['class'] = $class;
         return html_writer::table($table);
     }
 
@@ -352,16 +359,29 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      * @param $rowclasses
      * @return string
      */
-    public function render_approved_column($question, $baseurl, $rowclasses) {
-        $class = 'question-unapproved';
-        $content = get_string('not_approved', 'studentquiz');
-        $title = get_string('approve', 'studentquiz');
-
-        if (!empty($question->approved)) {
-            $class = 'question-approved';
-            $content = get_string('approved', 'studentquiz');
-            $title = get_string('unapprove', 'studentquiz');
+    public function render_state_column($question, $baseurl, $rowclasses) {
+        switch ($question->state) {
+            case studentquiz_helper::STATE_DISAPPROVED:
+                // Disapproved
+                $state = 'state_disapproved';
+                break;
+            case studentquiz_helper::STATE_APPROVED:
+                // Approved.
+                $state = 'state_approved';
+                break;
+            case studentquiz_helper::STATE_NEW:
+                // New.
+                $state = 'state_new';
+                break;
+            case studentquiz_helper::STATE_CHANGED:
+                // Changed.
+                $state = 'state_changed';
+                break;
+            default:
+                throw new coding_exception('Invalid question state');
         }
+        $title = get_string('state_change_tooltip', 'studentquiz', get_string($state, 'studentquiz'));
+        $content = $this->output->pix_icon($state, '', 'studentquiz');
 
         if (question_has_capability_on($question, 'editall')) {
             $url = new moodle_url($baseurl, [
@@ -369,7 +389,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
                     'q' . $question->id => 1,
                     'sesskey' => sesskey()
             ]);
-            $content = html_writer::tag('a', $content, ['href' => $url, 'title' => $title, 'class' => $class]);
+            $content = html_writer::link($url, $content, ['title' => $title]);
         }
 
         return $content;
@@ -491,6 +511,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      */
     public function render_practice_column($question, $rowclasses) {
         $output = '';
+        $attrs = ['tabindex' => 0];
 
         if (!empty($question->myattempts)) {
             $output .= $question->myattempts;
@@ -504,14 +525,17 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             // TODO: Refactor magic constant.
             if ($question->mylastattempt == 'gradedright') {
                 $output .= get_string('lastattempt_right', 'studentquiz');
+                $attrs['aria-label'] = get_string('lastattempt_right_label', 'studentquiz');
             } else {
                 $output .= get_string('lastattempt_wrong', 'studentquiz');
+                $attrs['aria-label'] = get_string('lastattempt_wrong_label', 'studentquiz');
             }
         } else {
             $output .= get_string('no_mylastattempt', 'studentquiz');
+            $attrs['aria-label'] = get_string('no_mylastattempt_label', 'studentquiz');
         }
 
-        return $output;
+        return html_writer::span($output, 'pratice_info', $attrs);
     }
 
     /**
@@ -739,12 +763,13 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
     public function init_question_table_wanted_columns() {
         global $CFG;
         $CFG->questionbankcolumns = 'checkbox_column,question_type_column,'
-                . 'mod_studentquiz\\bank\\approved_column,'
+                . 'mod_studentquiz\\bank\\state_column,'
                 . 'mod_studentquiz\\bank\\question_name_column,'
                 . 'mod_studentquiz\\bank\\question_text_row,'
                 . 'mod_studentquiz\\bank\\preview_column,'
-                . 'edit_action_column,'
+                . 'mod_studentquiz\\bank\\sq_edit_action_column,'
                 . 'delete_action_column,'
+                . 'mod_studentquiz\\bank\\sq_hidden_column,'
                 . 'mod_studentquiz\\bank\\anonym_creator_name_column,'
                 . 'mod_studentquiz\\bank\\tag_column,'
                 . 'mod_studentquiz\\bank\\practice_column,'
@@ -758,7 +783,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      *
      * @return array
      */
-    public function get_is_sortable_difficulty_level_column($aggregated) {
+    public function get_is_sortable_difficulty_level_column() {
         return [
                 'difficulty' => [
                         'field' => 'dl.difficultylevel',
@@ -766,7 +791,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
                         'tip' => get_string('average_column_name', 'studentquiz')
                 ],
                 'mydifficulty' => [
-                        'field' => $aggregated ? 'mydifficulty' : 'mydiffs.mydifficulty',
+                        'field' => 'mydifficulty',
                         'title' => get_string('mine_column_name', 'studentquiz'),
                         'tip' => get_string('mine_column_name', 'studentquiz')
                 ]
@@ -1108,7 +1133,7 @@ EOT;
                     'class' => 'btn',
                     'type' => 'submit',
                     'name' => 'approveselected',
-                    'value' => get_string('approve_toggle', 'studentquiz')
+                    'value' => get_string('state_toggle', 'studentquiz')
             ]);
             $output .= html_writer::empty_tag('input', [
                     'class' => 'btn',
@@ -1269,6 +1294,69 @@ EOT;
         return $output;
     }
 
+    /**
+     * Render state change dialog
+     *
+     * @param string $message Message to display
+     * @param string $continue Continue button label
+     * @param string $cancel Cancel button label
+     * @return string HTML for state change dialog
+     */
+    public function render_change_state_dialog($message, $continue, $cancel) {
+        if ($continue instanceof single_button) {
+            // ok
+            $continue->primary = true;
+        } else if (is_string($continue)) {
+            $continue = new single_button(new moodle_url($continue), get_string('continue'), 'get', true);
+        } else if ($continue instanceof moodle_url) {
+            $continue = new single_button($continue, get_string('continue'), 'get', true);
+        } else {
+            throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a URL (string/moodle_url) or a single_button instance.');
+        }
+        if (is_string($cancel)) {
+            $cancel = new single_button(new moodle_url($cancel), get_string('cancel'), 'get');
+        } else if ($cancel instanceof moodle_url) {
+            $cancel = new single_button($cancel, get_string('cancel'), 'get');
+        } else {
+            throw new coding_exception('The cancel param to $OUTPUT->confirm() must be either a URL (string/moodle_url) or a single_button instance.');
+        }
+        $attributes = [
+                'role' => 'alertdialog',
+                'aria-labelledby' => 'modal-header',
+                'aria-describedby' => 'modal-body',
+                'aria-modal' => 'true'
+        ];
+        $states = [
+                studentquiz_helper::STATE_DISAPPROVED => get_string('state_disapproved', 'studentquiz'),
+                studentquiz_helper::STATE_APPROVED => get_string('state_approved', 'studentquiz'),
+                studentquiz_helper::STATE_CHANGED => get_string('state_changed', 'studentquiz'),
+                studentquiz_helper::STATE_HIDE => get_string('hide'),
+                studentquiz_helper::STATE_DELETE => get_string('delete')
+        ];
+        $output = $this->box_start('generalbox modal modal-dialog modal-in-page show', 'notice', $attributes);
+        $output .= $this->box_start('modal-content', 'modal-content');
+        $output .= $this->box_start('modal-header p-x-1', 'modal-header');
+        $output .= html_writer::tag('h4', get_string('confirm'));
+        $output .= $this->box_end();
+        $attributes = [
+                'role' => 'alert',
+                'data-aria-autofocus' => 'true'
+        ];
+        $output .= $this->box_start('modal-body', 'modal-body', $attributes);
+        $output .= html_writer::tag('p', $message);
+        $output .= html_writer::select($states, 'statetype');
+        $output .= $this->box_end();
+        $output .= $this->box_start('modal-footer', 'modal-footer');
+        $output .= html_writer::tag('div', $this->render($continue) . $this->render($cancel), ['class' => 'buttons']);
+        $output .= $this->box_end();
+        $output .= $this->box_end();
+        $output .= $this->box_end();
+
+        $this->page->requires->js_call_amd('mod_studentquiz/state_change', 'init');
+
+        return $output;
+    }
+
 }
 
 class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
@@ -1305,9 +1393,10 @@ class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
     public function feedback(question_definition $question,
                              question_display_options $options, $cmid,
                              $comments, $userid, $anonymize = true, $ismoderator = false) {
-        global $CFG;
-        return $this->render_rate($question->id)
-            . $this->render_comment($cmid, $question->id, $comments, $userid, $anonymize, $ismoderator);
+        global $COURSE;
+        return $this->render_state_choice($question->id, $COURSE->id, $cmid)
+                . $this->render_rate($question->id)
+                . $this->render_comment($cmid, $question->id, $comments, $userid, $anonymize, $ismoderator);
     }
 
     /**
@@ -1336,13 +1425,24 @@ class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
         }
 
         $choices = '';
-        $rates = [5, 4, 3, 2, 1];
+        $rates = [1, 2, 3, 4, 5];
         foreach ($rates as $rate) {
             $class = 'star-empty';
             if ($rate <= $selected) {
                 $class = 'star';
             }
-            $choices .= html_writer::span('', $rateable . $class, array('data-rate' => $rate, 'data-questionid' => $questionid));
+            if ($rate == 1) {
+                $ratedescription = get_string('rate_one_star_desc', 'mod_studentquiz');
+            } else {
+                $ratedescription = get_string('rate_multi_stars_desc', 'mod_studentquiz', $rate);
+            }
+            $rateableattr = [
+                    'data-rate' => $rate,
+                    'data-questionid' => $questionid,
+                    'tabindex' => 0,
+                    'aria-label' => $ratedescription
+            ];
+            $choices .= html_writer::span('', $rateable . $class, $rateableattr);
         }
         return html_writer::tag('label', get_string('rate_title', 'mod_studentquiz'), array('for' => 'rate_field'))
             . $this->output->help_icon('rate_help', 'mod_studentquiz') . ': '
@@ -1415,6 +1515,32 @@ class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
                 'comments'),
             'studentquiz_behaviour'
         );
+    }
+
+    /**
+     * Render state choice for specific question
+     *
+     * @param int $questionid Question id
+     * @return string HTML state choice select box
+     */
+    public function render_state_choice($questionid, $courseid, $cmid) {
+        $output = '';
+        if (has_capability('mod/studentquiz:previewothers', $this->page->context)) {
+            $states = [
+                    studentquiz_helper::STATE_DISAPPROVED => get_string('state_disapproved', 'studentquiz'),
+                    studentquiz_helper::STATE_APPROVED => get_string('state_approved', 'studentquiz'),
+                    studentquiz_helper::STATE_CHANGED => get_string('state_changed', 'studentquiz'),
+                    studentquiz_helper::STATE_HIDE => get_string('hide'),
+                    studentquiz_helper::STATE_DELETE => get_string('delete')
+            ];
+            $output .= html_writer::tag('label', 'Change state', ['for' => 'statetype']);
+            $output .= html_writer::select($states, 'statetype');
+            $output .= html_writer::tag('button', 'Submit',
+                    ['type' => 'button', 'class' => 'btn btn-secondary', 'id' => 'change_state', 'data-questionid' => $questionid,
+                            'data-courseid' => $courseid, 'data-cmid' => $cmid]);
+            $this->page->requires->js_call_amd('mod_studentquiz/state_change', 'init');
+        }
+        return $output;
     }
 }
 
@@ -1708,28 +1834,6 @@ class mod_studentquiz_ranking_renderer extends mod_studentquiz_renderer {
         }
         $rankingresultset->close();
         $data = $this->render_table_data($celldata, $rowstyle);
-        return $this->render_table($data, $size, $align, $head, $caption);
+        return $this->render_table($data, $size, $align, $head, $caption, 'generaltable rankingtable');
     }
-}
-
-class mod_studentquiz_migration_renderer extends mod_studentquiz_renderer {
-
-    public function view_body_success($cmid, $studentquiz) {
-        return $this->output->notification(get_string('migrated_successful', 'studentquiz'),
-                \core\output\notification::NOTIFY_SUCCESS)
-            . $this->output->single_button(new moodle_url('/mod/studentquiz/view.php', array('id' => $cmid)),
-                get_string('finish_button', 'studentquiz'));
-    }
-
-    public function view_body($cmid, $studentquiz) {
-        if ($studentquiz->aggregated == 1) {
-            return $this->output->error_text(get_string('migrate_already_done', 'studentquiz'));
-
-        } else {
-            return $this->output->confirm(get_string('migrate_ask', 'studentquiz'),
-                new moodle_url('/mod/studentquiz/migrate.php', array('id' => $cmid, 'do' => 'yes')),
-                new moodle_url('/mod/studentquiz/view.php', array('id' => $cmid)));
-        }
-    }
-
 }

@@ -46,6 +46,8 @@ class qtype_ordering_question extends question_graded_automatically {
     /** Show answers in one horizontal line */
     const LAYOUT_HORIZONTAL = 1;
 
+    /** Default value for numberingstyle */
+    const NUMBERING_STYLE_DEFAULT = 'none';
 
     /** @var int Zero grade on any error */
     const GRADING_ALL_OR_NOTHING = -1;
@@ -224,7 +226,7 @@ class qtype_ordering_question extends question_graded_automatically {
         if (array_key_exists($name, $response)) {
             $items = explode(',', $response[$name]);
         } else {
-            $items = array(); // shouldn't happen !!
+            $items = array(); // Shouldn't happen !!
         }
         $answerids = array();
         foreach ($this->answers as $answer) {
@@ -234,10 +236,10 @@ class qtype_ordering_question extends question_graded_automatically {
             if (array_key_exists($item, $answerids)) {
                 $item = $this->answers[$answerids[$item]];
                 $item = $this->html_to_text($item->answer, $item->answerformat);
-                $item = shorten_text($item, 10, true); // force truncate at 10 chars
+                $item = shorten_text($item, 10, true); // Force truncate at 10 chars.
                 $items[$i] = $item;
             } else {
-                $items[$i] = ''; // shouldn't happen !!
+                $items[$i] = ''; // Shouldn't happen !!
             }
         }
         return implode('; ', array_filter($items));
@@ -535,7 +537,8 @@ class qtype_ordering_question extends question_graded_automatically {
                     'selecttype' => self::SELECT_ALL,
                     'selectcount' => 0,
                     'gradingtype' => self::GRADING_ABSOLUTE_POSITION,
-                    'showgradingdetails' => 1,
+                    'showgrading' => 1,
+                    'numberingstyle' => self::NUMBERING_STYLE_DEFAULT,
                     'correctfeedback' => '',
                     'correctfeedbackformat' => FORMAT_MOODLE,
                     'incorrectfeedback' => '',
@@ -702,38 +705,38 @@ class qtype_ordering_question extends question_graded_automatically {
         // Var $subsets is the collection of all subsets within $positions.
         $subsets = array();
 
-        // loop through the values at each position
+        // Loop through the values at each position.
         foreach ($positions as $p => $value) {
 
-            // is $value a "new" value that cannot be added to any $subsets found so far
+            // Is $value a "new" value that cannot be added to any $subsets found so far?
             $isnew = true;
 
-            // an array of new and saved subsets to be added to $subsets
+            // An array of new and saved subsets to be added to $subsets.
             $new = array();
 
-            // append the current value to any subsets to which it belongs
-            // i.e. any subset whose end value is less than the current value
+            // Append the current value to any subsets to which it belongs
+            // i.e. any subset whose end value is less than the current value.
             foreach ($subsets as $s => $subset) {
 
-                // get value at end of $subset
+                // Get value at end of $subset.
                 $end = $positions[end($subset)];
 
                 switch (true) {
 
                     case ($value == ($end + 1)):
-                        // for a contiguous value, we simply append $p to the subset
+                        // For a contiguous value, we simply append $p to the subset.
                         $isnew = false;
                         $subsets[$s][] = $p;
                         break;
 
                     case $contiguous:
-                        // if the $contiguous flag is set, we ignore non-contiguous values
+                        // If the $contiguous flag is set, we ignore non-contiguous values.
                         break;
 
                     case ($value > $end):
-                        // for a non-contiguous value, we save the subset so far,
+                        // For a non-contiguous value, we save the subset so far,
                         // because a value between $end and $value may be found later,
-                        // and then append $p to the subset
+                        // and then append $p to the subset.
                         $isnew = false;
                         $new[] = $subset;
                         $subsets[$s][] = $p;
@@ -741,29 +744,16 @@ class qtype_ordering_question extends question_graded_automatically {
                 }
             }
 
-            // if this is a "new" value, add it as a new subset
+            // If this is a "new" value, add it as a new subset.
             if ($isnew) {
                 $new[] = array($p);
             }
 
-            // append any "new" subsets that were found during this iteration
+            // Append any "new" subsets that were found during this iteration.
             if (count($new)) {
                 $subsets = array_merge($subsets, $new);
             }
         }
-
-        // remove short subsets, that are subsets of longer subsets
-        //$keys = array();
-        //foreach ($subsets as $s => $subset) {
-        //    $key = implode(',', $subset);
-        //    $search = implode(',(\d+,)*', $subset);
-        //    $search = preg_grep("/$search/", $keys);
-        //    if (count($search)) {
-        //        //unset($subsets[$s]);
-        //    } else {
-        //        //$keys[] = $key;
-        //    }
-        //}
 
         return $subsets;
     }
@@ -836,5 +826,23 @@ class qtype_ordering_question extends question_graded_automatically {
             self::GRADING_LONGEST_CONTIGUOUS_SUBSET      => get_string('longestcontiguoussubset',    $plugin)
         );
         return self::get_types($types, $type);
+    }
+
+    /**
+     * @param string $style
+     * @return array of the numbering styles supported. For each one, there
+     *      should be a lang string numberingstylexxx in the qtype_ordering
+     *      language file, and a case in the switch statement in number_in_style,
+     *      and it should be listed in the definition of this column in install.xml.
+     */
+    public static function get_numbering_styles($style=null) {
+        $plugin = 'qtype_ordering';
+        $styles = array('none' => get_string('numberingstylenone', $plugin),
+                        'abc'  => get_string('numberingstyleabc',  $plugin),
+                        'ABC'  => get_string('numberingstyleABC',  $plugin),
+                        '123'  => get_string('numberingstyle123',  $plugin),
+                        'iii'  => get_string('numberingstyleiii',  $plugin),
+                        'III'  => get_string('numberingstyleIII',  $plugin));
+        return self::get_types($styles, $style);
     }
 }

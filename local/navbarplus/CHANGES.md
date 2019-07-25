@@ -4,6 +4,20 @@ moodle-local_navbarplus
 Changes
 -------
 
+### Unreleased 
+
+* 2019-06-26 - Removed the optional aspect from the behat tests scenarios.
+
+### Release v3.7-r1
+
+* 2019-06-19 - Added Behat tests.
+* 2019-06-17 - Improved accessibility for the icons.
+* 2019-06-17 - Prepare compatibility for Moodle 3.7.
+
+### Release v3.6-r3
+
+* 2019-06-19 - Fixed bug that added id attribute to all other items.
+
 ### Release v3.6-r2
 
 * 2019-05-31 - Target link to FontAwesome icon list to FontAwesome 4.7.0 which is still used by Moodle core.
