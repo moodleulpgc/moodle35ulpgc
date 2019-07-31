@@ -126,3 +126,11 @@ $string['updatelink_help'] = 'When data on Historic data table is loaded by othe
 $string['numupdated'] = 'Updated historic for {$a} users';
 $string['useridnumber'] = 'User ID number';
 $string['courseidnumber'] = 'course ID number';
+$string['nodata'] = 'No user data to collect or download';
+
+// events
+$string['eventhistoric'] = 'Feedback Historic tool';
+$string['eventhistoricset'] = 'Historic set';
+$string['eventgradescopied'] = 'Historic grades copied for multiple users';
+$string['eventhistoricimported'] = 'Historic grades imported';
+$string['eventhistoricexported'] = 'Historic grades exported';

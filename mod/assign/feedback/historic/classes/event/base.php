@@ -71,7 +71,7 @@ class base extends \mod_assign\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        $logmessage = get_string('eventcopyset', 'assignfeedback_historic');
+        $logmessage = get_string('eventhistoric', 'assignfeedback_historic');
         $this->set_legacy_logdata('view submission grading table', $logmessage);
         return parent::get_legacy_logdata();
     }

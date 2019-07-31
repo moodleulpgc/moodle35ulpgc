@@ -1132,10 +1132,11 @@ class assign_feedback_historic extends assign_feedback_plugin {
         $mform = new assignfeedback_historic_export_form(null, array('assignment'=>$this->assignment,
                                                                              'params'=>$formparams));
 
+        $returnurl = new moodle_url('view.php', array('id'=>$this->assignment->get_course_module()->id,
+                                                        'action'=>'grading'));
+                                                                             
         if ($mform->is_cancelled()) {
-            redirect(new moodle_url('view.php',
-                                    array('id'=>$this->assignment->get_course_module()->id,
-                                          'action'=>'grading')));
+            redirect($returnurl);
             return;
         } else if ($data = $mform->get_data()) {
             $groupmode = groups_get_activity_groupmode($this->assignment->get_course_module());
@@ -1210,19 +1211,21 @@ class assign_feedback_historic extends assign_feedback_plugin {
 
                 $csvexport->download_file();
                 exit;
+            } else {
+                redirect($returnurl, get_string('nodata', 'assignfeedback_historic'));
+                return;
             }
-        } else {
-            $header = new assign_header($this->assignment->get_instance(),
-                                        $context,
-                                        false,
-                                        $this->assignment->get_course_module()->id,
-                                        get_string('export', 'assignfeedback_historic'));
-            $o = '';
-            $o .= $this->assignment->get_renderer()->render($header);
-            $o .= $this->assignment->get_renderer()->render(new assign_form('exporthistoric', $mform));
-            $o .= $this->assignment->get_renderer()->render_footer();
         }
-
+    
+        $header = new assign_header($this->assignment->get_instance(),
+                                    $context,
+                                    false,
+                                    $this->assignment->get_course_module()->id,
+                                    get_string('export', 'assignfeedback_historic'));
+        $o = '';
+        $o .= $this->assignment->get_renderer()->render($header);
+        $o .= $this->assignment->get_renderer()->render(new assign_form('exporthistoric', $mform));
+        $o .= $this->assignment->get_renderer()->render_footer();
         return $o;
     }
 

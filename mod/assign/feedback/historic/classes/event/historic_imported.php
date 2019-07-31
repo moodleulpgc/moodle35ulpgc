@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  (c) Enrique Castro ULPGC
  * @license        http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class extensions_granted extends base {
+class historic_imported extends base {
 
     /**
      * Returns description of what happened.
@@ -27,11 +27,7 @@ class extensions_granted extends base {
      * @return string
      */
     public function get_description() {
-        $todate = '';
-        if($this->other['related']) {
-            $todate = "until '".userdate($this->other['related'])."'";
-        }
-        return "The user with id '$this->userid' has granted an extension $todate for multiple users " .
+        return "The user with id '$this->userid' has imported data into Historic " .
                 "in the assignment activity with the course module id '$this->contextinstanceid'. ";
     }
 
@@ -41,7 +37,7 @@ class extensions_granted extends base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventextensionsgranted', 'assignfeedback_historic');
+        return get_string('eventhistoricimported', 'assignfeedback_historic');
     }
 
 }

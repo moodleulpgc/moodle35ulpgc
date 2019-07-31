@@ -113,3 +113,11 @@ Esto puede llevar bastante tiempo.';
 $string['numupdated'] = 'Actualizado histórico de {$a} estudiantes';
 $string['useridnumber'] = 'DNI';
 $string['courseidnumber'] = 'Código asignatura';
+$string['nodata'] = 'No hay datos históricos de usuarios que mostrar o descargar';
+
+// events
+$string['eventhistoric'] = 'Histórico de Calificaciones';
+$string['eventhistoricset'] = 'Histórico establecido';
+$string['eventgradescopied'] = 'Datos del Histórico de Calificaciones copiados';
+$string['eventhistoricimported'] = 'Histórico de Calificaciones importado';
+$string['eventhistoricexported'] = 'Histórico de Calificaciones exportado';

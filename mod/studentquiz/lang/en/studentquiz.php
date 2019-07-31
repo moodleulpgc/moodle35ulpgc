@@ -130,6 +130,7 @@ $string['emailunhiddensmall'] = 'Your question \'{$a->questionname}\' has been u
 $string['emailunhiddensubject'] = 'Question has been unhidden: {$a->questionname}';
 
 $string['filter'] = 'Filter';
+$string['filter_advanced_element'] = '{$a} (Advanced element)';
 $string['filter_ishigher'] = 'Is higher';
 $string['filter_islower'] = 'Is lower';
 $string['filter_label_approved'] = 'Approved questions';
@@ -172,8 +173,10 @@ $string['messageprovider:changed'] = 'Question changed notification';
 $string['messageprovider:commentadded'] = 'Comment added notification';
 $string['messageprovider:commentdeleted'] = 'Comment deleted notification';
 $string['messageprovider:deleted'] = 'Question deleted notification';
+$string['messageprovider:disapproved'] = 'Question disapproved notification';
+$string['messageprovider:hidden'] = 'Question hidden notification';
+$string['messageprovider:unhidden'] = 'Question unhidden notification';
 $string['messageprovider:minecommentdeleted'] = 'My comment deleted notification';
-$string['messageprovider:unapproved'] = 'Question unapproved notification';
 $string['migrate_already_done'] = 'Nothing was done because this activity has been migrated already!';
 $string['migrate_ask'] = 'The speed of StudentQuiz improved with version 3.2.1, but this question set is still based on a prior version.
 Questions and quizzes will be loaded faster if you run this speed-up migration. You will experience faster loading; nothing else will change.';

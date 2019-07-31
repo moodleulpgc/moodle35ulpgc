@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  (c) Enrique Castro ULPGC
  * @license        http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class historic_imported extends base {
+class historic_set extends base {
 
     /**
      * Returns description of what happened.
@@ -27,8 +27,8 @@ class historic_imported extends base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has imported data into Historic " .
-                "in the assignment activity with the course module id '$this->contextinstanceid'. ";
+        return "The user with id '$this->userid' has set Historic data " .
+        "in the assignment activity with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -37,7 +37,7 @@ class historic_imported extends base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventextensionsgranted', 'assignfeedback_historic');
+        return get_string('eventhistoricset', 'assignfeedback_historic');
     }
 
 }

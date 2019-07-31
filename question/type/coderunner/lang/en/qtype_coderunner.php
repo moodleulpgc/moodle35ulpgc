@@ -182,6 +182,7 @@ $string['graphhelp'] = '- Double click at a blank space to create a new node/sta
 - Double click an existing node to "mark" it e.g. as an accept state for Finite State Machines
   (FSMs). Double click again to unmark it.
 - Click and drag to move a node.
+- Alt click and drag to move a (sub)graph.
 - Shift click inside one node and drag to another to create a link.
 - Shift click on a blank space, drag to a node to create a start link (FSMs only).
 - Click and drag a link to alter its curve.
@@ -189,7 +190,6 @@ $string['graphhelp'] = '- Double click at a blank space to create a new node/sta
 - Typing _ followed by a digit makes that digit a subscript.
 - Typing \\epsilon creates an epsilon character (and similarly for \\alpha, \\beta etc).
 - Click on a link/node then press the Delete key to remove it (or function-delete on a Mac).';
-
 $string['goodemptyprecheck'] = 'Passed';
 $string['gotcolhdr'] = 'Got';
 $string['grader'] = 'Grader';
@@ -549,6 +549,19 @@ can contain an incoming edge from nowhere (the start edge). Default: false.</li>
 <li>isdirected. True if edges are directed. Default: true.</li>
 <li>noderadius. The radius of a node, in pixels. Default: 26.</li>
 <li>fontsize. The font size used for node and edge labels. Default: 20 points.</li>
+<li>helpmenutext. A string to be used in lieu of the default Help info, if supplied.
+No default.</li>
+<li>locknodes. True to prevent the user from moving nodes. Useful when the
+answer box is preloaded with a graph that the student has to annotate by
+changing node or edge labels or by adding/removing edges. Note, though that
+nodes can still be added and deleted.</li>
+<li>lockedges. True to prevent the user from dragging edges to change
+their curvature. Possibly useful if the
+answer box is preloaded with a graph that the student has to annotate by
+changing node or edge labels or by adding/removing edges. Also ensures that
+edges added by a student are straight, e.g. to draw a polygon on a set of
+given points. Note, though that
+edges can still be added and deleted.</li>
 </ul></p>';
 
 $string['qtype_java_class'] = '<p>A Java write-a-class question, where the student submits a
@@ -729,6 +742,19 @@ can contain an incoming edge from nowhere (the start edge). Default: false.</li>
 <li>isdirected. True if edges are directed. Default: false.</li>
 <li>noderadius. The radius of a node, in pixels. Default: 26.</li>
 <li>fontsize. The font size used for node and edge labels. Default: 20 points.</li>
+<li>helpmenutext. A string to be used in lieu of the default Help info, if supplied.
+No default.</li>
+<li>locknodes. True to prevent the user from moving nodes. Useful when the
+answer box is preloaded with a graph that the student has to annotate by
+changing node or edge labels or by adding/removing edges. Note, though that
+nodes can still be added and deleted.</li>
+<li>lockedges. True to prevent the user from dragging edges to change
+their curvature. Possibly useful if the
+answer box is preloaded with a graph that the student has to annotate by
+changing node or edge labels or by adding/removing edges. Also ensures that
+edges added by a student are straight, e.g. to draw a polygon on a set of
+given points. Note, though that
+edges can still be added and deleted.</li>
 </ul></p>';
 
 $string['qtype_python3_w_input'] = '<p>A Python3 question type, which can handle
@@ -1105,10 +1131,10 @@ The template parameters
 from the actual question are merged with, and override, those from the
 prototype (since CodeRunner V3.2.2).
 
-There is also a \'Table\' user interface element, which is still experimental
-as of version 3.5. It displays a table of text areas for the student to
+There is also a \'Table\' user interface element, which displays a table of text
+areas for the student to
 fill in. It is used by the \'python3_program_testing\' question type, which is
-included in the sample questions on github. See the plugin documentation,
+included in the sample questions on github. See the CodeRunner documentation,
 that example and the source code (ui_table.js) for more information.
 
 Students with poor eyesight, or authors wishing to inspect serialisations

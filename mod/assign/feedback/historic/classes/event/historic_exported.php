@@ -37,7 +37,7 @@ class historic_exported extends base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventextensionsgranted', 'assignfeedback_historic');
+        return get_string('eventhistoricexported', 'assignfeedback_historic');
     }
 
 }
