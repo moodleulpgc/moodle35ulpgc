@@ -115,5 +115,15 @@ class repository_searchable extends repository_filesystem
 
         return $list;
     }
-
+    
+        /**
+     * Get the list of files and directories in that repository.
+     *
+     * @param string $path to browse.
+     * @param string $page page number.
+     * @return array list of files and folders.
+     */
+    public function get_fs_listing($path = '', $page = '') { // added ecastro ULPGC 
+        return parent::get_listing($path = '', $page = '');
+    }
 }

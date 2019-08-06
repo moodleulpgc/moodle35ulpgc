@@ -134,8 +134,13 @@ $string['userfield'] = 'custom user field';
 $string['userfieldlabel'] = 'User field Label';
 $string['userfieldlabelnovalue'] = 'label';
 
+// centers
+$string['faculty'] = 'Cod. Facultad';
+$string['degree'] = 'Cod. Titulación';
+$string['department'] = 'Cod. Departamento';
+
 // term
-$string['term0'] = 'Anuales';
+$string['term'] = 'Semestre';
 $string['term1'] = 'Primer semestre';
 $string['term2'] = 'Segundo semestre';
 $string['term3'] = 'Ambos semestres';

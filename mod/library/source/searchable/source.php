@@ -15,21 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for the librarysource_timelimit plugin.
+ * Implementaton of the librarysource_searchable plugin.
  *
  * @package    librarysource
- * @subpackage timelimit
- * @copyright  2019 Enrique Castro @ ULPGC
+ * @subpackage searchable
+ * @copyright  2019 Enrique  Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['allowhidden'] = 'Allow hidden instances';
-$string['allowhidden_help'] = 'If enabled, then hidden instances will be considered in addition to visible ones.';
-$string['pluginname'] = 'Filesystem Library source';
-$string['privacy:metadata'] = 'The Filesystem Library source plugin does not store any personal data.';
+require_once($CFG->dirroot . '/mod/library/source/sourcebase.php');
 
 
+/**
+ * A wrapper for a searchabe repository class to manage Library files
+ *
+ * @copyright  2019 Enrique Castro @ ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class librarysource_searchable extends library_source_base {
 
+    use filesystem_manage_files; 
+
+    /**
+     * Get a list of files within a folder .
+     * @param string $pathname folder to list.
+     */
+    public function list_files($pathname) {
+        $listing = ':'.base64_encode($pathname).':';
+        return $this->repository->get_fs_listing($listing)['list'];
+    }
+    
+}

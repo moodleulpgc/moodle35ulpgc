@@ -24,12 +24,17 @@
 
 require(__DIR__.'/../../config.php');
 require_once($CFG->dirroot.'/mod/library/locallib.php');
+//require_once($CFG->libdir.'/completionlib.php');
 
 // Course_module ID, or
 $id = optional_param('id', 0, PARAM_INT);
 
 // ... module instance id.
 $l  = optional_param('l', 0, PARAM_INT);
+
+$redirect = optional_param('redirect', 0, PARAM_BOOL);
+$forceview = optional_param('forceview', 0, PARAM_BOOL);
+
 
 if ($id) {
     list($course, $cm) = get_course_and_cm_from_cmid($id, 'library');
@@ -50,54 +55,66 @@ require_capability('mod/library:view', $context);
 library_view($library, $course, $cm, $context);
 
 $PAGE->set_url('/mod/library/view.php', array('id' => $cm->id));
-$PAGE->set_title(format_string($library->name));
+$PAGE->set_title($course->shortname.': '.$library->name);
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
+$PAGE->set_activity_record($library);
 
-//echo $OUTPUT->header();
-//echo $OUTPUT->footer();
+$target = null;
+$parameters = library_parameter_value_mapping($library, $cm, $course);
+$source = library_get_source_plugin($library, $parameters);
+$target = $source->get_source_content($context->id, $library->id);
 
-$fs = get_file_storage();
-$files = $fs->get_area_files($context->id, 'mod_library', 'content', 0, 'sortorder DESC, id ASC', false); // TODO: this is not very efficient!!
-if (count($files) < 1) {
-    library_print_filenotfound($library, $cm, $course);
+/*
+if($repository = library_get_repository($library)) {
+    $parameters = library_parameter_value_mapping($library, $cm, $course);
+    $target = library_get_source_content($library, $repository, $parameters, $context->id);
+}
+*/
+$output = $PAGE->get_renderer('mod_library');
+
+if (!$target) {
+    $filename = ($library->pathname) ? $library->pathname.'/' : '';
+    $filename .= str_replace(array_keys($parameters),array_values($parameters), $library->searchpattern);
+    $output->print_filenotfound($filename);
     die;
+}
+
+if($library->displaymode == LIBRARY_DISPLAYMODE_FILE) {
+    $library->mainfile = $target->get_filename();
+    $displaytype = library_get_final_display_type($library);
+    if ($displaytype == RESOURCELIB_DISPLAY_OPEN || $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD) {
+        $redirect = true;
+    }
+
+    // Don't redirect teachers, otherwise they can not access course or module settings.
+    if ($redirect && !course_get_format($course)->has_view_page() &&
+            (has_capability('moodle/course:manageactivities', $context) ||
+            has_capability('moodle/course:update', context_course::instance($course->id)))) {
+        $redirect = false;
+    }
+
+    if ($redirect && !$forceview) {
+        // coming from course page or url index page
+        // this redirect trick solves caching problems when tracking views ;-)
+        //$path = '/'.$context->id.'/mod_library/content/'.$library->revision.$target->get_filepath().$target->get_filename();
+        $fullurl = moodle_url::make_file_url('/pluginfile.php', $path, $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD);
+        redirect($fullurl);
+    }
+
+    switch ($displaytype) {
+        case RESOURCELIB_DISPLAY_EMBED:
+            $output->print_embed($target);
+            break;
+        case RESOURCELIB_DISPLAY_FRAME:
+            $output->print_in_frame($target);
+            break;
+        default:
+            $output->print_workaround($target);
+            break;
+    }
 } else {
-    $file = reset($files);
-    unset($files);
-}
-
-$library->mainfile = $file->get_filename();
-$displaytype = library_get_final_display_type($library);
-if ($displaytype == RESOURCELIB_DISPLAY_OPEN || $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD) {
-    $redirect = true;
-}
-
-// Don't redirect teachers, otherwise they can not access course or module settings.
-if ($redirect && !course_get_format($course)->has_view_page() &&
-        (has_capability('moodle/course:manageactivities', $context) ||
-        has_capability('moodle/course:update', context_course::instance($course->id)))) {
-    $redirect = false;
-}
-
-if ($redirect && !$forceview) {
-    // coming from course page or url index page
-    // this redirect trick solves caching problems when tracking views ;-)
-    $path = '/'.$context->id.'/mod_library/content/'.$library->revision.$file->get_filepath().$file->get_filename();
-    $fullurl = moodle_url::make_file_url('/pluginfile.php', $path, $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD);
-    redirect($fullurl);
-}
-
-switch ($displaytype) {
-    case RESOURCELIB_DISPLAY_EMBED:
-        library_display_embed($library, $cm, $course, $file);
-        break;
-    case RESOURCELIB_DISPLAY_FRAME:
-        library_display_frame($library, $cm, $course, $file);
-        break;
-    default:
-        library_print_workaround($library, $cm, $course, $file);
-        break;
+    $output->print_folder($target);
 }
 
 

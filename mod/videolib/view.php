@@ -50,7 +50,8 @@ require_capability('mod/videolib:view', $context);
 // Completion and trigger events.
 videolib_view($videolib, $course, $cm, $context);
 
-$PAGE->set_url('/mod/videolib/view.php', array('id' => $cm->id));
+$baseurl = new moodle_url('/mod/videolib/view.php', array('id' => $cm->id));
+$PAGE->set_url($baseurl);
 
 $options = empty($videolib->displayoptions) ? array() : unserialize($videolib->displayoptions);
 
@@ -64,9 +65,9 @@ if ($inpopup and $videolib->display == RESOURCELIB_DISPLAY_POPUP) {
     $PAGE->set_activity_record($videolib);
 }
 echo $OUTPUT->header();
-if (isset($options['printheading']) || !empty($options['printheading'])) {
-    echo $OUTPUT->heading(format_string($videolib->name), 2);
-}
+echo $OUTPUT->heading(format_string($videolib->name), 2);
+groups_print_activity_menu($cm, $baseurl);
+$currentgroup = groups_get_activity_group($cm, true);
 
 if (!empty($options['printintro'])) {
     if (trim(strip_tags($videolib->intro))) {

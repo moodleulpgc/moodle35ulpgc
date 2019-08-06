@@ -47,7 +47,7 @@ $capabilities = [
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ],
 
-    'mod/library:addfiles' => [
+    'mod/library:edit' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -57,7 +57,7 @@ $capabilities = [
         ],
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ],
-
+    
     'mod/library:manage' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
@@ -68,6 +68,5 @@ $capabilities = [
         ],
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ],
-
-
+    
 ];

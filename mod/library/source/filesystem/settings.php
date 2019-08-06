@@ -15,21 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for the librarysource_timelimit plugin.
+ * This file defines the admin settings for this plugin
  *
- * @package    librarysource
- * @subpackage timelimit
- * @copyright  2019 Enrique Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   librarysource_filesystem
+ * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$settings->add(new admin_setting_configcheckbox('librarysource_filesystem/enabled',
+                   new lang_string('enabled', 'library'),
+                   new lang_string('enabled_help', 'library'), 1));
 
-defined('MOODLE_INTERNAL') || die();
-
-$string['allowhidden'] = 'Allow hidden instances';
-$string['allowhidden_help'] = 'If enabled, then hidden instances will be considered in addition to visible ones.';
-$string['pluginname'] = 'Filesystem Library source';
-$string['privacy:metadata'] = 'The Filesystem Library source plugin does not store any personal data.';
-
-
+ 
+$settings->add(new admin_setting_configcheckbox('librarysource_filesystem/allowhidden',
+                   new lang_string('allowhidden', 'librarysource_filesystem'),
+                   new lang_string('allowhidden_help', 'librarysource_filesystem'), 1));
 

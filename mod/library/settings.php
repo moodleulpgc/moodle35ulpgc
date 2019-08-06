@@ -61,13 +61,17 @@ if ($ADMIN->fulltree) {
 
     //--- modedit defaults -----------------------------------------------------------------------------------
     $settings->add(new admin_setting_heading('librarymodeditdefaults', get_string('modeditdefaults', 'admin'), get_string('condifmodeditdefaults', 'admin')));
+/*
+    $settings->add(new admin_setting_configcheckbox('library/showexpanded',
+        get_string('showexpanded', 'library'), get_string('showexpanded', 'library'), 1));
 
     $settings->add(new admin_setting_configcheckbox('library/printheading',
         get_string('printheading', 'library'), get_string('printintroexplain', 'library'), 1));
     $settings->add(new admin_setting_configcheckbox('library/printintro',
         get_string('printintro', 'library'), get_string('printintroexplain', 'library'), 1));
+*/
     $settings->add(new admin_setting_configselect('library/display',
-        get_string('displayselect', 'library'), get_string('displayselectexplain', 'library'), RESOURCELIB_DISPLAY_AUTO, $displayoptions));
+        get_string('displayselect', 'library'), get_string('displayselectexplain', 'library'), RESOURCELIB_DISPLAY_EMBED, $displayoptions));
     $settings->add(new admin_setting_configtext('library/popupwidth',
         get_string('popupwidth', 'library'), get_string('popupwidthexplain', 'library'), 620, PARAM_INT, 7));
     $settings->add(new admin_setting_configtext('library/popupheight',

@@ -26,10 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['allowhidden'] = 'Allow hidden instances';
-$string['allowhidden_help'] = 'If enabled, then hidden instances will be considered in addition to visible ones.';
-$string['pluginname'] = 'Filesystem Library source';
-$string['privacy:metadata'] = 'The Filesystem Library source plugin does not store any personal data.';
-
-
+$string['allowhidden'] = 'Use hidden instances';
+$string['allowhidden_help'] = 'If enabled, then hidden repository instances will also be used.';
+$string['pluginname'] = 'Searchable Library source';
+$string['privacy:metadata'] = 'The Searchable Library source plugin does not store any personal data.';
 

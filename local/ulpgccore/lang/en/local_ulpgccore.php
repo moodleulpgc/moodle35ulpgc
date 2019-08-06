@@ -152,11 +152,17 @@ $string['userfield'] = 'custom user field';
 $string['userfieldlabel'] = 'User field Label';
 $string['userfieldlabelnovalue'] = 'label';
 
+// centers
+$string['faculty'] = 'Faculty';
+$string['degree'] = 'Degree';
+$string['department'] = 'Department';
+
 // term
-$string['term0'] = 'Anuales';
-$string['term1'] = 'Primer semestre';
-$string['term2'] = 'Segundo semestre';
-$string['term3'] = 'Ambos semestres';
+$string['term'] = 'Semestre';
+$string['term0'] = 'Anuals';
+$string['term1'] = 'First term';
+$string['term2'] = 'Second term';
+$string['term3'] = 'Both terms';
 
 // admin
 $string['customnavnodes'] = 'Custom nav nodes';

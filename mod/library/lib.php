@@ -29,6 +29,10 @@ define('LIBRARY_DISPLAYMODE_FILE', 0);
 define('LIBRARY_DISPLAYMODE_FOLDER', 1);
 define('LIBRARY_DISPLAYMODE_TREE', 2);
 
+define('LIBRARY_FILEUPDATE_UPDATE', 0);
+define('LIBRARY_FILEUPDATE_REOLD',  1);
+define('LIBRARY_FILEUPDATE_RENEW',  2);
+define('LIBRARY_FILEUPDATE_NO',     3);
 
 
 /**
@@ -40,8 +44,8 @@ define('LIBRARY_DISPLAYMODE_TREE', 2);
 function library_supports($feature) {
     switch($feature) {
         case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
+        case FEATURE_GROUPS:                  return true;
+        case FEATURE_GROUPINGS:               return true;
         case FEATURE_MOD_INTRO:               return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
         case FEATURE_GRADE_HAS_GRADE:         return false;
@@ -147,9 +151,11 @@ function library_set_displayoptions($data) {
         $displayoptions['popupwidth']  = $data->popupwidth;
         $displayoptions['popupheight'] = $data->popupheight;
     }
-    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
+    
+    if (isset($data->printintro)) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
+   
     if (!empty($data->showsize)) {
         $displayoptions['showsize'] = 1;
     }
@@ -159,6 +165,7 @@ function library_set_displayoptions($data) {
     if (!empty($data->showdate)) {
         $displayoptions['showdate'] = 1;
     }
+
     return serialize($displayoptions);
 }
 
@@ -315,14 +322,53 @@ function library_page_type_list($pagetype, $parentcontext, $currentcontext) {
  * @param array $options Additional options affecting the file serving.
  */
 function mod_library_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options = array()) {
-    global $DB, $CFG;
+    global $CFG, $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
-        send_file_not_found();
+        return false;
     }
 
-    require_login($course, true, $cm);
-    send_file_not_found();
+    require_course_login($course, true, $cm);
+    if (!has_capability('mod/library:view', $context)) {
+        return false;
+    }
+
+    if ($filearea !== 'content') {
+        // intro is handled automatically in pluginfile.php
+        return false;
+    }
+
+
+    $fs = get_file_storage();
+    $relativepath = implode('/', $args);
+    $fullpath = rtrim("/$context->id/mod_library/$filearea/$relativepath", '/');
+    do {
+        if (!$file = $fs->get_file_by_hash(sha1($fullpath))) {
+            if ($fs->get_file_by_hash(sha1("$fullpath/."))) {
+                if ($file = $fs->get_file_by_hash(sha1("$fullpath/index.htm"))) {
+                    break;
+                }
+                if ($file = $fs->get_file_by_hash(sha1("$fullpath/index.html"))) {
+                    break;
+                }
+                if ($file = $fs->get_file_by_hash(sha1("$fullpath/Default.htm"))) {
+                    break;
+                }
+            }
+        }
+    } while (false);
+
+    // should we apply filters?
+    $mimetype = $file->get_mimetype();
+    if ($mimetype === 'text/html' or $mimetype === 'text/plain' or $mimetype === 'application/xhtml+xml') {
+        $filter = $DB->get_field('resource', 'filterfiles', array('id'=>$cm->instance));
+        $CFG->embeddedsoforcelinktarget = true;
+    } else {
+        $filter = 0;
+    }
+    
+    // finally send the file
+    send_stored_file($file, null, $filter, $forcedownload, $options);
 }
 
 
@@ -428,4 +474,31 @@ function library_extend_navigation($librarynode, $course, $module, $cm) {
  * @param navigation_node $librarynode {@link navigation_node}
  */
 function library_extend_settings_navigation($settingsnav, $librarynode = null) {
+    global $USER, $PAGE, $CFG, $DB, $OUTPUT;
+
+    $library = $DB->get_record('library', array('id' => $PAGE->cm->instance));
+    if (empty($PAGE->cm->context)) {
+        $PAGE->cm->context = context_module::instance($PAGE->cm->instance);
+    }
+
+    //$params = $PAGE->url->params();
+    $canmanage  = has_capability('mod/library:manage', $PAGE->cm->context);
+
+    if ($canmanage) {
+        $node = $librarynode->add(get_string('managelibrary', 'library'), null, navigation_node::TYPE_CONTAINER);
+        
+        $source = library_get_source_plugin($library);
+        if($source->allow_uploads()) {
+            $url = new moodle_url('/mod/library/manage.php', array('id'=>$PAGE->cm->id, 'action'=>'add'));
+            $files = $node->add(get_string('addfiles', 'library', ''), clone $url, navigation_node::TYPE_SETTING);
+        }
+        
+        if($source->allow_deletes()) {
+            $url->param('action', 'del');
+            $files = $node->add(get_string('delfiles', 'library', ''), clone $url, navigation_node::TYPE_SETTING);
+        }
+        
+        $url = new moodle_url('/admin/settings.php', array('section'=>'modsettinglibrary'));
+        $config = $node->add(get_string('manageconfig', 'library'), $url, navigation_node::TYPE_SETTING);
+    }
 }

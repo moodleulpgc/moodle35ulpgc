@@ -15,17 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for the librarysource_timelimit plugin.
+ * Version information for the librarysource_searchable plugin.
  *
  * @package    librarysource
- * @subpackage timelimit
- * @copyright  2019 Enrique Castro @ ULPGC
+ * @subpackage searchable
+ * @copyright  2019 Enrique  Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'OneDrive Library source';
-$string['privacy:metadata'] = 'The OneDrive Library source plugin does not store any personal data.';
 
+$plugin->version   = 2019033000;
+$plugin->requires  = 2018050800;
+$plugin->component = 'librarysource_searchable';
+$plugin->maturity = MATURITY_STABLE;
+$plugin->dependencies = array('repository_searchable' => 2017021700);

@@ -30,55 +30,23 @@ require_once($CFG->dirroot . '/mod/library/source/sourcebase.php');
 
 
 /**
- * A rule representing the time limit. It does not actually restrict access, but we use this
- * class to encapsulate some of the relevant code.
+ * A wrapper for a filesystem repository class to manage Library files
  *
- * @copyright  2009 Tim Hunt
+ * @copyright  2019 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class librarysource_filesystem extends library_source_base {
 
-    public static function make(quiz $quizobj, $timenow, $canignorefilesystems) {
+    
+    use filesystem_manage_files; 
 
-        if (empty($quizobj->get_quiz()->filesystem) || $canignorefilesystems) {
-            return null;
-        }
-
-        return new self($quizobj, $timenow);
+    /**
+     * Get a list of files within a folder .
+     * @param $pathname folder to list.
+     */
+    public function list_files($pathname) {
+        $listing = ':'.base64_encode($pathname).':';
+        return $this->repository->get_listing($listing)['list'];
     }
-
-    public function description() {
-        return get_string('quizfilesystem', 'librarysource_filesystem',
-                format_time($this->quiz->filesystem));
-    }
-
-    public function end_time($attempt) {
-        $timedue = $attempt->timestart + $this->quiz->filesystem;
-        if ($this->quiz->timeclose) {
-            $timedue = min($timedue, $this->quiz->timeclose);
-        }
-        return $timedue;
-    }
-
-    public function time_left_display($attempt, $timenow) {
-        // If this is a teacher preview after the time limit expires, don't show the time_left
-        $endtime = $this->end_time($attempt);
-        if ($attempt->preview && $timenow > $endtime) {
-            return false;
-        }
-        return $endtime - $timenow;
-    }
-
-    public function is_preflight_check_required($attemptid) {
-        // Warning only required if the attempt is not already started.
-        return $attemptid === null;
-    }
-
-    public function add_preflight_check_form_fields(mod_quiz_preflight_check_form $quizform,
-            MoodleQuickForm $mform, $attemptid) {
-        $mform->addElement('header', 'honestycheckheader',
-                get_string('confirmstartheader', 'librarysource_filesystem'));
-        $mform->addElement('static', 'honestycheckmessage', '',
-                get_string('confirmstart', 'librarysource_filesystem', format_time($this->quiz->filesystem)));
-    }
+    
 }

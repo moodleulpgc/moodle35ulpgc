@@ -99,8 +99,6 @@ class mod_videolib_mod_form extends moodleform_mod {
         if(!$canmanage = has_capability('mod/videolib:manage', $this->context)) {
             $mform->disabledIf('searchpattern', 'searchtype', 'eq', 1);
         }
-        
-        
 
         $mform->addElement('header', 'parameterssection', get_string('parametersheader', 'videolib'));
         $mform->addElement('static', 'parametersinfo', '', get_string('parametersheader_help', 'videolib'));
@@ -123,8 +121,6 @@ class mod_videolib_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'optionssection', get_string('appearance'));
         
-        $mform->addElement('advcheckbox', 'printheading', get_string('printheading', 'videolib'));
-        $mform->setDefault('printheading', $config->printheading);
         $mform->addElement('advcheckbox', 'printintro', get_string('printintro', 'videolib'));
         $mform->setDefault('printintro', $config->printintro);
 
@@ -172,9 +168,6 @@ class mod_videolib_mod_form extends moodleform_mod {
     function data_preprocessing(&$default_values) {
         if (!empty($default_values['displayoptions'])) {
             $displayoptions = unserialize($default_values['displayoptions']);
-            if (isset($displayoptions['printheading'])) {
-                $default_values['printheading'] = $displayoptions['printheading'];
-            }
             if (isset($displayoptions['printintro'])) {
                 $default_values['printintro'] = $displayoptions['printintro'];
             }
@@ -199,9 +192,10 @@ class mod_videolib_mod_form extends moodleform_mod {
     function definition_after_data() {
         parent::definition_after_data();
         $mform    =& $this->_form;
+        $cm = $this->_cm;
         $canmanage = has_capability('mod/videolib:manage', $this->context);
         
-        if(!$canmanage) {
+        if(!$canmanage && isset($cm) && $cm->score) {
             $parcount = 5;
             $elements = array();
             for ($i=0; $i < $parcount; $i++) {
@@ -209,21 +203,18 @@ class mod_videolib_mod_form extends moodleform_mod {
                 $elements[]  = "variable_$i";
                 $elements[] = "pargoup_$i";
             }
+            $elements[] = 'source';
             $elements[] = 'searchtype';
+            $elements[] = 'searchpattern';
                         
             foreach($elements as $name) {
                 if($mform->elementExists($name)) {
                     $el =& $mform->getElement($name);
-                    $el->freeze();
                     $el->setPersistantFreeze(true);
+                    $el->freeze();
                 }
             }
-            
-            $mform->disabledIf('searchpattern', 'searchtype', 'noteq', 0);
-            
         }
-
-
     }
     
 }

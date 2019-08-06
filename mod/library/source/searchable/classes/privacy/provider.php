@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * Privacy Subsystem implementation for librarysource_onedrive.
+ * Privacy Subsystem implementation for librarysource_searchable.
  *
- * @package    librarysource_onedrive
+ * @package    librarysource_searchable
  * @copyright  2019 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace librarysource_onedrive\privacy;
+namespace librarysource_searchable\privacy;
 defined('MOODLE_INTERNAL') || die();
 /**
- * Privacy Subsystem for librarysource_onedrive implementing null_provider.
+ * Privacy Subsystem for librarysource_searchable implementing null_provider.
  *
  * @copyright  2019 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

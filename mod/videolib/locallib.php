@@ -60,6 +60,7 @@ function videolib_get_variable_options($config) {
         'modcmid'         => 'cmid',
         'modname'         => get_string('name'),
         'modidnumber'     => get_string('idnumbermod'),
+        'activitygroup'   => get_string('group'),
     );
 
     $options[get_string('miscellaneous')] = array(
@@ -91,6 +92,14 @@ function videolib_get_variable_options($config) {
         'userurl'         => get_string('webpage'),
     );
 
+    if($ulpgc = get_config('local_ulpgccore')) {
+        $options[get_string('course')]['department'] = get_string('department', 'local_ulpgccore');
+        $options[get_string('course')]['term'] = get_string('term', 'local_ulpgccore');
+    
+        $options[get_string('category')]['faculty'] = get_string('faculty', 'local_ulpgccore');
+        $options[get_string('category')]['degree'] = get_string('degree', 'local_ulpgccore');
+    }
+    
     if ($config->rolesinparams) {
         $roles = role_fix_names(get_all_roles());
         $roleoptions = array();
@@ -137,7 +146,20 @@ function videolib_get_variable_values($videolib, $cm, $course, $config) {
         'catname'         => $category->name,
         'catidnumber'     => $category->idnumber,
     );
-    //// TODO TODO add ulpgc customs category/course data
+    
+    if($ulpgc = get_config('local_ulpgccore')) {   
+        require_once($CFG->dirroot.'/local/ulpgccore/lib.php');
+        $course = local_ulpgccore_get_course_details($course);
+        $categoryrec = local_ulpgccore_get_category_details($category->get_db_record());
+    
+        $values['department'] = $course->department;
+        $values['term'] = $course->term;
+    
+        $values['faculty'] = $categoryrec->faculty;
+        $values['degree'] = $categoryrec->degree;
+    }
+    
+    $values['activitygroup'] = groups_get_activity_group($cm); 
     
     
     if (isloggedin()) {

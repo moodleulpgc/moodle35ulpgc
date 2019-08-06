@@ -15,20 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the librarysource_delaybetweenattempts plugin.
+ * This file defines the admin settings for this plugin
  *
- * @package    librarysource
- * @subpackage onedrive
- * @copyright  2019 Enrique  Castro @ ULPGC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   librarysource_searchable
+ * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$settings->add(new admin_setting_configcheckbox('librarysource_searchable/enabled',
+                   new lang_string('enabled', 'library'),
+                   new lang_string('enabled_help', 'library'), 1));
 
-defined('MOODLE_INTERNAL') || die();
+ 
+$settings->add(new admin_setting_configcheckbox('librarysource_searchable/allowhidden',
+                   new lang_string('allowhidden', 'librarysource_searchable'),
+                   new lang_string('allowhidden_help', 'librarysource_searchable'), 1));
 
-
-$plugin->version   = 2019033000;
-$plugin->requires  = 2018050800;
-$plugin->component = 'librarysource_onedrive';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array('repository_onedrive' => 2013080300);

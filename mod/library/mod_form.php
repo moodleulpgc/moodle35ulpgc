@@ -43,7 +43,6 @@ class mod_library_mod_form extends moodleform_mod {
         global $CFG;
 
         $mform = $this->_form;
-        
         $config = get_config('library');
 
         // Adding the "general" fieldset, where all the common settings are showed.
@@ -68,40 +67,88 @@ class mod_library_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
-        $mform->addElement('header', 'repositorysection', get_string('repositoryheader', 'library'));
-
+        $mform->addElement('header', 'displaysection', get_string('displayheader', 'library'));
+        
         $options = array(LIBRARY_DISPLAYMODE_FILE => get_string('file'),
                             LIBRARY_DISPLAYMODE_FOLDER => get_string('folder'),
-                            LIBRARY_DISPLAYMODE_TREE => get_string('modetree', 'library'),
+                            /* LIBRARY_DISPLAYMODE_TREE => get_string('modetree', 'library'), */
                         );
         $mform->addElement('select', 'displaymode', get_string('displaymode', 'library'), $options);
         $mform->setDefault('displaymode', 0);
         $mform->addHelpButton('displaymode', 'repository', 'library');
+        
+        $mform->addElement('text', 'pathname', get_string('pathname', 'library'), array('size'=>'60'));
+        $mform->setType('pathname', PARAM_PATH);
+        $mform->addHelpButton('pathname', 'pathname', 'library');
+
+        $mform->addElement('text', 'searchpattern', get_string('searchpattern', 'library'), array('size'=>'60'));
+        $mform->setType('searchpattern', PARAM_TEXT);
+        $mform->addHelpButton('searchpattern', 'searchpattern', 'library');
+        //$mform->addRule('searchpattern', null, 'required', null, 'client');
+        
+        
+        
+        
+        if ($this->current->instance) {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
+        } else {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+        }
+
+        if (count($options) == 1) {
+            $mform->addElement('hidden', 'display');
+            $mform->setType('display', PARAM_INT);
+            reset($options);
+            $mform->setDefault('display', key($options));
+        } else {
+            $mform->addElement('select', 'display', get_string('displayselect', 'library'), $options);
+            $mform->setDefault('display', $config->display);
+            $mform->addHelpButton('display', 'displayselect', 'library');
+            $mform->disabledIf('display', 'displaymode', 'neq', 0);
+        }
+        
+        /*
+        // Adding option to show sub-folders expanded or collapsed by default.
+        $mform->addElement('advcheckbox', 'showexpanded', get_string('showexpanded', 'library'));
+        $mform->addHelpButton('showexpanded', 'showexpanded', 'library');
+        $mform->setDefault('showexpanded', $config->showexpanded);
+        $mform->disabledIf('showexpanded', 'displaymode', 'eq', 0);
+        */
+        
+        // Adding options to show window if new window.
+        $mform->addElement('advcheckbox', 'printintro', get_string('printintro', 'videolib'));
+        $mform->setDefault('printintro', $config->printintro);
+        $mform->addHelpButton('printintro', 'printintro', 'library');
+
+        $mform->addElement('advcheckbox', 'popupwidth', get_string('popupwidth', 'library'));
+        $mform->addHelpButton('popupwidth', 'popupwidth', 'library');
+        $mform->setDefault('popupwidth', $config->popupwidth);
+        $mform->disabledIf('popupwidth', 'display', 'neq', RESOURCELIB_DISPLAY_POPUP);
+        
+        $mform->addElement('advcheckbox', 'popupheight', get_string('popupheight', 'library'));
+        $mform->addHelpButton('popupheight', 'popupheight', 'library');
+        $mform->setDefault('popupheight', $config->popupheight);
+        $mform->disabledIf('popupheight', 'display', 'neq', RESOURCELIB_DISPLAY_POPUP);
+        
+        
+        
+        $mform->setExpanded('displaysection', true, true);
+        
+        $mform->addElement('header', 'repositorysection', get_string('repositoryheader', 'library'));
 
         $options = array();
         foreach (core_plugin_manager::instance()->get_plugins_of_type('librarysource') as $plugin) {
             $options[$plugin->name] = $plugin->displayname;
         }
         $mform->addElement('select', 'source', get_string('repository', 'library'), $options);
-        $mform->setDefault('source', 0);
+        $mform->setDefault('source', 'filesystem');
         $mform->addHelpButton('source', 'repository', 'library');
 
         $mform->addElement('text', 'reponame', get_string('repositoryname', 'library'), array('size'=>'60'));
         $mform->setType('reponame', PARAM_TEXT);
         $mform->addHelpButton('reponame', 'repositoryname', 'library');
-        
-        $mform->addElement('text', 'pathname', get_string('pathname', 'library'), array('size'=>'60'));
-        $mform->setType('pathname', PARAM_PATH);
-        $mform->addHelpButton('pathname', 'pathname', 'library');
 
-        
-        $mform->addElement('header', 'parameterssection', get_string('parametersheader', 'library'));
         $mform->addElement('static', 'parametersinfo', '', get_string('parametersheader_help', 'library'));
-
-        $mform->addElement('text', 'searchpattern', get_string('searchpattern', 'library'), array('size'=>'60'));
-        $mform->setType('searchpattern', PARAM_TEXT);
-        $mform->addHelpButton('searchpattern', 'searchpattern', 'library');
-        //$mform->addRule('searchpattern', null, 'required', null, 'client');
         
         $parcount = 5;
         $options = library_get_variable_options($config);
@@ -129,23 +176,7 @@ class mod_library_mod_form extends moodleform_mod {
         $mform->addElement('header', 'optionssection', get_string('appearance'));
         */
 
-        if ($this->current->instance) {
-            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-        } else {
-            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
-        }
 
-        if (count($options) == 1) {
-            $mform->addElement('hidden', 'display');
-            $mform->setType('display', PARAM_INT);
-            reset($options);
-            $mform->setDefault('display', key($options));
-        } else {
-            $mform->addElement('select', 'display', get_string('displayselect', 'library'), $options);
-            $mform->setDefault('display', $config->display);
-            $mform->addHelpButton('display', 'displayselect', 'library');
-        }
-        
         $mform->addElement('hidden', 'revision');
         $mform->setType('revision', PARAM_INT);
         $mform->setDefault('revision', 1);
@@ -160,9 +191,6 @@ class mod_library_mod_form extends moodleform_mod {
     function data_preprocessing(&$default_values) {
         if (!empty($default_values['displayoptions'])) {
             $displayoptions = unserialize($default_values['displayoptions']);
-            if (isset($displayoptions['printheading'])) {
-                $default_values['printheading'] = $displayoptions['printheading'];
-            }
             if (isset($displayoptions['printintro'])) {
                 $default_values['printintro'] = $displayoptions['printintro'];
             }
@@ -187,9 +215,10 @@ class mod_library_mod_form extends moodleform_mod {
     function definition_after_data() {
         parent::definition_after_data();
         $mform    =& $this->_form;
-        $canmanage = has_capability('mod/library:manage', $this->context);
-        
-        if(!$canmanage) {
+        $cm = $this->_cm;
+        $canedit = has_capability('mod/library:edit', $this->context);
+       
+        if(!$canedit && isset($cm) && $cm->score) {
             $parcount = 5;
             $elements = array();
             for ($i=0; $i < $parcount; $i++) {
@@ -197,13 +226,17 @@ class mod_library_mod_form extends moodleform_mod {
                 $elements[]  = "variable_$i";
                 $elements[] = "pargoup_$i";
             }
+            $elements[] = 'source';
             $elements[] = 'searchtype';
+            $elements[] = 'reponame';
+            $elements[] = 'pathname';
+            $elements[] = 'searchpattern';
                         
             foreach($elements as $name) {
                 if($mform->elementExists($name)) {
                     $el =& $mform->getElement($name);
-                    $el->freeze();
                     $el->setPersistantFreeze(true);
+                    $el->freeze();
                 }
             }
             

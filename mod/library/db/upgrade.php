@@ -36,12 +36,20 @@ function xmldb_library_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // For further information please read the Upgrade API documentation:
-    // https://docs.moodle.org/dev/Upgrade_API
-    //
-    // You will also have to create the db/install.xml file by using the XMLDB Editor.
-    // Documentation for the XMLDB Editor can be found at:
-    // https://docs.moodle.org/dev/XMLDB_editor
+    if ($oldversion < 2019073000) {
+    
+        // Capabilities cleanup
+        $select = 'capability = :cap';
+        $params = array('cap'=>'mod/library:addfiles');
+        $DB->set_field_select('role_capabilities', 'capability', 'mod/library:edit', $select, $params);  
+        
+        //Uninstall unused plugins
+        $DB->delete_records('config_plugins', array('plugin'=>'librarysource_onedrive'));
+    
+    
+        // Library savepoint reached.
+        upgrade_mod_savepoint(true, 2019073000, 'library');
+    }
 
     return true;
 }
