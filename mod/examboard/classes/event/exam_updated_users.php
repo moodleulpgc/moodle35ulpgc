@@ -27,13 +27,13 @@ namespace mod_examboard\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The board members update event class.
+ * The exam viewed event class.
  *
  * @package    mod_examboard
  * @copyright  2017 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tutor_updated extends base {
+class exam_updated_users extends base {
 
     /**
      * Init method.
@@ -45,7 +45,6 @@ class tutor_updated extends base {
 
     }
 
-
     /**
      * Returns relevant UR params arrayL.
      *
@@ -56,5 +55,6 @@ class tutor_updated extends base {
                         'item' => $this->objectid);
         return $params;
     }
+    
     
 }

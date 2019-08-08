@@ -37,7 +37,7 @@ $sort = optional_param('tsort', '', PARAM_ALPHANUMEXT);
 $order = optional_param('order', '', PARAM_ALPHANUMEXT);
 $userorder = optional_param('uorder', 1, PARAM_INT); 
 $examid = optional_param('exam', 0, PARAM_INT);
-
+$boardid = optional_param('board', 0, PARAM_INT);
 
 if ($id) {
     list ($course, $cm) = get_course_and_cm_from_cmid($id, 'examboard');
@@ -76,6 +76,7 @@ if($examid) {
     $urlparams['view'] = 'exam';
     $urlparams['item'] = $examid;
 }
+
 
 // http://localhost/moodle31ulpgc/mod/examboard/view.php?id=8975&view=exam&item=1
 // http://localhost/moodle31ulpgc/mod/examboard/edit.php?id=8975&exam=1&user=58&action=userdown
@@ -120,7 +121,12 @@ die();
 */
 
 // actions not requiring interface form
-$actions = array('examhide', 'userup', 'userdown', 'reorder');
+$actions = array('examhide', 'userup', 'userdown', 'usertoggle', 'reorder', 'memberup', 'memberdown', 'delmember', 'boardtoggle');
+
+$eventparams = array(
+    'context' => $context,
+    'other' => array('examboardid'=>$examboard->id),
+);
 
 if($examid && in_array($action, $actions)) {
     if($action == 'examhide') {
@@ -144,7 +150,6 @@ if($examid && in_array($action, $actions)) {
             } else {
                 $max = 0;
             }
-            $params = array('examid'=>$examid, 'userid'=>$userid);
             $sortorder = $DB->get_field('examboard_examinee', 'sortorder', $params);
             if($sortorder < $max) {
                 $lower = $DB->get_field('examboard_examinee', 'id', array('examid'=>$examid, 'sortorder' => ($sortorder + 1)));
@@ -154,6 +159,59 @@ if($examid && in_array($action, $actions)) {
         }
     } elseif($action == 'reorder') {    
         examboard_reorder_examinees($examid, optional_param('reorder', 0, PARAM_INT));
+    } elseif($action == 'usertoggle') {   
+        if($userid = optional_param('user', 0, PARAM_INT)) {
+            $params = array('examid'=>$examid, 'userid'=>$userid);
+            $status = $DB->get_field('examboard_examinee', 'excluded', $params); 
+            $status = $status ? 0 : 1;
+            $DB->set_field('examboard_examinee', 'excluded', $status, $params); 
+        }
+    }
+    redirect($returnurl);
+}    
+if($boardid && in_array($action, $actions)) {
+    $returnurl->param('view', 'board');
+    $returnurl->param('item', $boardid);
+    if($action == 'memberup') {
+        if($userid = optional_param('user', 0, PARAM_INT)) {
+            $params = array('boardid'=>$boardid, 'userid'=>$userid);
+            if($sortorder = $DB->get_field('examboard_member', 'sortorder', $params)) {
+                $upper = $DB->get_field('examboard_member', 'id', array('boardid'=>$boardid, 'sortorder' => ($sortorder - 1)));
+                $DB->set_field('examboard_member', 'sortorder', ($sortorder -1), $params);
+                $DB->set_field('examboard_member', 'sortorder', $sortorder, array('id'=>$upper));
+            }
+        }
+    } elseif($action == 'memberdown') {
+        if($userid = optional_param('user', 0, PARAM_INT)) {
+            $params = array('boardid'=>$boardid, 'userid'=>$userid);
+            if($max = $DB->get_records_menu('examboard_member', $params, 'sortorder DESC', 'id, sortorder', 0, 1)) {
+                $max = reset($max) + 1;
+            } else {
+                $max = 0;
+            }
+            $sortorder = $DB->get_field('examboard_member', 'sortorder', $params);
+            if($sortorder < $max) {
+                $lower = $DB->get_field('examboard_member', 'id', array('boardid'=>$boardid, 'sortorder' => ($sortorder + 1)));
+                $DB->set_field('examboard_member', 'sortorder', ($sortorder + 1), $params);
+                $DB->set_field('examboard_member', 'sortorder', $sortorder, array('id'=>$lower));
+            }
+        }
+    } elseif($action == 'delmember') {
+        if($userid = optional_param('user', 0, PARAM_INT)) {
+            $params = array('boardid'=>$boardid, 'userid'=>$userid);
+            if($DB->delete_records('examboard_member', $params)) {
+                $eventparams['objectid'] = $boardid;
+                $eventparams['relateduserid'] = $userid;
+                $event = \mod_examboard\event\member_updated::create($eventparams);
+                $event->trigger();
+                $event = \mod_examboard\event\board_updated_members::create($eventparams);
+                $event->trigger();
+            }
+        }
+    } elseif($action == 'boardtoggle') {       
+        $status = $DB->get_field('examboard_board', 'active', array('id'=>$boardid)); 
+        $status = $status ? 0 : 1;
+        $DB->set_field('examboard_board', 'active', $status, array('id'=>$boardid)); 
     }
     redirect($returnurl);
 }
@@ -182,7 +240,7 @@ if(is_subclass_of($mform, 'moodleform')) {
         // capabilities has been checkef in examboard_set_action_form
         
         if($action == 'addexam' || $action == 'updateexam') {
-            $message = examboard_process_add_update_exam($examboard->id, $fromform);
+            $message = examboard_process_add_update_exam($examboard, $fromform);
             $returnurl->remove_params('view', 'item');
 
         } elseif($action == 'editmembers') {
@@ -224,6 +282,11 @@ if(is_subclass_of($mform, 'moodleform')) {
             } else {
                 $message = get_string('cannotsavedata', 'error');   
             }
+
+            $eventparams['objectid'] = $examid;
+            $eventparams['relateduserid'] = $userid;
+            $event = \mod_examboard\event\exam_updated_users::create($eventparams);
+            $event->trigger();
             
         } elseif(($action == 'deleteall') && ($fromform->confirmed == 'deleteall')) {
             $users = examboard_get_exam_examinees($fromform->exam);
@@ -233,6 +296,10 @@ if(is_subclass_of($mform, 'moodleform')) {
                     $deleted++;
                 }
             }
+            $eventparams['objectid'] = $examid;
+            $eventparams['relateduserid'] = $userid;
+            $event = \mod_examboard\event\exam_updated_users::create($eventparams);
+            $event->trigger();
             $message = get_string('deletedexaminees', 'examboard', $deleted);
             
         } elseif($action == 'userassign') {

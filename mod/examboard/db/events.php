@@ -27,30 +27,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 $observers = array(
-
+   
     array(
-        'eventname' => '\mod_examboard\event\tutor_updated',
+        'eventname' => '\mod_examboard\event\board_updated_users',
         'callback' => '\mod_examboard\user_observers::synch_exam',
         'includefile' => '/mod/examboard/locallib.php',
         'internal' => false,
     ),
 
     array(
-        'eventname' => '\mod_examboard\event\examinee_updated',
-        'callback' => '\mod_examboard\user_observers::synch_exam',
-        'includefile' => '/mod/examboard/locallib.php',
-        'internal' => false,
-    ),
-    
-    array(
-        'eventname' => '\mod_examboard\event\examinee_removed',
-        'callback' => '\mod_examboard\user_observers::synch_exam',
-        'includefile' => '/mod/examboard/locallib.php',
-        'internal' => false,
-    ),
-
-    array(
-        'eventname' => '\mod_examboard\event\member_updated',
+        'eventname' => '\mod_examboard\event\board_updated_members',
         'callback' => '\mod_examboard\user_observers::synch_board',
         'includefile' => '/mod/examboard/locallib.php',
         'internal' => false,

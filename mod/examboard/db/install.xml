@@ -72,6 +72,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="examboardid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="boardid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="examperiod" TYPE="char" LENGTH="30" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="sessionname" TYPE="char" LENGTH="255" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="venue" TYPE="char" LENGTH="255" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="examdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>	
@@ -84,6 +85,9 @@
         <KEY NAME="examboardid" TYPE="foreign" FIELDS="examboardid" REFTABLE="examboard" REFFIELDS="id"/>
         <KEY NAME="boardid" TYPE="foreign" FIELDS="boardid" REFTABLE="examboard_board" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="board-period-session" UNIQUE="true" FIELDS="boardid, examperiod, sessionname"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="examboard_member" COMMENT="examboard members by exam and role">
       <FIELDS>

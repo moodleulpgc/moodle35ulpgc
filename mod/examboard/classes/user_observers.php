@@ -62,6 +62,7 @@ class user_observers {
         global $DB;
         $examboard = $DB->get_record('examboard', array('id' => $event->other['examboardid']));
         if($examboard && $exams = examboard_get_board_exams($event->objectid, $event->other['examboardid'], false)) {
+            $exams = reset($exams);
             foreach($exams as $exam) {
                 examboard_synchronize_groups($examboard, $exam);
                 examboard_synchronize_gradeables($examboard, $exam, false); 

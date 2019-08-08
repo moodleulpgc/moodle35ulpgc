@@ -45,13 +45,9 @@ class examboard_board_confirmation_form extends moodleform {
         $board   = $this->_customdata['board'];
         $userid   = $this->_customdata['user'];
         $canmanage   = $this->_customdata['canmanage'];
-
-        
-        //$session = exam_session::from_record($exam);
-        
-        
         
         $mform->addElement('static', 'boardname', get_string('board', 'examboard'), $board->title.' '.$board->idnumber);
+        $mform->addElement('static', 'examperiod', get_string('examperiod', 'examboard'), $exam->examperiod);
         $mform->addElement('static', 'sessionname', get_string('session', 'examboard'), $exam->sessionname);
         $separator = '';
         if($exam->venue && $exam->examdate) {

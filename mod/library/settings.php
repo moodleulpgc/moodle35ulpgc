@@ -73,9 +73,9 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('library/display',
         get_string('displayselect', 'library'), get_string('displayselectexplain', 'library'), RESOURCELIB_DISPLAY_EMBED, $displayoptions));
     $settings->add(new admin_setting_configtext('library/popupwidth',
-        get_string('popupwidth', 'library'), get_string('popupwidthexplain', 'library'), 620, PARAM_INT, 7));
+        get_string('popupwidth', 'library'), get_string('popupwidth_help', 'library'), 620, PARAM_INT, 7));
     $settings->add(new admin_setting_configtext('library/popupheight',
-        get_string('popupheight', 'library'), get_string('popupheightexplain', 'library'), 450, PARAM_INT, 7));
+        get_string('popupheight', 'library'), get_string('popupheight_help', 'library'), 450, PARAM_INT, 7));
 }
 
 $ADMIN->add('modlibraryfolder', $settings);

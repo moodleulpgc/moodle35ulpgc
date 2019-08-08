@@ -27,13 +27,13 @@ namespace mod_examboard\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The board members update event class.
+ * The exam viewed event class.
  *
  * @package    mod_examboard
  * @copyright  2017 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tutor_updated extends base {
+class board_updated_members extends base {
 
     /**
      * Init method.
@@ -41,7 +41,7 @@ class tutor_updated extends base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'examboard_exam';
+        $this->data['objecttable'] = 'examboard_board';
 
     }
 
@@ -52,7 +52,7 @@ class tutor_updated extends base {
      * @return array
      */
     public function set_url_params() {
-        $params = array('view' => 'exam',
+        $params = array('view' => 'board',
                         'item' => $this->objectid);
         return $params;
     }

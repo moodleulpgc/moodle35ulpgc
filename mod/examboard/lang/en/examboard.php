@@ -26,15 +26,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['areanotification'] = 'Notifications';
+$string['assess'] = 'Assess';
 $string['assessment'] = 'Assessment';
 $string['board'] = 'Exam board';
 $string['member'] = 'Board member';
 $string['exemption'] = 'Exemption';
 $string['exempted'] = 'Exempted';
 $string['exempted_help'] = 'Check if this user has been exempted of duties as board member';
+$string['exclude'] = 'Exclude user from exam grading';
+$string['include'] = 'Include user for exam grading';
+$string['userhide'] = 'To exclude a user from exam grading prevents teachers to add grades, but allow to access the items submitted by the student, if any.';
+$string['usershow'] = 'To include a user for exam grading allows teachers to grade the student';
 $string['excluded'] = 'Excluded';
 $string['excluded_help'] = 'The excluded user is shown but cannot be graded';
 $string['approved'] = 'Approved';
+$string['filtersheader'] = 'Table filters';
 $string['examboard:addinstance'] = 'Add an instance of Examboard';
 $string['examboard:view'] = 'View exam boards';
 $string['examboard:viewall'] = 'View all boards, exams and sessions';
@@ -207,6 +213,7 @@ $string['reorder'] = 'Reorder';
 $string['orderkeepchosen'] = 'Keep as shown';
 $string['orderrandomize'] = 'Randomize';
 $string['orderalphabetic'] = 'Alphabetic';
+$string['orderalphatutor'] = 'Alphabetic by tutor';
 $string['codename'] = 'Label';
 $string['session'] = 'Exam session';
 $string['examinees'] = 'Examinees';
@@ -545,10 +552,23 @@ $string['deletedexaminees'] = 'Removed {$a} examinees & tutors from this examina
 $string['deletedboard'] = 'Committee has been deleted and its {$a} members.';
 $string['examplacedate'] = 'Venue & Date';
 $string['updateboard'] = 'Update committee';
+$string['boardhide'] = 'Hiding an Exam Board may prevent it to be dispalyed and used in the activity';
+$string['boardshow'] = 'Showing the Exam Board wil allow the memebres to be active and seen by others';
 $string['boardtitle'] = 'Title';
 $string['boardtitle_help'] = 'Committee title is the word user to refer formally to them in this context';
 $string['accessgroup'] = 'Group';
 $string['accessgroup_help'] = 'If a group is set then only users (students, teachers) of that group would access to this exam. ';
+$string['periodlabel'] = 'Period: {$a}';
+$string['examperiod'] = 'Period';
+$string['examperiod_help'] = 'One of the defined periods for examinations. 
+
+Examination periods are set at Institution level by administrators. The teacher can only select the applicable one for this exam.';
+$string['examperiods'] = 'Exam Periods';
+$string['examperiods_help'] = 'The institutionally defined periods for examinations. 
+Examination periods are set at Institution level by administrators. The teacher can only select the applicable one for this exam.
+You may specify each period in a row, encoded as "code:display name" (without "" quotation marks). Code must be an ID label of less that 30 characters 
+Add as much rows as needed.
+';
 $string['examsession'] = 'Session';
 $string['examsession_help'] = 'The name of the Examination session. 
 
@@ -685,8 +705,17 @@ $string['viewgradingdetails'] = 'Click to view grading details by criteria.';
 $string['usergrades'] = 'User grades';
 $string['synchusers'] = 'Update groups & access';
 $string['foruser'] = 'Participant';
+$string['event_board_updated_members'] = 'Board members updated';
+$string['event_board_updated_members_desc'] = 'The user with id \'{$a->userid}\' has updated the members of Board panel 
+with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
 $string['event_board_viewed'] = 'Board viewed';
 $string['event_board_viewed_desc'] = 'The user with id \'{$a->userid}\' viewed the Board panel 
+with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_exam_updated'] = 'Exam updated';
+$string['event_exam_updated_desc'] = 'The user with id \'{$a->userid}\' has updated the Exam 
+with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
+$string['event_exam_updated_users'] = 'Exam users updated';
+$string['event_exam_updated_users_desc'] = 'The user with id \'{$a->userid}\' has updated the users (examinees or tutors) related to Exam 
 with id \'{$a->objectid}\' in activity with cm id \'{$a->cmid}\'.';
 $string['event_exam_viewed'] = 'Board Exam viewed';
 $string['event_exam_viewed_desc'] = 'The user with id \'{$a->userid}\' viewed the Exam page 

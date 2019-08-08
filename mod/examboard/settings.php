@@ -27,6 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
 
+    $settings->add(new admin_setting_configtextarea('examboard/examperiods', 
+                                                        get_string('examperiods', 'examboard'), 
+                                                        get_string('examperiods_help', 'examboard'), 
+                                                        '-:Exams', PARAM_TEXT, 20, 4));
+
     $modules = new admin_setting_configmultiselect_modules('examboard/gradeables', 
                                                         get_string('gradeablemods', 'examboard'), 
                                                         get_string('gradeablemods_help', 'examboard'), 

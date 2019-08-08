@@ -72,6 +72,9 @@ class examinees_table extends \flexible_table implements renderable {
     /** @var object the gradebook grade item for this instance of examboard PLUS scale . */
     public $gradeitem = false;
     
+    /** @var bool if the activity links to other modules containing user deliverables. */
+    public $hasexternalactivity = false;
+    
     /** @var modinfo the course module containing gradeable && submission data . */
     public $gradeable = false;
     
@@ -119,6 +122,8 @@ class examinees_table extends \flexible_table implements renderable {
         $this->gradeitem    = examboard_get_grade_item($examboard->id, $examboard->course);
         
         $this->gradeitem->scale = examboard_get_scale($examboard->grade);
+        
+        $this->hasexternalactivity = ($examboard->gradeable || $examboard->proposal || $examboard->defense);
         
         $this->chair        = $examboard->chair;
         $this->secretary    = $examboard->secretary;

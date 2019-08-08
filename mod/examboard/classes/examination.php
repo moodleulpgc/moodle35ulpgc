@@ -64,8 +64,11 @@ class examination {
     
     /** @var int grading strategy from examboard instance. */
     public $grademode = '';
+
+    /** @var string the examperiod name  */
+    public $examperiod = '';
     
-        /** @var string the exam session name  */
+    /** @var string the exam session name  */
     public $sessionname = '';
     
     /** @var string the classroom name in which this examination will take place. */
@@ -103,6 +106,19 @@ class examination {
         $this->idnumber = $examrec->idnumber;
         $this->name = $examrec->name;
         $this->boardactive = $examrec->boardactive;
+        
+        $options = get_config('examboard', 'examperiods');
+        $examperiods = array();
+        foreach(explode("\n", $options) as $conv) {
+            $key = strstr(trim($conv), ':', true);
+            $examperiods[$key] = ltrim(strstr($conv, ':'), ':');
+        }
+        if(array_key_exists($examrec->examperiod, $examperiods)) {
+            $this->examperiod = $examperiods[$examrec->examperiod];
+        } else {
+            $this->examperiod = get_string('none');
+        }
+        
         $this->sessionname = $examrec->sessionname;
         $this->venue = $examrec->venue;
         $this->examdate = $examrec->examdate;

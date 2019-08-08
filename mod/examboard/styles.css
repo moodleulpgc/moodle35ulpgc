@@ -8,10 +8,27 @@
     float: left; 
 }
 
-
+.path-mod-examboard .namingmenu {
+    float: right;
+    margin-left: 1.0rem;
+}
 
 .path-mod-examboard .pagebuttons {
     text-align:center;
+}
+
+.path-mod-examboard .tablefilters {
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.path-mod-examboard .tablefilters .singleselect {
+    margin: 2px 2px;
+    padding-left: 10px;
+}
+
+.path-mod-examboard .collapsibleregion.tablefilters {
+    margin-bottom: 1.0rem;
 }
 
 .path-mod-examboard .iteminfo .boardactivebutton, 
@@ -20,6 +37,11 @@
 .path-mod-examboard .singleboardtable .cell .continuebutton {
     display: inline-block;
 }
+
+.path-mod-examboard .pagebuttons .continuebutton {
+    margin: 6px 1.0rem;
+}
+
 
 .path-mod-examboard div.usersummary div.usersummarysection img.userpicture {
     width: 100px;
@@ -93,4 +115,9 @@
 
 .path-mod-examboard div.no-overflow  {
     overflow: inherit;
+}
+
+.path-mod-examboard .dimmed, .path-mod-examboard .dimmed a 
+{
+    color: #868e96 !important; 
 }

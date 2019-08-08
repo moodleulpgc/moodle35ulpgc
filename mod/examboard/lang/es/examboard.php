@@ -26,14 +26,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['assessment'] = 'Evaluación';
+$string['assess'] = 'Evaluar';
 $string['board'] = 'Tribunal';
 $string['member'] = 'Miembro del tribunal';
 $string['exemption'] = 'Eximido';
 $string['exempted'] = 'Eximido';
 $string['exempted_help'] = 'Marcar si este usuario ha sido eximido de sus deberes como miembro del Tribunal.';
+$string['exclude'] = 'Excluir al estudiante de la evaluación';
+$string['include'] = 'Incluir al estudiante en la evaluación';
+$string['userhide'] = 'Excluir a un estudiante de la evaluación impide que los Profesores puedan emitir calificaciones, 
+pero permite el acceso a los ítems entregados por el estudiante, si existen';
+$string['usershow'] = 'Incluir a un usuario en la evaluación permite a los Profesores evaluar y calificar al estudiante';
 $string['excluded'] = 'Excluido';
 $string['excluded_help'] = 'El estudiante excluído es mostrado pero no puede ser calificado';
 $string['approved'] = 'Conformidad';
+$string['filtersheader'] = 'Filtros de selección';
 $string['examboard:addinstance'] = 'Añadir una instancia de Tribunal';
 $string['examboard:view'] = 'Ver actividades Tribunal';
 $string['examboard:viewall'] = 'Ver todos los Tribunales y sesiones';
@@ -50,7 +57,7 @@ $string['modulename'] = 'Tribunal';
 $string['modulenameplural'] = 'Tribunales';
 $string['partialgrading'] = 'Incompleta';
 $string['pluginname'] = 'Tribunal';
-$string['pluginadministration'] = 'Admnistración de Tribunales';
+$string['pluginadministration'] = 'Administración de Tribunales';
 $string['manageallocation'] = 'Gestionar asignaciones';
 $string['notify'] = 'Notificar';
 $string['notify_help'] = 'Permite enviar mensajes de notificación a los participantes en un examen por Tribunal.';
@@ -180,7 +187,7 @@ Se pueden asignar o eliminar tutores, según la configuración del módulo en cu
 
 También puede cambiar el método de ordenamiento de los  estudiantes en el examen.
 ';
-$string['userdeleteconfirm'] = 'Borrar un usuario es permenente. <br />
+$string['userdeleteconfirm'] = 'Borrar un usuario es permanente. <br />
 Desea continuar? ';
 $string['deleteallconfirm'] = 'Borrar a todos los estudiantes es permanente. <br />
 Desea continuar? ';
@@ -205,6 +212,7 @@ $string['reorder'] = 'Reordenar';
 $string['orderkeepchosen'] = 'Mantener orden actual';
 $string['orderrandomize'] = 'Reordenar al azar';
 $string['orderalphabetic'] = 'Orden alfabético';
+$string['orderalphatutor'] = 'Alfabético por tutor';
 $string['codename'] = 'Código';
 $string['session'] = 'Sesión';
 $string['examinees'] = 'Estudiantes';
@@ -256,7 +264,7 @@ $string['allocnumexams'] = 'Asignados miembros en {$a} exámenes';
 $string['allocemptied'] = 'No quedan usuarios que ubicar';
 $string['allocprevious'] = 'Borrar existentes';
 $string['allocprevious_help'] = 'Si se activa, se eliminarán todas las asignaciones previas 
-antes de proceder a la distribución al azar de miembrs de tribunal.';
+antes de proceder a la distribución al azar de miembros de tribunal.';
 $string['allocdeputy'] = 'Asignar sustitutos';
 $string['allocdeputy_help'] = 'Si se activa, además de los miembros titulares se asignará un sustituto en cada posición.';
 $string['allocrepeatable'] = 'Permitir repeticiones';
@@ -552,13 +560,26 @@ $string['examhasgrades'] = 'El examen incluye estudiantes que ya han sido califi
 $string['examplacedate'] = 'Lugar y Fecha';
 $string['updateboard'] = 'Actualizar Tribunal';
 $string['boardtitle'] = 'Título';
-$string['boardtitle_help'] = 'El título del Tribunal es la palabra usada para refererise al conjunto de miembros del Tribunal.';
+$string['boardtitle_help'] = 'El título del Tribunal es la palabra usada para refererise al conjunto de miembros del mismo. 
+
+Si no se desea otra cosa, usar la palabra "Tribunal".';
 $string['accessgroup'] = 'Grupo';
 $string['accessgroup_help'] = 'Si se estableec un grupo concreto entonces solo usuarios pertenecientes a ese grupo, 
 tanto estudiante, examinadores o tutores, podrán acceder al mismo. 
 
 Solo se podrá asignar como miembros del tribunal o como estudiantes examinandos (o sus tutores) a personas que pertenezcan a ese grupo. ';
-$string['examsession'] = 'Sesión/Convocatoria';
+$string['periodlabel'] = 'Convocatoria: {$a}';
+$string['examperiod'] = 'Convocatoria';
+$string['examperiod_help'] = 'Una de las convocatorias oficiales para exámenes por Tribunal. 
+
+Los tipos de convocatorias y sus nombres se definen a nivel institucional y no se pueden cambiar aquí. 
+El profesor solo puede escoger la más apropiada al examen en cuestión.';
+$string['examperiods'] = 'Convocatorias';
+$string['examperiods_help'] = 'Las convocatorias definidas institucionalmente. 
+Los tipos de convocatorias y sus nombres se definen a nivel institucional y no se pueden cambiar aquí. El profesor solo puede escoger la más apropiada al examen en cuestión.
+Debe especificar cada Convocatoria en una línea como "código:nombre visible" (sin comillas). El código debe ser una etiqueta de menos de 30 caracteres. 
+Puede añadir tantas líneas como Convocatorias necesite. Es recomendable tener una pseudoconvocatoria "-:Otra" para englobar todos los casos especiales. ';
+$string['examsession'] = 'Sesión';
 $string['examsession_help'] = 'El nombre de la sesión o convocatoria de examen. 
 
 Cada Tribunal puede reunirse varias veces en diferentes sesiones para examinar a los mismos o diferentes estudiantes. 

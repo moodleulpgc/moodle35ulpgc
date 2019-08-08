@@ -44,6 +44,7 @@ define('EXAMBOARD_PUBLISH_DATE',2);
 define('EXAMBOARD_ORDER_KEEP',  0);
 define('EXAMBOARD_ORDER_RANDOM',1);
 define('EXAMBOARD_ORDER_ALPHA', 2);
+define('EXAMBOARD_ORDER_TUTOR', 2);
 
 
 /**
@@ -263,7 +264,7 @@ function examboard_synchronize_groups($examboard, $exam = false) {
 
     foreach($exams as $eid => $exam) {
         // get group idnumber & check group exists or create
-        $idnumber = $exam->title.'_'.$exam->idnumber;
+        $idnumber = trim($exam->title.'_'.$exam->idnumber);
         $name = $exam->title.' '.$exam->idnumber.' ('.$exam->sessionname.')';
         if(!$group = groups_get_group_by_idnumber($courseid, $idnumber)) {
             $group = new stdClass();

@@ -59,17 +59,20 @@ class examboard_addexam_form extends moodleform {
         $mform->addElement('text', 'title', get_string('boardtitle', 'examboard'), array('size'=>'20'));
         $mform->setType('title', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('title', 'boardtitle', 'examboard');
-        $mform->disabledIf('title', 'boardid', 'neq', 0);
+        $mform->addRule('title', null, 'required', null, 'client');
+        //$mform->disabledIf('title', 'boardid', 'neq', 0);
         
         $mform->addElement('text', 'idnumber', get_string('boardidnumber', 'examboard'), array('size'=>'20'));
-        $mform->setType('idnumber', PARAM_ALPHANUMEXT);
+        $mform->setType('idnumber', PARAM_TEXT);
         $mform->addHelpButton('idnumber', 'boardidnumber', 'examboard');
-        $mform->disabledIf('idnumber', 'boardid', 'neq', 0);
+        $mform->addRule('idnumber', null, 'required', null, 'client');
+        //$mform->disabledIf('idnumber', 'boardid', 'neq', 0);
+        
         
         $mform->addElement('text', 'name', get_string('boardname', 'examboard'), array('size'=>'64'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addHelpButton('name', 'boardname', 'examboard');
-        $mform->disabledIf('name', 'boardid', 'neq', 0);    
+        //$mform->disabledIf('name', 'boardid', 'neq', 0);    
         
         if(groups_get_activity_groupmode($cm)) {
             $groups = array(0 => get_string('allparticipants')) + groups_list_to_menu(groups_get_activity_allowed_groups($cm));
@@ -84,14 +87,24 @@ class examboard_addexam_form extends moodleform {
         $activestr = get_string('visibility_explain', 'examboard');
         $mform->addElement('advcheckbox', 'boardactive', get_string('boardactive', 'examboard'), $activestr);
         $mform->setDefault('boardactive', 1);
-        $mform->disabledIf('boardactive', 'boardid', 'neq', 0);
+        //$mform->disabledIf('boardactive', 'boardid', 'neq', 0);
         
         $mform->addElement('header', 'examfieldset', get_string('examdata', 'examboard'));
 
+        $options = get_config('examboard', 'examperiods');
+        $examperiods = array();
+        foreach(explode("\n", $options) as $conv) {
+            $key = strstr(trim($conv), ':', true);
+            $examperiods[$key] = ltrim(strstr($conv, ':'), ':');
+        }
+        $mform->addElement('select', 'examperiod', get_string('examperiod', 'examboard'), $examperiods);
+        $mform->setDefault('examperiod', 'ord');
+        $mform->addHelpButton('examperiod', 'examperiod', 'examboard');
+        $mform->addRule('examperiod', null, 'required', null, 'client');
+        
         $mform->addElement('text', 'sessionname', get_string('examsession', 'examboard'), array('size'=>'64'));
         $mform->setType('sessionname', PARAM_TEXT);
         $mform->addHelpButton('sessionname', 'examsession', 'examboard');
-        $mform->addRule('sessionname', null, 'required', null, 'client');
         
         $mform->addElement('text', 'venue', get_string('examvenue', 'examboard'), array('size'=>'64'));
         $mform->setType('venue', PARAM_TEXT);
@@ -112,15 +125,20 @@ class examboard_addexam_form extends moodleform {
             $mform->addElement('header', 'bulkfieldset', get_string('bulkaddexam', 'examboard'));
             
             $grouparr = array();
-            $grouparr[] = $mform->createElement('text', 'bulkaddnum', '', array('size'=>'6'));
-            $grouparr[] = $mform->createElement('text', 'bulkaddstart', '', array('size'=>'6'));
+            $grouparr[] = $mform->createElement('text', 'bulkaddnum', '', array('size'=>'4'));
+            $grouparr[] = $mform->createElement('text', 'bulkaddstart', '', array('size'=>'4'));
+            $grouparr[] = $mform->createElement('text', 'bulkaddreplace', '', array('size'=>'4'));
             $grouparr[] = $mform->createElement('submit', 'submitbulkadd', get_string('submitbulkaddexam', 'examboard'));
             $mform->addGroup($grouparr, 'groupbulkadd', get_string('bulkaddnum', 'examboard'), 
-                                array('  &nbsp;&nbsp;&nbsp;&nbsp;   '.get_string('bulkaddstart', 'examboard'),'  &nbsp;&nbsp;&nbsp;&nbsp;   ' ), false);
+                                array('&nbsp;&nbsp;&nbsp;&nbsp; '.get_string('bulkaddstart', 'examboard').'&nbsp;', 
+                                      '&nbsp;&nbsp;&nbsp;&nbsp; '.get_string('bulkaddreplace', 'examboard').'&nbsp;',  
+                                      '&nbsp;&nbsp;&nbsp;&nbsp; '), false);
             $mform->setType('bulkaddnum', PARAM_INT);
             $mform->setType('bulkaddstart', PARAM_INT);
+            $mform->setType('bulkaddreplace', PARAM_TEXT);
             $mform->setDefault('bulkaddnum', 1);
             $mform->setDefault('bulkaddstart', count($existingboards) + 1);
+            $mform->setDefault('bulkaddreplace', '#');
             $mform->addHelpButton('groupbulkadd', 'bulkaddnum', 'examboard');
             $mform->disabledIf('groupbulkadd', 'boardid', 'neq', 0);
         }

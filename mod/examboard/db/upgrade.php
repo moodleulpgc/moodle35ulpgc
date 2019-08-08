@@ -177,6 +177,29 @@ function xmldb_examboard_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018080600, 'examboard');   
     }
 
+    if ($oldversion < 2019073002) {
+        // Define table examboard to be modified
+        $table = new xmldb_table('examboard_exam');
+        $field = new xmldb_field('examperiod', XMLDB_TYPE_CHAR, '30', null, XMLDB_NOTNULL, null, '-', 'boardid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        //now update the table content (Customize for this table and moment   )
+        
+        $DB->set_field_select('examboard_exam', 'examperiod', 'ord', "sessionname LIKE '%Conv. Ordinaria%' ", null);
+        $DB->set_field_select('examboard_exam', 'examperiod', 'ext', "sessionname LIKE '%Conv. Extra%' ", null);
+        $DB->set_field_select('examboard_exam', 'examperiod', '-', "examperiod IS NULL OR examperiod = '' ", null);
+    
+        $DB->set_field_select('examboard_exam', 'sessionname', 'Sesión 1', "sessionname LIKE '%Sesión 1%'", null);
+        $DB->set_field_select('examboard_exam', 'sessionname', 'Sesión 2', "sessionname LIKE '%Sesión 2%'", null);
+        $DB->set_field_select('examboard_exam', 'sessionname', 'Sesión 3', "sessionname LIKE '%Sesión 3%'", null);
+        $DB->set_field_select('examboard_exam', 'sessionname', 'Sesión 4', "sessionname LIKE '%Sesión 4%'", null);
+        $DB->set_field_select('examboard_exam', 'sessionname', '', "sessionname LIKE '%Conv%'", null);    
+    
+    
+        upgrade_mod_savepoint(true, 2019073002, 'examboard');   
+    }    
     
     
     return true;

@@ -29,6 +29,7 @@ use plugin_renderer_base;
 use html_writer;
 use pix_icon;
 use moodle_url;
+use single_select;
 
 use stdClass;
 
@@ -43,8 +44,11 @@ class renderer extends plugin_renderer_base {
      * @param exams_table $viewer object with the examinations list and vieweing options
      * @return string
      */
-    public function view_exams($examboard, $cm, $viewer) {
+    public function view_exams($viewer) {
         $output = '';
+        
+        $examboard = $this->page->activityrecord;
+        $cm = $this->page->cm;        
         
         $output .= $this->heading(format_string($examboard->name), 2, null);
 
@@ -52,7 +56,8 @@ class renderer extends plugin_renderer_base {
             $output .= $this->box(format_module_intro('examboard', $examboard, $cm->id), 'generalbox', 'intro');
         }
         
-        //$output .= groups_print_activity_menu($cm, $viewer->baseurl, true);
+        $output .= groups_print_activity_menu($cm, $viewer->baseurl, true);
+                
         
         //TODO //TODO //TODO //TODO //TODO //TODO //TODO //TODO 
         
@@ -68,12 +73,11 @@ class renderer extends plugin_renderer_base {
     /**
      * Generates the view exams table page
      *
-     * @param object $examboard record from DB with module instance information
      * @param object $cm Course Module cm_info
      * @param exams_table $viewer object with the examinations list and vieweing options
      * @return string
      */
-    public function view_user_grade_page($examboard, $exam, $user) {
+    public function view_user_grade_page($exam, $user) {
         global $CFG, $USER;
         
         require_once($CFG->dirroot . '/mod/examboard/grading_form.php');
@@ -81,6 +85,7 @@ class renderer extends plugin_renderer_base {
         require_capability('mod/examboard:grade', $this->page->context);
         
         $output = '';    
+        $examboard = $this->page->activityrecord;
     
         $title = get_string('gradinguser', 'examboard', $this->format_exam_name($exam));
         $output .= $this->heading($title, 2);    
@@ -147,14 +152,14 @@ class renderer extends plugin_renderer_base {
     /**
      * Generates the grading explanation page for advanced grading
      *
-     * @param object $examboard record from DB with module instance information
      * @param object $exam examination object
      * @param object $grade record from the DB
      * @return string
      */
-    public function view_grading_explanation($examboard, $exam, $grade, $user, $grader) {
-        global $CFG, $PAGE, $USER;
+    public function view_grading_explanation($exam, $grade, $user, $grader) {
+        global $CFG, $USER;
 
+        $examboard = $this->page->activityrecord;
         $context = $this->page->context;
         if($USER->id != $grade->userid) { 
             require_capability('mod/examboard:manage', $context);
@@ -168,7 +173,7 @@ class renderer extends plugin_renderer_base {
             if ($controller = $gradingmanager->get_active_controller()) {
                 $menu = make_grades_menu($examboard->grade);
                 $controller->set_grade_range($menu, $examboard->grade > 0);
-                $gradefordisplay = $controller->render_grade($PAGE,
+                $gradefordisplay = $controller->render_grade($this->page,
                                                                 $grade->id,
                                                                 examboard_get_grade_item($examboard->id, $examboard->course),
                                                                 '',
@@ -247,12 +252,43 @@ class renderer extends plugin_renderer_base {
                                                                 'view' => 'exam',
                                                                 'item' => $exam->id,
                                                                 ));
-        $output .= $this->single_button($url, get_string('returntoexam', 'examboard'), 'get',
+        $output .= $this->single_button($url, get_string('returntoexam', 'examboard'), 'post',
                                                 array('class' => 'continuebutton'));
         
         
         return $output;
     }
+    
+    
+    /**
+     * Adds formatted examperiod to exam records in an array
+     *
+     * @param array $exams collection of exam records
+     * @return array
+     */
+    public function helper_format_examperiod($exams) {
+    
+        // would be possible with array_map, but options needed to be load before
+        $options = get_config('examboard', 'examperiods');
+        $examperiods = array();
+        foreach(explode("\n", $options) as $conv) {
+            $key = strstr(trim($conv), ':', true);
+            $examperiods[$key] = ltrim(strstr($conv, ':'), ':');
+        }
+    
+        $none = get_string('none');
+    
+        foreach($exams as $key => $exam) {
+            if(array_key_exists($exam->examperiod, $examperiods)) {
+                $exam->examperiod = $examperiods[$exam->examperiod];
+            } else {
+                $exam->examperiod = $none;
+            }
+            $exams[$key] = $exam;
+        }
+        return $exams;
+    }
+    
     
     
     /**
@@ -279,46 +315,33 @@ class renderer extends plugin_renderer_base {
         $editurl = new moodle_url('/mod/examboard/edit.php', $url->params());
         $editurl->param('board', $board->id);
 
-        $editurl->param('action', 'boardactive');
+        $editurl->param('action', 'boardtoggle');
         $active = $board->active ? get_string('yes') : get_string('no'); 
         if($committee->canmanage) {
             $action = $board->active ? get_string('inactive', 'examboard') : get_string('active', 'examboard'); 
-            $active .= '  &nbsp; '.$this->single_button($editurl, $action, 'get',
-                                                        array('class' => 'boardactivebutton'));
+            $icon = $board->active ? 'i/hide' : 'i/show';
+            $confirm = $board->active ? get_string('boardhide', 'examboard') : get_string('boardshow', 'examboard'); 
+            $confirmaction = new \confirm_action($confirm);
+            // Confirmation JS.
+            $this->page->requires->strings_for_js(array('boardhide', 'boardshow'), 'examboard');
+            $icon = new pix_icon($icon, $action, 'core', array());
+            $active .=  '&nbsp; '.$this->output->action_icon($editurl, $icon, $confirmaction);
         }
         
-        
         $output .= $this->box(html_writer::span(get_string('boardactive', 'examboard'), 'label').
-                                            ' &nbsp '.$active, 'iteminfo');  
+                                            ' &nbsp '.$active, 'iteminfo'); 
+        $committee->assignedexams = $this->helper_format_examperiod($committee->assignedexams);
         $output .= $this->view_board_exams(clone($url), $committee->assignedexams, get_string('assignedexams', 'examboard'));
         
         if($hasmembers = !empty($committee->members)) {
-            $output .= $this->box($this->view_board_filter($url), 'generalbox tablefilter');
             $output .= $this->view_board_table($board, $editurl, $committee);
         } else {
             $output .= $this->heading(get_string('nothingtodisplay'));
         }
         
+        $otherexams = $this->helper_format_examperiod($otherexams);
+        
         $output .= $this->box($this->view_board_buttons($url, $editurl, $committee, $otherexams), 'generalbox pagebuttons');
-        
-        return $output;
-    }
-    
-    /**
-     * returns a select form to specify if deputy members as viewed or not 
-     * and another select for user name format
-     *
-     * @param object $course The course record
-     * @param array $examboard Array conting examboard data
-     * @param object $cm Course Module cm_info
-     * @param object $context The page context
-     * @param array of exam records from db
-     * @return string
-     */
-    public function view_board_filter($url) {
-        $output = '';
-        
-        $output = 'aquí va el filtro';
         
         return $output;
     }
@@ -348,63 +371,79 @@ class renderer extends plugin_renderer_base {
         return $output;
     }
     
-    
     /**
-     * Generates the main action buttons of the page, according to capabilities
+     * Generates the menu to select naming format: by first or last name
      *
-     * @param object $cm Course Module cm_info
-     * @param object $context The page context
-     * @param array of exam records from db
+     * @param moodle_url $baseurl the viewer url with params
      * @return string
      */
-    public function view_sort_filter($cmid, $baseurl, $viewall) {
+    public function view_name_sort_menu($baseurl) {
         global $SESSION;
     
         $output = '';
-        $userorder = $baseurl->get_param('uorder'); 
-        $groupid = $baseurl->get_param('group');   
 
-        list ($course, $cm) = get_course_and_cm_from_cmid($cmid, 'examboard');
-        $context = \context_module::instance($cmid);
-
-        $nf = '';
         if(isset($SESSION->nameformat)) {
-            $options = array(0 => get_string('firstname'),
+            $userorder = $baseurl->get_param('uorder'); 
+            $options = array(   0 => get_string('firstname'),
                                 1 => get_string('lastname'));
 
             $nf = $this->single_select($baseurl, 'uorder', $options, $userorder, null, null, array('label'=>get_string('userorder', 'local_ulpgcgroups')));                            
+            // groupselector class because should pair with groups menu, if used
+            $output .= $this->container($nf, 'groupselector namingmenu');
         }                    
-                            
-        $g = groups_print_activity_menu($cm, $baseurl, true);
-        
-        $u = '';
-        if($viewall) {
-            $userid = $baseurl->get_param('fuser');   
-            $orderby = $userorder ? 'u.lastname' : 'u.firstname' ;
-            $names = get_all_user_name_fields(true, 'u');
-            $options = get_enrolled_users($context, 'mod/examboard:view', $groupid, 'u.id, u.idnumber,'.$names, $orderby, 0, 0, true);  
-            foreach($options as $uid => $user) {
-                $options[$uid] = fullname($user);
-            }
-            $options = array(0 => get_string('any')) + $options;
-            
-            $u = $this->single_select($baseurl, 'fuser', $options, $userid, null, null, array('label'=>get_string('foruser', 'examboard')));
-        }
-      
-        $output = '<div class="clearer clearfix"></div>'.$nf.' '.$u.' '.$g.'<div class="clearer clearfix"></div>';
       
         return $output;
     }
+    
+    /**
+     * Filters to select exams by a number or criteria
+     *
+     * @param moodle_url $baseurl the viewer url with params
+     * @return string
+     */
+    public function view_exams_filters($baseurl, $filters) {
+        global $DB;
+        
+        $output = '';
+        $examboard = $this->page->activityrecord;
+        $context = $this->page->context;   
+        $none = array('' => get_string('any'));
+        
+        foreach($filters as $key => $filter) {
+            $selected = optional_param($filter->param, $filter->default, $filter->paramtype);
+            $select = new single_select($baseurl, $filter->param, $none + $filter->options, $selected, null);
+            $select->set_label($filter->label);
+            $select->method = 'post';
+            $output .= $this->render($select); 
+        
+        } 
+ 
+        $caption = get_string('filtersheader', 'examboard').'  &nbsp; ';
+        return print_collapsible_region($output, 'tablefilters', 'tablefilters_'.$examboard->id, $caption, 'tablefilters_'.$examboard->id, false, true); 
+     }
+    
+    
     
     public function format_exam_name($exam, $title = false) {
         $name = '';
         if($title) {
             $name = $exam->title.' ';
         }
+        
         $name .= $exam->idnumber;
-        if(isset($exam->sessionname) && $exam->sessionname) {
-            $name .= ' ('.$exam->sessionname.')';
+        $specialty = '';
+        if(isset($exam->examperiod) && $exam->examperiod) {
+            $specialty .= $exam->examperiod;
         }
+        if(isset($exam->sessionname) && $exam->sessionname) {
+            $separator = ($specialty) ? '-' : '';
+            $specialty .= $separator.$exam->sessionname;
+        }
+        
+        if($specialty) {
+            $name .= ' ('.$specialty.')';
+        }
+        
         return $name;
     }
     
@@ -449,7 +488,7 @@ class renderer extends plugin_renderer_base {
         
         if($canmanage) {
             $url->param('action', 'addexam');
-            $output .= $this->single_button($url, get_string('addexam', 'examboard'), 'get',
+            $output .= $this->single_button($url, get_string('addexam', 'examboard'), 'post',
                                                     array('class' => 'continuebutton'));
         }
         
@@ -482,23 +521,20 @@ class renderer extends plugin_renderer_base {
     public function view_board_buttons($url, $editurl, $committee, $otherexams) {
         $output = ''; 
         
-        $output .= $this->single_button($url, get_string('returntoexams', 'examboard'), 'get',
+        $output .= $this->single_button($url, get_string('returntoexams', 'examboard'), 'post',
                                                 array('class' => 'continuebutton'));
         
         if($committee->canmanage) {
             $name = $committee->members ? 
                             get_string('editmembers', 'examboard') : get_string('addmembers', 'examboard');
             $editurl->param('action', 'editmembers');
-            $output .= $this->single_button($editurl, $name, 'get',
+            $output .= $this->single_button($editurl, $name, 'post',
                                                     array('class' => 'continuebutton'));
                             
             if($committee->members && $otherexams) {
                 //managers 
                 foreach($otherexams as $eid => $exam) {
-                    $otherexams[$eid] = $exam->idnumber;
-                    if(isset($exam->sessionname) && $exam->sessionname) {
-                        $otherexams[$eid] .= ' ('.$exam->sessionname.')';
-                    }
+                    $otherexams[$eid] = $this->format_exam_name($exam);
                 }
                 
                 $editurl->param('action', 'assignexam');
@@ -533,11 +569,35 @@ class renderer extends plugin_renderer_base {
             $output .= '<br />' . $tribunal->name;
         }
         
-        
-        
-        
         return $this->box($output, 'boardname');
     }
+    
+
+    public function show_exam_placedate($exam) {
+        $output = '';
+        if($exam->venue) {
+            $output .= $this->box($exam->venue, 'sessionvenue');
+        }
+        if($exam->examdate) {
+            $output .= $this->box(userdate($exam->examdate), 'sessiondate');
+        }
+        if($exam->duration) {
+            $output .=$this->box('('.format_time($exam->duration).')', 'sessiondate');
+        }
+        return $output;
+    }    
+    
+    public function show_exam_session($exam) {
+        $output = '';
+        if($exam->examperiod) {
+            $output .= $this->box($exam->examperiod, 'sessionperiod');
+        }
+        if($exam->sessionname) {
+            $output .= $this->box($exam->sessionname, 'sessionname');
+        }
+        return $output;
+    }    
+
     
     
     public function render_exam_session(exam_session $session) {
@@ -545,7 +605,9 @@ class renderer extends plugin_renderer_base {
         if($session->venue) {
             $output .= $this->box($session->venue, 'sessionvenue');
         }
-        $output .= $this->box(userdate($session->examdate), 'sessiondate');
+        if($session->examdate) {
+            $output .= $this->box(userdate($session->examdate), 'sessiondate');
+        }
         if($session->duration) {
             $output .=$this->box('('.format_time($session->duration).')', 'sessiondate');
         }
@@ -554,7 +616,12 @@ class renderer extends plugin_renderer_base {
     
     
     public function render_committee(committee $board) {
+        global $USER;
         $output = '';
+        
+        if(!$board->active && !$board->canmanage && (empty($board->members) || !in_array($USER->id, array_keys($board->members)))) {
+            return $output;
+        }
         
         $class = $board->active ? '' : ' dimmed ';
         $output .= $this->container_start( $class);
@@ -670,7 +737,7 @@ class renderer extends plugin_renderer_base {
             $name = $confirm ? get_string('unconfirm', 'examboard') : 
                                 get_string('confirm', 'examboard');
             $editurl->param('action', 'boardconfirm');
-            $button = $this->single_button($editurl, $name, 'get',
+            $button = $this->single_button($editurl, $name, 'post',
                                                     array('class' => 'continuebutton'));
             $editurl->remove_params('action');
         }        
@@ -790,11 +857,16 @@ class renderer extends plugin_renderer_base {
         
         $header = array('role'   => get_string('memberrole', 'examboard'),
                         'name'   => get_string('membername', 'examboard'),
+                        'action' => get_string('action'),
                         'exam'   => get_string('session', 'examboard'),
                         'status' => get_string('boardstatus', 'examboard'),
-                        'notify' => get_string('boardnotify', 'examboard'),);
+
+                        );
         $countexams = count($committee->assignedexams);
         $countmembers = count($committee->members);
+        if(!$committee->canmanage) {   
+            unset($header['action']);
+        }
         if($countexams < 2) {
             unset($header['exam']);
         }
@@ -818,21 +890,52 @@ class renderer extends plugin_renderer_base {
 
         $userurl = new moodle_url('/user/view.php', array('course' =>  $this->page->course->id));
         $lastmember = 0;
+        $maxusers = count($committee->members);
+        //$editurl->param('boardid', $committee->id);
         foreach($committee->members as $uid => $member) {
-                $columns = array();
-                $columns['role'] = $rolestr[$member->sortorder];
-                $userurl->param('id', $uid);
-                $columns['name'] = $this->user_picture($member).' '.html_writer::link($userurl, fullname($member));
+            $editurl->param('user', $uid);
+            $columns = array();
+            $columns['role'] = $rolestr[$member->sortorder];
+            $userurl->param('id', $uid);
+            $columns['name'] = $this->user_picture($member).' '.html_writer::link($userurl, fullname($member));
+            if($committee->canmanage) {   
+                $action = '';       
+                $attributes = array();     
+                
+                
+                
+            // delete
+                $deleteaction = new \confirm_action(get_string('userdeleteconfirm', 'examboard'));
+                // Confirmation JS.
+                $this->page->requires->strings_for_js(array('deleteallconfirm', 'userdeleteconfirm'), 'examboard');
+                $editurl->param('action', 'delmember');
+                $icon = new pix_icon('i/delete', get_string('deleteuser', 'examboard'), 'core', $attributes);
+                $action .=  $this->output->action_icon($editurl, $icon, $deleteaction);
+            // move buttons
+                if($member->sortorder) {
+                    $editurl->param('action', 'memberup');
+                    $icon = new pix_icon('t/up', get_string('up'), 'core', $attributes);
+                    $action .=  ' '.$this->output->action_icon($editurl, $icon);
+                }
+
+                if($member->sortorder < ($maxusers - 1)) {
+                    $editurl->param('action', 'memberdown');
+                    $icon = new pix_icon('t/down', get_string('down'), 'core', $attributes);
+                    $action .=  ' '.$this->output->action_icon($editurl, $icon);
+                }          
+                
+                $columns['action'] = $action;
+            }
                 
             foreach($committee->assignedexams as $examid => $exam) {
                 if($countexams > 1) {
                     $columns['exam'] = $this->format_exam_name($exam);
                 }
                 $confirm = isset($committee->confirmations[$uid][$examid]) ? $committee->confirmations[$uid][$examid] : 0;
-                $editurl->param('user', $uid);
                 $editurl->param('exam', $examid);
                 $columns['status'] = $this->display_confirmation($uid, $confirm, $editurl, $committee->requireconfirm, 
                                                                     $committee->defaultconfirm, $committee->canmanage);
+                $editurl->remove_params('exam');
                 $columns['notify'] = '';
                 if(($committee->canmanage || ($member->userid == $USER->id)) && isset($committee->notifications[$uid][$examid])) {
                     $columns['notify'] = $this->display_notifications($committee->notifications[$uid][$examid]);
@@ -877,24 +980,19 @@ class renderer extends plugin_renderer_base {
         if($table->examination->name) {
             $output .= $this->heading(format_string($examname), 5);
         }
+        
+        $output .= $this->heading(get_string('periodlabel', 'examboard', $table->examination->examperiod), 3);
         $output .= $this->heading(get_string('sessionlabel', 'examboard', $table->examination->sessionname), 3);
         
         // Prepare table header.
-        $columns = array('examinee' => $table->examinee);
-        if($table->usetutors) {
-            $columns['tutor'] = $table->tutor;
-        }
-        $columns += array('examinee' => $table->examinee,
+        $columns = array('examinee' => $table->examinee,
                           'tutor'    => $table->tutor,
                           'sortorder'=> get_string('order', 'examboard'),
                           'userlabel'=> get_string('userlabel', 'examboard'),
-                          'grade'    => get_string('grade'),
+                          'gradeable'=> get_string('assessment', 'examboard'),
                           'action'   => get_string('action'),);
         if(!$table->usetutors) {
             unset($columns['tutor']);
-        }
-        if(!$table->grademax) {
-            unset($columns['grade']);
         }
                           
         $table->define_columns(array_keys($columns));
@@ -917,7 +1015,7 @@ class renderer extends plugin_renderer_base {
         if(isset($columns['tutor'])) {
             $table->examination->load_tutors();
         }
-        if(isset($columns['grade'])) {
+        if(isset($columns['gradeable'])) {
             $table->examination->load_grades();
         }
         
@@ -929,6 +1027,11 @@ class renderer extends plugin_renderer_base {
         $gradingurl->param('view', 'grading'); 
         $userurl = new moodle_url('/user/view.php', array('course'=>$this->page->course->id));
         foreach($table->examination->examinees as $uid => $user) {
+            if($user->excluded && !$table->canmanage) {
+                //do not show excluded students to graders non managers
+                //continue;
+            }
+        
             $table->editurl->param('user', $uid);
             $row = array();
             $userurl->param('id', $uid);
@@ -942,9 +1045,15 @@ class renderer extends plugin_renderer_base {
             }
             $row['sortorder'] = $user->sortorder + 1;
             $row['userlabel'] = $user->userlabel;
-            if(isset($columns['grade'])) {
-                $row['grade'] = $this->display_user_gradeables($table, $uid);
-                $row['grade'] .= $this->display_user_grades($table, $uid);
+            if(isset($columns['gradeable'])) {
+                if($table->hasexternalactivity) {
+                    if(!$user->excluded || $table->canmanage) {
+                        $row['gradeable'] = $this->display_user_gradeables($table, $uid);
+                    }
+                }
+                if($table->grademax) {
+                    $row['gradeable'] .= $this->display_user_grades($table, $uid);
+                }
             }
 
             $row['action'] = $this->examinee_table_user_actions($table->editurl, $gradingurl, $user, $numusers, $table->canmanage, ($table->grademax && !$user->excluded));
@@ -1189,14 +1298,23 @@ class renderer extends plugin_renderer_base {
         $action = '';       
         $attributes = array(); //array('class' => 'icon');
         if($canmanage) {
+        
+        // hide/show
+            $str = ($user->excluded) ? get_string('include', 'examboard') : get_string('exclude', 'examboard');
+            $icon =  ($user->excluded) ? 'i/hide' :  'i/show';
+            $toggleaction = ($user->excluded) ? get_string('usershow', 'examboard') : get_string('userhide', 'examboard');
+            $toggleaction = new \confirm_action($toggleaction);
+
+            $url->param('action', 'usertoggle');
+            $icon = new pix_icon($icon, $str, 'core', $attributes);
+            $action .=  '&nbsp; '.$this->output->action_icon($url, $icon, $toggleaction);
+        
         // edit 
             $url->param('action', 'updateuser');
             $icon = new pix_icon('i/settings', get_string('updateuser', 'examboard'), 'core', $attributes);
             $action .=  '&nbsp; '.$this->output->action_icon($url, $icon);
         // delete
             $deleteaction = new \confirm_action(get_string('userdeleteconfirm', 'examboard'));
-            // Confirmation JS.
-            $PAGE->requires->strings_for_js(array('deleteallconfirm', 'userdeleteconfirm'), 'examboard');
 
             $url->param('action', 'deleteuser');
             $icon = new pix_icon('i/delete', get_string('deleteuser', 'examboard'), 'core', $attributes);
@@ -1214,6 +1332,10 @@ class renderer extends plugin_renderer_base {
                 $icon = new pix_icon('t/down', get_string('down'), 'core', $attributes);
                 $action .=  '&nbsp; '.$this->output->action_icon($url, $icon);
             }
+            
+
+            // Confirmation JS.
+            $this->page->requires->strings_for_js(array('usershow', 'userhide', 'userdeleteconfirm'), 'examboard');
         }
         
         if($cangrade) {
@@ -1236,22 +1358,23 @@ class renderer extends plugin_renderer_base {
         $output = '';
     
         $returnurl = new moodle_url('/mod/examboard/view.php', array('id'=>$url->get_param('id')));
-        $output .= $this->single_button($returnurl, get_string('returntoexams', 'examboard'), 'get',
+        $output .= $this->single_button($returnurl, get_string('returntoexams', 'examboard'), 'post',
                                                 array('class' => 'continuebutton'));
         $url->param('action', 'updateuser');
-        $output .= $this->single_button($url, get_string('adduser', 'examboard'), 'get',
+        $output .= $this->single_button($url, get_string('adduser', 'examboard'), 'post',
                                                     array('class' => 'continuebutton'));
 
         if($hasusers) {
             $url->param('action', 'deleteall');
             $deleteaction = new \confirm_action(get_string('deleteallconfirm', 'examboard'));
-            $output .= $this->single_button($url, get_string('deleteall', 'examboard'), 'get',
+            $output .= $this->single_button($url, get_string('deleteall', 'examboard'), 'post',
                                                     array('class' => 'continuebutton', 
                                                             'actions' =>array($deleteaction)));            
             //managers can reorder here
             $options = array(EXAMBOARD_ORDER_KEEP   => get_string('orderkeepchosen', 'examboard'),
                             EXAMBOARD_ORDER_RANDOM => get_string('orderrandomize', 'examboard'),
                             EXAMBOARD_ORDER_ALPHA  => get_string('orderalphabetic', 'examboard'),
+                            EXAMBOARD_ORDER_TUTOR  => get_string('orderalphatutor', 'examboard'),
                             );
             $url->param('action', 'reorder');
             $output .= $this->show_select_button_form($url, $options, 'reorder', 'reorder');
@@ -1273,18 +1396,14 @@ class renderer extends plugin_renderer_base {
         $output = '';
        
         // Prepare table header.
-        $table = array('idnumber'  => get_string('codename', 'examboard'),
-                            'board'     => get_string('board', 'examboard'),
-                            'sessionname'     => get_string('session', 'examboard'),
-                            'examdate'     => get_string('examplacedate', 'examboard'),
-                            'examinee'  => get_string('examinees', 'examboard'),
-                            );
-        if($viewer->publishgrade || $viewer->canmanage) {
-            $table['grade'] = get_string('grade');
-        }
-        if($viewer->canmanage) {
-            $table['action'] = get_string('actions');
-        }
+        $table = array('idnumber'       => get_string('codename', 'examboard'),
+                        'board'         => get_string('board', 'examboard'),
+                        'sessionname'   => get_string('session', 'examboard'),
+                        'examdate'      => get_string('examplacedate', 'examboard'),
+                        'examinee'      => get_string('examinees', 'examboard'),
+                        'grade'         => get_string('assessment', 'examboard'), //get_string('grade'),
+                        'action'        => get_string('actions'),
+                        );
         $viewer->define_columns(array_keys($table));
         $viewer->define_headers(array_values($table));
         $viewer->set_attribute('id', 'mod_examboard_view_exams_table');
@@ -1297,24 +1416,34 @@ class renderer extends plugin_renderer_base {
         $viewer->no_sorting('action');
         $viewer->collapsible(true);
 
+        /*
         $examboard = new stdclass();
         $examboard->id = $viewer->examboardid;
         $examboard->usetutors = true;
+        */
+        $examboard = $this->page->activityrecord;
         $userid = $viewer->baseurl->get_param('fuser');   
         $viewall = ($viewer->canmanage || $viewer->canviewall);
-        $count = examboard_count_user_exams($examboard, $viewall, $userid, $viewer->groupid);
+        
+        $viewer->table_filters_setup($viewer->baseurl);
+        $filters = $viewer->get_exams_table_filter_values();
+        $count = examboard_count_user_exams($examboard, $viewall, $userid, $viewer->groupid, $filters);
         $viewer->pagesize(30, $count);  
 
         $viewer->setup();
         
         $viewer->examinations = examboard_get_user_exams($examboard, $viewall, $userid, $viewer->groupid, 
-                                                            $viewer->get_sql_sort(), $viewer->get_page_start(), $viewer->get_page_size(), true); 
+                                                            $viewer->get_sql_sort(), $filters, $viewer->get_page_start(), $viewer->get_page_size(), true); 
         $viewer->initialbars(false);
         
         //TODO //TODO //TODO //TODO //TODO //TODO //TODO 
         // add list unassigned boards(if can manage)
         
-        $output .= $this->box($this->view_sort_filter($viewer->cmid, $viewer->baseurl, $viewall), 'generalbox tablefilter');
+        $output .= $this->view_name_sort_menu($viewer->baseurl);
+        
+        if(examboard_count_user_exams($examboard, $viewall, 0, $viewer->groupid) > 1) {
+            $output .= $this->view_exams_filters($viewer->baseurl, $viewer->filters);
+        }
                                                             
         foreach($viewer->examinations as $examid => $exam) {
             $row = array();
@@ -1322,6 +1451,7 @@ class renderer extends plugin_renderer_base {
             $tribunal = $this->render(board_name::from_record($exam));
             $committee = '';
             $ismember = false;
+            $isgrader = $viewer->cangrade;
             if($viewer->cangrade || ($viewer->publishboard) || $viewer->canmanage) {
                 //we get all mebers, including deputy for capbility checking 
                 $members = $exam->load_board_members();
@@ -1340,6 +1470,7 @@ class renderer extends plugin_renderer_base {
                 $board = new committee($exam->boardid, $exam->boardactive, $members, $viewer->requireconfirm, $viewer->defaultconfirm,  
                                                         $viewer->chair, $viewer->secretary, $viewer->vocal); 
                 $board->is_downloading = $viewer->is_downloading();
+                $board->canmanage = $viewer->canmanage;
                 if($isgrader) {
                     $viewer->hasconfirms[$exam->id] = $this->format_exam_name($exam);
                 }
@@ -1361,9 +1492,11 @@ class renderer extends plugin_renderer_base {
             
             
         
-            $row[] = $this->box($exam->sessionname, 'sessionname');
-            $session = exam_session::from_record($exam);
-            $row[] = $this->render($session);
+            //$row[] = $this->box($exam->sessionname, 'sessionname');
+            //$session = exam_session::from_record($exam);
+            $row[] = $this->show_exam_session($exam);
+            $row[] = $this->show_exam_placedate($exam);
+            //$row[] = $this->render($session);
 
             $examinee_list = new examinee_list($viewer->examinee, $viewer->tutor, $viewer->usetutors, $examid);
             //$ownuser = ($viewall || $isgrader) ? '' : " userid = '{$USER->id}' ";            
@@ -1390,35 +1523,48 @@ class renderer extends plugin_renderer_base {
             
             $row[] = $this->render($examinee_list);
             
-            if($viewer->cansubmit && isset($examinee_list->users[$USER->id]) && ($exam->active )) {
+            // 'Grades' column should contain gradeable link && user grades for user, link to assess for others
+            $grades = '';
+            $gradeicon = '';
+
+            $examinee = 0;
+            if(!$isgrader && $viewer->cansubmit && isset($examinee_list->users[$USER->id])) {
+                // this is a student, should see only his grades
+                if($exam->active) {
                     $viewer->hassubmits[$exam->id] = $exam->idnumber;
+                }
+                $examinee = $USER->id;
             }
             
             if(($viewer->publishgrade) || $viewer->canmanage || $isgrader) {
-                $grades = '';
+                $exam->load_grades($examinee);
                 $userstable = examinees_table::get_from_url($viewer->baseurl);
                 $userstable->examination = $exam;
                 $userstable->canmanage = $viewer->canmanage;
                 $userstable->viewgradeurl = clone($viewer->baseurl);
                 $userstable->viewgradeurl->params(array('item' => $userstable->examination->id,
                                                         'view'=>'graded'));
-                $exam->load_grades();
-                foreach($examinee_list->users as $uid => $user) {
+                $examinees = $examinee ? array($examinee => $examinee_list->users[$examinee]) : $examinee_list->users;
+                foreach($examinees as $uid => $user) {
+                    if($examinee && $viewer->hassubmits[$exam->id]) {
+                        $grades .= $this->display_user_gradeables($userstable, $uid);
+                    } 
                     $grades .= html_writer::div($this->display_user_grades($userstable, $uid), 'usergrades');
                 }
 
                 // add grade button if user can grade those students
-                $gradeicon = '';
-                if(($isgrader && $examinee_list->users) && !$viewer->is_downloading()) {
+                if(($viewer->hasexternalactivity && $isgrader && $examinee_list->users) && !$viewer->is_downloading()) {
                     $url = clone $viewer->baseurl;
                     $url->param('view', 'exam');
                     $url->param('item', $exam->id);
 //                    $icon = new pix_icon('i/grades', get_string('gradeusers', 'examboard'));
-                    $gradeicon = html_writer::link($url, get_string('assessment', 'examboard'), array('class' =>'btn btn-primary'));
+                    $gradeicon = html_writer::link($url, get_string('assess', 'examboard'), array('class' =>'btn btn-secondary'));
                 }
-                $row[] =  $grades.$gradeicon;
             }
+            $row[] =  $grades.$gradeicon;
 
+
+            // now the last 'action' column
             if($viewer->canmanage) {
                 $action = $this->exam_row_actions(clone $viewer->editurl, clone $viewer->baseurl, $exam);
                 $row[] = $action;

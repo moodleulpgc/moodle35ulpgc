@@ -81,6 +81,7 @@ $PAGE->set_url($url);
 $PAGE->set_title(format_string($examboard->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
+$PAGE->set_activity_record($examboard);
 
 // add navbar
 if($view) {
@@ -177,7 +178,7 @@ if($view == 'board' && ($cangrade || $canmanage)) {
     // we are about to grade a singleuser
     $userid = optional_param('user', 0, PARAM_INT);
     $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
-    echo $renderer->view_user_grade_page($examboard, $examination, $user);
+    echo $renderer->view_user_grade_page($examination, $user);
     
 } elseif($view == 'graded' && $itemid) {
     $userid = optional_param('user', 0, PARAM_INT);
@@ -187,17 +188,17 @@ if($view == 'board' && ($cangrade || $canmanage)) {
         $examination = \mod_examboard\examination::get_from_id($itemid);
         $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
         $grader = $DB->get_record('user', array('id'=>$grade->grader), '*', MUST_EXIST);
-        echo $renderer->view_grading_explanation($examboard, $examination, $grade, $user, $grader);
+        echo $renderer->view_grading_explanation($examination, $grade, $user, $grader);
     }
     
 } else {
     $exams_list_viewer = new \mod_examboard\output\exams_table($url, $examboard);
     $exams_list_viewer->canmanage = $canmanage;
     $exams_list_viewer->cansubmit = has_capability('mod/examboard:submit', $context);
-    $exams_list_viewer->cangrade = $examboard->grade &&  $cangrade;
+    $exams_list_viewer->cangrade = $cangrade;
     $exams_list_viewer->editurl = $editurl;
     $exams_list_viewer->canviewall = $canviewall || $canmanage;
-    echo $renderer->view_exams($examboard, $cm, $exams_list_viewer);   
+    echo $renderer->view_exams($exams_list_viewer);   
 }
 
 $SESSION->nameformat = ''; // ecastro ULPGC remove naming format
