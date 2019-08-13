@@ -109,6 +109,7 @@ if($action == 'assignseats_venues') {
         $names = get_all_user_name_fields(true, 'u');
         $from = get_string('mailfrom',  'examregistrar');
         $delivered = array();
+        $configdata = examregistrar_get_instance_configdata($examregistrar);
         foreach($pending as $file) {
             $fname = $file->get_filename();
             $name =  (false === strpos($fname, '.')) ? $fname : strstr($fname, '.', true);
@@ -119,7 +120,7 @@ if($action == 'assignseats_venues') {
                     $fcontext = context_course::instance($sessionexams[$examid]->courseid);
                     $filerecord['contextid'] = $fcontext->id;
                     $filerecord['itemid'] = $examfile->id;
-                    $filerecord['filename'] = $examfile->idnumber.$config->extresponses;
+                    $filerecord['filename'] = $examfile->idnumber.$configdata->extresponses;
                     $files = $fs->get_area_files($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'], $filerecord['itemid']);
                     $num = 1;
                     if($files) {
@@ -266,6 +267,43 @@ if($action == 'assignseats_venues') {
             die();
         }
     }
+} elseif(($action == 'checkvoucher')) {
+    $vouchernum = optional_param('vouchernum', '', PARAM_ALPHANUMEXT);
+    $crccode = optional_param('code', '', PARAM_ALPHANUMEXT);
+    // we put this here to be aable to perfom checking from the QRcode url, without web form
+    if($vouchernum && $crccode) {
+        $verify = true;
+        echo $output->heading(get_string('checkvoucher',  'examregistrar'), 3, 'main');
+        
+        echo examregistrar_verify_voucher($cm->id, $vouchernum, $crccode, ($canmanageseats || $canprintexams || $canmanage));
+        
+        if(!$canmanageseats) {
+            if($canprintexams) {
+                $baseurl->param('tab','printexams');
+            } elseif($canbook) {
+                $baseurl->param('tab','booking');
+            } 
+        }
+        echo $OUTPUT->continue_button($baseurl);
+
+        echo $output->footer();
+        die();
+    
+    } else {
+        $data = new stdClass();
+        $data->id = $cm->id;
+        $data->tab = 'session';
+        $data->session = $session;
+        $data->bookedsite = $bookedsite;
+
+        $mform = new examregistrar_voucher_checking_form(null, array('data'=>$data));
+        if (!$mform->is_cancelled()) {
+            echo $output->heading(get_string('checkvoucher',  'examregistrar'), 3, 'main');
+            $mform->display();
+            echo $output->footer();
+            die();
+        }
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -303,11 +341,14 @@ if($action == 'assignseats_venues') {
     $url = new moodle_url($baseurl, array('action'=>'assignseats_venues'));
     $text[] = html_writer::link($url, get_string('assignseats_venues', 'examregistrar'));
 
-
-
     $uploadurl->param('csv', 'assignseats');
     $uploadurl->param('edit', 'session_rooms');
     $text[] = html_writer::link($uploadurl, get_string('uploadcsvassignseats', 'examregistrar'));
+    
+    $url = new moodle_url($baseurl, array('action'=>'checkvoucher'));
+    $url->params($params);
+    $text[] = html_writer::link($url, get_string('checkvoucher', 'examregistrar'));
+
 
     echo implode(',&nbsp;&nbsp;',$text).'<br />';
 

@@ -58,6 +58,7 @@ $baseurl = new moodle_url('/mod/examregistrar/view.php', array('id'=>$cm->id,'ta
 $examregprimaryid = examregistrar_get_primaryid($examregistrar);
 $examregistrar->context = $context;
 $examregistrar->examregprimaryid = $examregprimaryid;
+$examregistrar->config = examregistrar_get_instance_configdata($examregistrar);
 /// Print the page header
 
 $PAGE->set_url('/mod/examregistrar/view.php', array('id' => $cm->id));
@@ -65,7 +66,9 @@ $PAGE->set_title(format_string($examregistrar->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
+$PAGE->set_activity_record($examregistrar);
 $output = $PAGE->get_renderer('mod_examregistrar');
+
 // other things you may want to set - remove if not needed
 //$PAGE->set_cacheable(false);
 //$PAGE->set_focuscontrol('some-html-id');
@@ -158,7 +161,8 @@ if($action == 'response_files' && $examfid) {
             if(isset($formdata->files) && $formdata->files) {
                 $DB->set_field('examregistrar_examfiles', 'taken', 1, array('id'=>$examfid));
             }
-            add_to_log($course->id, 'examregistrar', 'edit exam response files', 'view.php?id='.$cm->id, $examregistrar->name, $cm->id);
+            //add_to_log($course->id, 'examregistrar', 'edit exam response files', 'view.php?id='.$cm->id, $examregistrar->name, $cm->id);
+            
         } elseif(!$formdata) {
             echo $output->header();
             include_once('tabs.php');
@@ -215,7 +219,7 @@ if($tab == 'view') {
     include_once('session.php');
 }
 
-/// Display the examregistrar
+/// Set the view event 
 $eventdata = array();
 $eventdata['objectid'] = $examregistrar->id;
 $eventdata['context'] = $context;

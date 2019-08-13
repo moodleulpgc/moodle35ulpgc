@@ -19,7 +19,7 @@ namespace block_examswarnings\task;
 /**
  * Simple task to run the cron.
  */
-class send_student_reminders extends \core\task\scheduled_task {
+class send_student_reminders extends base {
 
     /**
      * Get a descriptive name for this task (shown to admins).
@@ -37,101 +37,83 @@ class send_student_reminders extends \core\task\scheduled_task {
     public function execute() {
         global $CFG, $DB;
 
-    /// We require some stuff
-        $config = get_config('block_examswarnings');
-        if(!$config->enablewarnings) {
+        if(!$configs = $this->get_configs()) {
             return true;
         }
-        
-        $now = time();
-        $today = usergetmidnight($now);  
-        
+
     /// checks for once a day except if in debugging mode 
         if(!debugging('', DEBUG_DEVELOPER)) {   
-            if(self::get_last_run_time() < strtotime("+1 day", $today)) { 
+            if(self::get_last_run_time() < strtotime("+1 day", usergetmidnight(time()))) { 
                 return true;
             }
         }
-
+        
         require_once($CFG->dirroot.'/blocks/examswarnings/locallib.php');
         
-    /// gets sending day    
-        list($period, $session) = examswarnings_get_session_period($config);
-        $sendingday = strtotime("-{$config->examconfirmdays} days", $session->examdate + 60*60*$session->timeslot);
-        $sendingday = (($today < $sendingday) && ($sendingday < strtotime("+1 day", $today))) ? true : false;  
-        
-    /// email reminders to students with exam
-        if($config->enablewarnings && $sendingday) {
-            mtrace("...doing students reminders & warnings.");
-            mtrace("...config->examconfirmdays ". $config->examconfirmdays);
-            $names = get_all_user_name_fields(true, 'u');
-            
-            $sql = "SELECT b.id AS bid, b.userid, b.booked, b.bookedsite, e.courseid, c.fullname, c.shortname, 
-                            u.id, u.username, u.email, u.mailformat, u.idnumber, u.maildisplay, $names
-                    FROM {examregistrar_bookings} b
-                    JOIN {examregistrar_exams} e ON b.examid = e.id
-                    JOIN {course} c ON e.courseid = c.id AND c.visible = 1
-                    JOIN {user} u ON u.id = b.userid
-                    WHERE e.examregid = :examregid AND e.examsession = :session AND e.visible = 1 AND b.booked = 1
-                    GROUP BY b.examid, b.userid
-                    ORDER BY b.userid ";
-                    // changed to booked = 1, not sendong reminders if not booked. 
-                    // this simplifies if booked several times, many entries on table.
-                    // may add a repeated query with booked = 0 (and not exists booked = 1) to add explicitly unbooked, but not neccesary now  
-            if($users = $DB->get_records_sql($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
-                mtrace("    ... doing reserved exam reminders.");
+        foreach($configs as $config) {
+            /// gets session data & sending day    
+            list($period, $session, $sendingday) = $this->get_session_days($config, 'examconfirmdays');        
                 
-                // Prepare the message class.
-                $msgdata = examswarnings_prepare_message('exam_student_reminders');
-                $student = \core_user::get_noreply_user();
-                $sent = array();
+        /// email reminders to students with exam
+            if($config->enablewarnings && $sendingday) {
+                mtrace("...doing students reminders & warnings.");
+                mtrace("...config->examconfirmdays ". $config->examconfirmdays);
+                $names = get_all_user_name_fields(true, 'u');
                 
-                $yesno = array(0=>get_string('no'), 1=>get_string('yes'));
-                $examdate = userdate($session->examdate, '%A %d de %B de %Y');
-                foreach($users as $user) {
-                    $message = $config->confirmmessage;
-                    list($name, $idnumber) = examregistrar_get_namecodefromid($user->bookedsite, 'locations');
-                    $replaces = array('%%course%%' => $user->shortname.'-'.$user->fullname,
-                                    '%%date%%' => $examdate,
-                                    '%%place%%' => $name,
-                                    '%%registered%%' => $yesno[$user->booked],
-                                    );
-                    foreach($replaces as $search => $replace) {
-                        $message = str_replace($search, $replace, $message);
-                    }
+                $sql = "SELECT b.id AS bid, b.userid, b.booked, b.bookedsite, e.courseid, c.fullname, c.shortname, 
+                                u.id, u.username, u.email, u.mailformat, u.idnumber, u.maildisplay, $names
+                        FROM {examregistrar_bookings} b
+                        JOIN {examregistrar_exams} e ON b.examid = e.id
+                        JOIN {course} c ON e.courseid = c.id AND c.visible = 1
+                        JOIN {user} u ON u.id = b.userid
+                        WHERE e.examregid = :examregid AND e.examsession = :session AND e.visible = 1 AND b.booked = 1
+                        GROUP BY b.examid, b.userid
+                        ORDER BY b.userid ";
+                        // changed to booked = 1, not sending reminders if not booked. 
+                        // this simplifies if booked several times, many entries on table.
+                        // may add a repeated query with booked = 0 (and not exists booked = 1) to add explicitly unbooked, but not neccesary now  
+                if($users = $DB->get_records_sql($sql, array('examregid'=>$config->primaryreg, 'session'=>$session->id ))) {
+                    mtrace("    ... doing reserved exam reminders.");
                     
-                    $student = username_load_fields_from_object($student, $user, null, array('id', 'idnumber', 'email', 'mailformat', 'maildisplay'));
-                    $student->emailstop = 0;
+                    // Prepare the message class.
+                    $msgdata = examswarnings_prepare_message('exam_student_reminders');
+                    $student = \core_user::get_noreply_user();
+                    $sent = array();
                     
-                    $msgdata->userto = $student;
-                    $msgdata->courseid = $user->courseid;
-                    $msgdata->subject = get_string('confirmsubject', 'block_examswarnings', $user->shortname);
-                    $msgdata->fullmessagehtml = $message;
-                    $msgdata->fullmessage = html_to_text($message, 75, false);
-                    $msgdata->fullmessageformat = FORMAT_HTML;
-                    
-                    $flag = '';
-                    if(!$config->noemail) {
-                        if(!message_send($msgdata)) {
-                            $flag = ' - '.get_string('remindersenderror', 'block_examswarnings');
+                    $yesno = array(0=>get_string('no'), 1=>get_string('yes'));
+                    $examdate = userdate($session->examdate, '%A %d de %B de %Y');
+                    foreach($users as $user) {
+                        $message = $config->confirmmessage['text'];
+                        list($name, $idnumber) = examregistrar_get_namecodefromid($user->bookedsite, 'locations');
+                        $replaces = array('%%course%%' => $user->shortname.'-'.$user->fullname,
+                                        '%%date%%' => $examdate,
+                                        '%%place%%' => $name,
+                                        '%%registered%%' => $yesno[$user->booked],
+                                        );
+                        foreach($replaces as $search => $replace) {
+                            $message = str_replace($search, $replace, $message);
                         }
+                        
+                        $student = username_load_fields_from_object($student, $user, null, array('id', 'idnumber', 'email', 'mailformat', 'maildisplay'));
+                        $student->emailstop = 0;
+                        
+                        $msgdata->userto = $student;
+                        $msgdata->courseid = $user->courseid;
+                        $msgdata->subject = get_string('confirmsubject', 'block_examswarnings', $user->shortname);
+                        $msgdata->fullmessagehtml = $message;
+                        $msgdata->fullmessage = html_to_text($message, 75, false);
+                        $msgdata->fullmessageformat = FORMAT_HTML;
+                        
+                        $flag = '';
+                        if(!$config->noemail) {
+                            if(!message_send($msgdata)) {
+                                $flag = ' - '.get_string('remindersenderror', 'block_examswarnings');
+                            }
+                        }
+                        $sent[] = $user->shortname.': '.fullname($user).$flag;
                     }
-                    $sent[] = $user->shortname.': '.fullname($user).$flag;
-                }
-                if($controluser = examswarnings_get_controlemail($config)) {
-                    $from = get_string('examreminderfrom',  'block_examswarnings');
-                    $info = new \stdClass;
-                    $info->num = count($sent);
-                    $info->date = userdate($session->examdate, '%A %d de %B de %Y');
-                    list($sessionname, $idnumber) = examregistrar_item_getelement($session, 'examsession');
-                    $subject = get_string('confirmsubject', 'block_examswarnings', "$sessionanme ($idnumber)");
-                    $text = get_string('controlmailtxt',  'block_examswarnings', $info )."\n\n".implode("\n", $sent);
-                    foreach($controluser as $cu) {
-                        $html = ($cu->mailformat == 1) ? get_string('controlmailhtml',  'block_examswarnings', $info ).'<br />'.implode(' <br />', $sent) : '';
-                        email_to_user($cu, $from, $subject, $text, $html);
-                    }
-                    mtrace("    ... sent {$info->num} reserved exam reminders.");
-                }
+                    $this->send_control_email($config, $session, $sent);
+                } // end if users
             }
         }
     }

@@ -528,7 +528,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
 
         $exam->set_users($venue);
 
-        $config = get_config('examregistrar');
+        $config = $this->page->activityrecord->config;
         $now = time();
         $examdate = $exam->get_examdate();
 
@@ -1035,7 +1035,7 @@ class mod_examregistrar_renderer extends plugin_renderer_base {
         $baseurl = $coursereview->url;
         $course = $coursereview->course;
         $examregistrar = $coursereview->examregistrar;
-        $config = get_config('examregistrar');
+        $config = $this->page->activityrecord->config;
 
         $quizmodid = $DB->get_field('modules', 'id', array('name'=>'quiz'));
 

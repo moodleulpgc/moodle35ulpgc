@@ -12,6 +12,135 @@ require_once('../../../config.php');
 require_once($CFG->libdir.'/formslib.php');
 //require_once($CFG->dirroot."/mod/examregistrar/lib.php");
 
+
+class examregistrar_configparams_actionform extends moodleform {
+
+    function definition() {
+
+        $mform =& $this->_form;
+        $action = $this->_customdata['action'];
+        $edit = $this->_customdata['edit'];
+        $id = $this->_customdata['id']; // course_module id
+        $session = $this->_customdata['session'];
+        $examreg = $this->_customdata['exreg'];
+        $exreg = examregistrar_get_primaryid($examreg);
+        $settings = get_config('examregistrar');
+        
+        $attributes=array('size'=>'4');
+    
+        $mform->addElement('header', 'headerdeadlines', get_string('headerdeadlines', 'examregistrar'));
+
+        $mform->addElement('text', 'selectdays', get_string('selectdays', 'examregistrar'), $attributes);
+        $mform->setType('selectdays', PARAM_INT);
+        $mform->setDefault('selectdays', $settings->selectdays);
+        $mform->addHelpButton('selectdays', 'selectdays', 'examregistrar');
+
+        $mform->addElement('text', 'cutoffdays', get_string('cutoffdays', 'examregistrar'), $attributes);
+        $mform->setType('cutoffdays', PARAM_INT);
+        $mform->setDefault('cutoffdays', $settings->cutoffdays);
+        $mform->addHelpButton('cutoffdays', 'cutoffdays', 'examregistrar');
+
+        $mform->addElement('text', 'extradays', get_string('extradays', 'examregistrar'), $attributes);
+        $mform->setType('extradays', PARAM_INT);
+        $mform->setDefault('extradays', $settings->extradays);
+        $mform->addHelpButton('extradays', 'extradays', 'examregistrar');
+        
+        $mform->addElement('text', 'lockdays', get_string('lockdays', 'examregistrar'), $attributes);
+        $mform->setType('lockdays', PARAM_INT);
+        $mform->setDefault('lockdays', $settings->lockdays);
+        $mform->addHelpButton('lockdays', 'lockdays', 'examregistrar');
+        
+        $mform->addElement('text', 'approvalcutoff', get_string('approvalcutoff', 'examregistrar'), $attributes);
+        $mform->setType('approvalcutoff', PARAM_INT);
+        $mform->setDefault('approvalcutoff', $settings->approvalcutoff);
+        $mform->addHelpButton('approvalcutoff', 'approvalcutoff', 'examregistrar');
+        
+        $mform->addElement('text', 'printdays', get_string('printdays', 'examregistrar'), $attributes);
+        $mform->setType('printdays', PARAM_INT);
+        $mform->setDefault('printdays', $settings->printdays);
+        $mform->addHelpButton('printdays', 'printdays', 'examregistrar');
+        
+        $mform->setExpanded('headerdeadlines', true);
+
+        
+        $mform->addElement('header', 'headerallocation', get_string('headerallocation', 'examregistrar'));
+        
+        $categories =  make_categories_options();
+        $select = $mform->addElement('select', 'staffcats', get_string('staffcategories', 'examregistrar'), $categories);
+        $select->setMultiple(true);
+        $select->setSelected(explode(',', $settings->staffcats));
+        $mform->addHelpButton('staffcats', 'staffcategories', 'examregistrar');
+      
+        
+        $mform->addElement('advcheckbox', 'excludecourses', get_string('excludecourses', 'examregistrar'), '  ');
+        $mform->setDefault('excludecourses', $settings->excludecourses);
+        $mform->setType('excludecourses', PARAM_INT);
+        $mform->addHelpButton('excludecourses', 'excludecourses', 'examregistrar');
+        
+        $attributes=array('size'=>'8');
+      
+        $mform->addElement('text', 'venuelocationtype', get_string('venuelocationtype', 'examregistrar'), $attributes);
+        $mform->setType('venuelocationtype', PARAM_ALPHANUMEXT);
+        $mform->setDefault('venuelocationtype', $settings->venuelocationtype);
+        $mform->addHelpButton('venuelocationtype', 'venuelocationtype', 'examregistrar');        
+        
+        $mform->addElement('text', 'defaultrole', get_string('defaultrole', 'examregistrar'), $attributes);
+        $mform->setType('defaultrole', PARAM_ALPHANUMEXT);
+        $mform->setDefault('defaultrole', $settings->defaultrole);
+        $mform->addHelpButton('defaultrole', 'defaultrole', 'examregistrar');            
+        
+        $mform->setExpanded('headerallocation', false);
+
+        
+        $mform->addElement('header', 'headerfilesuffix', get_string('headerfilesuffix', 'examregistrar'));
+        
+        $mform->addElement('text', 'extanswers', get_string('extensionanswers', 'examregistrar'), $attributes);
+        $mform->setType('extanswers', PARAM_FILE);
+        $mform->setDefault('extanswers', $settings->extanswers);
+        $mform->addHelpButton('extanswers', 'extensionanswers', 'examregistrar');            
+        
+        $mform->addElement('text', 'extkey', get_string('extensionkey', 'examregistrar'), $attributes);
+        $mform->setType('extkey', PARAM_FILE);
+        $mform->setDefault('extkey', $settings->extkey);
+        $mform->addHelpButton('extkey', 'extensionkey', 'examregistrar');            
+
+        $mform->addElement('text', 'extresponses', get_string('extensionresponses', 'examregistrar'), $attributes);
+        $mform->setType('extresponses', PARAM_FILE);
+        $mform->setDefault('extresponses', $settings->extresponses);
+        $mform->addHelpButton('extresponses', 'extensionresponses', 'examregistrar');           
+        
+        $mform->setExpanded('headerfilesuffix', false);
+
+        
+        $mform->addElement('header', 'headerprinting', get_string('headerprinting', 'examregistrar'));
+        
+        $mform->addElement('advcheckbox', 'pdfwithteachers', get_string('pdfwithteachers', 'examregistrar'), ' &nbsp; ');
+        $mform->setDefault('pdfwithteachers', $settings->pdfwithteachers);
+        $mform->setType('pdfwithteachers', PARAM_INT);
+        $mform->addHelpButton('pdfwithteachers', 'pdfwithteachers', 'examregistrar');
+
+        $mform->addElement('advcheckbox', 'pdfaddexamcopy', get_string('pdfaddexamcopy', 'examregistrar'), ' ');
+        $mform->setDefault('pdfaddexamcopy', $settings->pdfaddexamcopy);
+        $mform->setType('pdfaddexamcopy', PARAM_INT);
+        $mform->addHelpButton('pdfaddexamcopy', 'pdfaddexamcopy', 'examregistrar');
+        
+        $mform->setExpanded('headerprinting', false);
+
+        
+        $mform->addElement('hidden', 'edit', $edit);
+        $mform->setType('edit', PARAM_ALPHANUMEXT);
+        $mform->addElement('hidden', 'action', $action);
+        $mform->setType('action', PARAM_ALPHANUMEXT);
+        $mform->addElement('hidden', 'examregid', $exreg);
+        $mform->setType('examregid', PARAM_INT);
+        $mform->addElement('hidden', 'id', $id);
+        $mform->setType('id', PARAM_INT);
+
+        $this->add_action_buttons(true, get_string('save', 'examregistrar'));    
+    }
+}
+
+
 class examregistrar_sessionrooms_actionform extends moodleform {
 
     function definition() {

@@ -55,6 +55,7 @@ class restore_examregistrar_activity_structure_step extends restore_activity_str
                         $paths[] = new restore_path_element('examregistrar_examination', '/activity/examregistrar/examinations/examination');
                         $paths[] = new restore_path_element('examregistrar_examsfile', '/activity/examregistrar/examsfiles/examsfile');
                         $paths[] = new restore_path_element('examregistrar_booking', '/activity/examregistrar/bookings/booking');
+                        $paths[] = new restore_path_element('examregistrar_voucher', '/activity/examregistrar/bookings/booking/vouchers/voucher');
                         $paths[] = new restore_path_element('examregistrar_seat', '/activity/examregistrar/seatings/seat');
                     }
                 }
@@ -207,10 +208,28 @@ class restore_examregistrar_activity_structure_step extends restore_activity_str
         // insert only if not existing yet (defined by unique index)
         if(!$DB->record_exists('examregistrar_bookings', array('examid'=>$data->examid, 'userid'=>$data->userid))) {
             $newitemid = $DB->insert_record('examregistrar_bookings', $data);
+            $this->set_mapping('examregistrar_booking', $oldid, $newitemid);
         }
     }
 
 
+    protected function process_examregistrar_voucher($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->bookingid = $this->get_new_parentid('examregistrar_booking');
+        $data->examregid = $this->task->get_activityid();
+
+        // insert only if not existing yet (defined by unique index)
+        if(!$DB->record_exists('examregistrar_vouchers', array('examregid'=>$data->examregid, 'bookingid'=>$data->bookingid))) {
+            $newitemid = $DB->insert_record('examregistrar_vouchers', $data);
+        }
+    }
+    
+    
+    
     protected function process_examregistrar_seat($data) {
         global $DB;
 

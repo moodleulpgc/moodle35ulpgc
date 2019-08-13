@@ -15,14 +15,16 @@ require_once($CFG->dirroot.'/mod/examregistrar/booking_form.php'); // lagdays fu
 function examswarnings_get_sessiondata($config) {
     global $DB;
 
-    $regconfig = get_config('examregistrar');
-
+    //$regconfig = get_config('examregistrar');
     $examregistrar = $DB->get_record('examregistrar', array('id'=> $config->primaryreg));
+    $regconfig = unserialize(base64_decode($examregistrar->configdata));
+    $regconfig = $regconfig ? $regconfig : get_config('examregistrar');
+    
     $periods = examregistrar_current_periods($examregistrar);
     $period = reset($periods);
     
     if(!$period) {
-        //return array(0,0,0,0,0);
+        return array(0,0,0,0,0);
     }
     
     $extra = $period ? examregistrar_is_extra_period($examregistrar, $period) : 0;
@@ -75,7 +77,7 @@ function examswarnings_get_controlemail($config) {
     * @param bool   $strictness if true the only NON existing bookings are returned, not booking with booked = 0
     * @return array of exams needing appointment in session
     */
-function examswarnings_notappointedexams($period, $session, $extra, $userid = 0, $strictness=true) {
+function examswarnings_notappointedexams($period, $session, $extra, $config, $userid = 0, $strictness=true) {
     global $DB, $USER;
 
     if(!$userid) {
@@ -106,15 +108,54 @@ function examswarnings_notappointedexams($period, $session, $extra, $userid = 0,
     $params['user4'] = $userid;
     $params['period'] = $period->id;
     $params['session'] = $session->id;
-    $params['examassign'] = get_config('block_examswarnings', 'examidnumber');
+    $params['examassign'] = $config->examidnumber;
     $extrawhere = '';
     if($extra) {
+    /*
         $extrawhere = " AND NOT EXISTS (SELECT b3.id FROM {examregistrar_bookings} b3
                                                         JOIN {examregistrar_exams} e2 ON b3.examid = e2.id AND e2.period = :period2
                                                         WHERE b3.booked = 1 AND b3.userid = :user5 AND e2.courseid = e.courseid )";
+                                                        */
+        $extrawhere = " AND NOT EXISTS (SELECT b3.id FROM {examregistrar_bookings} b3
+                                                        JOIN {examregistrar_exams} e2 ON b3.examid = e2.id 
+                                                        WHERE e2.period = e.period AND b3.booked = 1 
+                                                            AND b3.userid = :user5 AND e2.courseid = e.courseid )";
         $params['user5'] = $userid;
-        $params['period2'] = $period->id;
+        //$params['period2'] = $period->id;
     }
+    
+
+    $sql = "SELECT e.id, e.programme, e.courseid, c.shortname, c.category, b.booked
+                FROM {examregistrar_exams} e
+                JOIN {course} c ON e.courseid = c.id
+                JOIN {grade_items} gi ON c.id = gi.courseid AND gi.itemtype = 'course'
+                LEFT JOIN {grade_grades} gg ON gi.id = gg.itemid AND gg.userid = :user1
+                WHERE e.period = :period AND e.examsession = :session AND e.visible = 1 AND e.callnum > 0
+                    AND c.id $incourses 
+                    /* and not passed the course  */
+                    AND NOT (gg.finalgrade >= gi.gradepass AND gg.finalgrade IS NOT NULL)
+                    
+                    
+                    /* and not passed associated assign if exists  */
+                    AND NOT EXISTS (SELECT 1 FROM {grade_items} gia
+                                                JOIN {course_modules} cm ON cm.course = gia.courseid AND gia.iteminstance = cm.instance AND gia.itemtype = 'mod' AND gia.itemmodule = 'assign' 
+                                                LEFT JOIN {grade_grades} gga ON gia.id = gga.itemid AND gga.userid = :user2
+                                                WHERE gia.courseid = c.id AND cm.id = e.assignplugincm 
+                                                AND NOT (gga.finalgrade >= gia.gradepass AND gga.finalgrade IS NOT NULL) 
+                    )
+                    /* and not passed config gradeable item  */
+                    AND NOT EXISTS (SELECT 1 FROM {grade_items} gii
+                                                LEFT JOIN {grade_grades} ggi ON gii.id = ggi.itemid AND ggi.userid = :user3
+                                                WHERE gii.courseid = c.id AND gii.idnumber = :examassign
+                                                AND NOT (ggi.finalgrade >= gii.gradepass AND ggi.finalgrade IS NOT NULL) 
+                    )                                
+                    /* not having a booking in the examid   */
+                    AND NOT EXISTS (SELECT 1 FROM {examregistrar_bookings} b WHERE b.userid = :user4 AND b.examid = e.id)
+                    $extrawhere
+                GROUP BY e.id
+                ORDER BY c.shortname ";
+    
+/*    
     $sql = "SELECT e.id, e.programme, e.courseid, c.shortname, c.category, b.booked
                 FROM {examregistrar_exams} e
                 JOIN {course} c ON e.courseid = c.id
@@ -131,6 +172,7 @@ function examswarnings_notappointedexams($period, $session, $extra, $userid = 0,
                                 (gge.finalgrade >= ge.gradepass AND gge.finalgrade IS NOT NULL))
                 GROUP BY e.id
                 ORDER BY c.shortname ";
+*/
     $exams = $DB->get_records_sql($sql, $params);
     return $exams;
 }
@@ -222,17 +264,16 @@ function examswarnings_reminder_upcomingexams($period, $session, $userid = 0) {
     * @param int    $userid the ID of user
     * @return array of exams needing appointment in session
     */
-function examswarnings_roomcall_upcomingexams($period, $session, $userid = 0) {
+function examswarnings_roomcall_upcomingexams($period, $session, $config, $userid = 0) {
     global $DB, $USER;
 
     if(!$userid) {
         $userid = $USER->id;
     }
 
-    $config = get_config('block_examswarnings');
+    //$config = get_config('block_examswarnings');
 
-    $staffroles = explode(',', $config->roomcallroles);
-    list($inroles, $params) = $DB->get_in_or_equal($staffroles, SQL_PARAMS_NAMED, 'role');
+    list($inroles, $params) = $DB->get_in_or_equal($config->roomcallroles, SQL_PARAMS_NAMED, 'role');
     $params['user'] = $userid;
     $params['session'] = $session->id;
 

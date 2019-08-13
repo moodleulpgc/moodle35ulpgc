@@ -70,13 +70,17 @@ $baseurl = new moodle_url('/mod/examregistrar/manage.php', array('id' => $cm->id
 
 $includefile = '';
 
+$examregprimaryid = examregistrar_get_primaryid($examregistrar);
+$examregistrar->config = examregistrar_get_instance_configdata($examregistrar);
+
 /// Set the page header
 $PAGE->set_url($baseurl);
 $PAGE->set_title(format_string($examregistrar->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
-$output = $PAGE->get_renderer('mod_examregistrar');
+$PAGE->set_activity_record($examregistrar);
+
 if($edit) {
     $baseurl->param('edit', $edit);
     $PAGE->navbar->add(get_string($edit, 'examregistrar'), $baseurl);
@@ -84,7 +88,7 @@ if($edit) {
     $PAGE->navbar->add(get_string('manage', 'examregistrar'), $baseurl);
 }
 
-$examregprimaryid = examregistrar_get_primaryid($examregistrar);
+$output = $PAGE->get_renderer('mod_examregistrar');
 
 /// check permissions
 $canview = has_any_capability(array('mod/examregistrar:view', 'mod/examregistrar:viewall'), $context);
@@ -106,6 +110,13 @@ if(!$canmanage) {
 }
 
 $tab = 'manage';
+
+$eventdata = array();
+//$eventdata['objecttable'] = 'examregistrar_'.$edit;
+$eventdata['context'] = $context;
+$eventdata['other'] = array();
+$eventdata['other']['edit'] = $edit;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -211,6 +222,7 @@ if($upload) {
         } else {
             $updatecount = 0;
             $insertcount = 0;
+            
             switch($upload) {
                 case 'elements'  : $requiredfields = array('name', 'idnumber', 'type');
                                     require_capability('mod/examregistrar:editelements',$context);
@@ -252,9 +264,15 @@ if($upload) {
                 }
 
                 if($success) {
-                    $messagelist[] = $success;
-                } else {
-                    $insertcount +=1;
+                    if(is_int($success) && $item = (int)$success) {
+                        $eventdata['objectid'] = abs($item);
+                        $event = ($item > 0) ? \mod_examregistrar\event\manage_created::created($eventdata, 'examregistar_'.$upload) :
+                                                    \mod_examregistrar\event\manage_updated::created($eventdata, 'examregistar_'.$upload);
+                        $event->trigger();
+                        $insertcount +=1;
+                    } elseif(is_string($success)) {
+                        $messagelist[] = $success;
+                    }
                 }
             }
             $message = get_string('csvuploadsuccess', 'examregistrar', $insertcount).' <br /> '.implode('<br />', $messagelist);
@@ -263,9 +281,6 @@ if($upload) {
         if(!$message) {
             $message = get_string('changessaved');
         }
-
-        $delay = 5;
-        add_to_log($course->id, 'examregistrar', 'manage csv upload seats'.$upload, "manage.php?id={$cm->id}", $upload, $cm->id);
         redirect($baseurl, $message, $delay);
 
     }
@@ -297,7 +312,6 @@ if($upload) {
             }
         }
         $message = examregistrar_generateexams_fromcourses($examregistrar, $data);
-        add_to_log($course->id, 'examregistrar', 'manage generate courses'.$upload, "manage.php?id={$cm->id}", $edit, $cm->id);
         if($message) {
             $delay = 5;
             redirect($baseurl, $message, $delay);
@@ -376,19 +390,22 @@ if($upload) {
                 /// process form & store element in database
                 $data = examregistrar_extract_edititem_formdata($edit, $formdata);
 
-                //print_object($data);
-
+                unset($eventdata['other']['name']);
                 if($element) { // this means itemid > 0 and record exists, over-write & update
                     $data->id = $element->id;
                     ////print_object('Add INSERT');
                     if($success = $DB->update_record($itemtable, $data)) {
-                        add_to_log($course->id, 'examregistrar', 'update '.$itemname, "manage.php?id={$cm->id}&edit=$edit", $data->display, $cm->id);
+                        $eventdata['objectid'] = $data->id;
+                        $event = \mod_examregistrar\event\manage_updated::created($eventdata, $itemtable);
+                        $event->trigger();
                     }
 
                 } else {
                     ////print_object('UPDATE item');
                     if($data->id = $DB->insert_record($itemtable, $data)) {
-                        add_to_log($course->id, 'examregistrar', 'add '.$itemname, "manage.php?id={$cm->id}&edit=$edit", $data->display, $cm->id);
+                        $eventdata['objectid'] = $data->id;
+                        $event = \mod_examregistrar\event\manage_created::created($eventdata, $itemtable);
+                        $event->trigger();
                     }
                 }
                 if($data->id && $itemtable == 'examregistrar_locations') {
@@ -414,7 +431,11 @@ if($upload) {
         if(isset($delete->id) && $delete->id) {
             $info = new stdClass;
             $info->type = get_string($itemname.'item', 'examregistrar');
-            list($info->name,  $info->idnumber) = examregistrar_item_getelement($delete, $itemname);
+            if($edit == 'exams') {
+                list($info->name,  $info->idnumber) = examregistrar_get_namecodefromid($delete->id, 'exams');
+            } else {
+                list($info->name,  $info->idnumber) = examregistrar_item_getelement($delete, $itemname);
+            }
             $confirm = optional_param('confirm', 0, PARAM_BOOL);
             if(!$confirm) {
                 $PAGE->navbar->add(get_string('delete'));
@@ -430,9 +451,11 @@ if($upload) {
                 /// TODO check dependencies /// TODO check dependencies /// TODO check dependencies
 
                 if ($DB->delete_records($itemtable, array('id'=>$delete->id))) {
-                    $name = isset($delete->name) ? $delete->name : $delete->id; 
-                    add_to_log($course->id, 'examregistrar', 'delete '.$itemname, "manage.php?id={$cm->id}&edit=$edit", $name, $cm->id);
-                    //redirect($baseurl, get_string('changessaved'), $delay);
+                    $name = isset($info->name) ? $info->name : $delete->id; 
+                    $eventdata['objectid'] = $delete->id;
+                    $eventdata['other']['name'] = $name;
+                    $event = \mod_examregistrar\event\manage_deleted::created($eventdata, $itemtable);
+                    $event->trigger();
                     $delete = 0;
                 }
             }
@@ -477,9 +500,20 @@ if($upload) {
                 $DB->set_field_select($itemtable, 'visible', $visible, " id $insql ", $inparams);
             } elseif($batch == 'delete') {
                 $DB->delete_records_list($itemtable, 'id', $items);
+                    unset($eventdata['other']['name']); 
+                    foreach($items as $i) {
+                        $eventdata['objectid'] = $i;
+                        $event = \mod_examregistrar\event\manage_deleted::created($eventdata, $itemtable);
+                        $event->trigger();         
+                    }       
             } elseif($batch == 'setsession') {
                 list($insql, $inparams) = $DB->get_in_or_equal($items);
                 $DB->set_field_select($itemtable, 'examsession', $batchaction, " id $insql ", $inparams);
+                    foreach($items as $i) {
+                        $eventdata['objectid'] = $i;
+                        $event = \mod_examregistrar\event\manage_updated::created($eventdata,$itemtable);
+                        $event->trigger();         
+                    }                
             } elseif($batch == 'setparent') {
                 list($insql, $inparams) = $DB->get_in_or_equal($items);
                 $DB->set_field_select($itemtable, 'parent', $batchaction, " id $insql ", $inparams);
@@ -505,25 +539,13 @@ if($upload) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
-//add_to_log($course->id, 'examregistrar', 'manage', "manage.php?id={$cm->id}", $examregistrar->name, $cm->id);
-
-$eventdata = array();
-$eventdata['objectid'] = $examregistrar->id;
-$eventdata['context'] = $context;
-$eventdata['userid'] = $USER->id;
-$eventdata['other'] = array();
-$eventdata['other']['edit'] = $edit;
-
-$event = \mod_examregistrar\event\manage_viewed::create($eventdata);
+$event = \mod_examregistrar\event\manage_viewed::created($eventdata);
 $event->add_record_snapshot('course_modules', $cm);
-$event->add_record_snapshot('course', $course);
 $event->trigger();
 
 $table = new examregistar_management_table('examregistrar-manage-edit-'.$edit.$examregistrar->id);
 
-$filename = clean_filename(examregistrar_get_primaryidnumber($examregistrar).'_table_'.$edit);
+$filename = clean_filename('examregistrar_table_'.$edit.'_'.userdate(time(), '%Y%m%d-%H%M'));
 $table->is_downloading($download, $filename, $edit);
 
 /// Print the page header, Output starts here
@@ -558,6 +580,8 @@ $table->is_downloading($download, $filename, $edit);
             $uploadurl->param('csv', 'elements');
             $uploadurl->param('edit', 'elements');
             $text[] = html_writer::link($uploadurl, get_string('uploadcsvelements', 'examregistrar'));
+            $actionurl->param('action', 'configparams');
+            $text[] = html_writer::span(html_writer::link($actionurl, get_string('configparams', 'examregistrar')), 'configparams');            
             echo implode(',&nbsp;&nbsp;',$text).'<br />';
         }
         if($canmanageperiods) {

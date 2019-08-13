@@ -62,8 +62,8 @@ class exam_submitted extends base {
      */
     public function get_description() {
         $message = $this->other['examfileid']
-        return "Attempt with id '$this->objectid' for exam '{$this->other['examid']}' submitted as final exam version with feedback '{$this->other['message']}' in the quiz with " .
-            "course module id '$this->contextinstanceid'.";
+        return "Attempt with id '$this->objectid' for exam '{$this->other['examid']}' submitted as final exam version with ID '{$this->other['examfileid']}',  named '{$this->other['idnumber']}',".
+                "in the quiz with course module id '$this->contextinstanceid'.";
     }
 }
 

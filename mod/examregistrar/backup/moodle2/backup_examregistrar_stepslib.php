@@ -48,7 +48,7 @@ class backup_examregistrar_activity_structure_step extends backup_activity_struc
         // Define each element separated
         $examregistrar = new backup_nested_element('examregistrar', array('id'), array(
             'name', 'intro', 'introformat', 'primaryreg', 'primaryidnumber', 'annuality', 'programme',
-            'workmode', 'lagdays', 'reviewmod', 'timecreated', 'timemodified'));
+            'workmode', 'reviewmod', 'lagdays', 'configdata', 'timecreated', 'timemodified'));
 
         $elements = new backup_nested_element('elements');
 
@@ -93,6 +93,11 @@ class backup_examregistrar_activity_structure_step extends backup_activity_struc
 
         $booking = new backup_nested_element('booking', array('id'), array(
             'examid', 'userid', 'booked', 'bookedsite', 'modifierid', 'timemodified'));
+            
+        $vouchers = new backup_nested_element('vouchers');
+
+        $voucher = new backup_nested_element('voucher', array('id'), array(
+            'examregid', 'bookingid', 'uniqueid', 'timemodified'));
 
         $rooms = new backup_nested_element('session_rooms');
 
@@ -142,6 +147,9 @@ class backup_examregistrar_activity_structure_step extends backup_activity_struc
         $examregistrar->add_child($bookings);
         $bookings->add_child($booking);
 
+        $booking->add_child($vouchers);
+        $vouchers->add_child($voucher);
+        
         $examregistrar->add_child($rooms);
         $rooms->add_child($room);
 
@@ -186,6 +194,7 @@ class backup_examregistrar_activity_structure_step extends backup_activity_struc
                     $examination->set_source_table('examregistrar_exams', array('period' => backup::VAR_PARENTID));
                     $examsfile->set_source_table('examregistrar_examfiles', array('examid' => backup::VAR_PARENTID));
                     $booking->set_source_table('examregistrar_booking', array('examid' => backup::VAR_PARENTID));
+                    $booking->set_source_table('examregistrar_vouchers', array('bookingid' => backup::VAR_PARENTID));
                     $seat->set_source_table('examregistrar_seatings', array('examid' => backup::VAR_PARENTID));
                 }
             }

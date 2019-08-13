@@ -80,7 +80,8 @@ function examregistrar_get_venue_element($examregistrar) {
     global $DB;
 
     $exregid = examregistrar_get_primaryid($examregistrar);
-    $venuecode = get_config('examregistrar', 'venuelocationtype');
+    $config = examregistrar_get_instance_configdata($examregistrar); 
+    $venuecode = $config->venuelocationtype;
     return $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$exregid, 'type'=>'locationtypeitem', 'idnumber'=>$venuecode));
 }
 
@@ -95,7 +96,8 @@ function examregistrar_get_default_role($examregistrar) {
     global $DB;
 
     $exregid = examregistrar_get_primaryid($examregistrar);
-    $rolecode = get_config('examregistrar', 'defaultrole');
+    $config = examregistrar_get_instance_configdata($examregistrar);
+    $rolecode = $config->defaultrole;
     return $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$exregid, 'type'=>'roleitem', 'idnumber'=>$rolecode));
 }
 
@@ -477,6 +479,59 @@ function examregistrar_examfile_idnumber($exam, $source) {
     return $examidnumber;
 }
 
+
+/**
+ * Locates the Tracker issue associated to an examregistrar instance
+ *  Returns de issueid of the issue creted for an exam file
+ *
+ * @param object $examregistrar the examregistrar object
+ * @param object $examregistrar the examregistrar object
+ * @param object $examregistrar the examregistrar object
+ * @return int tracker issue ID
+ */
+function examregistrar_get_instance_configdata($examregistrar) {
+    global $CFG, $DB;
+
+    if(isset($examregistrar->config) && $examregistrar->config) {
+        return $examregistrar->config;
+    }
+    
+    if(isset($examregistrar->configdata)) {
+            $config =  $examregistrar->configdata;
+    } else {
+        $exregid = examregistrar_get_primaryid($examregistrar);
+        $config = $DB->get_field('examregistrar', 'configdata', array('id' =>$exregid));
+    }
+   
+    return unserialize(base64_decode($config));
+}
+
+
+function examregistrar_file_set_nameextension($examregistrar, $filename, $type, $ext='.pdf') {
+
+    $filename = trim($filename);
+    $ext = trim($ext);
+    if(strpos($ext, '.') === false) {
+        $ext = '.'.$ext;
+    }
+
+    $config = examregistrar_get_instance_configdata($examregistrar);
+
+    $qualifier = '';
+    if($type == 'answers') {
+        $qualifier = $config->extanswers;
+    } elseif($type == 'key') {
+        $qualifier = $config->extkey;
+    } elseif($type == 'responses') {
+        $qualifier = $config->extresponses;
+    }
+    if($qualifier) {
+        $qualifier = trim($qualifier);
+    }
+
+    return clean_filename($filename.$qualifier.$ext);
+}
+
 /**
  * Locates the Tracker issue associated to an examregistrar instance
  *  Returns de issueid of the issue creted for an exam file
@@ -529,14 +584,14 @@ function examregistrar_review_addissue($examregistrar, $course, $examfile, $trac
     $items[] = get_string('examsessionitem', 'examregistrar').': '.$name.' ('.$idnumber.')';
 
     $examcontext = context_course::instance($examcourse->id);
-    $filename = examregistrar_file_set_nameextension($examfile->idnumber, 'exam'); //$examfile->idnumber.'.pdf';
+    $filename = examregistrar_file_set_nameextension($examregistrar, $examfile->idnumber, 'exam'); //$examfile->idnumber.'.pdf';
     $url = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$examcontext->id.'/mod_examregistrar/exam/rev/'.$tracker->course.'/'.$examfile->id.'/'.$filename);
     $mime = mimeinfo("icon", $filename);
     $icon = new pix_icon(file_extension_icon($filename), $mime, 'moodle', array('class'=>'icon'));
     $filelink = $OUTPUT->action_link($url, $filename, null, null, $icon); //   html_writer::link($ffurl, " $icon &nbsp; $filename ");
     $filelink .= '<br />';
 
-    $filename = examregistrar_file_set_nameextension($examfile->idnumber, 'answers');//$examfile->idnumber.'_resp.pdf';
+    $filename = examregistrar_file_set_nameextension($examregistrar, $examfile->idnumber, 'answers');//$examfile->idnumber.'_resp.pdf';
     $url = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$examcontext->id.'/mod_examregistrar/exam/rev/'.$tracker->course.'/'.$examfile->id.'/answers/'.$filename);
     $mime = mimeinfo("icon", $filename);
     $icon = new pix_icon(file_extension_icon($filename), $mime, 'moodle', array('class'=>'icon'));
@@ -567,7 +622,20 @@ function examregistrar_review_addissue($examregistrar, $course, $examfile, $trac
 
     $issueid = $DB->insert_record('tracker_issue', $issue);
     if($issueid > 0) {
-        $DB->set_field('examregistrar_examfiles', 'reviewid', $issueid, array('id'=>$examfile->id));
+        if($DB->set_field('examregistrar_examfiles', 'reviewid', $issueid, array('id'=>$examfile->id))) {
+            $eventdata = array();
+            $eventdata['objectid'] = $examfile->id;
+            list($course, $cm) = get_course_and_cm_from_instance($examregistrar, 'examregistrar', $examregistrar->course);
+            $eventdata['context'] = context_module::instance($cm->id);
+            $eventdata['other'] = array();
+            $eventdata['other']['attempt'] = $examfile->attempt;
+            $eventdata['other']['examid'] = $examfile->examid;
+            $eventdata['other']['issueid'] = $issueid;
+            $eventdata['other']['idnumber'] = $examfile->idnumber;
+            $eventdata['other']['examregid'] = $examregistrar->id;
+            $event = \mod_examregistrar\event\examfiles_synced::create($eventdata);
+            $event->trigger();
+        }
     }
     return (int)$issueid;
 }
@@ -1490,6 +1558,32 @@ function examregistrar_remove_roomstaffers($sessionid, $roomid, $userid=0, $role
 //////////////////////////////////////////////////////////////////////////////////
 //   Booking functions                                                         //
 ////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Checks booked exams and make unique bookings, holds ALL users that booked, but only once each
+ *
+ * @param int $examregprimaryid 
+ * @param int $bookingid the locationID for the booking
+ * @param int $now timestamp
+ * @return stadclass voucher object
+ */
+function examregistrar_set_booking_voucher($examregprimaryid, $bookingid, $now) {
+    global $DB;
+    $voucher = new stdClass();
+    $voucher->examregid = $examregprimaryid;
+    $voucher->bookingid = $bookingid;
+    $voucher->uniqueid = strtoupper(base_convert(bin2hex(random_bytes_emulate(10)), 16, 36));
+    $voucher->timemodified = $now;
+    do {
+        $voucher->uniqueid = strtoupper(base_convert(bin2hex(random_bytes(10)), 16, 36));
+    } while ($DB->record_exists('examregistrar_vouchers', array('examregid'=>$examregprimaryid, 'uniqueid' => $voucher->uniqueid)));
+    $voucher->id = $DB->insert_record('examregistrar_vouchers', $voucher);
+
+    return $voucher;
+}
+
+
 /**
  * Checks booked exams and make unique bookings, holds ALL users that booked, but only once each
  *
@@ -1508,19 +1602,6 @@ function examregistrar_get_unique_bookings($session, $bookedsite, $timelimit = 0
         $params['timelimit'] = $timelimit;
     }
 
-/*
-    $sql = "SELECT b.userid AS buserid, b.*, COUNT(b.id) AS numexams,
-                (SELECT COUNT(userid)
-                    FROM  {examregistrar_bookings} b2
-                    WHERE b2.examid = b.examid AND b2.locationid = b.locationid AND b2.booked = 1
-                    GROUP by b2.examid ) AS partners
-            FROM {examregistrar_bookings} b
-            JOIN {examregistrar_exams} e ON b.examid = e.id
-            WHERE e.examsession = :examsession AND b.locationid = :bookedsite AND b.booked = 1 $timewhere
-            GROUP BY b.userid
-            ORDER BY partners DESC, b.examid ASC
-             " ;
-*/
     $sql = "SELECT b.*,
                 (SELECT COUNT(userid)
                     FROM  {examregistrar_bookings} b2
@@ -1576,44 +1657,8 @@ function examregistrar_get_additional_bookings($session, $bookedsite, $timelimit
     $bookings = $DB->get_records_sql($sql, $params);
 
     return $bookings;
-
 }
 
-
-/*
-    $sql = "SELECT  b.userid, COUNT(b.id) AS numexams
-            FROM {examregistrar_bookings} b
-            JOIN {examregistrar_exams} e ON b.examid = e.id
-            WHERE e.examsession = :examsession AND b.locationid = :bookedsite  AND b.booked = 1
-            GROUP BY b.userid
-            HAVING numexams > 1
-            ORDER BY b.userid ASC
-             ";
-    if($extrausers = $DB->get_records_sql($sql, array('examsession'=>$session, 'bookedsite'=>$bookedsite))){
-        ////print_object($extrausers);
-        //print_object("  --- extrausers ----------------------");
-
-        foreach($extrausers as $userid => $numexams) {
-            if($timelimit && !isset($uniquebookings[$userid])) {
-                continue;
-            }
-            $booking = $uniquebookings[$userid];
-            $sql = "SELECT b.examid
-                    FROM {examregistrar_bookings} b
-                    JOIN {examregistrar_exams} e ON b.examid = e.id
-                    WHERE e.examsession = :examsession AND b.locationid = :bookedsite  AND b.booked = 1 AND userid = :userid ";
-
-            $exams = $DB->get_fieldset_sql($sql, array('examsession'=>$session, 'bookedsite'=>$bookedsite, 'userid'=>$userid));
-            $key = array_search($booking->examid, $exams);
-            unset($exams[$key]);
-            $booking->extraexams = implode(',',$exams);
-            $uniquebookings[$userid] = $booking;
-        }
-    }
-
-    return $uniquebookings;
-}
-*/
 
 /**
  * Checks booked exams and create/update data in session_seats allocation table
@@ -1995,22 +2040,91 @@ function examregistrar_update_additional_allocations($session, $bookedsite, $use
             $DB->update_record('examregistrar_session_seats', $main);
             //$DB->set_field('examregistrar_session_seats', 'additional', 0, array('id'=>$exam->id));
         }
-            /*
-        //$exam = reset($exams);
-        //$exam->additional = 0;
-        //$exams[$exam->id] = $exam;
-        if($timelimit) {
-            $exam->timecreated = $timelimit;
-        }
-        foreach($exams as $exam) {
-            //$DB->update_record('examregistrar_session_seats', $exam);
-        }
-        $exam = reset($exams);
-        //$DB->set_field('examregistrar_session_seats', 'additional', 0, array('id'=>$exam->id));
-        */
     }
 }
 
+
+/**
+ * Updates assignation of main/additional exam for user in a room
+ *
+ * @param int $session exam session id number (as used in bookings table)
+ * @param int $bookedsite the locationID for the booking
+ * @param int $userid the user whose allocation is updated
+ * @param int $roomid the room to check
+ * @param int $timelimit used only when checking new bookings
+ * @return string
+ */
+function examregistrar_verify_voucher($cmid, $vouchernum, $crccode, $canmanage) {
+    global $DB, $OUTPUT, $USER;
+    
+    $output = '';
+    list($rid, $uniqueid) = explode('-', $vouchernum);
+    if(!$voucher = $DB->get_record('examregistrar_vouchers', array('examregid' => $rid, 'uniqueid' => $uniqueid))) {
+        return $OUTPUT->box($OUTPUT->error_text(get_string('error_novoucher', 'examregistrar')), 'alert alert-danger');
+    }
+    if(!$booking = $DB->get_record('examregistrar_bookings', array('id' => $voucher->bookingid))) {
+        return $OUTPUT->box($OUTPUT->error_text(get_string('error_nobooking', 'examregistrar')), 'alert alert-danger');
+    }
+    // Privacy, do not show booking data to non allowed users
+    if(($USER->id != $booking->userid) && !$canmanage) {
+        return $OUTPUT->box($OUTPUT->error_text(get_string('error_voucheruser', 'examregistrar')), 'alert alert-danger');
+    }
+    $newcrccode = crc32("{$voucher->id}/{$booking->id}");
+    if($newcrccode != $crccode) {
+        return $OUTPUT->box($OUTPUT->error_text(get_string('error_crccode', 'examregistrar')), 'alert alert-danger');
+    }
+    
+    // by now we have an existing & valid booking & voucher
+    // let's check booking?
+    $user = $DB->get_record('user', array('id'=>$booking->userid), 'id, idnumber, firstname, lastname', MUST_EXIST);
+    list($examname, $notused) = examregistrar_get_namecodefromid($booking->examid, 'exams');
+    $attend = new stdClass();
+    $attend->take = core_text::strtoupper($booking->booked ?  get_string('yes') :  get_string('no'));
+    list($attend->site, $notused) = examregistrar_get_namecodefromid($booking->bookedsite, 'locations', 'location');
+    $userbooking = $examname.
+                    html_writer::div(get_string('voucheruser', 'examregistrar', $user), 'userbooking').
+                    html_writer::div(get_string('takeonsite', 'examregistrar', $attend), 'booked');
+    $booked = $booking->booked;
+    
+    // let's check time, is there a more recent voucher?
+    $sql = "SELECT v.*, b.userid, b.examid, b.bookedsite, b.booked
+            FROM {examregistrar_vouchers} v
+            JOIN {examregistrar_bookings} b ON b.id = v.bookingid
+            WHERE b.userid = :userid AND b.examid = :examid AND b.timemodified > :time 
+            ORDER BY v.timemodified DESC";
+    $params = array('userid'=>$booking->userid, 'examid'=>$booking->examid, 'time'=>$booking->timemodified);
+    if($newer = $DB->get_records_sql($sql, $params)) {
+        $a = new stdClass();
+        $a->count = count($newer);
+        $newer = reset($newer);
+
+            $icon = new pix_icon('t/download', get_string('voucherdownld', 'examregistrar'), 'core', null); 
+            $num = str_pad($newer->examregid, 4, '0', STR_PAD_LEFT).'-'.$newer->uniqueid;
+            $downloadurl = new moodle_url('/mod/examregistrar/download.php', array('id' => $cmid, 'down'=>'voucher', 'v'=>$num));
+            $num = $OUTPUT->action_link($downloadurl, $num, null, array('class'=>'voucherdownload'), $icon);
+            $a->last = get_string('vouchernum', 'examregistrar',  $num);
+
+        $output .= $OUTPUT->box($OUTPUT->error_text(get_string('error_latervoucher', 'examregistrar', $a)), 'alert alert-warning');
+        $attend->take = core_text::strtoupper($newer->booked ?  get_string('yes') :  get_string('no'));
+        list($attend->site, $notused) = examregistrar_get_namecodefromid($newer->bookedsite, 'locations', 'location');
+        $userbooking =  $examname.
+                        html_writer::div(get_string('voucheruser', 'examregistrar', $user), 'userbooking').
+                        html_writer::div(get_string('takeonsite', 'examregistrar', $attend), 'booked');
+        $booked = $newer->booked;
+    }
+    
+    $alert = $booked ? 'success' : 'danger';
+    
+    $output .= $OUTPUT->box($userbooking, "alert alert-$alert");
+    
+    return $output;
+    
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//   Staffers functions                                                         //
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Look for course teachers
@@ -2101,7 +2215,7 @@ function examregistrar_get_potential_staffers($examregistrar, $roomid, $newrole=
     $cm = get_coursemodule_from_instance('examregistrar', $examregistrar->id, $examregistrar->course, false, MUST_EXIST);
     $context = context_module::instance($cm->id);
 
-    $config = get_config('examregistrar');
+    $config = examregistrar_get_instance_configdata($examregistrar);
 
     $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
     $users = get_users_by_capability($context, 'mod/examregistrar:beroomstaff', $fields, 'lastname ASC');
@@ -2773,6 +2887,13 @@ function examregistrar_loadcsv_updaterecordfromrow($data, $table, $uniquefields,
 function examregistrar_loadcsv_elementscheck($record, $field, $elementtype, $ignoremodified, $editelements, $neverupdate=false) {
     global $DB;
 
+    $eventdata = array();
+    $eventdata['objecttable'] = 'examregistrar_elements';
+    list($course, $cm) = get_course_and_cm_from_instance($record->examregid, 'examregistrar');
+    $context = context_module::instance($cm->id);
+    $eventdata['context'] = $context;
+    $eventdata['other'] = array();
+    
     $elementid = 0;
     /// now integrity checks
     if(!$element = $DB->get_record('examregistrar_elements', array('examregid'=>$record->examregid, 'idnumber'=>$record->$field, 'type'=>$elementtype))) {
@@ -2782,7 +2903,11 @@ function examregistrar_loadcsv_elementscheck($record, $field, $elementtype, $ign
             if(isset($element->id)) {
                 unset($element->id);
             }
-            $elementid = $DB->insert_record('examregistrar_elements', $element);
+            if($elementid = $DB->insert_record('examregistrar_elements', $element)) {
+                $eventdata['objectid'] = $element->id;
+                $event = \mod_examregistrar\event\manage_created::create($eventdata);
+                $event->trigger();
+            }
         } else {
             return false;
         }
@@ -2793,13 +2918,19 @@ function examregistrar_loadcsv_elementscheck($record, $field, $elementtype, $ign
             $element = clone $record;
             $element->type = $elementtype;
             $element->id = $eid;
-            $DB->update_record('examregistrar_elements', $element);
+            if($DB->update_record('examregistrar_elements', $element)) {
+                $eventdata['objectid'] = $element->id;
+                $event = \mod_examregistrar\event\manage_updated::create($eventdata);
+                $event->trigger();
+            }
         } else {
             //do nothing, Do not abort, allow loading csv row without updating elements
         }
         $elementid = $element->id;
     }
-
+           
+    
+    
     return $elementid;
 }
 
@@ -2828,12 +2959,29 @@ function examregistrar_loadcsv_elements($examregistrar, $data, $ignoremodified) 
         return '  ignore updating: '.$data['name'];
     }
 
+    return examregistrar_saveupdate_csvloaded_item($record, 'elements', $update);
+}
+
+/**
+ * Validates uploaded room/venue data and stores in DB
+ *
+ * @param object $record, the item to sve or update 
+ * @param string $table the data table where to put data
+ * @param bool $update, save or update whether update existing data or not
+ * @return mixed item string if error int > 0 insert,  < 0 update
+ */
+function examregistrar_saveupdate_csvloaded_item($record, $table, $update = false) {
+    $item = false;
+    $table = 'examregistrar_'.$table;
     if($update) {
-        $DB->update_record('examregistrar_elements', $record);
+        if($DB->update_record($table, $record)) {
+            $item = -($record->id);
+        }
     } else {
-        $DB->insert_record('examregistrar_elements', $record);
+        $item = $DB->insert_record($table, $record);
     }
-    return;
+
+    return $item;
 }
 
 
@@ -2899,13 +3047,8 @@ function examregistrar_loadcsv_locations($examregistrar, $data, $ignoremodified,
     }
 
     /// TODO   update path & depth  TODO ///
-    if($update) {
-        $DB->update_record('examregistrar_locations', $record);
-    } else {
-        $DB->insert_record('examregistrar_locations', $record);
-    }
 
-    return;
+    return examregistrar_saveupdate_csvloaded_item($record, 'locations', $update);
 }
 
 
@@ -2968,13 +3111,7 @@ function examregistrar_loadcsv_sessions($examregistrar, $data, $ignoremodified, 
         $record->duration = 2*60*60;
     }
 
-    if($update) {
-        $DB->update_record('examregistrar_examsessions', $record);
-    } else {
-        $DB->insert_record('examregistrar_examsessions', $record);
-    }
-
-    return;
+    return examregistrar_saveupdate_csvloaded_item($record, 'examsessions', $update);
 }
 
 
@@ -3034,13 +3171,7 @@ function examregistrar_loadcsv_periods($examregistrar, $data, $ignoremodified, $
         $record->visible = (int)$record->visible;
     }
 
-    if($update) {
-        $DB->update_record('examregistrar_periods', $record);
-    } else {
-        $DB->insert_record('examregistrar_periods', $record);
-    }
-
-    return;
+    return examregistrar_saveupdate_csvloaded_item($record, 'periods', $update);
 }
 
 
@@ -3098,14 +3229,7 @@ function examregistrar_loadcsv_staffers($examregistrar, $examsession, $data, $ig
         $record->visible = (int)$record->visible;
     }
 
-    if($update) {
-        //$DB->update_record('examregistrar_staffers', $record);
-    } else {
-        //$DB->insert_record('examregistrar_staffers', $record);
-    }
-
-    //print_object($record);
-    return;
+    return examregistrar_saveupdate_csvloaded_item($record, 'staffers', $update);
 }
 
 
@@ -3639,12 +3763,30 @@ function examregistrar_generateexams_fromcourses($examregistrar, $options) {
     $message1 = '';
     $message2 = '';
     if($modified) {
+        $eventdata = array();
+        $eventdata['objecttable'] = 'examregistrar_exams';
+        list($course, $cm) = get_course_and_cm_from_instance($examregistrar, 'examregistrar');
+        $context = context_module::instance($cm->id);
+        $eventdata['context'] = $context;
+        $eventdata['other'] = array();
+    
         $updated = 0;
         $added = 0;
         $deleted = 0;
-        foreach($modified as $item) {
+        foreach($modified as $key => $item) {
+            $eventdata['objectid'] = $key;
+            switch($item) {
+                case 2 : $event = \mod_examregistrar\event\manage_created::create($eventdata);
+                        break;
+                case 3 : $event = \mod_examregistrar\event\manage_deleted::create($eventdata);
+                        break;
+                default: $event = \mod_examregistrar\event\manage_updated::create($eventdata);
+            }
+            $event->trigger();
+            
             $updated = ($item == 1) ? $updated + 1 : $updated;
             $added = ($item == 2) ? $added + 1 : $added;
+                        
             $deleted = ($item == 3) ? $deleted + 1 : $deleted;
         }
         $count = new stdClass;

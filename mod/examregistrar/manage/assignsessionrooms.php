@@ -69,12 +69,17 @@ if($edit) {
     $tab = 'session';
 }
 
+$examregprimaryid = examregistrar_get_primaryid($examregistrar);
+$examregistrar->config = examregistrar_get_instance_configdata($examregistrar);
+
 /// Set the page header
 $PAGE->set_url($baseurl);
 $PAGE->set_title(format_string($examregistrar->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
+$PAGE->set_activity_record($examregistrar);
+
 if($edit) {
     $PAGE->navbar->add(get_string($edit, 'examregistrar'), $baseurl);
 } else {
@@ -83,8 +88,6 @@ if($edit) {
 $PAGE->navbar->add(get_string($action, 'examregistrar'), null);
 
 $output = $PAGE->get_renderer('mod_examregistrar');
-
-$examregprimaryid = examregistrar_get_primaryid($examregistrar);
 
 /// check permissions
 $caneditelements = has_capability('mod/examregistrar:editelements',$context);

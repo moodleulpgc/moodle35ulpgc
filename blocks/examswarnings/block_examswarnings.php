@@ -44,6 +44,24 @@ class block_examswarnings extends block_list {
     }
 
     /**
+     * Serialize and store config data
+     */
+    function instance_config_save($data, $nolongerused = false) {
+        global $DB;
+        
+        $config = empty($data) ? null : clone($data);
+        
+        parent::instance_config_save($config, $nolongerused);
+    }
+
+    function instance_delete() {
+        global $DB;
+        $fs = get_file_storage();
+        $fs->delete_area_files($this->context->id, 'block_examswarnings');
+        return true;
+    }
+    
+    /**
      * The navigation block cannot be hidden by default as it is integral to
      * the navigation of Moodle.
      *
@@ -66,11 +84,15 @@ class block_examswarnings extends block_list {
 
     function get_content() {
         global $CFG, $USER, $DB, $OUTPUT;
+        
 
         if($this->content !== NULL) {
             return $this->content;
         }
 
+        
+        //print_object($this->config);        
+        
         require_once($CFG->dirroot.'/blocks/examswarnings/locallib.php');
 
         $this->content = new stdClass;
@@ -81,7 +103,7 @@ class block_examswarnings extends block_list {
         if (empty($this->instance)) {
            return $this->content = '';
         }
-
+        // if there is no examregistrar, return empty
         if(!$moduleid = $DB->get_field('modules', 'id', array('name'=>'examregistrar', 'visible'=>1)) || 
             !$DB->record_exists('examregistrar_elements', null)) {
             return $this->content;
@@ -94,8 +116,14 @@ class block_examswarnings extends block_list {
 
         $canbook = has_capability('mod/examregistrar:book', $context);
         $cansubmit = has_capability('mod/examregistrar:submit', $context);
+        $canmanage = has_capability('block/examswarnings:manage', $context);
         
-        $config = get_config('block_examswarnings');
+        $config = empty($this->config) ? get_config('block_examswarnings') : $this->config;
+        
+        if(!isset($config->primaryreg)) {
+            return $this->content = '';
+        }
+        
         list($period, $session, $extra, $check, $lagdays) = examswarnings_get_sessiondata($config);
         
         if(!$period) {
@@ -108,37 +136,33 @@ class block_examswarnings extends block_list {
         $upcomings = array();
         $reminders = array();
         $roomcalls = array();
-
-        if((strtotime(" - $lagdays days ",  $session->examdate) > $now) &&
-           ($session->examdate <  $check)) {
-            $warnings = examswarnings_notappointedexams($period, $session, $extra); // for students
-        }
-
-        if(($session->examdate > $now) && ($session->examdate <  $check)) {
-            $upcomings = examswarnings_upcomingexams($period, $session); // for students
-            $reminders = examswarnings_reminder_upcomingexams($period, $session); // for teachers
-            $roomcalls = examswarnings_roomcall_upcomingexams($period, $session); // for tecahers/room staff
-        }
-
-
-
-        if(is_siteadmin() && debugging('', DEBUG_DEVELOPER)) {
-            $o = new stdClass();
-            $o->category = 6;
-            $o->programme = '4036';
-            $o->shortname = '46051';
-            $o->roomidnumber = 'A-27';
-            if(!$warnings) {
+        
+        if(is_siteadmin()) {
+            if(debugging('', DEBUG_DEVELOPER)) {
+                $o = new stdClass();
+                $o->category = 6;
+                $o->programme = '4036';
+                $o->shortname = '46051';
+                $o->roomidnumber = 'A-27';
                 $warnings = array($o);
-            }
-            if(!$upcomings) {
                 $upcomings = array($o);
-            }
-            if(!$reminders) {
                 $reminders = array($o);
-            }
-            if(!$roomcalls) {
                 $roomcalls = array($o);
+            }
+        } else {
+            if($canbook && (strtotime(" - $lagdays days ",  $session->examdate) > $now) &&
+            ($session->examdate <  $check)) {
+                $warnings = examswarnings_notappointedexams($period, $session, $extra, $this->config); // for students
+            }
+
+            if(($session->examdate > $now) && ($session->examdate <  $check)) {
+                if($canbook) {
+                    $upcomings = examswarnings_upcomingexams($period, $session); // for students
+                }
+                if($cansubmit) {
+                    $reminders = examswarnings_reminder_upcomingexams($period, $session); // for teachers
+                    $roomcalls = examswarnings_roomcall_upcomingexams($period, $session, $this->config); // for tecahers/room staff
+                }
             }
         }
 
@@ -158,7 +182,7 @@ class block_examswarnings extends block_list {
             }
         }
 
-        $icon = $OUTPUT->pix_icon('i/text', '', 'moodle', array('class'=>'iconsmall'));
+        $icon = $OUTPUT->pix_icon('i/risk_personal', '', 'moodle', array('class'=>'iconsmall'));
         if($upcomings) {
             $this->content->items[] = html_writer::span(get_string('warningupcoming', 'block_examswarnings', count($upcomings)), 'warning examwarning');
             $this->content->icons[] = '';
@@ -186,7 +210,7 @@ class block_examswarnings extends block_list {
                     $this->content->items[] = html_writer::link($url, $warning->shortname, array('class'=>'warning'));
                 } else {
                     $this->content->items[] = html_writer::span($warning->shortname, 'warning');
-                }$DB->
+                }
                 $this->content->icons[] = $icon;
             }
         }
@@ -201,7 +225,15 @@ class block_examswarnings extends block_list {
                 $this->content->icons[] = $icon;
             }
         }
-
+        
+        if($canmanage) {
+            $icon = $OUTPUT->pix_icon('i/settings', '', 'moodle', array('class'=>'iconsmall'));
+            $url = clone $this->page->url;
+            $url->params(array('sesskey'=>sesskey(), 'edit'=>'on', 'bui_editid'=>$this->instance->id));
+            $this->content->items[] = html_writer::link($url, get_string('configurewarnings', 'block_examswarnings'));
+            $this->content->icons[] = $icon;
+        }
+        
         if(!$this->content->items) {
             return '';
         }
@@ -216,7 +248,7 @@ class block_examswarnings extends block_list {
         
         return true; // ecastro ULPGC disable cron for tasks
     }
-
+    
 }
 
 

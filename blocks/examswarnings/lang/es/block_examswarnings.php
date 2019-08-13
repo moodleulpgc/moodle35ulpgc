@@ -6,14 +6,14 @@ $string['blockname'] = 'Avisos de Examen';
 $string['blocktitle'] = 'Avisos de Examen';
 $string['privacy:metadata'] = 'El bloque Avisos de Examen sólo muestrra datos almacenados en otros plugins.';
 $string['primaryreg'] = 'Registro de Exámenes principal';
-$string['explainprimaryreg'] = 'Registro de Exámenes principal';
+$string['primaryreg_help'] = 'Registro de Exámenes principal';
 $string['messageprovider:exam_staff_reminders'] = 'Recordatorios de examen paraa personal';
 $string['messageprovider:exam_student_reminders'] = 'Recordatorios de examen para estudiantes';
 $string['messageprovider:exam_student_warnings'] = 'Alertas de examen no reservado para estudiantes';
 $string['messageprovider:exam_teacher_reminders'] = 'Recordatorios de examen para profesores';
 
 $string['examidnumber'] = 'Identificador del Examen';
-$string['explainexamidnumber'] = 'Código ID de calificación de la actividad que contiene la calificación del examen.';
+$string['examidnumber_help'] = 'Código ID de calificación de la actividad que contiene la calificación del examen.';
 $string['examlocations'] = 'Lugares';
 $string['examcalls'] = 'Convocatorias';
 $string['examdates'] = 'Fechas';
@@ -46,7 +46,7 @@ $string['explainexamsupdate'] = 'Si se activa, se incluyen rutinas en el cron pa
 $string['examsglossary'] = 'Identificador de los Glosarios de Exámenes';
 $string['explainexamsglossary'] = 'Cadena de búsqueda para identificar los glosarios de exámenes. Esta cadena debe aparecer en el cm.idnumber del glosario. El formato es ID_titulacion_anualidad';
 $string['annuality'] = 'Anualidad';
-$string['explainannuality'] = 'La anualidad en curso, en formato corto, por ejemplo: 201011 ';
+$string['annuality_help'] = 'La anualidad en curso, en formato corto, por ejemplo: 201011 ';
 $string['validcategories'] = 'Categorías válidas';
 $string['explainvalidcategories'] = 'Sólo los cursos pertenecientes a estas categorías serán procesados.';
 
@@ -69,49 +69,57 @@ $string['warnings'] = 'Avisos de Exámenes';
 $string['warningduedate'] = '¡Apuntarse a {$a} exámenes!';
 $string['warningupcoming'] = '{$a} Exámenes próximos';
 $string['roomcallupcoming'] = '{$a} Aulas con examen';
-
+$string['configurewarnings'] = 'Configurar avisos';
+$string['defaultsettings'] = 'Parámetros iniciales en nuevos bloques';
+$string['defaultsettings_help'] = 'Estos parametros definen el valor predefinido, incial, 
+que tendrá cada ítem de configuración en las nuevas instancias configuradas de este tipo de bloques.
+Solo se puede configurar instancias añadidas a nivel de sitio. ';
 $string['enablereminders'] = 'Habilitar recordatorios de examen';
-$string['configenablereminders'] = 'Si se activa, se enviarán mensajes de recordatorio por e-mail a todos los profesores de asignaturas con examen programado en los próximos días';
+$string['enablereminders_help'] = 'Si se activa, se enviarán mensajes de recordatorio por e-mail a todos los profesores de asignaturas con examen programado en los próximos días';
 $string['reminderdays'] = 'Días de antelación';
-$string['configreminderdays'] = 'Con cuántos días de antelación respecto a la fecha del examen se enviarán los mensajes de recordatorio';
+$string['reminderdays_help'] = 'Con cuántos días de antelación respecto a la fecha del examen se enviarán los mensajes de recordatorio';
 $string['remindermessage'] = 'Texto del mensaje recordatorio';
-$string['configremindermessage'] = 'El contenido del mensaje recordatorio de examen. Se pueden utilizar los comodines %%course%% y %%date%% para emplazar los datos reales.';
+$string['remindermessage_help'] = 'El contenido del mensaje recordatorio de examen. Se pueden utilizar los comodines %%course%% y %%date%% para emplazar los datos reales.';
 $string['examremindersubject'] = 'Recordatorio de examen de la asignatura {$a}.';
 
 $string['enableroomcalls'] = 'Habilitar recordatorios de examen para personal de aulas';
-$string['configenableroomcalls'] = 'Si se activa, se enviarán mensajes de recordatorio por e-mail a todo el personal de aulas con examen programado en los próximos días.';
+$string['enableroomcalls_help'] = 'Si se activa, se enviarán mensajes de recordatorio por e-mail a todo el personal de aulas con examen programado en los próximos días.';
 $string['roomcalldays'] = 'Días de antelación';
-$string['configroomcalldays'] = 'Con cuántos días de antelación respecto a la fecha de la sesión de examen se enviarán los mensajes de recordatorio al personal de aulas.';
+$string['roomcalldays_help'] = 'Con cuántos días de antelación respecto a la fecha de la sesión de examen se enviarán los mensajes de recordatorio al personal de aulas.';
 $string['roomcallroles'] = 'Roles de personal';
-$string['configroomcallroles'] = 'Los roles de personal de aulas usados en los recordatorios de exámenes en aulas.';
+$string['roomcallroles_help'] = 'Los roles de personal de aulas usados en los recordatorios de exámenes en aulas.';
 $string['roomcallmessage'] = 'Texto del mensaje recordatorio para el aula';
-$string['configroomcallmessage'] = 'El contenido del mensaje recordatorio de examen en Aula. Se pueden utilizar los comodines %%course%% y %%date%% para emplazar los datos reales.';
+$string['roomcallmessage_help'] = 'El contenido del mensaje recordatorio de examen en Aula. Se pueden utilizar los comodines %%course%% y %%date%% para emplazar los datos reales.';
 $string['roomcallsubject'] = 'Recordatorio de exámenes en el Aula {$a}. ';
 
 $string['enablewarnings'] = 'Habilitar alertas de examen';
-$string['configenablewarnings'] = 'Si se activa, se enviarán mensajes de alerta por e-mail a todos los estudiantes de asignaturas con examen programado en los próximos días.
+$string['enablewarnings_help'] = 'Si se activa, se enviarán mensajes de alerta por e-mail a todos los estudiantes de asignaturas con examen programado en los próximos días.
 
 Se enviarán dos tipos de alertas:
 1) Alerta si el estudiante NO ha reservado un examen próximo.
 2) Confirmación de los exámenes reservados próximamente.';
 $string['warningdays'] = 'Días de antelación';
-$string['configwarningdays'] = 'Con cuántos días de antelación respecto a la fecha del examen se enviarán los mensajes de alerta';
+$string['warningdays_help'] = 'Con cuántos días de antelación respecto a la fecha del examen se enviarán los mensajes de alerta';
 $string['examconfirmdays'] = 'Días de antelación de recordatorios';
-$string['configexamconfirmdays'] = 'Con cuantos días de antelación se enviarán los recordatorios de examen inscrito';
+$string['examconfirmdays_help'] = 'Con cuantos días de antelación se enviarán los recordatorios de examen inscrito';
+$string['headerreminders'] = 'Recordatorios a profesores (Ord)';
+$string['headerroomcalls'] = 'Recordatorios a personal de aulas (Ext)';
+$string['headerwarnings'] = 'Alertas a estudiantes (Ext)';
+$string['headercontrol'] = 'Control ';
 
 $string['warningsubject'] = 'Aviso de examen no reservado: {$a}.';
 $string['warningmessage'] = 'Texto del mensaje de alerta';
-$string['configwarningmessage'] = 'El contenido del mensaje de alerta de examen no reservado. Se pueden utilizar los comodines %%course%% y %%date%% para emplazar los datos reales.';
+$string['warningmessage_help'] = 'El contenido del mensaje de alerta de examen no reservado. Se pueden utilizar los comodines %%course%% y %%date%% para emplazar los datos reales.';
 $string['confirmsubject'] = 'Aviso de examen próximo: {$a}.';
 $string['confirmmessage'] = 'Texto del mensaje de confirmación';
-$string['configconfirmmessage'] = 'El contenido del mensaje recordatorio de examen. Se pueden utilizar los comodines %%course%%, %%place%%, %%registered%% y %%date%% para emplazar los datos reales.';
+$string['confirmmessage_help'] = 'El contenido del mensaje recordatorio de examen. Se pueden utilizar los comodines %%course%%, %%place%%, %%registered%% y %%date%% para emplazar los datos reales.';
 
 $string['extrarules'] = 'Reglas Conv. Extra';
-$string['configextrarules'] = 'Si activado, se emplearán las reglas propias de la Convocatoria Extraordinaria para seleccionar asignaturas y usuarios con exámenes próximos.';
+$string['extrarules_help'] = 'Si activado, se emplearán las reglas propias de la Convocatoria Extraordinaria para seleccionar asignaturas y usuarios con exámenes próximos.';
 $string['examreminderfrom'] = 'Sistema de Avisos de exámenes de Teleformación';
 $string['remindersenderror'] = 'Error';
 $string['controlemail'] = 'Email de Control';
-$string['configcontrolemail'] = 'Si se especifica, se enviará un mensaje de control al esta dirección conteniendo una lista de todos los profesores a los que se ha enviado un recordatorio.';
+$string['controlemail_help'] = 'Si se especifica, se enviará un mensaje de control al esta dirección conteniendo una lista de todos los profesores a los que se ha enviado un recordatorio.';
 $string['controlmailsubject'] = 'Recordatorios de examen del {$a} ';
 $string['controlmailtxt'] = 'Se han enviado {$a->num} recordatorios de examen para la fecha programada del {$a->date}.';
 $string['controlmailhtml'] = 'Se han enviado {$a->num} recordatorios de examen para la fecha programada del {$a->date}.';
@@ -120,4 +128,4 @@ $string['sendstudentwarnings'] = 'Correo de alerta a estudiantes SIN reservas de
 $string['sendstaffreminders'] = 'Correo de recordatorio a Personal de Aulas con examen';
 $string['sendteacherreminders'] = 'Correo de recordatorio a Tutores con examen';
 $string['noemail'] = 'NO e-mail';
-$string['confignoemail'] = 'NO enviar e-mails, solo pruebas.';
+$string['noemail_help'] = 'NO enviar e-mails, solo pruebas.';

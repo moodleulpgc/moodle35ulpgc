@@ -90,26 +90,35 @@ period, scope, call, examdate, timeslot, location, role
 * role: each role for a staffer in a location. Supervisor, Officer, ...
 
 ';
+
+$string['configparams'] = 'Configure default params';
+$string['defaultsettings'] = 'Initial values for instance config parameters';
+$string['defaultsettings_help'] = 'New instances of Exam registrar that are a Primary Registrar require to set congiguration options. 
+The initial default values wil be taken from here, and later may be modified from Registrar  Management.';
+$string['headerdeadlines'] = 'Selection periods';
+$string['headerallocation'] = 'Staff allocation';
+$string['headerfilesuffix'] = 'Exam archives suffixes';
+$string['headerprinting'] = 'Printing options';
 $string['selectdays'] = 'Select period';
-$string['configselectdays'] = 'Days before an exam date a student can select a seat.';
+$string['selectdays_help'] = 'Days before an exam date a student can select a seat.';
 $string['cutoffdays'] = 'Select deadline';
-$string['configcutoffdays'] = 'Days before an exam date a student cannot select a seat for exam at a given location.';
+$string['cutoffdays_help'] = 'Days before an exam date a student cannot select a seat for exam at a given location.';
 $string['extradays'] = 'Select extra additional';
-$string['configextradays'] = 'Additional days (plus cutoff) before an exam date a student cannot select a seat for exam at a given location in an Extra convocatory (one with many calls).';
+$string['extradays_help'] = 'Additional days (plus cutoff) before an exam date a student cannot select a seat for exam at a given location in an Extra convocatory (one with many calls).';
 $string['lockdays'] = 'Blockade period';
-$string['configlockdays'] = 'Days before an exam date a student cannot modify a selection for an exam seat.';
+$string['lockdays_help'] = 'Days before an exam date a student cannot modify a selection for an exam seat.';
 $string['approvalcutoff'] = 'Select approval deadline';
-$string['configapprovalcutoff'] = 'Days before an exam date a superviser can no longer approve or reject an exam.';
+$string['approvalcutoff_help'] = 'Days before an exam date a superviser can no longer approve or reject an exam.';
 $string['printdays'] = 'Print days';
-$string['configprintdays'] = 'Days before an exam date an examiner can download an exam.';
+$string['printdays_help'] = 'Days before an exam date an examiner can download an exam.';
 $string['defaultregistrar'] = 'Default instance';
 $string['configdefaultregistrar'] = 'Many functions in Exam registrar are called from other dependent modules or blocks.
 Here a default course module ID must be defined for use as fallback when no other module can be defined. ';
 $string['staffcategories'] = 'Staff course categories';
-$string['configstaffcategories'] = 'If selected any, then when looking for potential staff members, in addition to current course,
+$string['staffcategories_help'] = 'If selected any, then when looking for potential staff members, in addition to current course,
 the users enrolled on any course of those categories are checked for the appropiate capabilities.';
 $string['excludecourses'] = 'Exclude admin courses';
-$string['configexcludecourses'] = 'If set, the above search wil exclude users enrolled in courses without an academic charge.
+$string['excludecourses_help'] = 'If set, the above search wil exclude users enrolled in courses without an academic charge.
 Administrative and social courses are not considered.';
 $string['responsesfolder'] = 'Response files folder';
 $string['configresponsesfolder'] = 'Relative OS filesystem path (starting from moodledata) to the Response files folder.';
@@ -121,9 +130,9 @@ $string['responsessheeturl'] = 'Response sheet cmID';
 $string['configresponsessheeturl'] = 'If a model Responses sheet is used an exists in a course as a PDF, here can be stated the CM id for that file.';
 $string['printresponsessheet'] = 'Standard Responses Sheet';
 $string['defaultrole'] = 'Default role';
-$string['configdefaultrole'] = 'If set, the role with this idnumber will be used when no other role were specified for staff.';
+$string['defaultrole_help'] = 'If set, the role with this idnumber will be used when no other role were specified for staff.';
 $string['venuelocationtype'] = 'Location type for Venues';
-$string['configvenuelocationtype'] = 'Locations of this type will be selected as posible venues:
+$string['venuelocationtype_help'] = 'Locations of this type will be selected as posible venues:
 sites where students can book exams and rooms belong to. ';
 $string['questionwarning'] = 'Exam uses un-regulated questions';
 
@@ -219,7 +228,9 @@ $string['editsessions'] = 'Edit sessions';
 
 
 $string['editexamsessions'] = 'Edit sessions';
-
+$string['updateexamsession'] = 'Update exam session';
+$string['duration'] = 'Duration';
+$string['duration_help'] = 'The allocated time span for this exam session';
 $string['examsessions'] = 'Exam sessions';
 $string['editperiods'] = 'Edit periods';
 
@@ -658,9 +669,19 @@ $string['downloaduserlist'] = 'Download student list';
 $string['printexam'] = 'Exam PDF';
 $string['printexamresponses'] = 'Exam PDF with answers';
 $string['printexamkey'] = 'Checked response sheet';
-
 $string['take'] = 'Taking exam';
 $string['takeat'] = 'at';
+$string['takeonsite'] = 'Taking exam set to <strong>{$a->take}</strong> at {$a->site}';
+$string['checkvoucher'] = 'Verify exam voucher';
+$string['vouchernum'] = 'Exam voucher nº [{$a}]: ';
+$string['voucherdownld'] = ' Download the Exam booking voucher as PDF ';
+$string['vouchercrc'] = ' Verification code:  {$a} ';
+$string['voucherqr'] = ' You may use the QRCode to check readily the Exam voucher ';
+$string['vouchergenerated'] = ' Voucher generated on {$a} ';
+$string['voucherissued'] = ' Voucher issued on {$a} ';
+$string['voucheruser'] = ' The student {$a->firstname} {$a->lastname} with ID:{$a->idnumber} has a booking in this exam as: ';
+$string['voucherdisclaimer'] = 'This inscription voucher MUST be validated using the above codes.';
+$string['bookingdate'] = ' Exam booking reserved on {$a}. ';
 $string['taken'] = 'Exam Taken';
 $string['notbooked'] = 'Not Booked';
 $string['booked'] = 'Booked';
@@ -946,20 +967,25 @@ $string['error_noneapproved'] = 'No exam file approved';
 $string['error_nonesent'] = 'No exam file sent';
 $string['error_nonzero'] = 'The value must be different form 0';
 $string['error_lessthan'] = 'The value must be less than or equal {$a}';
-$string['extensionanswers'] = 'Answers filename suffix';
-$string['configextensionanswers'] = 'The file name suffix for the file with right answers.
+$string['error_novoucher'] = 'There is NO Exam voucher with that ID';
+$string['error_nobooking'] = 'There isn\'t an exam booking matching that Exam voucher';
+$string['error_crccode'] = 'The validation code doesn\'t match correct for that Exam voucher. Inscription cannot be verified.';
+$string['error_latervoucher'] = 'Voucher invalidated due to {$a->count} later bookings. Last {$a->last}.';
+$string['error_latervoucher'] = 'Voucher invalidated due to {$a->count} later bookings. Last {$a->last}.';
+$string['error_voucheruser'] = 'You are not allowed to access booking data from other participants ';
+$string['extensionanswers'] = 'Correct filename suffix';
+$string['extensionanswers_help'] = 'The file name suffix for the file with right answers.
 Must include any conection character or puntuation, but exclude the real filename extension.';
 $string['extensionkey'] = 'Key filename suffix';
-$string['configextensionkey'] = 'The file name suffix for the keys file.
+$string['extensionkey_help'] = 'The file name suffix for the keys file.
 Must include any conection character or puntuation, but exclude the real filename extension.';
 $string['extensionresponses'] = 'Responses filename suffix';
-$string['configextensionresponses'] = 'The file name suffix for the responses file, that with response sheets filled by students that took the exam.
+$string['extensionresponses_help'] = 'The file name suffix for the responses file, that with response sheets filled by students that took the exam.
 Must include any conection character or puntuation, but exclude the real filename extension.';
-
-$string['configpdfwithteachers'] = 'configpdfwithteachers';
-$string['pdfaddexamcopy'] = 'pdfaddexamcopy';
-$string['configpdfaddexamcopy'] = 'configpdfaddexamcopy';
-$string['pdfwithteachers'] = 'pdfwithteachers';
+$string['pdfaddexamcopy'] = 'Copy Exams files to printing job';
+$string['pdfaddexamcopy_help'] = 'If set, then the appropiate number of copies of the Exam will be adad to be printed.';
+$string['pdfwithteachers'] = 'Print with teachers';
+$string['pdfwithteachers_help'] = 'Id set, each printed exam will include the course teachers names';
 
 $string['examitem'] = 'Exam';
 $string['examsqc'] = 'Exams Quality Control';
@@ -991,11 +1017,13 @@ $string['resortbyidnumber'] = 'By idnumber';
 $string['eventattendanceapproved'] = 'Exam attendance data loaded';
 $string['eventattendanceloaded'] = 'Exam attendance data approved';
 $string['eventmanageviewed'] = 'Register management viewed';
-$string['eventexamfilesubmitted'] = 'Examfile attempt submitted';
-$string['eventexamfileuploaded'] = 'Examfile attempt uploaded';
+$string['eventexamfilecreated'] = 'Examfile attempt submitted';
+$string['eventexamfileupdated'] = 'Examfile attempt updated';
+$string['eventexamfiledeleted'] = 'Examfile attempt deleted';
 $string['eventexamfilereviewed'] = 'Examfile attempt status changed';
 $string['eventexamfileprintmodeset'] = 'Examfile print mode set';
 $string['eventexamfilessynced'] = 'Examfiles reviewed synchronized from Tracker issues';
+$string['eventexamfilesubmitted'] = 'Examfile attempt submitted from MakeExam';
 $string['eventcapabilitiesupdated'] = 'MakeExam composing capabilities updated';
 $string['eventbookingsubmitted'] = 'Exam booking submitted';
 $string['eventbookingunbooked'] = 'Exam booking removed by new booking';
@@ -1003,6 +1031,12 @@ $string['eventresponsesapproved'] = 'Exam Response files approved';
 $string['eventresponsesdeleted'] = 'Exam Response files deleted';
 $string['eventresponsesdistributed'] = 'Exam Response files distributed';
 $string['eventresponsesuploaded'] = 'Exam Response files uploaded';
+$string['eventmanageaction'] = 'Action executed in registrar';
+$string['eventmanage'] = 'Registrar element item {$a}';
+$string['eventmanageviewed'] = 'Registrar table/page viewed';
+$string['eventfiles'] = 'Registrar files {$a}';
+
+
 
 $string['headeruserdata'] = 'General User Attendance data';
 $string['headerroomsdata'] = 'Attendance data by room';

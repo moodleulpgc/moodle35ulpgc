@@ -88,17 +88,25 @@ period, scope, call, examdate, timeslot, location, role
 
 ';
 */
+$string['defaultsettings'] = 'Parámetros iniciales en nuevas instancias';
+$string['defaultsettings_help'] = 'Las nuevas instancias que sean Registros primarios requieren unos valores de configuración.
+Los valores predefinidos inicialmente se tomarán de aquí, y luego s epueden cambiar en la Gestión del Registro. ';
+$string['headerdeadlines'] = 'Plazos de selección';
+$string['headerallocation'] = 'Asignación de Personal';
+$string['headerfilesuffix'] = 'Sufijos de archivos de examen';
+$string['headerprinting'] = 'Opciones de impresión';
+$string['configparams'] = 'Configurar parámetros de operación';
 $string['selectdays'] = 'Periodo de elección';
-$string['configselectdays'] = 'Tiempo de antelación en días antes de la fecha de un examen
+$string['selectdays_help'] = 'Tiempo de antelación en días antes de la fecha de un examen
 en el que un Estudiante puede inscribirse paar realizar un examen en una sede. ';
 $string['cutoffdays'] = 'Plazo de selección';
-$string['configcutoffdays'] = 'Periodo en el que NO se pueden realizar ya inscripciones a examen. Tiempo en días antes de la realización del examen.';
+$string['cutoffdays_help'] = 'Periodo en el que NO se pueden realizar ya inscripciones a examen. Tiempo en días antes de la realización del examen.';
 $string['extradays'] = 'Plazo extra adicional';
-$string['configextradays'] = 'Días adicionales, a sumar a los anteriores, estableciendo el periodo en el que NO se pueden realizar ya inscripciones a examen, en el caso de Convocatorias Extraordinarias (más de un turno).';
+$string['extradays_help'] = 'Días adicionales, a sumar a los anteriores, estableciendo el periodo en el que NO se pueden realizar ya inscripciones a examen, en el caso de Convocatorias Extraordinarias (más de un turno).';
 $string['lockdays'] = 'Periodo de bloqueo';
-$string['configlockdays'] = 'Periodo en el que un estudiante que se ha inscrito para un examen ya no puede modificar su inscripción.';
+$string['lockdays_help'] = 'Periodo en el que un estudiante que se ha inscrito para un examen ya no puede modificar su inscripción.';
 $string['printdays'] = 'Plazo de impresión';
-$string['configprintdays'] = 'Días antes de un examen en que un examinados puede imprimir los exámenes de su sede.';
+$string['printdays_help'] = 'Días antes de un examen en que un examinados puede imprimir los exámenes de su sede.';
 $string['responsessheeturl'] = 'Hoja de Respuestas cmID';
 $string['printresponsessheet'] = 'Hoja de Respuestas para imprimir';
 $string['configresponsessheeturl'] = 'El nº cmid del recurso Archivo conteniendo la hoja de respuestas.';
@@ -113,24 +121,24 @@ $string['defaultregistrar'] = 'Registro de Exámenes predeterminado';
 $string['configdefaultregistrar'] = 'Muchas de las funciones y procesos de un Registro de Exámenes son invocadas por otros módulos o bloque dependientes.
 Si ese es el caso y existen varios Registros, aquí se define aquél módulo registro de Exámenes que funcionará como principal.';
 $string['staffcategories'] = 'Categorías de curso de Personal';
-$string['configstaffcategories'] = 'Si se selecciona alguna categoría de cursos entonces, además del curso base,
+$string['staffcategories_help'] = 'Si se selecciona alguna categoría de cursos entonces, además del curso base,
 cuando se busque Personal para atender aulas de examen se considerarán también los usuarios matriculados en algún curso de esa categoría o categorías.
 En cualquier caso se comprobará si los usuarios tienen otorgadas las capacidades para actual como Personal de aula.';
 $string['excludecourses'] = 'Excluir cursos administrativos';
-$string['configexcludecourses'] = 'Si se activa, la búsqueda anterior NO tendrá en consideración
+$string['excludecourses_help'] = 'Si se activa, la búsqueda anterior NO tendrá en consideración
 los cursos que no tengan una carga académica en créditos. Cursos sociales y administrativos serán excluidos de la búsqueda de personal.';
 $string['defaultrole'] = 'Rol predeterminado';
-$string['configdefaultrole'] = 'Si se especifica, el rol con este IDnumber se usará de forma predefinida
+$string['defaultrole_help'] = 'Si se especifica, el rol con este IDnumber se usará de forma predefinida
 cuando no se especifique otro rol explícitamente para el Personal.';
 $string['venuelocationtype'] = 'Tipo de Ubicación de Sedes';
-$string['configvenuelocationtype'] = 'Los "Ubicaciones" con este tipo serán utilizados como Sedes potenciales
+$string['venuelocationtype_help'] = 'Los "Ubicaciones" con este tipo serán utilizados como Sedes potenciales
 en la inscripción de estudiantes a examen y en la asignación de aulas por sesión de examen.';
 $string['useasprimary'] = 'Registro principal';
 $string['useasprimary_help'] = '
 Si se selecciona, la instancia indicada proporcionará el Registro principal de Exámenes.
 
 Esto significa que el sistema usará los Exámenes, sesiones, aulas etc. definidos y gestionados por esa instancia de registro de Exámenes.';
-$string['thisisprimary'] = 'Est ainstancia es un Registro Principal';
+$string['thisisprimary'] = 'Esta instancia es un Registro Principal';
 $string['primaryidnumber'] = 'Código ID del Registro principal';
 $string['primaryidnumber_help'] = '
 Si éste es un Registro principal, esta opción almacena una ID única que permite identificar dicho registro principal.
@@ -202,6 +210,9 @@ $string['degreetype'] = 'Tipo de titulación';
 $string['editelement'] = 'Editar elemento';
 $string['editelements'] = 'Editar elementos';
 $string['editexamsessions'] = 'Editar Sesiones';
+$string['updateexamsession'] = 'Actualizar Sesión de examen';
+$string['duration'] = 'Duración';
+$string['duration_help'] = 'La extensión temporal prevista para esta sesión de examen, para cada examen';
 $string['examsessions'] = 'Sesiones de examen';
 $string['editperiods'] = 'Editar Convocatorias';
 $string['periods'] = 'Convicatorias';
@@ -621,6 +632,17 @@ $string['printexamresponses'] = 'PDF de examen con respuestas correctas';
 $string['printexamkey'] = 'PDF de examen con plantilla marcada';
 $string['take'] = 'Me presento';
 $string['takeat'] = 'en';
+$string['takeonsite'] = '<strong>{$a->take}</strong> me presento en {$a->site}';
+$string['checkvoucher'] = 'Verificar comprobante de examen';
+$string['vouchernum'] = ' Comprobante de inscripción nº {$a} ';
+$string['voucherdownld'] = ' Descargar el comprobante como PDF ';
+$string['vouchercrc'] = ' Código de verificación: {$a} ';
+$string['voucherqr'] = ' Puede usar el código QR para la verificación rápida del comprobante de inscripción ';
+$string['vouchergenerated'] = ' Comprobante generado el {$a} ';
+$string['voucherissued'] = ' Comprobante emitido el {$a} ';
+$string['voucheruser'] = 'El estudiante <strong>{$a->firstname} {$a->lastname}</strong>, con DNI nº <strong>{$a->idnumber}</strong>, ha realizado una inscripción en el examen y sesión indicada como:';
+$string['voucherdisclaimer'] = 'Este Comprobante debe ser validado en la plataforma usando los códigos de más arriba. Solo si la verificación es validada este Comprobante constituye una evidencia de inscripción.';
+$string['bookingdate'] = ' Inscripción realizada el {$a}. ';
 $string['taken'] = 'Examen realizado';
 $string['notbooked'] = 'No inscrito';
 $string['booked'] = 'Inscrito';
@@ -879,19 +901,24 @@ $string['allsessions'] = 'Todas las sesiones';
 $string['error_manyapproved'] = 'Más de un Archivo de examen aprobado';
 $string['error_noneapproved'] = 'Sin archivo de examen aprobado';
 $string['error_nonesent'] = 'Sin archivos de examen enviados';
+$string['error_novoucher'] = 'No existe un Comprobante de inscripción con ese número de registro';
+$string['error_nobooking'] = 'No existe una inscripción a examen que corresponda a este Comprobante de inscripción';
+$string['error_crccode'] = 'El código de verificación NO es correcto para este Comprobante de inscripcion. NO puede validarse.';
+$string['error_latervoucher'] = 'El Comprobante verificado está invalidado por {$a->count} incripciones posteriores. Última inscripción con {$a->last}.';
+$string['error_voucheruser'] = 'No tiene permiso para acceder a datos de inscripción de otros participantes.';
 $string['extensionanswers'] = 'Sufijo del archivo de Correctas';
-$string['configextensionanswers'] = 'El sufijo a añadir al nombre del fichero de examen con las respuestas correctas incluidas.
+$string['extensionanswers_help'] = 'El sufijo a añadir al nombre del fichero de examen con las respuestas correctas incluidas.
 Debe contener cualquier separador y puntuación, pero excluye la extensión real del archivo.';
 $string['extensionkey'] = 'Sufijo del archivo de Claves';
-$string['configextensionkey'] = 'El sufijo a añadir al nombre del fichero de examen con las plantilla rellenada.
+$string['extensionkey_help'] = 'El sufijo a añadir al nombre del fichero de examen con las plantilla rellenada.
 Debe contener cualquier separador y puntuación, pero excluye la extensión real del archivo.';
 $string['extensionresponses'] = 'Sufijo del archivo de Respuestas';
-$string['configextensionresponses'] = 'El sufijo a añadir al nombre del fichero de examen con las hojas de respuesta rellenadas por los estudiantes.
+$string['extensionresponses_help'] = 'El sufijo a añadir al nombre del fichero de examen con las hojas de respuesta rellenadas por los estudiantes.
 Debe contener cualquier separador y puntuación, pero excluye la extensión real del archivo.';
 $string['pdfaddexamcopy'] = 'Añadir copia de Exámenes';
-$string['configpdfaddexamcopy'] = 'Si se activa, al PDF de una Aula se añadirán copias de los PDF de Examen a realizar en dicha Aula.';
+$string['pdfaddexamcopy_help'] = 'Si se activa, al PDF de una Aula se añadirán copias de los PDF de Examen a realizar en dicha Aula.';
 $string['pdfwithteachers'] = 'Incluir Tutores';
-$string['configpdfwithteachers'] = 'Si se activa, los PDFs generados para Examen y Aula
+$string['pdfwithteachers_help'] = 'Si se activa, los PDFs generados para Examen y Aula
 incluirán siempre la lista de Profesores/Tutores de la asignatura.';
 
 $string['examitem'] = 'Examen';
@@ -920,7 +947,6 @@ $string['generateextracallef'] = 'Generar PDFs extra';
 $string['resortbyshortname'] = 'Por nombre corto';
 $string['resortbyfullname'] = 'Por nombre completo';
 $string['resortbyidnumber'] = 'Por idnumber';
-$string['eventmanageviewed'] = 'Gestión del registro vista';
 
 $string['headeruserdata'] = 'Asistencia detallada por usuario';
 $string['headerroomsdata'] = 'Asistencia por Aula/Sede';

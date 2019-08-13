@@ -15,41 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_examregistrar course module viewed event.
+ * mod_examregistrar examfiles submitted/reviewed events.
  *
- * @package mod_examregistrar
- * @copyright 2015 onwards Enrique castro @ ULPGC
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_examregistrar
+ * @copyright  2015 Enrique Castro @ ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_examregistrar\event;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_examregistrar course module viewed event class.
+ * mod_examregistrar examfile printmodeset event class.
  *
- * @package mod_examregistrar
- * @copyright 2015 onwards Enrique castro @ ULPGC
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_examregistrar
+ * @copyright  2015 Enrique Castro @ ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manage_viewed extends manage_created {
-
-    /**
-     * Init method.
-     */
-    protected function init() {
-        $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
-    }
-
+class examfile_printmodeset extends examfile_created {
     /**
      * Returns description of what happened.
      *
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the management page '{$this->other['edit']}' for activity with " .
-            "course module id '$this->contextinstanceid'.";
+        $exam = (isset($this->other['idnumber'])) ? ", {$this->other['idnumber']}, " : '';
+        return "Printmode for Examfile '{$this->objectid}'$exam has been set to '{$this->other['printmode']}'". 
+            "in the activity with course module id '$this->contextinstanceid'. ";
     }
 
     /**
@@ -58,9 +51,8 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventmanageviewed', 'examregistrar');
+        return get_string('eventexamfileprintmodeset', 'mod_examregistrar');
     }
 
 }
-
 

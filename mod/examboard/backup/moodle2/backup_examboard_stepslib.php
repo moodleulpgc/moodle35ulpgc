@@ -94,6 +94,7 @@ class backup_examboard_activity_structure_step extends backup_activity_structure
 
         $exam = new backup_nested_element('exam', array('id'), 
                                                 array('boardid',
+                                                        'examperiod',
                                                         'sessionname',
                                                         'venue',
                                                         'examdate',

@@ -32,13 +32,13 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2015 onwards Enrique castro @ ULPGC
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manage_viewed extends manage_created {
+class manage_updated extends manage_created {
 
     /**
      * Init method.
      */
     protected function init() {
-        $this->data['crud'] = 'r';
+        $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
@@ -48,8 +48,12 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the management page '{$this->other['edit']}' for activity with " .
-            "course module id '$this->contextinstanceid'.";
+        $named = '';
+        if(isset($this->other['name'])) {
+            $named = 'named '.$this->other['name'];
+        }
+        return "The user with id '$this->userid' has updated the item '{$this->objectid}' in table '{$this->objecttable}' $named" .
+            " from activity with cm id '$this->contextinstanceid'.";
     }
 
     /**
@@ -58,9 +62,8 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventmanageviewed', 'examregistrar');
+        return get_string('eventmanage', 'examregistrar', 'updated');
     }
-
 }
 
 

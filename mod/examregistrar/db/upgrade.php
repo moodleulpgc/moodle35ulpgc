@@ -324,5 +324,46 @@ function xmldb_examregistrar_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018051803, 'examregistrar');
     }
 
+    if ($oldversion < 2019080100) {    
+    
+                // Define table messageinbound_datakeys to be created.
+        $table = new xmldb_table('examregistrar_vouchers');
+        // Adding fields to table session vouchers.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('examregid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('bookingid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('uniqueid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        
+        // Adding keys to table session vouchers.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('bookingid', XMLDB_KEY_FOREIGN, array('bookingid'), 'examregistrar_sessions', array('id'));
+
+        // Adding indexes to table session vouchers.
+        $table->add_index('examregid-uniqueid', XMLDB_INDEX_UNIQUE, array('examregid, uniqueid'));    
+    
+        // Conditionally launch create table for exam student response files.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    
+        upgrade_mod_savepoint(true, 2019080100, 'examregistrar');
+    }
+    
+    if ($oldversion < 2019080200) {    
+    
+        // Define field assignplugincm to be added to forum.
+        $table = new xmldb_table('examregistrar');
+        $field = new xmldb_field('configdata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'lagdays');
+
+        // Conditionally launch add field assignplugincm.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    
+        upgrade_mod_savepoint(true, 2019080200, 'examregistrar');
+    }
+    
+    
     return true;
 }

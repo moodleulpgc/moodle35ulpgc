@@ -69,6 +69,8 @@ if($edit) {
     $tab = 'session';
 }
 
+$examregprimaryid = examregistrar_get_primaryid($examregistrar);
+$examregistrar->config = examregistrar_get_instance_configdata($examregistrar);
 
 /// Set the page header
 $PAGE->set_url($baseurl);
@@ -76,6 +78,8 @@ $PAGE->set_title(format_string($examregistrar->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
+$PAGE->set_activity_record($examregistrar);
+
 if($edit) {
     $PAGE->navbar->add(get_string($edit, 'examregistrar'), $baseurl);
 } else {
@@ -84,8 +88,6 @@ if($edit) {
 $PAGE->navbar->add(get_string($action, 'examregistrar'), null);
 
 $output = $PAGE->get_renderer('mod_examregistrar');
-
-$examregprimaryid = examregistrar_get_primaryid($examregistrar);
 
 /// check permissions
 $caneditelements = has_capability('mod/examregistrar:editelements',$context);
@@ -97,8 +99,10 @@ $canmanage = $caneditelements || $canmanageperiods || $canmanageexams || $canman
 
 require_capability('mod/examregistrar:manageseats', $context);
 
+$config = examregistrar_get_instance_configdata($examregistrar);
+
 ///////////////////////////////////////////////////////////////////////////////assign_
-$defaultrole = $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$examregprimaryid, 'type'=>'roleitem', 'idnumber'=>get_config('examregistrar', 'defaultrole')));
+$defaultrole = $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$examregprimaryid, 'type'=>'roleitem', 'idnumber'=>$config->defaultrole)));
 
 $session   = optional_param('session', 0, PARAM_INT);
 $roomid   = optional_param('room', 0, PARAM_INT);
@@ -137,10 +141,6 @@ $potentialmembers  = array();
 
 
 /// TODO   TODO TODO  look for users in ALL courses that use this examregid
-
-
-$config = get_config('examregistrar');
-//print_object($config);
 
 $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
 $users = get_users_by_capability($context, 'mod/examregistrar:beroomstaff', $fields, 'lastname ASC');

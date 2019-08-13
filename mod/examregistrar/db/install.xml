@@ -18,6 +18,7 @@
         <FIELD NAME="workmode" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Usage and display mode for module instance"/>
         <FIELD NAME="reviewmod" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Idnumber of module in charge of perfom exam reviews"/>
         <FIELD NAME="lagdays" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Hold or waiver days"/>
+        <FIELD NAME="configdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A serialized blob of instance configuration data managed in block for each instance."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -238,6 +239,22 @@
         <INDEX NAME="booked" UNIQUE="false" FIELDS="booked"/>
         <INDEX NAME="examid-userid" UNIQUE="false" FIELDS="examid, userid"/>
         <INDEX NAME="examid-userid-booked-bookedsite" UNIQUE="false" FIELDS="examid, userid, booked, bookedsite"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="examregistrar_vouchers" COMMENT="Stores information about exam booking history and vouchers log">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="examregid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="bookingid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="uniqueid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="bookingid" TYPE="foreign" FIELDS="id" REFTABLE="examregistrar_bookings" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="examregid-uniqueid" UNIQUE="true" FIELDS="examregid, uniqueid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="examregistrar_session_rooms" COMMENT="Stores information about places used in a session">

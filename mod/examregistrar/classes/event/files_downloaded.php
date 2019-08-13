@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2015 onwards Enrique castro @ ULPGC
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manage_viewed extends manage_created {
+class files_downloaded extends \core\event\base {
 
     /**
      * Init method.
@@ -48,8 +48,9 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the management page '{$this->other['edit']}' for activity with " .
-            "course module id '$this->contextinstanceid'.";
+        $file = isset($this->other['name']) ? $this->other['name'].' ' : '';
+        return "The user with id '$this->userid' has downloaded file '{$this->other['name']}' from Exam registrar files" .
+            " from activity with cm id '$this->contextinstanceid'.";
     }
 
     /**
@@ -58,7 +59,16 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventmanageviewed', 'examregistrar');
+        return get_string('eventfiles', 'examregistrar', 'downloaded');
+    }
+
+    /**
+     * Get URL related to the action.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url("/mod/examregistrar/view.php", array('id' => $this->contextinstanceid));
     }
 
 }

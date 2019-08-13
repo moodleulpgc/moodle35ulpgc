@@ -122,9 +122,6 @@ function examregistrar_add_instance(stdClass $examregistrar, mod_examregistrar_m
     $examregistrar->timecreated = time();
     $examregistrar->timemodified = $examregistrar->timecreated;
 
-
-    # You may have to add extra stuff in here #
-
     $examregid = $DB->insert_record('examregistrar', $examregistrar);
     return $examregid;
 }
@@ -291,7 +288,7 @@ function examregistrar_get_post_actions() {
  * @param object $examregistrar object
  * @return int
  */
-function examregistrar_get_primaryid($examregistrar) {
+function examregistrar_get_primaryid($examregistrar, $config = null) {
     global $DB;
 
     $exregid = false;
@@ -306,8 +303,41 @@ function examregistrar_get_primaryid($examregistrar) {
         }
     } elseif($examregistrar->primaryidnumber) {
         $exregid = $examregistrar->id;
+        $exreg = $examregistrar;
     }
+    
+    // this is a primary examregistrar but not configured, add default data
+    if($exregid && (!isset($exreg->configdata) || !$exreg->configdata)) {
+        $config = examregistrar_clean_config($config);
+        if(!empty($config)) {
+            $DB->set_field('examregistrar', 'configdata', base64_encode(serialize($config)), array('id' =>$exreg->id));
+        }
+    }
+    
     return $exregid;
+}
+
+
+/**
+ * Returns instanceid of primary registrar
+ *
+ * @param object $examregistrar config object
+ * @return int
+ */
+function examregistrar_clean_config($config = null) {
+    if(!$config) {
+        $config = get_config('examregistrar');
+        $config->staffcats = explode(',', $config->staffcats);
+    }
+    $defaults = array('selectdays', 'cutoffdays', 'extradays', 'lockdays', 'approvalcutoff', 'printdays', 
+                        'staffcats', 'excludecourses', 'venuelocationtype', 'defaultrole', 
+                        'extanswers', 'extkey', 'extresponses', 'pdfwithteachers', 'pdfaddexamcopy' );
+    foreach($config as $key => $value  ) {
+        if(!in_array($key, $defaults)) {
+            unset($config->{$key});
+        }
+    }
+    return $config;
 }
 
 /**
@@ -534,6 +564,16 @@ function examregistrar_examstatus_synchronize($examstatus, $tracker1, $tracker2,
                 $success = false;
             }
         }
+    }
+
+    if($success) {
+        $eventdata = array();
+        $eventdata['other'] = array();
+        $eventdata['other']['action'] = 'Examfiles set status';
+        $eventdata['other']['extra'] = $examstatus;
+        $eventdata['other']['tab'] = 'review';
+        $event = \mod_examregistrar\event\manage_action::create($eventdata);
+        $event->trigger();
     }
 
     return $success;
@@ -886,7 +926,7 @@ function examregistrar_get_file_info($browser, $areas, $course, $cm, $context, $
  * @param array $options additional options affecting the file serving
  */
 
-function examregistrar_pluginfile($course, $cm, context $context, $filearea, $args, $forcedownload) {
+function mod_examregistrar_pluginfile($course, $cm, context $context, $filearea, $args, $forcedownload) {
     global $DB, $CFG;
 
     $fileareas = array('exam', 'responses', 'answers', 'sheet', 'sessionrooms', 'sessionresponses', 'session', 'examresponses', 'roomresponses');
@@ -899,7 +939,7 @@ function examregistrar_pluginfile($course, $cm, context $context, $filearea, $ar
     }
 
     $fs = get_file_storage();
-
+    
     if($filearea == 'sheet') {
         $cmid = array_shift($args);
         $context = context_module::instance($cmid);
@@ -957,12 +997,18 @@ function examregistrar_pluginfile($course, $cm, context $context, $filearea, $ar
         $fullpath = "/$context->id/mod_examregistrar/$filearea/$itemid/$relativepath";
     }
 
-
-
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
         return false;
     }
 
+    // now we can set the event
+    $eventdata = array();
+    $eventdata['context'] = $context;
+    $eventdata['other'] = array();
+    $eventdata['other']['name'] = $fullpath;    
+    $event = \mod_examregistrar\event\files_downloaded::create($eventdata);
+    $event->trigger();
+    
     // Download MUST be forced - security!
     send_stored_file($file, 0, 0, true);
 }
@@ -1079,31 +1125,6 @@ function examregistrar_pluginfile($course, $cm, context $context, $filearea, $ar
         }
         $url = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$contextid.'/mod_examregistrar/'.$area.'/'.$revpath.$itemid.$path.$filename, $forcedownload);
         return $url;
-    }
-
-    function examregistrar_file_set_nameextension($filename, $type, $ext='.pdf') {
-
-        $filename = trim($filename);
-        $ext = trim($ext);
-        if(strpos($ext, '.') === false) {
-            $ext = '.'.$ext;
-        }
-
-        $config = get_config('examregistrar');
-
-        $qualifier = '';
-        if($type == 'answers') {
-            $qualifier = $config->extanswers;
-        } elseif($type == 'key') {
-            $qualifier = $config->extkey;
-        } elseif($type == 'responses') {
-            $qualifier = $config->extresponses;
-        }
-        if($qualifier) {
-            $qualifier = trim($qualifier);
-        }
-
-        return clean_filename($filename.$qualifier.$ext);
     }
 
 

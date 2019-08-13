@@ -132,19 +132,30 @@ function quiz_makeexam_validate_questions($examfileid) {
         }
     }
 
-    $tagvalidated = tag_get_id(get_string('tagvalidated', 'quiz_makeexam'));
-    $tagrejected  = tag_get_id(get_string('tagrejected', 'quiz_makeexam'));
-    $tagnoreview  = tag_get_id(get_string('tagunvalidated', 'quiz_makeexam'));
+    $tagvalidated = false;
+    if($tagvalidated = core_tag_tag::get_by_name(core_tag_collection::get_default(), get_string('tagvalidated', 'quiz_makeexam'))) {
+    }
+    $tagrejected = false;
+    if($tagrejected = core_tag_tag::get_by_name(core_tag_collection::get_default(), get_string('tagrejected', 'quiz_makeexam'))) {
+
+    }
+    $tagnoreview = false;
+    if($tagnoreview = core_tag_tag::get_by_name(core_tag_collection::get_default(), get_string('tagunvalidated', 'quiz_makeexam'))) {
+
+    }
 
     if($validate && $tagvalidated) {
         foreach($validate as $qid) {
             if($tagrejected) {
-                tag_delete_instance('question', $qid, $tagrejected);
+                $tag = core_tag_tag::get($tagrejected);
+                core_tag_tag::remove_item_tag('', 'question', $qid, $tagrejected->rawname, $userid);
             }
             if($tagnoreview) {
-                tag_delete_instance('question', $qid, $tagnoreview);
+                $tag = core_tag_tag::get($tagnoreview);
+                core_tag_tag::remove_item_tag('', 'question', $qid, $tagnoreview->rawname, $userid);
             }
-            tag_assign('question', $qid, $tagvalidated, 0, $reviewerid, 'core_question',  $context->id);
+            
+            core_tag_tag::add_item_tag('core_question', 'question', $qid, $context, $tagvalidated->rawname, $reviewerid);
         }
     }
 
@@ -242,17 +253,11 @@ function quiz_makeexam_examname($exam) {
 function quiz_makeexam_install_official_tags() {
     global $CFG;
 
-    // install official tags
-    require_once($CFG->dirroot . '/tag/lib.php');
-    $tags[] = get_string('tagvalidated', 'quiz_makeexam');
-    $tags[] = get_string('tagrejected', 'quiz_makeexam');
-    $tags[] = get_string('tagunvalidated', 'quiz_makeexam');
-    foreach($tags as $tag) {
-        $tag = trim($tag);
-        if(!$tagid = tag_get_id($tag)) {
-            $ids = tag_add($tag, 'official');
-        } else {
-            tag_type_set($tagid, 'official');
-        }
-    }
+        // install official tags
+        require_once($CFG->dirroot . '/tag/lib.php');
+        $tags[] = get_string('tagvalidated', 'quiz_makeexam');
+        $tags[] = get_string('tagrejected', 'quiz_makeexam');
+        $tags[] = get_string('tagunvalidated', 'quiz_makeexam');
+        
+        $tags = core_tag_tag::create_if_missing(1, $tags, true);
 }

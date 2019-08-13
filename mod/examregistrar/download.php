@@ -30,6 +30,7 @@ require_once($CFG->dirroot.'/lib/pdflib.php');
 require_once(__DIR__.'/locallib.php');
 
 require_once($CFG->dirroot.'/mod/examregistrar/classes/pdf_fpdi.class.php');
+require_once($CFG->libdir.'/tcpdf/tcpdf_barcodes_2d.php'); // Used for generating qrcode.
 
 $id = optional_param('id', 0, PARAM_INT); // course_module ID, or
 $e  = optional_param('e', 0, PARAM_INT);  // examregistrar instance ID - it should be named as the first character of the module
@@ -56,12 +57,18 @@ if($examcm) {
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
+$baseurl = new moodle_url('/mod/examregistrar/view.php', array('id' => $cm->id));
 
-$PAGE->set_url('/mod/examregistrar/view.php', array('id' => $cm->id));
+$examregprimaryid = examregistrar_get_primaryid($examregistrar);
+$examregistrar->config = examregistrar_get_instance_configdata($examregistrar);
+
+$PAGE->set_url($baseurl);
 $PAGE->set_title(format_string($examregistrar->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
+$PAGE->set_activity_record($examregistrar);
+
 $output = $PAGE->get_renderer('mod_examregistrar');
 
 $period   = optional_param('period', '', PARAM_INT);
@@ -74,6 +81,7 @@ $shortname   = optional_param('shortname', '', PARAM_ALPHANUMEXT);
 $download = optional_param('down', '', PARAM_ALPHANUMEXT);
 $rsort = optional_param('rsort', '', PARAM_ALPHANUMEXT);
 $esort = optional_param('esort', '', PARAM_ALPHANUMEXT);
+$voucher   = optional_param('v', '', PARAM_ALPHANUMEXT);
 
 require_capability('mod/examregistrar:download', $context);
 
@@ -208,36 +216,6 @@ function examregistrar_venuezips($examregistrar, $allocations, $params, $output)
     $url = new moodle_url('/mod/examregistrar/view.php', array('id'=>$cm->id, 'tab'=>'session', 'session'=>$session, 'venue'=>$bookedsite));
     $message = get_string('roomspdfsgenerated', 'examregistrar', html_writer::alist($fileszipped));
     redirect($url, $message, 5);
-
-//     $zipfile = '';
-//     if($filesforzipping) {
-//         $zipfile = tempnam($path.'/', $zipfilename);
-//          $zipper = new zip_packer();
-//          if(!$zipper->archive_to_pathname($filesforzipping, $zipfile)) {
-//             $zipfile = '';
-//          }
-//     }
-//
-//
-//     if($zipfile) {
-//     /*
-//         $addtolog = $this->add_to_log('download all submissions', get_string('downloadall', 'assign'), '', true);
-//         $params = array(
-//             'context' => $this->context,
-//             'objectid' => $this->get_instance()->id
-//         );
-//         $event = \mod_assign\event\all_submissions_downloaded::create($params);
-//         $event->set_legacy_logdata($addtolog);
-//         $event->trigger();
-//         */
-//         // Send file and delete after sending.
-//         send_temp_file($zipfile, $zipfilename.'.zip');
-//         // We will not get here - send_temp_file calls exit.
-//     }
-
-    // if we are here, there is nothing zipped
-
-
 }
 
 function examregistrar_roomallocations_printpdf($examregistrar, $allocations, $params, $renderer, $filedest='I') {
@@ -253,7 +231,7 @@ function examregistrar_roomallocations_printpdf($examregistrar, $allocations, $p
     $pdf->initialize_page_setup($examregistrar, 'room');
     // ---------------------------------------------------------
 
-    $config = get_config('examregistrar');
+    $config = examregistrar_get_instance_configdata($examregistrar);
     $itemcount = 0;
     $totalitems = count($allocations) ;
     foreach($allocations as $room) {
@@ -289,7 +267,7 @@ function examregistrar_roomsummary_printpdf($examregistrar, $allocations, $param
     $pdf->initialize_page_setup($examregistrar, 'userlist');
     // ---------------------------------------------------------
 
-    $config = get_config('examregistrar');
+    $config = examregistrar_get_instance_configdata($examregistrar);
 
     $pdf->setPrintHeader(true);
     $pdf->setPrintFooter(true);
@@ -404,7 +382,7 @@ function examregistrar_examallocations_printpdf($examregistrar, $allocations, $p
     $pdf->initialize_page_setup($examregistrar, 'exam');
     // ---------------------------------------------------------
 
-    $config = get_config('examregistrar');
+    $config = examregistrar_get_instance_configdata($examregistrar);
     $itemcount = 0;
     $totalitems = count($allocations) ;
     foreach($allocations as $exam) {
@@ -551,7 +529,7 @@ function examregistrar_examallocations_binderpdf($examregistrar, $allocations, $
     $pdf->initialize_page_setup($examregistrar, 'binder');
     // ---------------------------------------------------------
 
-    $config = get_config('examregistrar');
+    $config = examregistrar_get_instance_configdata($examregistrar);
     $itemcount = 0;
     $totalitems = count($allocations) ;
     foreach($allocations as $exam) {
@@ -900,6 +878,116 @@ function examregistrar_venue_fax_binder_printpdf($examregistrar, $params, $rende
 }
 
 
+function examregistrar_voucher_printpdf($baseurl, $context, $voucherparam, $output, $filedest='I') {
+    global $CFG, $DB, $USER;
+    
+    list($rid, $uniqueid) = explode('-', $voucherparam);
+    
+    $examregistrar  = $DB->get_record('examregistrar', array('id' => $rid), '*', MUST_EXIST);
+
+    $voucher = $DB->get_record('examregistrar_vouchers', array('examregid' => $rid, 'uniqueid' => $uniqueid), '*', MUST_EXIST);
+    $booking = $DB->get_record('examregistrar_bookings', array('id' => $voucher->bookingid), '*', MUST_EXIST);
+    $exam = $DB->get_record('examregistrar_exams', array('id' => $booking->examid), '*', MUST_EXIST);
+    $user = $DB->get_record('user', array('id' => $booking->userid), '*', MUST_EXIST);
+    
+    $exam = new examregistrar_exam($exam);
+    
+    $canbook = has_capability('mod/examregistrar:book',  $context);
+    $canbookothers = has_capability('mod/examregistrar:bookothers',  $context);
+    
+    if(!(($USER->id == $booking->userid) && $canbook) && !(($USER->id != $booking->userid) && $canbookothers)) {
+        $baseurl->param('tab','booking');
+        \core\notification::add(get_string('nopermissiontoviewpage', 'error'), \core\output\notification::NOTIFY_ERROR);
+        redirect($baseurl);
+    }
+    
+    $params = array('session'=>$exam->examsession, 'bookedsite'=>$booking->bookedsite,
+                    'room'=>'', 'programme'=>$exam->programme, 'exam'=>$booking->examid);
+    
+    $pdf = new examregistrar_pdf();
+
+    $pdf->initialize_replaces($examregistrar, $params, 'exam');
+
+    $pdf->set_template($examregistrar, 'exam');
+
+    $pdf->initialize_page_setup($examregistrar, 'exam');
+    // ---------------------------------------------------------
+
+    $pdf->replaces['programme'] = $exam->programme;
+    $pdf->replaces['shortname'] = $exam->get_exam_name(false, true, false, false); //$exam->shortname;
+    $pdf->replaces['fullname'] = $exam->fullname;
+    $pdf->replaces['callnum'] = $exam->callnum;
+    $pdf->replaces['examscope'] = $exam->examscope;
+
+    $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
+    $main = examregistrar_str_replace($pdf->replaces, $pdf->template['examtitle']);
+    
+    $codecsv = get_string('vouchernum', 'examregistrar',  $voucherparam);
+    $attend = new stdClass();
+    $attend->take = core_text::strtoupper($booking->booked ?  get_string('yes') :  get_string('no'));
+    list($attend->site, $notused) = examregistrar_get_namecodefromid($booking->bookedsite, 'locations', 'location');
+    
+    $crccode = crc32("{$voucher->id}/{$booking->id}");
+
+    // add titlepage for exam
+    $pdf->setPrintHeader(true);
+    $pdf->setPrintFooter(true);
+    $pdf->setHeaderTemplateAutoreset(true);
+    $pdf->SetHeaderData($pdf->logoimage, $pdf->logowidth, $header[0] , $header[1]);
+    $pdf->SetFont('freeserif', '', 12);
+    $pdf->startPageGroup();
+    $pdf->AddPage('', '', true);
+    $pdf->writeHTML($main, false, false, true, false, '');
+    $pdf->SetFont('freeserif', '', 14);
+    $pdf->writeHTML(get_string('vouchernum', 'examregistrar',  $voucherparam), false, false, true, false, '');
+    $pdf->Ln(10);
+    $pdf->writeHTML(get_string('vouchercrc', 'examregistrar',  $crccode), false, false, true, false, '');
+    $pdf->Ln(10);
+    $pdf->SetFont('freeserif', '', 12);
+    $pdf->writeHTML(get_string('voucheruser', 'examregistrar', $user), false, false, true, false, '');
+    $pdf->Ln(8);
+    $pdf->writeHTML(html_writer::tag('h2', get_string('takeonsite', 'examregistrar', $attend)), false, false, true, false, 'C');
+    $pdf->Ln(10);
+    $pdf->writeHTML(get_string('bookingdate', 'examregistrar', userdate($booking->timemodified)), true, false, true, false, '');
+    $pdf->writeHTML(get_string('voucherdisclaimer', 'examregistrar'), false, false, true, false, '');
+    $pdf->Ln(10);
+    // QR code section
+    $pdf->writeHTML(get_string('voucherqr', 'examregistrar'), false, false, true, false, '');
+    $pdf->Ln(10);    
+    $qrcodeurl = new moodle_url('/mod/examregistrar/view.php', array('id'=>1, 'tab'=>'session', 'action'=>'checkvoucher', 
+                'vouchernum'=>$voucherparam, 'code'=>$crccode));
+    //$barcode = new TCPDF2DBarcode($qrcodeurl->out(), 'QRCODE');
+    //$image = $barcode->getBarcodePngData(15, 15);
+    // echo html_writer::img('data:image/png;base64,' . base64_encode($image), get_string('qrcode', 'attendance'))
+    // set style for barcode
+    $style = array(
+        'border' => 2,
+        'vpadding' => 'auto',
+        'hpadding' => 'auto',
+        'fgcolor' => array(0,0,0),
+        'bgcolor' => false, //array(255,255,255)
+        'module_width' => 1, // width of a single module in points
+        'module_height' => 1 // height of a single module in points
+    );
+    // QRCODE,H : QR-CODE Best error correction
+    $pdf->write2DBarcode($qrcodeurl->out(), 'QRCODE,H', 65, '', 80, 80, $style, 'N');
+    $pdf->Ln(10);
+    $pdf->writeHTML(get_string('vouchergenerated', 'examregistrar', userdate(time())), false, false, true, false, 'R');
+    
+    $filename = $voucherparam.'.pdf';
+    // now we can set the event
+    $eventdata = array();
+    $eventdata['context'] = $context;
+    $eventdata['other'] = array();
+    $eventdata['other']['name'] = $filename;    
+    $event = \mod_examregistrar\event\files_downloaded::create($eventdata);
+    $event->trigger();
+    $pdf->Output($filename, $filedest);
+}
+
+
+
+
 function examregistrar_roomallocations_download($examregistrar, $allocations, $params, $renderer){
     global $CFG, $DB, $USER;
 
@@ -1026,6 +1114,8 @@ if($download) {
                         'room'=>$room, 'programme'=>$programme, 'sort'=>$rsort);
         $allocations = examregistrar_get_roomallocations_byroom($params);
         examregistrar_venuezips($examregistrar, $allocations, $params, $output);
+    } elseif($download == 'voucher') {    
+        examregistrar_voucher_printpdf($baseurl, $context, $voucher, $output);
     }
 }
 

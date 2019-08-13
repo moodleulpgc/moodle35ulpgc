@@ -71,8 +71,6 @@ $bookingparams = array('period'=>$period,
 
 $bookingurl = new moodle_url($baseurl, $bookingparams);
 
-
-
 echo $output->box(get_string('bookinghelp1', 'examregistrar', $examregistrar), 'generalbox mod_introbox', 'examregistrarintro');
 
 /// display user form, if allowed
@@ -107,7 +105,7 @@ if($canbookothers = has_capability('mod/examregistrar:bookothers',$context)) {
 $annuality =  examregistrar_get_annuality($examregistrar);
 $canviewall = has_capability('mod/examregistrar:viewall', $context);
 
-$config = get_config('examregistrar');
+$config = examregistrar_get_instance_configdata($examregistrar);
 $capabilities = array('bookothers'=>$canbookothers, 'manageexams'=>$canmanageexams);
 $lagdays = examregistrar_set_lagdays($examregistrar, $config, $periodobj, $capabilities);
 
@@ -117,6 +115,10 @@ echo $output->exams_item_selection_form($examregistrar, $course, $bookingurl, $b
 if($canviewall) {
     echo $output->exams_courses_selector_form($examregistrar, $course, $bookingurl, $bookingparams);
 }
+
+$bookingurl->param('action', 'checkvoucher');
+echo $output->box(html_writer::link($bookingurl, get_string('checkvoucher', 'examregistrar')), 'resettable mdl-right ');
+$bookingurl->remove_params('action');
 
 $examcourses = array();
 $noexamcourses = array();
@@ -183,6 +185,7 @@ foreach($examcourses as $cid => $usercourse) {
         $booking->examid = 0;
         $booking->booked = -1;
         $booking->bookedsite = 0;
+        $booking->voucher = '';
         $visible = false;
         // loop al exams in the period/examscope calls. If one exam, set as is,
         // if there are several calls, visibility is set if any one is visible.
@@ -198,6 +201,7 @@ foreach($examcourses as $cid => $usercourse) {
                 $booking->examid = $exam->id;
                 $booking->booked = $userbooking->booked;
                 $booking->bookedsite = $userbooking->bookedsite;
+                $booking->voucher = $DB->get_record('examregistrar_vouchers', array('examregid'=>$examregprimaryid, 'bookingid'=> $userbooking->id));
             }
         }
         $booking->visible = $visible;
@@ -251,7 +255,7 @@ $mform = new examregistrar_booking_form(null, array('exreg' => $examregistrar, '
                                                     'params'=>$bookingparams, 'capabilities'=>$capabilities),
                                                'post', '', array('class'=>' bookingform ' ));
 
-$message = '';
+$message = array();
 
 if($formdata = $mform->get_data()) {
 
@@ -320,6 +324,9 @@ if($formdata = $mform->get_data()) {
                                                                             'modifierid'=>$USER->id), 'timemodified DESC')) {
                 $record = reset($records);
                 $newid = $record->id;
+                // recover exam voucher if record_exists
+                $voucher = $DB->get_record('examregistrar_vouchers', array('examregid'=>$examregprimaryid, 'bookingid'=> $record->id));
+                
             } else {
                 // we must insert
                 $record = new stdClass;
@@ -327,7 +334,6 @@ if($formdata = $mform->get_data()) {
                 $record->userid = $userid;
                 $record->booked = $booking['booked'];
                 $record->bookedsite = $booking['bookedsite'];
-                $record->component = '';
                 $record->modifierid = $USER->id;
                 $record->timecreated = $now;
                 $record->timemodified = $now;
@@ -342,8 +348,11 @@ if($formdata = $mform->get_data()) {
                 if($exam && ($exam->period == $period) &&
                         !examregistrar_check_exam_in_past($now, $lagdays, $examdate) &&
                         (examregistrar_check_exam__within_period($now, $periodobj, $examdate, $config) OR $canmanageexams)) {
-                    $newid = $DB->insert_record('examregistrar_bookings', $record);
-                  } else {
+                    if($newid = $DB->insert_record('examregistrar_bookings', $record)) {
+                        // we have a new booking, set voucher for it
+                        $voucher = examregistrar_set_booking_voucher($examregprimaryid, $newid, $now);
+                    }
+                } else {
                     $booking['error'] = 'offbounds';
                     $errors[$key] = $booking;
                 }
@@ -363,19 +372,41 @@ if($formdata = $mform->get_data()) {
                 $eventdata['other']['booked'] = $booking['booked'];
                 $eventdata['other']['bookedsite'] = $booking['bookedsite'];
 
+                // Booking is already stored in database, this is a clearing
+                $select = " userid = :userid AND examid = :examid AND id <> :id AND booked <> 0 ";
+                $params = array('id'=>$newid, 'examid'=>$booking['examid'], 'userid'=>$userid);
+                // only clear if needed, avoid extra logging messsge
+                if($DB->record_exists_select('examregistrar_bookings', $select, $params)) {
+                    $DB->set_field_select('examregistrar_bookings', 'timemodified', $now, $select, $params);
+                    if($DB->set_field_select('examregistrar_bookings', 'booked', 0, $select, $params)) {
+                        $event = \mod_examregistrar\event\booking_unbooked::create($eventdata);
+                        $event->trigger();
+                    }
+                }
+                
+                // set the log for active booking after clearing others (store was done before)
                 $event = \mod_examregistrar\event\booking_submitted::create($eventdata);
                 $event->add_record_snapshot('examregistrar_bookings', $record);
                 $event->trigger();
-
-                $message = get_string('changessaved'); // ensure changes are reported
-                $select = " userid = :userid AND examid = :examid AND id <> :id AND booked <> 0 ";
-                $DB->set_field_select('examregistrar_bookings', 'timemodified', $now, $select,
-                                    array('id'=>$newid, 'examid'=>$booking['examid'], 'userid'=>$userid));
-                if($DB->set_field_select('examregistrar_bookings', 'booked', 0, $select,
-                                    array('id'=>$newid, 'examid'=>$booking['examid'], 'userid'=>$userid))) {
-                    $event = \mod_examregistrar\event\booking_unbooked::create($eventdata);
-                    $event->trigger();
+                
+                // return the message 
+                list($examname, $notused) = examregistrar_get_namecodefromid($record->examid, 'exams');
+                $attend = new stdClass();
+                $attend->take = core_text::strtoupper($record->booked ?  get_string('yes') :  get_string('no'));
+                list($attend->site, $notused) = examregistrar_get_namecodefromid($record->bookedsite, 'locations', 'location');
+                $vouchername = '';
+                if(isset($voucher->id) && $voucher->id) {
+                    $icon = new pix_icon('t/download', get_string('voucherdownld', 'examregistar'), 'core', null); 
+                    $vouchernum = str_pad($voucher->examregid, 4, '0', STR_PAD_LEFT).'-'.$voucher->uniqueid;
+                    $downloadurl = new moodle_url('/mod/examregistrar/download.php', array('id' => $cm->id, 'down'=>'voucher', 'v'=>$vouchernum));
+                    $vouchernum = $OUTPUT->action_link($downloadurl, $vouchernum, null, array('class'=>'voucherdownload'), $icon);
+                    $vouchername = get_string('vouchernum', 'examregistrar',  $vouchernum);
+                
                 }
+//                print_object(base_convert(crc32('fsdfasdffsfsdf58961wfqfwd fsd sfsfs'.$voucher->id), 10, 36));
+                
+                $message[$newid] = get_string('exam', 'examregistrar').' '.$examname.' '.get_string('takeonsite', 'examregistrar', $attend).' '.$vouchername; 
+                
             }
             // there must be only one booking in one call in case several calls in a period
             if($booking['numcalls'] > 1 && $booking['booked']) {
@@ -388,19 +419,22 @@ if($formdata = $mform->get_data()) {
                         list($insql, $params) = $DB->get_in_or_equal($others);
                         $select = " examid $insql AND userid = ? AND booked <> 0 ";
                         $params[] = $userid;
-                        $DB->set_field_select('examregistrar_bookings', 'timemodified', $now, $select, $params);
-                        if($DB->set_field_select('examregistrar_bookings', 'booked', 0, $select, $params)) {
-                            // log the action
-                            $eventdata = array();
-                            $eventdata['objectid'] = $newid;
-                            $eventdata['context'] = $context;
-                            $eventdata['userid'] = $USER->id;
-                            $eventdata['relateduserid'] = $userid;
-                            $eventdata['other'] = array();
-                            $eventdata['other']['examregid'] = $examregistrar->id;
-                            $eventdata['other']['examid'] = $booking['examid'];
-                            $event = \mod_examregistrar\event\booking_unbooked::create($eventdata);
-                            $event->trigger();
+                        // only clear if needed, avoid extra logging messsge
+                        if($DB->record_exists_select('examregistrar_bookings', $select, $params)) {
+                            $DB->set_field_select('examregistrar_bookings', 'timemodified', $now, $select, $params);
+                            if($DB->set_field_select('examregistrar_bookings', 'booked', 0, $select, $params)) {
+                                // log the action
+                                $eventdata = array();
+                                $eventdata['objectid'] = $newid;
+                                $eventdata['context'] = $context;
+                                $eventdata['userid'] = $USER->id;
+                                $eventdata['relateduserid'] = $userid;
+                                $eventdata['other'] = array();
+                                $eventdata['other']['examregid'] = $examregistrar->id;
+                                $eventdata['other']['examid'] = $booking['examid'];
+                                $event = \mod_examregistrar\event\booking_unbooked::create($eventdata);
+                                $event->trigger();
+                            }
                         }
                     }
                 }
@@ -414,13 +448,15 @@ if($formdata = $mform->get_data()) {
             $errors[$key] = html_writer::span(get_string('bookingerror_'.$error['error'], 'examregistrar', $shortname), 'errorbox alert-error');
             unset($formdata->booking[$key]);
         }
-        $message = '<p>'.implode('<br />', $errors).'</p>';
+        $message[] = '<p>'.implode('<br />', $errors).'</p>';
     }
 }
 
 if($message) {
     echo $output->box(get_string('changessaved'), ' generalbox messagebox success ');
-    echo $output->box($message, ' generalbox messagebox centerbox centeredbox error ');
+    foreach($message as $mes) {
+        echo $output->box($mes, ' generalbox messagebox centerbox centeredbox error ');
+    }
     $url = new moodle_url($baseurl, $bookingparams);
     echo $output->continue_button($url);
 

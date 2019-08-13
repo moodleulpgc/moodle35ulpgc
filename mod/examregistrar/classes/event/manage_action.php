@@ -32,13 +32,13 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2015 onwards Enrique castro @ ULPGC
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manage_viewed extends manage_created {
+class manage_action extends \core\event\base {
 
     /**
      * Init method.
      */
     protected function init() {
-        $this->data['crud'] = 'r';
+        $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
@@ -48,8 +48,12 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the management page '{$this->other['edit']}' for activity with " .
-            "course module id '$this->contextinstanceid'.";
+        $extra = '';
+        if(isset($this->other['extra'])) {
+            $extra = 'with '.$this->other['extra'];
+        }
+        return "The user with id '$this->userid' has done action '{$this->other['action']}' $extra " .
+            "in activity with cm id '$this->contextinstanceid'.";
     }
 
     /**
@@ -58,9 +62,30 @@ class manage_viewed extends manage_created {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventmanageviewed', 'examregistrar');
+        return get_string('eventmanageaction', 'examregistrar');
     }
 
+    /**
+     * Get URL related to the action.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url("/mod/examregistrar/view.php", array('id' => $this->contextinstanceid, 'tab'=>$this->other['tab']));
+    }
+
+    /**
+     * Custom validation.
+     *
+     * @throws \coding_exception
+     * @return void
+     */
+    protected function validate_data() {
+        parent::validate_data();
+        if (!isset($this->other['tab'])) {
+            throw new \coding_exception('Examregistrar manage needs an tab var');
+        }
+    }
 }
 
 

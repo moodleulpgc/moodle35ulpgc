@@ -123,13 +123,24 @@ if($delete) {
             die;
 
     } elseif(confirm_sesskey()){
-        if($DB->delete_records('examregistrar_examfiles', array('id'=>$delete))) {
+        if($DB->delete_records('examregistrar_examfiles', array('id'=>$delete)) && $examfile = $DB->get_record('examregistrar_examfiles', array('id'=>$delete))) {
             // update makeexam attempts
             $DB->set_field_select('quiz_makeexam_attempts', 'examfileid', 0, " examfileid = ? ", array($delete));
             // update tracker issue
             if($issue = optional_param('issue', 0, PARAM_INT)) {
                 $DB->set_field('tracker_issue', 'status', 6, array('id'=>$issue)); // 6 is TRANSFERRED
             }
+            // log the action
+            $eventdata = array();
+            $eventdata['objectid'] = $examfile->id;
+            $eventdata['context'] = $context;
+            $eventdata['other'] = array();
+            $eventdata['other']['examregid'] = $examregistrar->id;
+            $eventdata['other']['examid'] = $examfile->examid;
+            $eventdata['other']['attempt'] = $examfile->attempt;
+            $eventdata['other']['idnumber'] = $examfile->idnumber;
+            $event = \mod_examregistrar\event\examfile_deleted::create($eventdata);
+            $event->trigger();
         }
     }
 }
@@ -193,7 +204,6 @@ if($status) {
             $eventdata = array();
             $eventdata['objectid'] = $examfile->id;
             $eventdata['context'] = $context;
-            $eventdata['userid'] = $USER->id;
             $eventdata['other'] = array();
             $eventdata['other']['examregid'] = $examregistrar->id;
             $eventdata['other']['status'] = $status;
@@ -201,7 +211,6 @@ if($status) {
             $eventdata['other']['attempt'] = $examfile->attempt;
             $eventdata['other']['idnumber'] = $examfile->idnumber;
             $event = \mod_examregistrar\event\examfile_reviewed::create($eventdata);
-            $event->add_record_snapshot('examregistrar_examfiles', $examfile);
             $event->trigger();
         }
     }
@@ -225,7 +234,6 @@ if($toggleprint) {
             $eventdata = array();
             $eventdata['objectid'] = $attempt;
             $eventdata['context'] = $context;
-            $eventdata['userid'] = $USER->id;
             $eventdata['other'] = array();
             $eventdata['other']['examregid'] = $examregistrar->id;
             $eventdata['other']['printmode'] = $printmode;
@@ -282,6 +290,18 @@ if($upload) {
             }
             if($DB->update_record('examregistrar_examfiles', $examfile)) {
                 $newid = $examfile->id;
+                $eventdata = array();
+                $eventdata['objectid'] = $examfile->id;
+                $eventdata['context'] = $context;
+                $eventdata['other'] = array();
+                $eventdata['other']['examregid'] = $examregistrar->id;
+                $eventdata['other']['examid'] = $examfile->examid;
+                $eventdata['other']['attempt'] = $examfile->attempt;
+                $eventdata['other']['idnumber'] = $examfile->idnumber;
+                $eventdata['other']['status'] = $examfile->status;
+                $event = \mod_examregistrar\event\examfile_updated::create($eventdata);
+                $event->trigger();
+
             }
         } else {
             // no attempt, we are adding
@@ -298,30 +318,43 @@ if($upload) {
 
             $newid = $DB->insert_record('examregistrar_examfiles', $examfile);
             $examfile = $DB->get_record('examregistrar_examfiles', array('id'=>$newid), '*', MUST_EXIST);
-
-        }
-        if($newid) {
-            // now we can store uploaded files
-
-            $examfilecontext = context_course::instance($examcourse->id);
-            $filename = $examfile->idnumber.'.pdf';
-            $mform->save_stored_file('uploadfileexam', $examfilecontext->id, 'mod_examregistrar', 'exam', $newid, '/', $filename, true);
-            $suffix = get_config('examregistrar', 'extanswers');
-            $filename = $examfile->idnumber.$suffix.'.pdf';
-            $mform->save_stored_file('uploadfileanswers', $examfilecontext->id, 'mod_examregistrar', 'exam', $newid, '/answers/', $filename, true);
-            // log the action
             $eventdata = array();
             $eventdata['objectid'] = $examfile->id;
             $eventdata['context'] = $context;
-            $eventdata['userid'] = $USER->id;
             $eventdata['other'] = array();
             $eventdata['other']['examregid'] = $examregistrar->id;
             $eventdata['other']['examid'] = $examfile->examid;
             $eventdata['other']['attempt'] = $examfile->attempt;
             $eventdata['other']['idnumber'] = $examfile->idnumber;
-            $event = \mod_examregistrar\event\examfile_uploaded::create($eventdata);
-            $event->add_record_snapshot('examregistrar_examfiles', $examfile);
+            $eventdata['other']['status'] = $examfile->status;
+            $event = \mod_examregistrar\event\examfile_created::create($eventdata);
             $event->trigger();
+        }
+        if($newid) {
+            // now we can store uploaded files
+            $eventdata = array();
+            $eventdata['context'] = $context;
+            $eventdata['other'] = array();
+            $eventdata['other']['examregid'] = $examregistrar->id;
+            $eventdata['other']['tab'] =$tab;
+            $eventdata['other']['area'] ='exam';
+            $eventdata['other']['item'] = $newid;
+            $examfilecontext = context_course::instance($examcourse->id);
+            $filename = $examfile->idnumber.'.pdf';
+            if($mform->save_stored_file('uploadfileexam', $examfilecontext->id, 'mod_examregistrar', 'exam', $newid, '/', $filename, true)) {
+                $eventdata['other']['name'] = $filename;
+                $event = \mod_examregistrar\event\files_uploaded::create($eventdata);
+                $event->trigger();
+            }
+            $config = examregistrar_get_instance_configdata($examregistrar);
+            $suffix = $config->extanswers;
+            $filename = $examfile->idnumber.$suffix.'.pdf';
+            if($mform->save_stored_file('uploadfileanswers', $examfilecontext->id, 'mod_examregistrar', 'exam', $newid, '/answers/', $filename, true)) {
+                $eventdata['other']['name'] = $filename;
+                $event = \mod_examregistrar\event\files_uploaded::create($eventdata);
+                $event->trigger();
+            }
+            // log the action
         }
 
         echo $output->box(get_string('changessaved'), ' generalbox messagebox success ');
@@ -349,6 +382,10 @@ if($exemption) {
 
         $now = time();
 
+        $eventdata = array();
+        $eventdata['context'] = $context;
+        $eventdata['other'] = array();
+
         $count = 0;
         foreach($formdata->courses as $courseid) {
             $ccontext = context_course::instance($courseid);
@@ -365,17 +402,10 @@ if($exemption) {
             if($success) {
                 $count += 1;
             }
-            $eventdata = array();
-            $eventdata['objectid'] = $examregistrar->id;
-            $eventdata['context'] = $context;
-            $eventdata['userid'] = $USER->id;
-            $eventdata['other'] = array();
-            $eventdata['other']['courseid'] = $courseid;
+            $eventdata['courseid'] = $courseid;
             $eventdata['other']['assign'] = $formdata->assign;
             $event = \mod_examregistrar\event\capabilities_updated::create($eventdata);
             $event->trigger();
-
-
         }
 
         $message = get_string('nochange');
@@ -418,16 +448,15 @@ if($synch) {
                         break;
             case 'create' : break;
         }
-        examregistrar_tracker_add_issues($examregistrar, $course);
         $eventdata = array();
-        $eventdata['objectid'] = $examregistrar->id;
         $eventdata['context'] = $context;
-        $eventdata['userid'] = $USER->id;
         $eventdata['other'] = array();
-        $eventdata['other']['synch'] = $synch;
-        $eventdata['other']['examregid'] = $examregistrar->id;
-        $event = \mod_examregistrar\event\examfiles_synced::create($eventdata);
+        $eventdata['other']['action'] = 'Examfile set status';
+        $eventdata['other']['extra'] = $synch;
+        $eventdata['other']['tab'] = $tab;
+        $event = \mod_examregistrar\event\manage_action::create($eventdata);
         $event->trigger();
+        examregistrar_tracker_add_issues($examregistrar, $course);
     }
 }
 

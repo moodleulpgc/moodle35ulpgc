@@ -10,7 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017120708;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2019080100;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2012061700;        // Requires this Moodle version
 $plugin->component = 'block_examswarnings'; // Full name of the plugin (used for diagnostics)
 $plugin->cron = 300;

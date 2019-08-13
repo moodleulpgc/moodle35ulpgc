@@ -565,18 +565,18 @@ class quiz_makeexam_report extends quiz_default_report {
 
         $success = true;
         if(!is_object($updateattempt)) {
-            $success = $DB->delete_records('quiz_makeexam_attempts', array('id'=>$attemptid));
+            if($success = $DB->delete_records('quiz_makeexam_attempts', array('id'=>$attemptid))) {
+                $eventdata = array();
+                $eventdata['objectid'] = $attemptid;
+                $eventdata['context'] = $this->context;
+                $eventdata['other'] = array();
+                $eventdata['other']['quizid'] = $quiz->id;
+                $eventdata['other']['examid'] = $examattempt->id;
+                $event = \quiz_makeexam\event\exam_recalled::create($eventdata);
+                $event->trigger();
+            }
         }
 
-        $eventdata = array();
-        $eventdata['objectid'] = $attemptid;
-        $eventdata['context'] = $this->context;
-        $eventdata['userid'] = $USER->id;
-        $eventdata['other'] = array();
-        $eventdata['other']['quizid'] = $quiz->id;
-        $eventdata['other']['examid'] = $examattempt->id;
-        $event = \quiz_makeexam\event\exam_recalled::create($eventdata);
-        $event->trigger();
 
         return $success;
 
@@ -1754,6 +1754,19 @@ class quiz_makeexam_report extends quiz_default_report {
             $fileinfo['filename'] = examregistrar_file_set_nameextension($examfile->idnumber, 'key');
             //$fs->create_file_from_string($fileinfo, $this->generate_pdf($quiz, $quizattemptid, $examid, $examattempt->id, 'key', true));
 
+            $eventdata = array();
+            $eventdata['objectid'] = $attemptid;
+            $eventdata['context'] = $this->context;
+            $eventdata['other'] = array();
+            $eventdata['other']['quizid'] = $quiz->id;
+            $eventdata['other']['examid'] = $examattempt->id;
+            $eventdata['other']['examfileid'] = $examattempt->examfileid;
+            $eventdata['other']['idnumber'] = $examfile->idnumber;
+            $event = \quiz_makeexam\event\exam_submitted::create($eventdata);
+            $event->trigger();
+
+            
+            
             // now create tracker issue for examfile
             $examregistrar = $this->get_examregistrar_instance($cm, $course);
             $issueid = examregistrar_review_addissue($examregistrar, $course, $examfile);
@@ -1882,7 +1895,7 @@ class quiz_makeexam_report extends quiz_default_report {
                         $result = question_bank::get_qtype($question->qtype)->save_question_options($question);
 
                         if (!empty($CFG->usetags) && isset($question->tags)) {
-                            tag_set('question', $question->id, $question->tags);
+                            core_tag_tag::set_item_tags('core_question', 'question', $question->id, $context, $question->tags);
                         }
                         // Give the question a unique version stamp determined by question_hash()
                         $DB->set_field('question', 'version', question_hash($question),

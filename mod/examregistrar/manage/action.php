@@ -169,7 +169,10 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
             unset($element->id);
             $mform->set_data($element);
         }
-
+    } elseif($action == 'configparams') {
+        $config = null;
+        $config = $DB->get_field('examregistrar', 'configdata', array('id'=>$examregprimaryid));
+        $mform->set_data(unserialize(base64_decode($config)));
     }
 
 /// process forms actions
@@ -240,6 +243,12 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                 $DB->set_field('examregistrar_session_seats', 'roomid', $room, array('examsession'=>$session, 'bookedsite'=>$bookedsite, 'userid'=>$userid));
                 examregistrar_update_additional_allocations($session, $bookedsite, $userid, $room);
             }
+        } elseif($action == 'configparams') {
+            $config = clone $formdata;
+            $config = examregistrar_clean_config($config);
+            if(!empty($config)) {
+                $DB->set_field('examregistrar', 'configdata', base64_encode(serialize($config)), array('id' =>$examregprimaryid));
+            }
         } elseif($action == 'addextracall' || $action == 'addextrasessioncall') {
             $examid = $formdata->exam;
             // we are adding based on existing exam
@@ -266,7 +275,18 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                     $exam->component = '';
                     $exam->modifierid = $USER->id;
                     $exam->timemodified = time();
-                    $extraexamid = $DB->insert_record('examregistrar_exams', $exam);
+                    if($extraexamid = $DB->insert_record('examregistrar_exams', $exam)) {
+                        $eventdata = array();
+                        $eventdata['objectid'] = $extraexamid;
+                        $eventdata['context'] = $context;
+                        $eventdata['other'] = array();
+                        $eventdata['other']['edit'] = 'exams';
+                        \mod_examregistrar\event\manage_created::created($eventdata, 'examregistar_'.$upload);
+                        $event->trigger();
+                    }
+                    
+                    
+                    
                 } else {
                     $exam = $exam = $DB->get_record('examregistrar_exams', array('id' => $extraexamid));
                 }
@@ -288,7 +308,19 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                         $examfile->timemodified = $now;
 
                         if(!$newid = $DB->get_field('examregistrar_examfiles', 'id', array('examid'=>$examfile->examid, 'status'=>$examfile->status, 'attempt'=>$examfile->attempt))) {
-                            $newid = $DB->insert_record('examregistrar_examfiles', $examfile);
+                            if($newid = $DB->insert_record('examregistrar_examfiles', $examfile)) {
+                                $eventdata = array();
+                                $eventdata['objectid'] = $newid;
+                                $eventdata['context'] = $context;
+                                $eventdata['other'] = array();
+                                $eventdata['other']['examregid'] = $examregistrar->id;
+                                $eventdata['other']['examid'] = $examfile->examid;
+                                $eventdata['other']['attempt'] = $examfile->attempt;
+                                $eventdata['other']['idnumber'] = $examfile->idnumber;
+                                $eventdata['other']['status'] = $examfile->status;
+                                $event = \mod_examregistrar\event\examfile_created::create($eventdata);
+                                $event->trigger();                            
+                            }
                         }
                         if($newid) {
                             // add PDF files
@@ -305,6 +337,8 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                                                                 $filerecord['filearea'], $filerecord['itemid'], $filerecord['filepath'],
                                                                 false, false);
                                 $file = reset($files);
+                                // examregistrar_generate_extracall_examfile($exam, $file, $filepath, $examfile, $examcourse)
+                                
                                 $template = $file->copy_content_to_temp();
                                 $newfile = $template.'_new';
 
@@ -394,7 +428,7 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                                 $pdf->Output($newfile, 'F');
                                 $filerecord['itemid'] = $newid;
                                 $type = ($filepath == '/answers/') ? 'answers' : 'exam';
-                                $filerecord['filename'] = examregistrar_file_set_nameextension($examfile->idnumber, $type);
+                                $filerecord['filename'] = examregistrar_file_set_nameextension($examregistrar, $examfile->idnumber, $type);
                                 if($oldfile = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'],
                                                             $filerecord['itemid'], $filerecord['filepath'], $filerecord['filename'])) {
                                     $oldfile->delete();
@@ -424,8 +458,21 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                         $booking->component = '';
                         $booking->modifierid = $USER->id;
                         $booking->timemodified = time();
-                        $DB->insert_record('examregistrar_bookings', $booking);
+                        $booking->id = $DB->insert_record('examregistrar_bookings', $booking);
+                        $voucher = examregistrar_set_booking_voucher($examregprimaryid, $booking->id, $booking->timemodified);
                     }
+                    $eventdata = array();
+                    $eventdata['objectid'] = $booking->id;
+                    $eventdata['context'] = $context;
+                    $eventdata['relateduserid'] = $booking->userid;
+                    $eventdata['other'] = array();
+                    $eventdata['other']['examregid'] = $examregistrar->id;
+                    $eventdata['other']['examid'] = $booking->examid;
+                    $eventdata['other']['booked'] = $booking->booked;
+                    $eventdata['other']['bookedsite'] = $booking->bookedsite;
+                    $event = \mod_examregistrar\event\booking_submitted::create($eventdata);
+                    $event->add_record_snapshot('examregistrar_bookings', $record);
+                    $event->trigger();
                 }
             }
         }

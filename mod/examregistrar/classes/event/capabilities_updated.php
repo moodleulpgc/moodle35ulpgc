@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_examregistrar item submitted event.
+ * mod_examregistrar examfiles submitted/reviewed events.
  *
  * @package    mod_examregistrar
  * @copyright  2015 Enrique Castro @ ULPGC
@@ -27,13 +27,13 @@ namespace mod_examregistrar\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * mod_examregistrar booking submitted event class.
+ * mod_examregistrar examfiles synced event class.
  *
  * @package    mod_examregistrar
  * @copyright  2015 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class booking_submitted extends \core\event\base {
+class capabilities_updated extends \core\event\base {
 
     /**
      * Returns description of what happened.
@@ -41,12 +41,8 @@ class booking_submitted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $booked = $this->other['booked'] ? 'booked' : 'unbooked';
-        $usertext = "The user with id '$this->userid'";
-        if($this->userid != $this->relateduserid) {
-            $usertext .= ", acting as user '$this->relateduserid',";
-        }
-        return "$usertext has $booked the exam '{$this->other['examid']}' at site '{$this->other['bookedsite']}' as booking with id '$this->objectid' in the Exam registrar activity
+        $mode = $this->other['assign'] ? 'assigned' : 'removed';
+        return "Extra capabilities for composing exams $mode for course '{$this->courseid}' in the Exam registrar activity
             with course module id '$this->contextinstanceid'. ";
     }
 
@@ -56,7 +52,7 @@ class booking_submitted extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventbookingsubmitted', 'mod_examregistrar');
+        return get_string('eventcapabilitiesupdated', 'mod_examregistrar');
     }
 
     /**
@@ -65,7 +61,7 @@ class booking_submitted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/examregistrar/view.php', array('id' => $this->contextinstanceid, 'tab'=>'booking'));
+        return new \moodle_url('/mod/examregistrar/view.php', array('id' => $this->contextinstanceid, 'tab'=>'review'));
     }
 
     /**
@@ -74,23 +70,8 @@ class booking_submitted extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['crud'] = 'c';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'examregistrar_bookings';
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    /**
-     * Custom validation.
-     *
-     * @throws \coding_exception
-     * @return void
-     */
-    protected function validate_data() {
-        parent::validate_data();
-
-        if (!isset($this->other['examregid'])) {
-            throw new \coding_exception('The \'examregid\' value must be set in other.');
-        }
-    }
 }
-

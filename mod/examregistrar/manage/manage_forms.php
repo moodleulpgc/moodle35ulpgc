@@ -145,7 +145,6 @@ class examregistrar_examsession_form extends moodleform {
         $item = $this->_customdata['item'];
         $cmid = $this->_customdata['cmid'];
         $examreg = $this->_customdata['exreg'];
-        $defaults = $this->_customdata['defaults'];
         $exreg = examregistrar_get_primaryid($examreg);
 
         $sessionmenu = examregistrar_elements_getvaluesmenu($examreg, 'examsessionitem', $exreg, 'choose');
@@ -1692,4 +1691,44 @@ class examregistrar_confirmresponses_form extends moodleform {
     
 }
 
+class examregistrar_voucher_checking_form extends moodleform {
 
+    function definition() {
+        global $COURSE;
+
+        $mform =& $this->_form;
+        $data    = $this->_customdata['data'];
+        
+        //vouchernum'=>$voucherparam, 'code'=>$crccode));
+        $mform->addElement('text', 'vouchernum', get_string('vouchernum', 'examregistrar', ''), array('size'=>'24'));
+        $mform->setType('vouchernum', PARAM_ALPHANUMEXT);
+        $mform->addRule('vouchernum', null, 'required', null, 'client');
+        //$mform->addHelpButton('vouchernum', 'vouchernum', 'examregistrar');
+        $mform->addElement('text', 'code', get_string('vouchercrc', 'examregistrar', ''), array('size'=>'15'));
+        $mform->setType('code', PARAM_ALPHANUMEXT);
+        $mform->addRule('code', null, 'required', null, 'client');
+        
+        $mform->addElement('hidden', 'id', $data->id);
+        $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'action', 'checkvoucher');
+        $mform->setType('action', PARAM_ALPHANUMEXT);
+
+        
+        if(isset($data->session)) {
+            $mform->addElement('hidden', 'session', $data->session);
+            $mform->setType('session', PARAM_INT);
+        }
+        if(isset($data->bookedsite)) {
+            $mform->addElement('hidden', 'venue', $data->bookedsite);
+            $mform->setType('venue', PARAM_INT);
+        }
+        if(isset($data->tab)) {
+            $mform->addElement('hidden', 'tab', $data->tab);
+            $mform->setType('tab', PARAM_ALPHANUMEXT);
+        }
+
+        $this->add_action_buttons();
+        
+    }
+}

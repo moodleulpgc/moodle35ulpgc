@@ -40,7 +40,7 @@ function examregistrar_check_exam__within_period($now, $period, $examdate, $conf
 class examregistrar_booking_form extends moodleform {
 
     function definition() {
-        global $EXAMREGISTRAR_ELEMENTTYPES, $DB;
+        global $EXAMREGISTRAR_ELEMENTTYPES, $DB, $OUTPUT;
 
         $mform =& $this->_form;
         $cmid = $this->_customdata['cmid'];
@@ -53,7 +53,7 @@ class examregistrar_booking_form extends moodleform {
         $capabilities = $this->_customdata['capabilities'];
         $canbookothers = $capabilities['bookothers'];
         $canmanageexams = $capabilities['manageexams'];
-        $config = get_config('examregistrar');
+        $config = examregistrar_get_instance_configdata($examreg);
 
         $mform->addElement('header', 'examcourses', get_string('examcourses', 'examregistrar'));
         $mform->setExpanded('examcourses', true);
@@ -178,12 +178,22 @@ class examregistrar_booking_form extends moodleform {
                 //$passmsg = get_string('noexam_4', 'examregistrar');
             }
 
+            $voucherlink = '';
+            if($booking->voucher) {
+                $icon = new pix_icon('t/download', get_string('voucherdownld', 'examregistrar'), 'core', null); 
+                $vouchernum = str_pad($booking->voucher->examregid, 4, '0', STR_PAD_LEFT).'-'.$booking->voucher->uniqueid;
+                $downloadurl = new moodle_url('/mod/examregistrar/download.php', array('id' => $cmid, 'down'=>'voucher', 'v'=>$vouchernum));
+                //$vouchernum = $OUTPUT->action_link($downloadurl, $vouchernum, null, null, $icon);
+                $voucherlink = get_string('vouchernum', 'examregistrar',  $OUTPUT->action_link($downloadurl, $vouchernum, null, array('class'=>'voucherdownload'), $icon));
+            }
+            
             $examgroup[] = $mform->createElement('static', '', '',$scope[0]);
             $examgroup[] = $examselect;
-            $examgroup[] = $mform->createElement('static', '', '',get_string('take', 'examregistrar'));
+            $examgroup[] = $mform->createElement('static', '', '', get_string('take', 'examregistrar'));
             $examgroup[] = $mform->createElement('selectyesno', 'booked', $booking->booked, 1);
             $examgroup[] = $mform->createElement('static', '', '',' &nbsp '.get_string('takeat', 'examregistrar').' &nbsp ');
             $examgroup[] = $mform->createElement('select', 'bookedsite', $booking->bookedsite, $venuemenu);
+            $examgroup[] = $mform->createElement('static', '', '', $voucherlink);
             $examgroup[] = $mform->createElement('hidden', 'numcalls', $booking->numcalls);
             $examgroup[] = $mform->createElement('hidden', 'shortname', $booking->course->shortname);
 

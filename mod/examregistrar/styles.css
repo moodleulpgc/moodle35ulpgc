@@ -147,7 +147,7 @@ i.fa.responseicon:hover {
 .busyalloc { color: red !important;}
 .freealloc { color: green;}
 
-.examregistrarfilterform {margin-top: 1.5em; margin-bottom: 1.5em;}
+.examregistrarfilterform {margin-top: 1.0em; margin-bottom: 1.0em;}
 .singleselect.filter {float:left;}
 .singleselect.center {margin-left:auto; margin-right:auto; text-align:center;}
 
@@ -195,4 +195,10 @@ i.fa.responseicon:hover {
 
 div.singlelinebutton {
    float: right; 
+   margin: 3px;
+}
+
+.configparams {
+   float: right;
+   font-weight: bold;
 }

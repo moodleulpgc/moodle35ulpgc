@@ -375,6 +375,12 @@ if($display) {
             echo $output->container($output->single_button($url, get_string('printuserspdf', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
             echo $output->container_end();
 
+            echo $output->container_start(' clearfix ');
+            $baseurl->param('action', 'checkvoucher');
+            echo $output->container($output->single_button($baseurl, get_string('checkvoucher', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
+            $baseurl->remove_params('action');
+            echo $output->container_end();
+            
             /*
             if($room) {
                 echo $output->container_start(' clearfix ');

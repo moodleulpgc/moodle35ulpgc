@@ -77,12 +77,17 @@ $actionurl->param('examsession', $session);
 
 $courseurl = new moodle_url('/course/search.php');
 
+$examregprimaryid = examregistrar_get_primaryid($examregistrar);
+$examregistrar->config = examregistrar_get_instance_configdata($examregistrar);
+
 /// Set the page header
 $PAGE->set_url($baseurl);
 $PAGE->set_title(format_string($examregistrar->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
+$PAGE->set_activity_record($examregistrar);
+
 $output = $PAGE->get_renderer('mod_examregistrar');
 if($edit) {
     //$baseurl->param('edit', $edit);
@@ -91,8 +96,6 @@ if($edit) {
     $PAGE->navbar->add(get_string('managesession', 'examregistrar'), $baseurl);
 }
     $PAGE->navbar->add(get_string('assignseats', 'examregistrar'), null);
-
-$examregprimaryid = examregistrar_get_primaryid($examregistrar);
 
 require_capability('mod/examregistrar:manageseats',$context);
 

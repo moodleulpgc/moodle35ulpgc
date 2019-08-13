@@ -745,8 +745,7 @@ function examboard_process_add_update_exam($examboard, $fromform) {
 //        $fromform->id = $fromform->exam; // this ensures id exists only if updating
     }
     
-    $fromform->examboardid = $examboard->id;
-    $fromform->timemodified = time();
+    $now = time();
     
     // sanitization
     foreach(array('title', 'idnumber', 'name', 'venue', 'sessionname') as $field) {
@@ -760,21 +759,22 @@ function examboard_process_add_update_exam($examboard, $fromform) {
     );
     
     $board = new stdClass();
-        $board->examboardid = $fromform->examboardid;
+        $board->examboardid = $examboard->id;
         $board->title = $fromform->title;
         $board->name = $fromform->name;
         $board->groupid = $fromform->groupid;
         $board->active = $fromform->boardactive;
-        $board->timemodified = $fromform->timemodified;
+        $board->timemodified = $now;
     
     $exam = new stdClass();
-        $exam->examboardid = $fromform->examboardid;
+        $exam->examboardid = $examboard->id;
+        $exam->examperiod = $fromform->examperiod;
         $exam->sessionname = $fromform->sessionname;
         $exam->venue  = $fromform->venue;
         $exam->examdate  = $fromform->examdate;
         $exam->duration  = $fromform->duration;
         $exam->active = $fromform->examactive;
-        $exam->timemodified  = $fromform->timemodified;
+        $exam->timemodified  = $now;
     
     
     $start = 0;
@@ -845,8 +845,6 @@ function examboard_process_add_update_exam($examboard, $fromform) {
     
     return $message;
 }
-
-
 
 
 function examboard_save_update_member($newuser, $member, $params) {
