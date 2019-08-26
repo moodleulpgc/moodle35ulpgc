@@ -9,7 +9,7 @@ Moodle Atto plugin which lets the administrator provide custom CSS classes which
 Requirements
 ------------
 
-This plugin requires Moodle 3.6+
+This plugin requires Moodle 3.7+
 
 
 Motivation for this plugin
@@ -57,7 +57,7 @@ There, please add the "styles" keyword to one of the lines in the "editor_atto |
 If you are using a default Atto toolbar, we propose to change "style1 = title, bold, italic" to "style1 = title, styles, bold, italic"
 
 
-Multilangugae filter support
+Multilanguage filter support
 ---------------------------
 
 Within the styles configuration, a title can support the Moodle multilang filter (if enabled), but additonal double-quotes will need to be escaped with a backslash.
@@ -71,8 +71,8 @@ For example:
 Theme support
 -------------
 
-This plugin should work with all Bootstrap based Moodle themes.
-It has been developed on and tested with Moodle Core's Clean and Boost themes.
+This plugin is developed and tested on Moodle Core's Boost theme.
+It should also work with Boost child themes, including Moodle Core's Classic theme. However, we can't support any other theme than Boost.
 
 
 Plugin repositories
@@ -151,8 +151,7 @@ www.synergy-learning.com
 on behalf of
 
 Ulm University
-kiz - Media Department
-Team Web & Teaching Support
+Communication and Information Centre (kiz)
 Alexander Bias
 
 

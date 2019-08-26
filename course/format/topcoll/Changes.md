@@ -1,11 +1,24 @@
 ﻿Version Information
 ===================
-Version 3.5.0.4
+Version 3.5.1.0
   1. Fix invalid HTML in case of zero section elements - thanks to Mario Wehr for raising this - #47.
   2. Fix: PHP Unit test failure (due to MDL-62680) - thanks to Anupama Dharmajan for the patch - #52.
   3. Fix: Two strange input fields remain in teacher view when all capabilities are forbidden - thanks to Tobias Reischmann for the patch - #54.
   4. Fix: Selecting specific topics breaks a section just above the selected topic - CONTRIB-7607.
   5. New: Accordion/Collapsed Topic aria attributes improvements - thanks to John Y for the patch - #62 and #64.
+  6. Fix position of activity / resource editing menu.
+  7. Change position of the window when clicking on a section anchor such that a navbar would not be in the way.
+     Thanks for the information in the Adaptable theme referencing: https://github.com/twbs/bootstrap/issues/1768.
+  8. New: Improve accessibility of the open and close all buttons - thanks to Rossco Hellmans for the patch - #56.
+  9. New: Based on '8', add key operation of toggles.
+ 10. Added the course and admin settings to enable or disable the toggle all functionality.  Reset in the 'layout'
+     area with associated capability for non-admins.
+ 11. Added the course and admin settings to enable or disable the view single section functionality.  Reset in the
+     'layout' area with associated capability for non-admins.
+ 12. Add missing Moodle define.
+ 13. Fix "Collapsed Topic Content/EditMenu Overlap" - https://moodle.org/mod/forum/discuss.php?d=388969.
+ 14. Fix error with analytic - get_section_dates function - thanks to https://github.com/tuanngocnguyen for the patch - #65.
+ 15. Apply MDL-64819 - #61.
 
 Version 3.5.0.3
   1. Fix CONTRIB-7434:

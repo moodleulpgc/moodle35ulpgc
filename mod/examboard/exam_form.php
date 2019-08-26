@@ -57,13 +57,13 @@ class examboard_addexam_form extends moodleform {
         $mform->addHelpButton('boardid', 'existingboard', 'examboard');
 
         $mform->addElement('text', 'title', get_string('boardtitle', 'examboard'), array('size'=>'20'));
-        $mform->setType('title', PARAM_ALPHANUMEXT);
+        $mform->setType('title', PARAM_TEXT);
         $mform->addHelpButton('title', 'boardtitle', 'examboard');
         $mform->addRule('title', null, 'required', null, 'client');
         //$mform->disabledIf('title', 'boardid', 'neq', 0);
         
         $mform->addElement('text', 'idnumber', get_string('boardidnumber', 'examboard'), array('size'=>'20'));
-        $mform->setType('idnumber', PARAM_TEXT);
+        $mform->setType('idnumber', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('idnumber', 'boardidnumber', 'examboard');
         $mform->addRule('idnumber', null, 'required', null, 'client');
         //$mform->disabledIf('idnumber', 'boardid', 'neq', 0);

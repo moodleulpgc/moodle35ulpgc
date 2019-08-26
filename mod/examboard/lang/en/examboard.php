@@ -602,6 +602,10 @@ Default option (unchecked) is to preserve existing data, ignoring potential upda
 If checked, then data present in the imported file will overwrite existing data for the same Examination.
 ';
 $string['ignoremodifiedexplain'] = ' uncheck to ignore if data already exists.';
+$string['deleteprevious'] = 'Delete previous users';
+$string['deleteprevious_help'] = 'If checked, then when importing a user, either a board member or an examinee, 
+all exising members or students will be deleted prior to adding imported ones';
+$string['deletepreviousexplain'] = 'Check to delete previous user before importing';
 $string['userencoding'] = 'User ID';
 $string['userencoding_help'] = 'The parameter used to identify users in the imported file. May be one of:
  
@@ -696,6 +700,7 @@ $string['bulkaddnum_help'] = 'This tool will add a series of numbered exams with
 Total number of exams to add and the number of the first added exam need to be indicated.
 ';
 $string['bulkaddstart'] = 'Starting no';
+$string['bulkaddreplace'] = 'Placeholder';
 $string['submitbulkaddexam'] = 'Add series';
 $string['submissionstatus'] = 'Submission & complementary items';
 $string['viewgraded'] = 'Grading details';

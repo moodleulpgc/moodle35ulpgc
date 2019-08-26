@@ -17,8 +17,7 @@
 /**
  * Collapsed Topics course format.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2015-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
@@ -83,7 +82,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         return $property;
     }
 
-    protected function init($numsections = 1, $layoutcolumnorientation = 2) {
+    protected function init($numsections = 1, $layoutcolumnorientation = 2, $toggleallenabled = 2, $viewsinglesectionenabled = 2) {
         $this->resetAfterTest(true);
 
         set_config('theme', 'boost');
@@ -114,6 +113,8 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         self::set_property($this->outputus, 'output', $ouroutput);
         $tcsettings = $this->courseformat->get_settings();
         $tcsettings['layoutcolumnorientation'] = $layoutcolumnorientation;
+        $tcsettings['toggleallenabled'] = $toggleallenabled;
+        $tcsettings['viewsinglesectionenabled'] = $viewsinglesectionenabled;
         self::set_property($this->outputus, 'tcsettings', $tcsettings);
     }
 
@@ -211,7 +212,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $thevalue .= '<div class="left side"><span class="cps_centre">1</span></div><div class="right side">';
         $thevalue .= '<a title="View only &#039;Topic 1&#039;" class="cps_centre" ';
         $thevalue .= 'href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;section=1">Topic<br />1</a>';
-        $thevalue .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1">';
+        $thevalue .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1" tabindex="0">';
         $thevalue .= '<span class="toggle_closed the_toggle tc-medium" role="button" aria-expanded="false" tabindex="0">';
         $thevalue .= '<h3 class="sectionname">Section 1<div class="cttoggle"> - Toggle</div></h3>';
         $thevalue .= '<div class="section_availability"></div></span></div>';
@@ -283,7 +284,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $theoutput .= '<div class="left side"><span class="cps_centre">1</span></div><div class="right side">';
         $theoutput .= '<a title="View only &#039;Topic 1&#039;" class="cps_centre" ';
         $theoutput .= 'href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;section=1">Topic<br />1</a>';
-        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1">';
+        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1" tabindex="0">';
         $theoutput .= '<span class="toggle_closed the_toggle tc-medium" role="button" aria-expanded="false" tabindex="0">';
         $theoutput .= '<h3 class="sectionname">Section 1<div class="cttoggle"> - Toggle</div></h3>';
         $theoutput .= '<div class="section_availability"></div></span></div>';
@@ -317,7 +318,7 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $theoutput .= '<div class="left side"><span class="cps_centre">1</span></div><div class="right side">';
         $theoutput .= '<a title="View only &#039;Topic 1&#039;" class="cps_centre" ';
         $theoutput .= 'href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'&amp;section=1">Topic<br />1</a>';
-        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1">';
+        $theoutput .= '</div><div class="content"><div class="sectionhead toggle toggle-arrow" id="toggle-1" tabindex="0">';
         $theoutput .= '<span class="toggle_closed the_toggle tc-medium" role="button" aria-expanded="false" tabindex="0">';
         $theoutput .= '<h3 class="sectionname">Section 1<div class="cttoggle"> - Toggle</div></h3>';
         $theoutput .= '<div class="section_availability"></div></span></div>';
@@ -389,8 +390,8 @@ class format_topcoll_courseformatrenderer_testcase extends advanced_testcase {
         $thevalue .= '</div><div class="right side"><img class="icon spacer" width="1" height="1" alt="" '.$ariahidden.'src="';
         $thevalue .= $CFG->wwwroot.'/theme/image.php/_s/boost/core/1/spacer" /></div><div class="content">';
         $thevalue .= '<div class="sectionbody toggle-arrow-hover toggle-arrow"><h4><span class="on tc-medium" id="';
-        $thevalue .= 'toggles-all-opened" role="button">Open all</span><span class="off tc-medium" id="toggles-all-closed" ';
-        $thevalue .= 'role="button">Close all</span></h4></div></div></li>';
+        $thevalue .= 'toggles-all-opened" role="button" tabindex="0">Open all</span><span class="off tc-medium" id="toggles-all-closed" ';
+        $thevalue .= 'role="button" tabindex="0">Close all</span></h4></div></div></li>';
         $this->assertEquals($thevalue, $theclass);
     }
 

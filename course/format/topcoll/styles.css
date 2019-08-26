@@ -6,8 +6,7 @@
  * Toggles are persistent on a per browser session per course basis but can be made to persist longer by a small
  * code change. Full installation instructions, code adaptions and credits are included in the 'Readme.txt' file.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2009-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - gjbarnard at gmail dot com and {@link http://moodle.org/user/profile.php?id=442195}
@@ -573,21 +572,6 @@ body.format-topcoll.dir-rtl .course-content ul.ctopics li.section .summary {
 
 body.format-topcoll .course-content ul.ctopics li.section .summary.summaryalwaysshown {
     padding-top: 10px;
-}
-
-body.format-topcoll.editing ul.ctopics .section .activity .contentwithoutlink,
-body.format-topcoll.editing ul.ctopics .section .activity .activityinstance {
-    display: inline;
-    padding-right: 0;
-}
-
-body.format-topcoll.editing.dir-rtl ul.ctopics .section .activity .contentwithoutlink,
-body.format-topcoll.editing.dir-rtl ul.ctopics .section .activity .activityinstance {
-    padding-left: 0;
-}
-
-body.format-topcoll.editing ul.ctopics .section .activity .actions {
-    position: relative;
 }
 
 body.format-topcoll.editing #region-main ul.ctopics .moodle-actionmenu ul.menubar {

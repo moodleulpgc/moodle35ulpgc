@@ -97,7 +97,7 @@ class examboard_examinee_form extends moodleform {
         
         $mform->addElement('text', 'userlabel', get_string('userlabel', 'examboard'), array('size'=>30));
         $mform->setDefault('userlabel', '');
-        $mform->setType('userlabel', PARAM_ALPHANUMEXT);
+        $mform->setType('userlabel', PARAM_TEXT);
         $mform->addHelpButton('userlabel', 'userlabel', 'examboard');
         
         $options = array(EXAMBOARD_ORDER_KEEP => get_string('orderkeepchosen', 'examboard'),
@@ -111,7 +111,7 @@ class examboard_examinee_form extends moodleform {
         $mform->addElement('advcheckbox', 'excluded', get_string('excluded', 'examboard'));
         $mform->setDefault('excluded', 0);
         $mform->addHelpButton('excluded', 'excluded', 'examboard');
-        
+
         $mform->addElement('hidden', 'id', $cmid);
         $mform->setType('id', PARAM_INT);
         

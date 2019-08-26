@@ -30,7 +30,8 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             STATE_SELECT: '#menustatetype',
             CHANGE_STATE_BUTTON: 'div.singlebutton button.btn-primary',
             STATE_VALUE_INPUT: 'input[name=state]',
-            SUBMIT_STATE_BUTTON: '#change_state'
+            SUBMIT_STATE_BUTTON: '#change_state',
+            CHANGE_STATE_NOTIFICATION: 'span.change-question-state'
         },
 
         init: function() {
@@ -43,12 +44,20 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
                 if (stateChangeSelect.val() !== '') {
                     stateValueInput.val(stateChangeSelect.val());
                     changeStateButton.removeAttr('disabled');
+                    submitStateButton.removeAttr('disabled');
                 } else {
                     changeStateButton.attr('disabled', 'disabled');
+                    submitStateButton.attr('disabled', 'disabled');
                 }
             });
 
             submitStateButton.on('click', function() {
+                submitStateButton.attr('disabled', 'disabled');
+                var pendingPromise = t.addPendingJSPromise('studentquizStateChange');
+                require(['core/loadingicon'], function (LoadingIcon) {
+                    var parentElement = $(t.SELECTOR.CHANGE_STATE_NOTIFICATION);
+                    LoadingIcon.addIconToContainerRemoveOnCompletion(parentElement, pendingPromise);
+                });
                 var args = {
                     courseid: submitStateButton.attr('data-courseid'),
                     cmid: submitStateButton.attr('data-cmid'),
@@ -59,8 +68,29 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
                 var promise = Ajax.call([{methodname: 'mod_studentquiz_set_state', args: args}], true, true);
                 promise[0].then(function(results) {
                     Notification.alert(results.status, results.message);
+                    pendingPromise.resolve();
+                    submitStateButton.removeAttr('disabled');
                 }).fail(failure);
             });
+        },
+
+        /**
+         * Add Pending Promise to current session.
+         *
+         *
+         * @param {string} pendingKey JSPending key
+         * @returns {*|jQuery|{}} Pending Promise
+         */
+        addPendingJSPromise: function(pendingKey) {
+            M.util.js_pending(pendingKey);
+
+            var pendingPromise = $.Deferred();
+            pendingPromise.then(function() {
+                    M.util.js_complete(pendingKey);
+                    return arguments[0];
+            }).catch(Notification.exception);
+
+            return pendingPromise;
         },
     };
 

@@ -22,8 +22,7 @@
  * Toggles are persistent on a per browser session per course basis but can be made to persist longer by a small
  * code change. Full installation instructions, code adaptions and credits are included in the 'Readme.txt' file.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
@@ -182,21 +181,23 @@ class format_topcoll_renderer extends format_section_renderer_base {
                 } else {
                     $topictext = get_string('setlayoutstructureday', 'format_topcoll');
                 }
-                $title = get_string('viewonly', 'format_topcoll', array('sectionname' => $topictext.' '.$section->section));
-                switch ($this->tcsettings['layoutelement']) { // Toggle section x.
-                    case 1:
-                    case 3:
-                    case 5:
-                    case 8:
-                        $o .= html_writer::link($url,
-                            $topictext.html_writer::empty_tag('br').
-                            $section->section, array('title' => $title, 'class' => 'cps_centre'));
-                        break;
-                    default:
-                        $o .= html_writer::link($url,
-                            $this->output->pix_icon('one_section', $title, 'format_topcoll'),
-                            array('title' => $title, 'class' => 'cps_centre'));
-                        break;
+                if ($this->tcsettings['viewsinglesectionenabled'] == 2) {
+                    $title = get_string('viewonly', 'format_topcoll', array('sectionname' => $topictext.' '.$section->section));
+                    switch ($this->tcsettings['layoutelement']) { // Toggle section x.
+                        case 1:
+                        case 3:
+                        case 5:
+                        case 8:
+                            $o .= html_writer::link($url,
+                                $topictext.html_writer::empty_tag('br').
+                                $section->section, array('title' => $title, 'class' => 'cps_centre'));
+                            break;
+                        default:
+                            $o .= html_writer::link($url,
+                                $this->output->pix_icon('one_section', $title, 'format_topcoll'),
+                                array('title' => $title, 'class' => 'cps_centre'));
+                            break;
+                    }
                 }
             }
         }
@@ -286,21 +287,19 @@ class format_topcoll_renderer extends format_section_renderer_base {
                 $section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
             if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
-                $markedthissection = get_string('markedthissection', 'format_topcoll');
                 $highlightoff = get_string('highlightoff');
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marked',
                                                'name' => $highlightoff,
-                                               'pixattr' => array('class' => '', 'alt' => $markedthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markedthissection,
+                                               'pixattr' => array('class' => ''),
+                                               'attr' => array('class' => 'editing_highlight',
                                                'data-action' => 'removemarker'));
             } else {
                 $url->param('marker', $section->section);
-                $markthissection = get_string('markthissection', 'format_topcoll');
                 $highlight = get_string('highlight');
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marker',
                                                'name' => $highlight,
-                                               'pixattr' => array('class' => '', 'alt' => $markthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markthissection,
+                                               'pixattr' => array('class' => ''),
+                                               'attr' => array('class' => 'editing_highlight',
                                                'data-action' => 'setmarker'));
             }
         }
@@ -451,7 +450,7 @@ class format_topcoll_renderer extends format_section_renderer_base {
         if (($onsectionpage == false) && ($section->section != 0)) {
             $o .= html_writer::start_tag('div',
                 array('class' => 'sectionhead toggle toggle-'.$this->tcsettings['toggleiconset'],
-                'id' => 'toggle-'.$section->section)
+                'id' => 'toggle-'.$section->section, 'tabindex' => '0')
             );
 
             if ((!($section->toggle === null)) && ($section->toggle == true)) {
@@ -782,9 +781,11 @@ class format_topcoll_renderer extends format_section_renderer_base {
         if ($coursenumsections > 0) {
             $sectiondisplayarray = array();
             if ($coursenumsections > 1) {
-                if (($this->userisediting) || ($this->tcsettings['onesection'] == 1)) {
-                    // Collapsed Topics all toggles.
-                    echo $this->toggle_all();
+                if ($this->tcsettings['toggleallenabled'] == 2) {
+                    if (($this->userisediting) || ($this->tcsettings['onesection'] == 1)) {
+                        // Collapsed Topics all toggles.
+                        echo $this->toggle_all();
+                    }
                 }
                 if ($this->tcsettings['displayinstructions'] == 2) {
                     // Collapsed Topics instructions.
@@ -1102,11 +1103,11 @@ class format_topcoll_renderer extends format_section_renderer_base {
         $o .= html_writer::start_tag('h4', null);
         $o .= html_writer::tag('span', get_string('topcollopened', 'format_topcoll'),
             array('class' => 'on ' . $this->tctoggleiconsize, 'id' => 'toggles-all-opened',
-            'role' => 'button')
+            'role' => 'button', 'tabindex' => '0')
         );
         $o .= html_writer::tag('span', get_string('topcollclosed', 'format_topcoll'),
             array('class' => 'off ' . $this->tctoggleiconsize, 'id' => 'toggles-all-closed',
-            'role' => 'button')
+            'role' => 'button', 'tabindex' => '0')
         );
         $o .= html_writer::end_tag('h4');
         $o .= html_writer::end_tag('div');

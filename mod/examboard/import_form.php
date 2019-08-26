@@ -69,6 +69,9 @@ class examboard_import_form extends moodleform {
 
         $mform->addElement('advcheckbox', 'ignoremodified', get_string('ignoremodified', 'examboard'), get_string('ignoremodifiedexplain', 'examboard'));
         $mform->addHelpButton('ignoremodified', 'ignoremodified', 'examboard');
+
+        $mform->addElement('advcheckbox', 'deleteprevious', get_string('deleteprevious', 'examboard'), get_string('deletepreviousexplain', 'examboard'));
+        $mform->addHelpButton('deleteprevious', 'deleteprevious', 'examboard');
         
         $userencodings = array('id' => get_string('userid', 'examboard'), 
                                 'idnumber' => get_string('idnumber'),

@@ -617,6 +617,10 @@ La opción predefinida (sin marcar) es preservar el contenido ya existente y NO 
 Si se marca esta opción, los datos presentes en el archivo importado sobre-escribirán a los existentes previamente en la misma entrada.
 ';
 $string['ignoremodifiedexplain'] = ' desmarcado para ignorar datos importados si ya existen.';
+$string['deleteprevious'] = 'Borrar usuarios previos';
+$string['deleteprevious_help'] = 'Si se marca, cuando se importe un usuario, sea un miembro del Tribubal o un estudiante a examinar, 
+todos los miembros o usuarios anteriores para ese examen serán eliminados antes de importar los nuevos.';
+$string['deletepreviousexplain'] = 'Marcar para borrar usuarios anteriores antes de importar.';
 $string['userencoding'] = 'Identificador de usuario';
 $string['userencoding_help'] = 'El parámetro usado en el archivo de importación para especificar a cada usuario. Puede ser uno de:
  
@@ -708,10 +712,13 @@ $string['remindercontrolbody'] = 'Se han enviado {$a->count} recordatorios de pa
 $string['bulkaddexam'] = 'Agregar lote de exámenes';
 $string['bulkaddnum'] = 'Nº de exámenes a añadir';
 $string['bulkaddnum_help'] = 'Esta herramienta agregará una serie de exámenes denominados igual y numerados correlativamente. 
+Para ello se debe añadir un marcador al texto del Código identificador. Por ejemplo, #. 
+Los números serán añadidos allá donde aparezca el carácter o elemento de marcador de sustitución en el texto del Código identificador.
 
-Se debe indicar el número total de exámenes de exámenes a añadir en el lote y el primer número de la serie.
+Se debe indicar el número total de exámenes de exámenes a añadir en el lote y el primer número de la serie. 
 ';
 $string['bulkaddstart'] = 'Empezar en';
+$string['bulkaddreplace'] = 'Marcador';
 $string['submitbulkaddexam'] = 'Agregar lote';
 $string['submissionstatus'] = 'Ítem evaluable y datos complementarios';
 $string['viewgraded'] = 'Detalles de calificación';

@@ -39,8 +39,8 @@
                 <exclude>
                     <directory suffix="_test.php">.</directory>
                     <directory suffix=".php">lang/en/</directory>
+                    <file>tests/coverage.php</file>
                     <file>version.php</file>
-                    <file>format.php</file>
                 </exclude>
             </whitelist>
         </filter>

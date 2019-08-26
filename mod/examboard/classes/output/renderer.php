@@ -1404,6 +1404,10 @@ class renderer extends plugin_renderer_base {
                         'grade'         => get_string('assessment', 'examboard'), //get_string('grade'),
                         'action'        => get_string('actions'),
                         );
+        if(!$viewer->canmanage) {
+            unset($table['action']);
+        }
+                        
         $viewer->define_columns(array_keys($table));
         $viewer->define_headers(array_values($table));
         $viewer->set_attribute('id', 'mod_examboard_view_exams_table');

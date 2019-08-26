@@ -208,6 +208,7 @@
 }
 
 .path-mod-studentquiz .studentquiz_behaviour .rate {
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
@@ -244,6 +245,7 @@
     display: inline-block;
     unicode-bidi: bidi-override;
     height: 0;
+    vertical-align: text-top;
 }
 
 .path-mod-studentquiz .studentquiz_behaviour .rate .error {
@@ -270,6 +272,19 @@
 .path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable:hover ~ .rateable.star-empty,
 .path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable.star-empty:hover ~ .rateable.star-empty {
     background-image: url([[pix:mod_studentquiz|star_empty_icon]]);
+}
+
+.path-mod-studentquiz .change-question-state {
+    display: block;
+}
+
+.path-mod-studentquiz .change-question-state select#menustatetype,
+.path-mod-studentquiz .change-question-state button#change_state {
+    margin-left: 10px;
+}
+
+.path-mod-studentquiz .change-question-state button#change_state {
+    margin-right: 10px;
 }
 
 .path-mod-studentquiz .pagination .form-control {
