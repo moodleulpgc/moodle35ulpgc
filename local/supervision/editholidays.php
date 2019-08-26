@@ -13,22 +13,15 @@
     require_once($CFG->dirroot."/local/supervision/editholidaysform.php");
     require_once($CFG->libdir.'/adminlib.php');
 
+    $cid = optional_param('cid', SITEID, PARAM_INT);
     $itemid       = optional_param('item', 0, PARAM_INT);
     $baseparams = array('item' => $itemid);
 
     $baseurl = new moodle_url('/local/supervision/editholidays.php', $baseparams);
-
+    $returnurl = new moodle_url('/local/supervision/holidays.php', array('cid'=>$cid));
     require_login();
-    $context = context_system::instance();
-   
-    admin_externalpage_setup('local_supervision_holidays');
-    $PAGE->set_context($context);
-    $PAGE->set_url('/local/supervision/holidays.php');
-    $PAGE->set_pagelayout('admin');
-    $title = get_string('insertholiday', 'local_supervision');
-    $PAGE->set_title($title);
-    $PAGE->set_heading($title);
-    $PAGE->set_cacheable( true);
+    $title = get_string('editholidays', 'local_supervision');
+    $context = supervision_page_setup('editholidays', $returnurl, $title);
     require_capability('local/supervision:manage', $context);
     
     $hid = optional_param('hid', 0, PARAM_INT);
@@ -44,7 +37,7 @@
         $date->duration =DAYSECS;
     }
 
-    $returnurl = new moodle_url('/local/supervision/holidays.php', array());
+    
 
     if ($hid and $delete) {
         if (!$confirm) {

@@ -36,56 +36,76 @@ $plugins = core_plugin_manager::instance()->get_plugins_of_type('supervisionwarn
     
     $settings = new admin_settingpage('local_supervision_settings', get_string('supervisionsettings','local_supervision')); 
 
-    $settings->add(new admin_setting_configcheckbox('local_supervision/enablestats', get_string('enablestats', 'local_supervision'),
-                    get_string('configenablestats', 'local_supervision'), 0, PARAM_INT));
+    $settings->add(new admin_setting_configcheckbox('local_supervision/enablestats', 
+                    get_string('enablestats', 'local_supervision'),
+                    get_string('enablestats_help', 'local_supervision'), 0));
 
     $roles = get_all_roles();
     $options = role_fix_names($roles, null, ROLENAME_ORIGINAL, true);
     list($usql, $params) = $DB->get_in_or_equal(array('editingteacher', 'teacher'));
     $defaultroles = $DB->get_records_select('role', " shortname $usql ", $params, '', 'id, name');
 
-    $settings->add(new admin_setting_configmultiselect('local_supervision/checkedroles', get_string('checkedroles', 'local_supervision'), get_string('configcheckedroles', 'local_supervision'), array_keys($defaultroles), $options));
+    $settings->add(new admin_setting_configmultiselect('local_supervision/checkedroles', 
+                    get_string('checkedroles', 'local_supervision'), 
+                    get_string('checkedroles_help', 'local_supervision'), array_keys($defaultroles), $options));
 
     $options = array('0' => get_string('choose')) + $options;
-    $settings->add(new admin_setting_configselect('local_supervision/checkerrole', get_string('checkerrole', 'local_supervision'), get_string('configcheckerrole', 'local_supervision'), 0, $options));
+    $settings->add(new admin_setting_configselect('local_supervision/checkerrole', 
+                    get_string('checkerrole', 'local_supervision'), 
+                    get_string('checkerrole_help', 'local_supervision'), 0, $options));
 
     $categories =  make_categories_options();
-    $settings->add(new admin_setting_configmultiselect('local_supervision/excludedcats', get_string('excludedcategories', 'local_supervision'), get_string('configexcludedcategories', 'local_supervision'), null, $categories));
+    $settings->add(new admin_setting_configmultiselect('local_supervision/excludedcats', 
+                    get_string('excludedcategories', 'local_supervision'), 
+                    get_string('excludedcategories_help', 'local_supervision'), null, $categories));
 
     $dbman = $DB->get_manager();
     if($dbman->field_exists('course_categories', 'faculty')) {
-        $settings->add(new admin_setting_configselect('local_supervision/enablefaculties', get_string('enablefaculties', 'local_supervision'), get_string('configenablefaculties', 'local_supervision'), 0,array(0 => get_string('no'), 1 => get_string('yes'))));
+        $settings->add(new admin_setting_configselect('local_supervision/enablefaculties', 
+                    get_string('enablefaculties', 'local_supervision'), 
+                    get_string('enablefaculties_help', 'local_supervision'), 0,array(0 => get_string('no'), 1 => get_string('yes'))));
     }
     if($dbman->field_exists('course', 'department')) {
-        $settings->add(new admin_setting_configselect('local_supervision/enabledepartments', get_string('enabledepartments', 'local_supervision'), get_string('configenabledepartments', 'local_supervision'), 0,array(0 => get_string('no'), 1 => get_string('yes'))));
+        $settings->add(new admin_setting_configselect('local_supervision/enabledepartments', 
+                    get_string('enabledepartments', 'local_supervision'), 
+                    get_string('enabledepartments_help', 'local_supervision'), 0,array(0 => get_string('no'), 1 => get_string('yes'))));
     }
 
-    $settings->add(new admin_setting_configtext('local_supervision/excludeshortnames', get_string('excludeshortnames', 'local_supervision'),
-                    get_string('configexcludeshortnames', 'local_supervision'), '', PARAM_NOTAGS));
+    $settings->add(new admin_setting_configtext('local_supervision/excludeshortnames', 
+                    get_string('excludeshortnames', 'local_supervision'),
+                    get_string('excludeshortnames_help', 'local_supervision'), '', PARAM_NOTAGS));
 
-    $settings->add(new admin_setting_configcheckbox('local_supervision/excludecourses', get_string('excludecourses', 'local_supervision'),
-                    get_string('configexcludecourses', 'local_supervision'), 0, PARAM_INT));
+    $settings->add(new admin_setting_configcheckbox('local_supervision/excludecourses', 
+                    get_string('excludecourses', 'local_supervision'),
+                    get_string('excludecourses_help', 'local_supervision'), 0));
 
-    $settings->add(new admin_setting_configtext('local_supervision/startdisplay',get_string('startdisplay','local_supervision'),
-                    get_string('configstartdisplay', 'local_supervision'),'',PARAM_TEXT));
-    $settings->add(new admin_setting_configcheckbox('local_supervision/enablemail', get_string('enablependingmail', 'local_supervision'),
-                    get_string('configenablemail', 'local_supervision'), 0, PARAM_INT));
-
-    $settings->add(new admin_setting_configselect("local_supervision/maildelay", get_string('maildelay', 'local_supervision'),
-                    get_string('configmaildelay', 'local_supervision'), 1, array(0,1,2,3,4,5,6,7)));
-
-    $settings->add(new admin_setting_configcheckbox('local_supervision/coordemail', get_string('enablecoordmail', 'local_supervision'),
-                    get_string('configcoordemail', 'local_supervision'), 0, PARAM_INT));
-
-    $settings->add(new admin_setting_configcheckbox('local_supervision/maildebug', get_string('maildebug', 'local_supervision'),
-                    get_string('configmaildebug', 'local_supervision'), 0, PARAM_INT));
-
-    $settings->add(new admin_setting_configtext('local_supervision/email', get_string('pendingmail', 'local_supervision'),
-                    get_string('configemail', 'local_supervision'), '', PARAM_NOTAGS));
+    $settings->add(new admin_setting_configtext('local_supervision/startdisplay', 
+                    get_string('startdisplay','local_supervision'),
+                    get_string('startdisplay_help', 'local_supervision'),'',PARAM_TEXT));
                     
-    $settings->add(new admin_setting_configcheckbox('local_supervision/synchsupervisors', get_string('synchsupervisors', 'local_supervision'),
-                    get_string('configsynchsupervisors', 'local_supervision'), 0, PARAM_INT));
+    $settings->add(new admin_setting_configcheckbox('local_supervision/enablemail', 
+                    get_string('enablemail', 'local_supervision'),
+                    get_string('enablemail_help', 'local_supervision'), 0));
 
+    $settings->add(new admin_setting_configselect("local_supervision/maildelay", 
+                    get_string('maildelay', 'local_supervision'),
+                    get_string('maildelay_help', 'local_supervision'), 1, array(0,1,2,3,4,5,6,7,10,14,15)));
+
+    $settings->add(new admin_setting_configcheckbox('local_supervision/coordemail', 
+                    get_string('coordemail', 'local_supervision'),
+                    get_string('coordemail_help', 'local_supervision'), 0));
+
+    $settings->add(new admin_setting_configcheckbox('local_supervision/maildebug', 
+                    get_string('maildebug', 'local_supervision'),
+                    get_string('maildebug_help', 'local_supervision'), 0));
+
+    $settings->add(new admin_setting_configtext('local_supervision/email', 
+                    get_string('pendingmail', 'local_supervision'),
+                    get_string('pendingmail_help', 'local_supervision'), '', PARAM_NOTAGS));
+                    
+    $settings->add(new admin_setting_configcheckbox('local_supervision/synchsupervisors', 
+                    get_string('synchsupervisors', 'local_supervision'),
+                    get_string('synchsupervisors_help', 'local_supervision'), 0));
 
     $ADMIN->add('managesupervisionwarnings', $settings);
 
@@ -99,7 +119,7 @@ $plugins = core_plugin_manager::instance()->get_plugins_of_type('supervisionwarn
                     get_string('editholidays', 'local_supervision'),  $url,'local/supervision:manage'));
     $url = new moodle_url('/local/supervision/supervisors.php', array());
     $ADMIN->add('managesupervisionwarnings', new admin_externalpage('local_supervision_supervisors', 
-                    get_string('editpermissions', 'local_supervision'),  $url,'local/supervision:manage'));
+                    get_string('supervisors', 'local_supervision'),  $url,'local/supervision:manage'));
 
 
 }

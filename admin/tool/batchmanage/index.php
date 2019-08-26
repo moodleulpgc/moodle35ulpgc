@@ -44,11 +44,10 @@ $PAGE->set_pagelayout('admin');
 
 $managejob = batchmanage_managejob_plugin::create($job);
 
-//print_object($_POST);
-
 // redirect must be before header call 
 $nextstep = '';
 $formdata = '';
+
 if($action && confirm_sesskey()) {
     $managejob->process_formsdata();
     
@@ -59,7 +58,15 @@ if($action && confirm_sesskey()) {
     if($formdata = $mform->get_data()) {
         $nextstep = $managejob->process_action($action, $formdata);
     } else {
-        redirect($returnurl, get_string('emptyform', 'tool_batchmanage')); 
+        $message = '';
+        if($errors = $mform->get_errors()) {
+            foreach($errors as $error) {
+                \core\notification::error($error);
+            }
+        } else {
+            $message = get_string('emptyform', 'tool_batchmanage');
+        }
+        redirect($returnurl, $message); 
     }
 }    
 

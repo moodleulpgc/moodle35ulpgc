@@ -187,14 +187,14 @@ class block_supervision extends block_list {
             $this->content->items[] = '<hr />'.get_string('management', 'block_supervision');
             $this->content->icons[] = '';
             $url = new moodle_url('/local/supervision/supervisors.php', array('cid'=>$course->id));
-            $this->content->items[] = $OUTPUT->action_link($url, get_string('editpermissions', 'local_supervision'));
+            $this->content->items[] = $OUTPUT->action_link($url, get_string('supervisors', 'local_supervision'));
             $this->content->icons[] = $OUTPUT->pix_icon('i/checkpermissions', '').'&nbsp;';
 
             $url = new moodle_url('/local/supervision/holidays.php', array('cid'=>$course->id));
             $this->content->items[] = $OUTPUT->action_link($url, get_string('editholidays', 'local_supervision'));
             $this->content->icons[] = $OUTPUT->pix_icon('i/calendar', '').'&nbsp;';
             
-            $url = new moodle_url('/admin/settings.php', array('section'=>'local_supervision_settings'));
+            $url = new moodle_url('/local/supervision/editsettings.php', array('cid'=>$course->id));
             $this->content->items[] = $OUTPUT->action_link($url, get_string('supervisionsettings', 'local_supervision'));
             $this->content->icons[] = $OUTPUT->pix_icon('t/edit', '').'&nbsp;';
         }

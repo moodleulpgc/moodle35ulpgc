@@ -47,18 +47,18 @@ $string['departmentsreview'] = 'Department Supervision';
 $string['nowarnings'] = 'No warnings filed';
 
 
-$string['configcheckedroles'] = 'Only the selected roles will be processed as potential subjects of <strong>teacher</strong> pending activity';
-$string['configcheckerrole'] = 'Only the selected role will be assigned as supervisor';
-$string['configenablemail'] = 'If activated, when the cron job detects a delay longer then expected it will send an e-mail to the teacher(s) as warning, in addition to recording and storing the failure';
-$string['configenablestats'] = 'If enabled, teh cronjob will detect, flag and store some conditions where a response is expected from teachers. That is \"pending activity\". This may be useful to elaborate logs of tasks achievement by teachers' ;
-$string['configexcludedcategories'] = 'Selected course categories will be excluded form supervision data collection';
+$string['checkedroles_help'] = 'Only the selected roles will be processed as potential subjects of <strong>teacher</strong> pending activity';
+$string['checkerrole_help'] = 'Only the selected role will be assigned as supervisor';
+$string['enablemail_help'] = 'If activated, when the cron job detects a delay longer then expected it will send an e-mail to the teacher(s) as warning, in addition to recording and storing the failure';
+$string['enablestats_help'] = 'If enabled, the cronjob will detect, flag and store some conditions where a response is expected from teachers. That is \"pending activity\". This may be useful to elaborate logs of tasks achievement by teachers' ;
+$string['excludedcategories_help'] = 'Selected course categories will be excluded form supervision data collection';
 $string['excludecourses'] = 'Exclude admin courses';
-$string['configexcludecourses'] = 'If set, courses without a credits count will be excluded form supervision';
+$string['excludecourses_help'] = 'If set, courses without a credits count will be excluded form supervision';
 $string['excludeshortnames'] = 'Exclude courses';
-$string['configexcludeshortnames'] = 'If set, courses with a shortname existing in the list will be excluded form supervision.
+$string['excludeshortnames_help'] = 'If set, courses with a shortname existing in the list will be excluded form supervision.
 Accepts a coma separated list of course shortnames';
 
-$string['enablependingmail'] = 'Enable mailing of detected pending failures';
+$string['enablemail'] = 'Enable mailing of detected pending failures';
 $string['enablestats'] = 'Enable pending stats';
 $string['editholidays'] = 'Manage holidays';
 $string['editsupervisor'] = 'Define Supervisor\'s permissions';
@@ -79,11 +79,11 @@ $string['deletedholiday'] = 'Deleted entry named "{$a}"';
 $string['type'] = 'Type';
 
 $string['startdisplay'] = 'Default visibility date';
-$string['configstartdisplay'] = 'Only records created after this date will be showed initially<br />Date format is ISO 8601 format year-month-day (or any valid strtotime() input)';
-$string['enablecoordmail'] = 'Enable mailing to supervisor addresses';
-$string['configcoordemail'] = 'If enabled, in addition to <i>enablemail</i>, then mail mesasges will be sent to supervisors in addition to user';
+$string['startdisplay_help'] = 'Only records created after this date will be showed initially<br />Date format is ISO 8601 format year-month-day (or any valid strtotime() input)';
+$string['coordemail'] = 'Enable mailing to supervisor addresses';
+$string['coordemail_help'] = 'If enabled, in addition to <i>enablemail</i>, then mail mesasges will be sent to supervisors in addition to user';
 $string['pendingmail'] = 'Copy address';
-$string['configemail'] = 'This address will receive a copy of all pending duties warning messages';
+$string['pendingmail_help'] = 'This address will receive a copy of all pending duties warning messages';
 $string['supervisionwarnings'] = 'Supervision warnings';
 $string['review'] = 'Review';
 $string['assigner'] = 'Assigner';
@@ -105,14 +105,14 @@ $string['itemname'] = 'Supervised item';
 $string['addpermission'] = 'Add supervising permission';
 $string['addusersetting'] = 'Allow this user to add new supervisors?';
 $string['adduser'] = 'Can add';
-$string['editpermissions'] = 'Supervision permissions';
+$string['supervisors'] = 'Supervisors';
 $string['itemscope'] = 'Supervision scope';
 $string['itemfilter'] = 'Item filter';
 $string['permissionexists'] = 'This user already has assigned supervision permissions on this item. < br/>Please, update existing permissions rather than adding a new ones. ';
 $string['deletepermission'] = 'Delete supervision permission';
 $string['deletepermission_confirm'] = 'You are about to delete the supervision premissions of {$a->user} on item {$a->name}. ';
 $string['maildelay'] = 'Mail delay';
-$string['configmaildelay'] = '
+$string['maildelay_help'] = '
 A delay between raising supervision flag  and the start of sending warning mails to users, in <b>DAYS</b>.';
 
 $string['warningemailtxt'] = 'Estimado profesor:
@@ -143,9 +143,9 @@ $string['emailstudent'] = '  con respecto al estudiante {$a->fullname} con DNI {
 $string['mailstats'] = 'Mails pending supervision warnings';
 $string['updatesupervisors'] = 'Updates supervisors from sinculpgc';
 $string['synchsupervisors'] = 'Update supervisors';
-$string['configsynchsupervisors'] = 'If enabled, supervisors will be synchronized from sinculpgc units table.';
+$string['synchsupervisors_help'] = 'If enabled, supervisors will be synchronized from sinculpgc units table.';
 $string['maildebug'] = 'Mail debug copy';
-$string['configmaildebug'] = 'When enabled, the email below will receive a copy of all messages.';
+$string['maildebug_help'] = 'When enabled, the email below will receive a copy of all messages.';
 $string['warningdigestsubject'] = 'Resumen de Monitorización de actividades pendientes';
 $string['warningdigesttxt'] = 'Notificaciones remitidas por usuario / asignatura.';
 $string['errorsubject'] = 'Errores en Monitorización de actividades pendientes';

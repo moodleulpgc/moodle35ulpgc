@@ -18,17 +18,9 @@
     $baseurl = new moodle_url('/local/supervision/holidays.php', $baseparams);
 
     require_login();
-    $context = context_system::instance();
    
-    admin_externalpage_setup('local_supervision_holidays');
-    $PAGE->set_context($context);
-    $PAGE->set_url('/local/supervision/holidays.php');
-    $PAGE->set_pagelayout('admin');
     $title = get_string('editholidays', 'local_supervision');
-    $PAGE->set_title($title);
-    $PAGE->set_heading($title);
-    $PAGE->set_cacheable( true);
-
+    $context = supervision_page_setup('editholidays', $baseurl, $title);
     require_capability('local/supervision:manage', $context);
 
     echo $OUTPUT->header();
@@ -70,12 +62,13 @@
     } else {
     }
     
-    if ($cid == SITEID) {
-        $url = $CFG->wwwroot.'/admin/search.php';
-    } else {
-        $url = new moodle_url('/course/view.php', array('id' => $cid));
+    $returnurl = get_local_referer(false);
+    $me = qualified_me();
+    if($returnurl == $me) {
+        $returnurl = is_siteadmin() ? '/admin/settings.php?section=supervisionwarnings' : '/my';
+        $returnurl = $CFG->wwwroot.$returnurl;
     }
-    echo $OUTPUT->continue_button($url);
     
+    echo $OUTPUT->continue_button($returnurl);
     
     echo $OUTPUT->footer();

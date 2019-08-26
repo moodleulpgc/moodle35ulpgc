@@ -9,6 +9,7 @@
 #bloque_dch_cabecera ul.enlaces_cabecera {
     padding: 0;
     margin: 0;
+    list-style: none;
 }
 
 #bloque_dch_cabecera ul.enlaces_cabecera li {
@@ -105,6 +106,8 @@
 .fixed-top.navbar .site-name {
     display: inline !important;
 }
+
+li.nav-item .usermenu {margin-right: 1.6rem;}
 
 @media (min-width: 768px) {
     li.nav-item .usermenu  {
@@ -229,8 +232,13 @@ button[data-action=toggle-drawer].btn-secondary:focus  {
 }
 
 #page-footer .tool_usertours-resettourcontainer,
+#page-footer .tool_dataprivacy,
 #page-footer .purgecaches {
     float: right;
+}
+
+#page-footer .col-12 div+div {
+    margin: 0 8px;
 }
 
 #pie_info {

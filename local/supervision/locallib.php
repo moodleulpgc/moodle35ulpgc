@@ -266,6 +266,34 @@
         return '';
     }
 
+    
+    /**
+     * Called by subpages to set PAGE, context and navigation
+     *
+     * @param string $subpage name of page
+     * @param moodle_url $url the base usrle for the page
+     * @return system context class
+     */
+    function supervision_page_setup($subpage, $url, $title) {    
+        global $PAGE;
+        
+        $context = context_system::instance();
+        $PAGE->set_context($context);
+        $PAGE->set_url($url);
+        $PAGE->set_pagelayout('admin');
+        $PAGE->set_title($title);
+        $PAGE->set_heading($title);
+        
+        $PAGE->navbar->add(get_string('administrationsite'), '/admin/search.php');
+        $PAGE->navbar->add(get_string('plugins', 'admin'));
+        $PAGE->navbar->add(get_string('localplugins'));
+        $PAGE->navbar->add(get_string('managewarningsettings', 'local_supervision'));
+        $PAGE->navbar->add(get_string($subpage, 'local_supervision'), $url);
+        
+        return $context;
+    }
+    
+    
     /**
      * Called by cron to load 'live' unfixed warnings and send supervision  emails to supervised users
      * Depends on each userid is a teacher fairly assigned (same group as student, enrolled etc.)
@@ -343,7 +371,6 @@
             
                 $info = new StdClass;
                 $info->coursename = $stat->shortname.' - '.$stat->fullname;
-                //http://localhost/moodle35ulpgc/report/supervision/index.php?id=1&warning=ungraded_assign&logformat=showashtml&chooselog=1
                 $info->reporturl = $CFG->wwwroot.'/report/supervision/index.php?id='.$stat->courseid.'&amp;warning='.$stat->warningtype;
                 $info->courseurl = $CFG->wwwroot.'/course/view.php?id='.$stat->courseid;
                 $info->activity = $stat->info;

@@ -141,6 +141,38 @@ abstract class batchmanageform extends moodleform {
     }   
     
     
+    public function validation_sql($data, $files, $fields = array()) {
+        $errors = array();
+        foreach($fields as $field) {
+            $sql = $data[$field];
+            $sql = trim($sql);
+
+            // Simple test to avoid evil stuff in the SQL.
+            $regex = '/\b(ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INTO|SELECT|TRUNCATE|UPDATE|SET|VACUUM|REINDEX|DISCARD|LOCK)\b/i';
+            if (preg_match($regex, $sql)) {
+                $errors[$field][] = get_string('notallowedwords', 'tool_batchmanage');
+            }
+            
+            if (strpos($sql, ';') !== false) {
+                // Do not allow any semicolons.
+                $errors[$field][] = get_string('nosemicolon', 'tool_batchmanage');
+            }    
+        }
+        
+        foreach($errors as $key => $values) {
+            $errors[$key] = implode(' | ', $values);
+        }
+        
+        return $errors;
+    }
+
+    public function get_errors() {
+        $mform =& $this->_form;
+        
+                
+        return $mform->_errors;
+    }
+    
 }
 
 

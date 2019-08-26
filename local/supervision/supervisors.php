@@ -21,6 +21,7 @@
     $page         = optional_param('page', 0, PARAM_INT);                     // which page to show
     $perpage      = optional_param('perpage', 25, PARAM_INT);
 
+    
     $baseparams = array('cid' => $cid,
                         'department' => $departmentassign,
                         'item' => $itemid,
@@ -46,14 +47,7 @@
         $title = get_string('bydepartment', 'local_supervision');
     }
 
-    admin_externalpage_setup('local_supervision_supervisors');
-    
-    $PAGE->set_context($context);
-    $PAGE->set_url($baseurl);
-    $PAGE->set_pagelayout('admin');
-    $PAGE->set_title($title);
-    $PAGE->set_heading($title);
-    $PAGE->set_cacheable( true);
+    $context = supervision_page_setup('supervisors', $baseurl, $title);
 
     if(!$canadd = supervision_can_add_supervisors($USER->id)) {
         require_capability('local/supervision:manage', $context);
@@ -127,7 +121,6 @@
             redirect($baseurl, get_string('changessaved'));
         }
 
-        $PAGE->navbar->add(get_string('supervisor', 'local_supervision'), null);
         $PAGE->navbar->add(get_string('addpermission', 'local_supervision'), null);
         echo $OUTPUT->header();
         echo $OUTPUT->heading(get_string('editsupervisor', 'local_supervision'));
@@ -301,13 +294,16 @@
     }
 
     echo '<br />';
-    if ($cid == SITEID) {
-        $url = $CFG->wwwroot.'/admin/search.php';
-    } else {
-        $url = new moodle_url('/course/view.php', array('id' => $cid));
+    
+    $returnurl = get_local_referer(false);
+    $me = qualified_me();
+    if($returnurl == $me) {
+        $returnurl = is_siteadmin() ? '/admin/settings.php?section=supervisionwarnings' : '/my';
+        $returnurl = $CFG->wwwroot.$returnurl;
     }
-    echo $OUTPUT->continue_button($url);
-
+    
+    echo $OUTPUT->continue_button($returnurl);
+    
     echo $OUTPUT->footer();
 
 

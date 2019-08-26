@@ -37,7 +37,7 @@ trait batchmanage_mod_selector {
         $mform->setDefault('module', 'choose');
         $mform->setType('module', PARAM_TEXT);
         //$mform->addRule('module', get_string('err_required', 'form'), 'lettersonly', null, 'client');
-        $mform->addRule('module', null, 'required', '', 'client');
+        $mform->addRule('module', null, 'required', null, 'client');
 
         $mform->addElement('text', 'instancename', get_string('instancename', 'tool_batchmanage'), array('size'=>'60'));
         $mform->setDefault('instancename', '');
@@ -109,6 +109,21 @@ trait batchmanage_mod_selector {
         }
 
         $this->add_action_buttons(true, $next);
+    }
+    
+    public function validation($data, $files) {
+    
+        $errors = parent::validation($data, $files);
+    
+        if(!$data['module']) {
+            $errors['module'] = get_string('nomodule', 'tool_batchmanage');
+        }
+        
+        if($data['uselike']) {
+            $errors = $errors + $this->validation_sql($data, $files, array('instancename'));    
+        } 
+    
+        return $errors;
     }
 }
 

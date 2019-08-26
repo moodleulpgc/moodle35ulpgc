@@ -115,11 +115,11 @@ $string['emptyform'] = 'Form empty. Need some specified data to operate';
 $string['notset'] = 'Not set';
 $string['referencecourse'] = 'Reference course idnumber';
 $string['configreferencecourse'] = 'IDnumber of an existing course that may be used as reference or template.';
-
+$string['notallowedwords'] = 'You have included a NON allowed word in an SQL query';
+$string['nosemicolon'] = 'You have included a semicolon ";" in an SQL query';
+$string['nomodule'] = 'You must select a module name';
 
 /*
-
-
 $string['eventtemplateupdated'] = 'Batch apply course template';
 $string['eventcourseconfigupdated'] = 'Batch apply course config';
 $string['eventsectionconfigupdated'] = 'Batch apply section config';
