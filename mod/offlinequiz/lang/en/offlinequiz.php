@@ -780,6 +780,7 @@ $string['statistics'] = 'Statistics';
 $string['statisticsplural'] = 'Statistics';
 $string['statsoverview'] = 'Statistics Overview';
 $string['studycode'] = 'Study code';
+$string['studycodecourse'] = '{$a->shortname} - {$a->fullname}';
 $string['theattempt'] = 'The attempt';
 $string['timesup'] = 'Time is up!';
 $string['totalmarksx'] = 'Total of marks: {$a}';

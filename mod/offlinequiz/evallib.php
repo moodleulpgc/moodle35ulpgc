@@ -123,9 +123,13 @@ function offlinequiz_check_scanned_page($offlinequiz, offlinequiz_page_scanner $
 
     if ($scannedpage->status == 'ok' || $scannedpage->status == 'suspended') {
         if (!$user = $DB->get_record('user', array($offlinequizconfig->ID_field => $scannedpage->userkey))) {
-            $scannedpage->status = 'error';
-            $scannedpage->error = 'nonexistinguser';
-        } else {
+            if(!$user = $DB->get_record('user', array('id' => ltrim($scannedpage->userkey, ' 0')))) { // ecastro ULPGC 
+                $scannedpage->status = 'error';
+                $scannedpage->error = 'nonexistinguser';
+            }
+        } 
+        
+        if(isset($user->id)) { // ecastro ULPGC
             $coursestudents = get_enrolled_users($coursecontext, 'mod/offlinequiz:attempt');
             if (empty($coursestudents[$user->id])) {
                 $scannedpage->status = 'error';
