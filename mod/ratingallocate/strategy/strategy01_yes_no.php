@@ -30,8 +30,8 @@ namespace ratingallocate\strategy_yesno;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
-require_once(__DIR__ . '/../locallib.php');
-require_once(__DIR__ . '/strategy_template_options.php');
+require_once(dirname(__FILE__) . '/../locallib.php');
+require_once(dirname(__FILE__) . '/strategy_template_options.php');
 
 class strategy extends \strategytemplate_options {
 

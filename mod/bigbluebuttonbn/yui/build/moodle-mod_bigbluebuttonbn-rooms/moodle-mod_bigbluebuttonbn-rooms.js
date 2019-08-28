@@ -36,7 +36,7 @@ M.mod_bigbluebuttonbn.rooms = {
      */
     init: function(bigbluebuttonbn) {
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?"
         });
         this.bigbluebuttonbn = bigbluebuttonbn;
         this.pinginterval = bigbluebuttonbn.ping_interval;
@@ -155,23 +155,23 @@ M.mod_bigbluebuttonbn.rooms = {
     },
 
     msgAttendeesIn: function(moderators, participants) {
-        var msg;
+        var msgModerators, viewers, msgViewers, msg;
         if (!this.hasParticipants(participants)) {
             return M.util.get_string('view_message_session_no_users', 'bigbluebuttonbn') + '.';
         }
-        var viewers = participants - moderators;
-        var msgModerators = ' <b>' + moderators + '</b> ' + this.msgModeratorsIn(moderators);
-        var msgViewers = ' <b>' + viewers + '</b> ' + this.msgViewersIn(viewers);
-        var msgAnd = ' ' + M.util.get_string('view_message_and', 'bigbluebuttonbn');
+        msgModerators = this.msgModeratorsIn(moderators);
+        viewers = participants - moderators;
+        msgViewers = this.msgViewersIn(viewers);
         msg = M.util.get_string('view_message_session_has_users', 'bigbluebuttonbn');
         if (participants > 1) {
-            return msg + msgModerators + msgAnd + msgViewers + '.';
+            return msg + ' <b>' + moderators + '</b> ' + msgModerators + ' ' +
+                M.util.get_string('view_message_and', 'bigbluebuttonbn') + ' <b>' + viewers + '</b> ' + msgViewers + '.';
         }
         msg = M.util.get_string('view_message_session_has_user', 'bigbluebuttonbn');
         if (moderators > 0) {
-            return msg + msgModerators + '.';
+            return msg + ' <b>1</b> ' + msgModerators + '.';
         }
-        return msg + msgViewers;
+        return msg + ' <b>1</b> ' + msgViewers + '.';
     },
 
     hasParticipants: function(participants) {

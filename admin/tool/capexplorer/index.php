@@ -25,7 +25,7 @@
 
 namespace tool_capexplorer;
 
-require_once(__DIR__ . '/../../../config.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/lib/adminlib.php');
 
 $PAGE->set_url('/admin/tool/capexplorer/index.php');

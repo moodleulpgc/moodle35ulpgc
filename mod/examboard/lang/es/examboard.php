@@ -81,6 +81,7 @@ Debe ser un código alfanumérico corto, sin espacios. Puede ser algo como T01 o
 $string['boardname'] = 'Nombre';
 $string['boardname_help'] = 'Un nombre para referirse al tribunal. 
 Puede usar una frase, varias palabras y espacios.';
+$string['boardactivevis'] = 'Visibilidad (Tribunal)';
 $string['boardactive'] = 'Visibilidad';
 $string['boardactive_help'] = 'Indica si el Tribunal será visible por los usuarios no gestores.  
 Puede crear tribunales inactivos como sustitutos, o mantenerlos invisibles hasta que se complete la asignación de miembros o estudiantes.';
@@ -96,6 +97,7 @@ $string['examdate'] = 'Fecha del examen';
 $string['examdate_help'] = 'La fecha en la que se realizará en examen.';
 $string['examduration'] = 'Duración';
 $string['examduration_help'] = 'El tiempo previsto para la realización del examen.';
+$string['examactivevis'] = 'Visibilidad (Examen)';
 $string['examactive'] = 'Visibilidad';
 $string['examactive_help'] = 'Si el examen será visible por usuarios no gestores.
 Puede crear exámenes invisibles para evitar el acceso de estudiantes, para mantener una reserva de sustitutos y otras opciones.';

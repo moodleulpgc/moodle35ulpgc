@@ -1298,7 +1298,7 @@ class grade_category extends grade_object {
                 $this->load_grade_item();
                 $num = count($grade_values);
                 $sum = 0;
-
+                
                 // This setting indicates if we should use algorithm prior to MDL-49257 fix for calculating extra credit weights.
                 // Even though old algorith has bugs in it, we need to preserve existing grades.
                 $gradebookcalculationfreeze = 'gradebook_calculations_freeze_' . $this->courseid;
@@ -1332,6 +1332,7 @@ class grade_category extends grade_object {
                         $sumweights += $items[$itemid]->aggregationcoef2;
                     }
                 }
+                
                 $userweights = array();
                 $totaloverriddenweight = 0;
                 $totaloverriddengrademax = 0;
@@ -1358,7 +1359,7 @@ class grade_category extends grade_object {
                     }
                 }
                 $nonoverriddenpoints = $grademax - $totaloverriddengrademax;
-
+                
                 // Then we need to recalculate the automatic weights except for extra credit items.
                 foreach ($grade_values as $itemid => $gradevalue) {
                     if (!$items[$itemid]->weightoverride && ($oldextracreditcalculation || !isset($extracredititems[$itemid]))) {
@@ -1378,7 +1379,7 @@ class grade_category extends grade_object {
                         }
                     }
                 }
-
+                
                 // Now when we finally know the grademax we can adjust the automatic weights of extra credit items.
                 if (!$oldextracreditcalculation) {
                     foreach ($grade_values as $itemid => $gradevalue) {
@@ -1403,7 +1404,7 @@ class grade_category extends grade_object {
                         $weights[$itemid] = $userweights[$itemid];
                     }
                 }
-
+                
                 // No we proceed with the extra credit items. They might have a different final
                 // weight in case the final grade was bounded. So we need to treat them different.
                 // Also, as we need to use the bounded_grade() method, we have to inject the
@@ -1445,7 +1446,7 @@ class grade_category extends grade_object {
                 }
                 $this->grade_item->grademax = $oldgrademax;
                 $this->grade_item->grademin = $oldgrademin;
-
+                
                 if ($grademax > 0) {
                     $agg_grade = $sum / $grademax; // Re-normalize score.
                 } else {

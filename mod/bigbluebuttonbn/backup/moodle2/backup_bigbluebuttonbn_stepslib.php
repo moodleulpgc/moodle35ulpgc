@@ -18,8 +18,8 @@
  * Class for the structure used for backup BigBlueButtonBN.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
@@ -29,8 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Define all the backup steps that will be used by the backup_bigbluebuttonbn_activity_task.
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @package   mod_bigbluebuttonbn
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_structure_step
 {
@@ -47,11 +48,11 @@ class backup_bigbluebuttonbn_activity_structure_step extends backup_activity_str
         // Define each element separated.
         $bigbluebuttonbn = new backup_nested_element('bigbluebuttonbn', array('id'), array(
                             'type', 'course', 'name', 'intro', 'introformat', 'meetingid',
-                            'moderatorpass', 'viewerpass', 'wait', 'record', 'welcome',
-                            'voicebridge', 'openingtime', 'closingtime', 'timecreated',
+                            'moderatorpass', 'viewerpass', 'wait', 'record', 'recordallfromstart',
+                            'recordhidebutton', 'welcome', 'voicebridge', 'openingtime', 'closingtime', 'timecreated',
                             'timemodified', 'presentation', 'participants', 'userlimit',
                             'recordings_html', 'recordings_deleted', 'recordings_imported',
-                            'recordings_preview', 'clienttype'));
+                            'recordings_preview', 'clienttype', 'muteonstart'));
 
         $logs = new backup_nested_element('logs');
 

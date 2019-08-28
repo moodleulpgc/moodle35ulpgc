@@ -75,16 +75,16 @@ class qtype_kprime_test extends advanced_testcase {
         $qdata->options->numberofrows = 4;
         $qdata->options->numberofcolumns = 2;
         $qdata->options->rows = array(
-            1 => (object) array( 
-                "id" => 1, 
-                "questionid" => 1, 
+            1 => (object) array(
+                "id" => 1,
+                "questionid" => 1,
                 "number" => 1,
                 "optiontext" => "option text 1",
                 "optiontextformat" => 1,
                 "optionfeedback" => "feedback to option 1",
                 "optionfeedbackformat" => 1
             ),
-            2 => (object) array( 
+            2 => (object) array(
                 "id" => 2,
                 "questionid" => 1,
                 "number" => 2,
@@ -93,8 +93,8 @@ class qtype_kprime_test extends advanced_testcase {
                 "optionfeedback" => "feedback to option 2",
                 "optionfeedbackformat" => 1
             ),
-            3 => (object) array( 
-                "id" => 3, 
+            3 => (object) array(
+                "id" => 3,
                 "questionid" => 1,
                 "number" => 3,
                 "optiontext" => "option text 3",

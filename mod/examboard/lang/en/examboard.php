@@ -83,6 +83,7 @@ Idnumber must be a single alpha-numeric code, something like T01 or B-101.';
 $string['boardname'] = 'Board name';
 $string['boardname_help'] = 'A name to identify the board as a team. 
 You may use a phrase, several words.';
+$string['boardactivevis'] = 'Visibility (Board)';
 $string['boardactive'] = 'Visibility';
 $string['boardactive_help'] = 'If the board will be visible by non-managing users. 
 You may create inactive boards to hold a reserve, or keep inactive until all names are agreed on.';
@@ -98,6 +99,7 @@ $string['examdate'] = 'Exam date';
 $string['examdate_help'] = 'When the examination will take place.';
 $string['examduration'] = 'Exam duration';
 $string['examduration_help'] = 'Period scheduled for the examination';
+$string['examactivevis'] = 'Visibility (Exams)';
 $string['examactive'] = 'Visibility';
 $string['examactive_help'] = 'If the Exam will be visible by non-managing users. 
 You may create inactive exams to hold a reserve, or keep inactive until all names are agreed on.';

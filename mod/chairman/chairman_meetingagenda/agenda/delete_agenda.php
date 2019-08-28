@@ -17,7 +17,7 @@ http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later                **
 **************************************************************************
 **************************************************************************/
 
-require_once(__DIR__.'../../../../config.php');
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 require_once('../../lib_chairman.php');
 
 $event_id = optional_param('event_id', 0, PARAM_INT); // event ID, or

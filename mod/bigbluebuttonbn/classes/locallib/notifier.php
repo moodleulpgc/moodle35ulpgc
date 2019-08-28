@@ -32,19 +32,18 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 /**
  * Helper class for sending notifications.
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class notifier {
     /**
      * Starts the notification process.
      *
-     * @param object $context
      * @param object $bigbluebuttonbn
      * @param string $action
      * @return void
      */
-    public static function notification_process($context, $bigbluebuttonbn, $action) {
+    public static function notification_process($bigbluebuttonbn, $action) {
         global $USER;
         // Prepare message.
         $msg = (object) array();
@@ -62,7 +61,7 @@ class notifier {
         $msg->activity_closingtime = bigbluebuttonbn_format_activity_time($bigbluebuttonbn->closingtime);
         $msg->activity_owner = fullname($USER);
         // Send notification to all users enrolled.
-        self::notification_send($context, $USER, $bigbluebuttonbn, self::notification_msg_html($msg));
+        self::notification_send($USER, $bigbluebuttonbn, self::notification_msg_html($msg));
     }
 
     /**
@@ -98,28 +97,42 @@ class notifier {
     /**
      * Sends the message.
      *
-     * @param object $context
      * @param object $sender
      * @param object $bigbluebuttonbn
      * @param string $message
      * @return void
      */
-    public static function notification_send($context, $sender, $bigbluebuttonbn, $message = '') {
-        global $DB;
-        $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
+    public static function notification_send($sender, $bigbluebuttonbn, $message = '') {
+        list($course, $cm) = get_course_and_cm_from_instance($bigbluebuttonbn, 'bigbluebuttonbn');
         // Complete message.
         $msg = (object) array();
         $msg->user_name = fullname($sender);
         $msg->user_email = $sender->email;
-        $msg->course_name = "$course->fullname";
+        $msg->course_name = $course->fullname;
         $message .= '<p><hr/><br/>'.get_string('email_footer_sent_by', 'bigbluebuttonbn').' '.
             $msg->user_name.'('.$msg->user_email.') ';
         $message .= get_string('email_footer_sent_from', 'bigbluebuttonbn').' '.$msg->course_name.'.</p>';
-        $users = (array) get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, true);
-        foreach ($users as $user) {
+        // Process the message sending.
+        foreach (self::users_to_notify($cm) as $user) {
             if ($user->id != $sender->id) {
                 message_post_message($sender, $user, $message, FORMAT_HTML);
             }
         }
+    }
+
+    /**
+     * Define users to be notified.
+     *
+     * @param object $cm
+     * @return array
+     */
+    public static function users_to_notify($cm) {
+        $context = \context_module::instance($cm->id);
+        $users = array();
+        // See if there are any users in the lesson.
+        $users = get_enrolled_users($context);
+        $info = new \core_availability\info_module($cm);
+        $users = $info->filter_user_list($users);
+        return $users;
     }
 }

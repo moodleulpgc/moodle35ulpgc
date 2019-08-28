@@ -1,0 +1,118 @@
+En la rama MOODLE_35_STABLE
+Tu rama está adelantada a 'origin/MOODLE_35_STABLE' por 7 commits.
+  (usa "git push" para publicar tus commits locales)
+
+Cambios no rastreados para el commit:
+  (usa "git add <archivo>..." para actualizar lo que será confirmado)
+  (usa "git checkout -- <archivo>..." para descartar los cambios en el directorio de trabajo)
+
+	modificado:     .travis.yml
+	modificado:     admin/settings/grades.php
+	modificado:     admin/tool/uploaduser/index.php
+	modificado:     availability/condition/grouping/classes/condition.php
+	modificado:     availability/condition/profile/classes/condition.php
+	modificado:     availability/condition/profile/classes/frontend.php
+	modificado:     backup/moodle2/restore_root_task.class.php
+	modificado:     backup/moodle2/restore_stepslib.php
+	modificado:     course/classes/management_renderer.php
+	modificado:     course/edit_form.php
+	modificado:     course/format/renderer.php
+	modificado:     course/lib.php
+	modificado:     course/management.php
+	modificado:     course/mod.php
+	modificado:     course/modlib.php
+	modificado:     course/moodleform_mod.php
+	modificado:     course/renderer.php
+	modificado:     enrol/locallib.php
+	modificado:     grade/edit/settings/form.php
+	modificado:     grade/edit/settings/index.php
+	modificado:     grade/edit/tree/category_form.php
+	modificado:     grade/edit/tree/index.php
+	modificado:     grade/edit/tree/item_form.php
+	modificado:     grade/edit/tree/lib.php
+	modificado:     grade/export/lib.php
+	modificado:     grade/export/ods/grade_export_ods.php
+	modificado:     grade/export/txt/grade_export_txt.php
+	modificado:     grade/export/xls/grade_export_xls.php
+	modificado:     grade/export/xml/grade_export_xml.php
+	modificado:     grade/lib.php
+	modificado:     grade/report/grader/lib.php
+	modificado:     grade/report/user/lib.php
+	modificado:     group/assign.php
+	modificado:     group/autogroup.php
+	modificado:     group/classes/output/index_page.php
+	modificado:     group/clientlib.js
+	modificado:     group/delete.php
+	modificado:     group/grouping.php
+	modificado:     group/grouping_form.php
+	modificado:     group/groupings.php
+	modificado:     group/import.php
+	modificado:     group/import_form.php
+	modificado:     group/index.php
+	modificado:     group/lib.php
+	modificado:     group/members.php
+	modificado:     group/overview.php
+	modificado:     group/templates/index.mustache
+	modificado:     lib/accesslib.php
+	modificado:     lib/classes/task/manager.php
+	modificado:     lib/coursecatlib.php
+	modificado:     lib/csvlib.class.php
+	modificado:     lib/editor/atto/plugins/align/lang/en/atto_align.php
+	modificado:     lib/editor/atto/plugins/align/lib.php
+	modificado:     lib/editor/atto/plugins/align/yui/build/moodle-atto_align-button/moodle-atto_align-button-debug.js
+	modificado:     lib/editor/atto/plugins/align/yui/build/moodle-atto_align-button/moodle-atto_align-button-min.js
+	modificado:     lib/editor/atto/plugins/align/yui/build/moodle-atto_align-button/moodle-atto_align-button.js
+	modificado:     lib/editor/atto/plugins/align/yui/src/button/js/button.js
+	modificado:     lib/editor/atto/plugins/charmap/lib.php
+	modificado:     lib/editor/atto/plugins/charmap/yui/build/moodle-atto_charmap-button/moodle-atto_charmap-button-debug.js
+	modificado:     lib/editor/atto/plugins/charmap/yui/build/moodle-atto_charmap-button/moodle-atto_charmap-button.js
+	modificado:     lib/editor/atto/plugins/charmap/yui/src/button/js/button.js
+	modificado:     lib/grade/grade_category.php
+	modificado:     lib/gradelib.php
+	modificado:     lib/modinfolib.php
+	modificado:     lib/moodlelib.php
+	modificado:     lib/myprofilelib.php
+	modificado:     lib/yui/build/moodle-core-chooserdialogue/moodle-core-chooserdialogue-debug.js
+	modificado:     lib/yui/build/moodle-core-chooserdialogue/moodle-core-chooserdialogue.js
+	modificado:     lib/yui/src/chooserdialogue/js/chooserdialogue.js
+	modificado:     mod/assign/feedback/offline/importgradesform.php
+	modificado:     mod/assign/feedback/offline/locallib.php
+	modificado:     mod/assign/gradingoptionsform.php
+	modificado:     mod/assign/gradingtable.php
+	modificado:     mod/assign/lib.php
+	modificado:     mod/assign/locallib.php
+	modificado:     mod/assign/module.js
+	modificado:     mod/assign/renderer.php
+	modificado:     mod/assign/templates/grading_actions.mustache
+	modificado:     mod/forum/lib.php
+	modificado:     mod/quiz/classes/output/edit_renderer.php
+	modificado:     mod/quiz/classes/question/bank/custom_view.php
+	modificado:     mod/quiz/classes/structure.php
+	modificado:     mod/quiz/locallib.php
+	modificado:     mod/quiz/report/reportlib.php
+	modificado:     mod/quiz/report/statistics/classes/calculator.php
+	modificado:     mod/quiz/report/statistics/statistics_form.php
+	modificado:     mod/scorm/datamodels/aicc.php
+	modificado:     mod/scorm/locallib.php
+	modificado:     question/type/match/renderer.php
+	modificado:     question/type/multichoice/renderer.php
+	modificado:     question/type/rendererbase.php
+	modificado:     user/classes/participants_table.php
+	modificado:     user/edit_form.php
+	modificado:     user/editadvanced.php
+	modificado:     user/filters/courserole.php
+	modificado:     user/filters/lib.php
+	modificado:     user/filters/text.php
+	modificado:     user/index.php
+	modificado:     user/lib.php
+	modificado:     user/profile/lib.php
+	modificado:     user/selector/lib.php
+
+Archivos sin seguimiento:
+  (usa "git add <archivo>..." para incluirlo a lo que se será confirmado)
+
+	blocks/calendar_month/styles.css
+	message/output/popup/db/events.php
+	ulpgc-modified-core.txt
+
+sin cambios agregados al commit (usa "git add" y/o "git commit -a")

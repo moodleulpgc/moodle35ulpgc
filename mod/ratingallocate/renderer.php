@@ -25,7 +25,7 @@ use ratingallocate\db as this_db;
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/locallib.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 class mod_ratingallocate_renderer extends plugin_renderer_base {
 

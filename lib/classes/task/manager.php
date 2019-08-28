@@ -518,7 +518,7 @@ class manager {
         $pluginmanager = \core_plugin_manager::instance();
 
         foreach ($records as $record) {
-
+        
             if ($lock = $cronlockfactory->get_lock(($record->classname), 0)) {
                 $classname = '\\' . $record->classname;
                 $task = self::scheduled_task_from_record($record);

@@ -55,7 +55,7 @@ define("CHECKLIST_AUTOPOPULATE_COURSE", 1);
 define("CHECKLIST_MAX_INDENT", 10);
 
 global $CFG;
-require_once(__DIR__.'/locallib.php');
+require_once(dirname(__FILE__).'/locallib.php');
 require_once($CFG->libdir.'/completionlib.php');
 
 /**

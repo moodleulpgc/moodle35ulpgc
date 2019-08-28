@@ -93,7 +93,7 @@ class qtype_kprime extends question_type {
         if (!isset($question->options->numberofcolumns)) {
             $question->options->numberofcolumns = QTYPE_KPRIME_NUMBER_OF_RESPONSES;
         }
-        if (!isset($question->options->shuffleanswers)) { 
+        if (!isset($question->options->shuffleanswers)) {
             $question->options->shuffleanswers = $kprimeconfig->shuffleanswers;
         }
         if (!isset($question->options->scoringmethod)) {
@@ -307,7 +307,7 @@ class qtype_kprime extends question_type {
             }
         }
     }
-    
+
     public function save_hints($formdata, $withparts = false) {
         global $DB;
         $context = $formdata->context;
@@ -382,7 +382,7 @@ class qtype_kprime extends question_type {
     protected function make_hint($hint) {
         return question_hint_kprime::load_from_record($hint);
     }
-    
+
     /**
      * Initialise the common question_definition fields.
      *

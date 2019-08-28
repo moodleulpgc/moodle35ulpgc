@@ -18,8 +18,8 @@
  * Settings for BigBlueButtonBN.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -28,13 +28,11 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(__DIR__.'/locallib.php');
 
-if ($ADMIN->fulltree) {
+if ($hassiteconfig) {
     // Configuration for BigBlueButton.
     $renderer = new \mod_bigbluebuttonbn\settings\renderer($settings);
-    // Renders general warning message for settings.
-    bigbluebuttonbn_settings_general_warning($renderer);
     // Renders general settings.
     bigbluebuttonbn_settings_general($renderer);
     // Evaluates if recordings are enabled for the Moodle site.
@@ -50,11 +48,13 @@ if ($ADMIN->fulltree) {
     bigbluebuttonbn_settings_waitmoderator($renderer);
     bigbluebuttonbn_settings_voicebridge($renderer);
     bigbluebuttonbn_settings_preupload($renderer);
+    bigbluebuttonbn_settings_preupload_manage_default_file($renderer);
     bigbluebuttonbn_settings_userlimit($renderer);
     bigbluebuttonbn_settings_duration($renderer);
     bigbluebuttonbn_settings_participants($renderer);
     bigbluebuttonbn_settings_notifications($renderer);
     bigbluebuttonbn_settings_clienttype($renderer);
+    bigbluebuttonbn_settings_muteonstart($renderer);
     // Renders settings for extended capabilities.
     bigbluebuttonbn_settings_extended($renderer);
 }

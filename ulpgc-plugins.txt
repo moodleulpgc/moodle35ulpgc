@@ -1,0 +1,67 @@
+En la rama MOODLE_35_STABLE
+Tu rama está adelantada a 'origin/MOODLE_35_STABLE' por 5 commits.
+  (usa "git push" para publicar tus commits locales)
+
+Cambios no rastreados para el commit:
+  (usa "git add <archivo>..." para actualizar lo que será confirmado)
+  (usa "git checkout -- <archivo>..." para descartar los cambios en el directorio de trabajo)
+  (confirmar o descartar el contenido sin seguimiento o modificado en los sub-módulos)
+
+	modificado:     admin/tool/advuserbulk (contenido no rastreado)
+
+Archivos sin seguimiento:
+  (usa "git add <archivo>..." para incluirlo a lo que se será confirmado)
+
+	admin/tool/backuprestore/
+	admin/tool/batchmanage/
+	auth/casulpgc/
+	availability/condition/response/
+	availability/condition/timeelapsed/
+	blocks/course_termlist/
+	blocks/examswarnings/
+	blocks/makeexam/
+	blocks/section/
+	blocks/supervision/
+	blocks/tracker/
+	blocks/usermanagement/
+	course/format/topicgroup/
+	enrol/metacat/
+	enrol/metapattern/
+	enrol/multicohort/
+	enrol/sinculpgc/
+	grade/grading/form/mcq/
+	lib/phpword/
+	local/assigndata/
+	local/sinculpgc/
+	local/supervision/
+	local/ulpgcassign/
+	local/ulpgccore/
+	local/ulpgcgroups/
+	local/ulpgcquiz/
+	media/player/bustreaming/
+	mod/assign/feedback/archive/
+	mod/assign/feedback/copyset/
+	mod/assign/feedback/historic/
+	mod/assign/feedback/wtpeer/
+	mod/assign/submission/data/
+	mod/assign/submission/exam/
+	mod/assign/submission/peers/
+	mod/examboard/
+	mod/examregistrar/
+	mod/library/
+	mod/quiz/accessrule/makeexamlock/
+	mod/quiz/report/gradingempty/
+	mod/quiz/report/makeexam/
+	mod/registry/
+	mod/videolib/
+	question/format/ulpgctf/
+	report/autogroups/
+	report/datacheck/
+	report/deviceanalytics/
+	report/supervision/
+	report/syncgroups/
+	report/trackertools/
+	theme/boost_campus/
+	ulpgc-plugins.txt
+
+sin cambios agregados al commit (usa "git add" y/o "git commit -a")

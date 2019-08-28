@@ -1157,7 +1157,7 @@ function scorm_reconstitute_array_element($sversion, $userdata, $elementname, $c
             $countsub = 0;
             $end = strpos($element, $matches[1]) + strlen($matches[1]);
             $subelement = substr($element, 0, $end);
-            $return .= '    '.$subelement." = new stdClass();\n";
+            $return .= '    '.$subelement." = new stdClass();\n"; // ecastro ULPGC
             // Now add the children.
             foreach ($children as $child) {
                 $return .= '    '.$subelement.".".$child." = new stdClass();\n";

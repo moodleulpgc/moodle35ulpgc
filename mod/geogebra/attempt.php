@@ -2,7 +2,7 @@
 
 require_once('../../config.php');
 require_once('lib.php');
-require_once(__DIR__.'/locallib.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT);  // course_module ID, or
 $a = optional_param('n', 0, PARAM_INT);    // geogebra instance ID

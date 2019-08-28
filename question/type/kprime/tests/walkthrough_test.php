@@ -54,16 +54,16 @@ class qtype_kprime_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $kprime->answernumbering = 'abc';
         $kprime->scoringmethod = "subpoints";
         $kprime->rows = array(
-            1 => (object) array( 
-                "id" => 1, 
-                "questionid" => 1, 
+            1 => (object) array(
+                "id" => 1,
+                "questionid" => 1,
                 "number" => 1,
                 "optiontext" => "option text 1",
                 "optiontextformat" => 1,
                 "optionfeedback" => "feedback to option 1",
                 "optionfeedbackformat" => 1
             ),
-            2 => (object) array( 
+            2 => (object) array(
                 "id" => 2,
                 "questionid" => 1,
                 "number" => 2,
@@ -72,8 +72,8 @@ class qtype_kprime_walkthrough_test extends qbehaviour_walkthrough_test_base {
                 "optionfeedback" => "feedback to option 2",
                 "optionfeedbackformat" => 1
             ),
-            3 => (object) array( 
-                "id" => 3, 
+            3 => (object) array(
+                "id" => 3,
                 "questionid" => 1,
                 "number" => 3,
                 "optiontext" => "option text 3",
@@ -119,7 +119,7 @@ class qtype_kprime_walkthrough_test extends qbehaviour_walkthrough_test_base {
     public function test_deferredfeedback_feedback_kprime() {
         $kprime = $this->make_a_kprime_question();
         $this->start_attempt_at_question($kprime, 'deferredfeedback', 1);
-        $this->process_submission(array("option0" => 1, "option1" => 1, "option2" => 2,"option3" => 2));
+        $this->process_submission(array("option0" => 1, "option1" => 1, "option2" => 2, "option3" => 2));
         $this->check_current_state(question_state::$complete);
         $this->check_current_mark(null);
         $this->check_current_output(

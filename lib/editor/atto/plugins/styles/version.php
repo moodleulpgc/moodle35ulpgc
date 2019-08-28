@@ -29,4 +29,5 @@ $plugin->component = 'atto_styles';
 $plugin->version = 2019041000;
 $plugin->release = 'v3.6-r1';
 $plugin->requires = 2018051705; //2018120300; ecastro ULPGC
+//$plugin->requires = 2019052000;
 $plugin->maturity = MATURITY_STABLE;

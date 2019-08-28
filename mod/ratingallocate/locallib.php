@@ -30,25 +30,24 @@ use ratingallocate\db as this_db;
 
 global $CFG;
 
-require_once(__DIR__ . '/lib.php');
-require_once($CFG->libdir  . '/eventslib.php');
-require_once(__DIR__ . '/form_manual_allocation.php');
-require_once(__DIR__ . '/form_modify_choice.php');
-require_once(__DIR__ . '/renderable.php');
+require_once(dirname(__FILE__) . '/lib.php');
+require_once(dirname(__FILE__) . '/form_manual_allocation.php');
+require_once(dirname(__FILE__) . '/form_modify_choice.php');
+require_once(dirname(__FILE__) . '/renderable.php');
 require_once($CFG->dirroot.'/group/lib.php');
 require_once(__DIR__.'/classes/algorithm_status.php');
 
 // Takes care of loading all the solvers.
-require_once(__DIR__ . '/solver/ford-fulkerson-koegel.php');
-require_once(__DIR__ . '/solver/edmonds-karp.php');
+require_once(dirname(__FILE__) . '/solver/ford-fulkerson-koegel.php');
+require_once(dirname(__FILE__) . '/solver/edmonds-karp.php');
 
 // Now come all the strategies.
-require_once(__DIR__ . '/strategy/strategy01_yes_no.php');
-require_once(__DIR__ . '/strategy/strategy02_yes_maybe_no.php');
-require_once(__DIR__ . '/strategy/strategy03_lickert.php');
-require_once(__DIR__ . '/strategy/strategy04_points.php');
-require_once(__DIR__ . '/strategy/strategy05_order.php');
-require_once(__DIR__ . '/strategy/strategy06_tickyes.php');
+require_once(dirname(__FILE__) . '/strategy/strategy01_yes_no.php');
+require_once(dirname(__FILE__) . '/strategy/strategy02_yes_maybe_no.php');
+require_once(dirname(__FILE__) . '/strategy/strategy03_lickert.php');
+require_once(dirname(__FILE__) . '/strategy/strategy04_points.php');
+require_once(dirname(__FILE__) . '/strategy/strategy05_order.php');
+require_once(dirname(__FILE__) . '/strategy/strategy06_tickyes.php');
 
 /**
  * Simulate a static/singleton class that holds all the strategies that registered with him
@@ -1609,7 +1608,7 @@ function groups_delete_group_members_by_group($groupid) {
 
         // Very ugly hack because some group-management functions are not provided in lib/grouplib.php
         // but does not add too much overhead since it does not include more files...
-        require_once (__DIR__.'../group/lib.php');
+        require_once (dirname(dirname(dirname(__FILE__))) . '/group/lib.php');
         foreach ($userids as $id) {
             groups_remove_member($group, $id);
         }

@@ -23,9 +23,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+  
 // List of observers.
 $observers = array(
-
     array(
         'eventname'   => '\core\event\course_module_created',
         'callback'    => 'format_topicgroup_observer::module_created',
@@ -34,5 +34,8 @@ $observers = array(
         'eventname'   => '\core\event\course_module_updated',
         'callback'    => 'format_topicgroup_observer::module_updated',
     ),
+    
+    
+    
 ); 
  

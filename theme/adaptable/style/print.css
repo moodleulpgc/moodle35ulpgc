@@ -92,7 +92,7 @@
     .form-search .input-append,
     .form-inline .input-append,
     .form-horizontal .input-append {
-       display: none !important;
+        display: none !important;
     }
 
     div.singleview_buttons {

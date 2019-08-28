@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 global $CFG;
-require_once(__DIR__ . '/../locallib.php');
+require_once(dirname(__FILE__) . '/../locallib.php');
 
 /**
  * mod_ratingallocate generator tests

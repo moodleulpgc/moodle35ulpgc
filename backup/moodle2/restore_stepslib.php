@@ -2096,7 +2096,7 @@ class restore_ras_and_caps_structure_step extends restore_structure_step {
             // TODO: assign_capability() needs one userid param to be able to specify our restore userid
             // TODO: it seems that assign_capability() doesn't check for valid capabilities at all ???
             if(!$data->capability) {
-                return; // ecastro ULPGC avoid empty assigments
+                return; // ecastro ULPGC avoid empty assignments
             }
             
             assign_capability($data->capability, $data->permission, $newroleid, $this->task->get_contextid());

@@ -1,0 +1,60 @@
+En la rama MOODLE_35_STABLE
+Tu rama está adelantada a 'origin/MOODLE_35_STABLE' por 6 commits.
+  (usa "git push" para publicar tus commits locales)
+
+Cambios no rastreados para el commit:
+  (usa "git add <archivo>..." para actualizar lo que será confirmado)
+  (usa "git checkout -- <archivo>..." para descartar los cambios en el directorio de trabajo)
+
+	modificado:     admin/tool/adhoc (nuevos commits)
+	modificado:     admin/tool/advuserbulk (nuevos commits)
+	modificado:     admin/tool/lockstats (nuevos commits)
+	modificado:     availability/condition/cohort (nuevos commits)
+	modificado:     blocks/admin_presets (nuevos commits)
+	modificado:     blocks/cohortspecifichtml (nuevos commits)
+	modificado:     blocks/news_slider (nuevos commits)
+	modificado:     course/format/onetopic (nuevos commits)
+	modificado:     enrol/attributes (nuevos commits)
+	modificado:     enrol/waitlist (nuevos commits)
+	modificado:     filter/generico (nuevos commits)
+	modificado:     grade/report/quizanalytics (nuevos commits)
+	modificado:     lib/editor/atto/plugins/generico (nuevos commits)
+	modificado:     lib/editor/atto/plugins/styles (nuevos commits)
+	modificado:     local/metadata (nuevos commits)
+	modificado:     local/navbarplus (nuevos commits)
+	modificado:     local/sandbox (nuevos commits)
+	modificado:     local/searchquestions (nuevos commits)
+	modificado:     local/unusedquestions (nuevos commits)
+	modificado:     mod/assign/feedback/onenote (nuevos commits)
+	modificado:     mod/assign/feedback/solutionsheet (nuevos commits)
+	modificado:     mod/assign/submission/gradereviews (nuevos commits)
+	modificado:     mod/assign/submission/onenote (nuevos commits)
+	modificado:     mod/attendance (nuevos commits)
+	modificado:     mod/chairman (nuevos commits)
+	modificado:     mod/datalynx (nuevos commits)
+	modificado:     mod/dialogue (nuevos commits)
+	modificado:     mod/game (nuevos commits)
+	modificado:     mod/hvp (nuevos commits)
+	modificado:     mod/moodleoverflow (nuevos commits)
+	modificado:     mod/offlinequiz (nuevos commits)
+	modificado:     mod/quiz/report/mcq (nuevos commits)
+	modificado:     mod/scheduler (nuevos commits)
+	modificado:     mod/tab (nuevos commits)
+	modificado:     mod/tracker (nuevos commits)
+	modificado:     mod/unedtrivial (nuevos commits)
+	modificado:     plagiarism/turnitin (nuevos commits)
+	modificado:     question/type/easyonewman (nuevos commits)
+	modificado:     question/type/formulas (nuevos commits)
+	modificado:     question/type/pmatch (nuevos commits)
+	modificado:     question/type/type_calc_sheet (nuevos commits)
+	modificado:     repository/searchable (nuevos commits)
+	modificado:     thirdpartymodules.sh
+	modificado:     ulpgc-plugins.txt
+
+Archivos sin seguimiento:
+  (usa "git add <archivo>..." para incluirlo a lo que se será confirmado)
+
+	course/format/topicgroup/
+	ulpgc-modified-thirdparty.txt
+
+sin cambios agregados al commit (usa "git add" y/o "git commit -a")

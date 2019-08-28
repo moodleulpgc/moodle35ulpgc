@@ -328,6 +328,9 @@ abstract class batchmanage_managejob_plugin  {
                 } else {
                     $isnull = '';
                 }
+                
+                //$formdata->credit = array_map('abs', $formdata->credit);
+                
                 if($formdata->credit) {
                     list($insql, $inparams) = $DB->get_in_or_equal($formdata->credit);
                     $isnull = $isnull ? " OR $isnull " : '';

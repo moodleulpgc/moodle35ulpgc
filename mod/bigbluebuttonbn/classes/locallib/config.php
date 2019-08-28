@@ -18,8 +18,8 @@
  * The mod_bigbluebuttonbn locallib/config.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
@@ -32,8 +32,8 @@ require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 /**
  * Handles the global configuration based on config.php.
  *
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class config {
 
@@ -87,6 +87,10 @@ class config {
             'recording_default' => true,
             'recording_editable' => true,
             'recording_icons_enabled' => true,
+            'recording_all_from_start_default' => false,
+            'recording_all_from_start_editable' => false,
+            'recording_hide_button_default' => false,
+            'recording_hide_button_editable' => false,
             'general_warning_message' => '',
             'general_warning_roles' => 'editingteacher,teacher',
             'general_warning_box_type' => 'info',
@@ -96,6 +100,9 @@ class config {
             'clienttype_enabled' => false,
             'clienttype_default' => '0',
             'clienttype_editable' => true,
+            'muteonstart_default' => false,
+            'muteonstart_editable' => false,
+
         );
     }
 
@@ -186,6 +193,10 @@ class config {
                'recording_default' => self::get('recording_default'),
                'recording_editable' => self::get('recording_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),
+               'recording_all_from_start_default' => self::get('recording_all_from_start_default'),
+               'recording_all_from_start_editable' => self::get('recording_all_from_start_editable'),
+               'recording_hide_button_default' => self::get('recording_hide_button_default'),
+               'recording_hide_button_editable' => self::get('recording_hide_button_editable'),
                'general_warning_message' => self::get('general_warning_message'),
                'general_warning_box_type' => self::get('general_warning_box_type'),
                'general_warning_button_text' => self::get('general_warning_button_text'),
@@ -194,6 +205,8 @@ class config {
                'clienttype_enabled' => self::get('clienttype_enabled'),
                'clienttype_editable' => self::get('clienttype_editable'),
                'clienttype_default' => self::get('clienttype_default'),
+               'muteonstart_editable' => self::get('muteonstart_editable'),
+               'muteonstart_default' => self::get('muteonstart_default'),
           );
     }
 }

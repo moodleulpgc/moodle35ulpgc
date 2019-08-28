@@ -25,10 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
-require_once(__DIR__ . '/capabilityformfield.php');
+require_once(dirname(__FILE__) . '/capabilityformfield.php');
 
 MoodleQuickForm::registerElementType('capability',
-    __DIR__ . '/capabilityformfield.php',
+    dirname(__FILE__) . '/capabilityformfield.php',
     'MoodleQuickForm_capability');
 
 

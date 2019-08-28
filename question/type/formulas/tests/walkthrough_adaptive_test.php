@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../../../engine/lib.php');
+require_once(dirname(__FILE__) . '/../../../engine/lib.php');
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
-require_once(__DIR__ . '/test_base.php');
+require_once(dirname(__FILE__) . '/test_base.php');
 require_once($CFG->dirroot . '/question/type/formulas/tests/helper.php');
 
 

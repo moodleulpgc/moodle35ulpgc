@@ -18,16 +18,16 @@
  * @package profilefield_oidc
  * @author James McQuillan <james.mcquillan@remote-learner.net>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @copyright (C) 2014 onwards Microsoft Open Technologies, Inc. (http://msopentech.com/)
+ * @copyright (C) 2014 onwards Microsoft, Inc. (http://microsoft.com/)
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2015060101;
-$plugin->requires = 2015051100;
+$plugin->version = 2016062000;
+$plugin->requires = 2016052300;
 $plugin->component = 'profilefield_oidc';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '29.0.0.1';
+$plugin->release = '3.1.0.0';
 $plugin->dependencies = [
-    'auth_oidc' => 2015060103
+    'auth_oidc' => 2016062000,
 ];

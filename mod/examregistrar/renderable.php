@@ -850,7 +850,7 @@ class examregistrar_exam_attemptsreview implements renderable {
                 $courseid = $DB->get_field('tracker', 'course', array('id'=>$issue->trackerid), MUST_EXIST);
                 $lang = $DB->get_field('tracker_translation', 'forcedlang', array('trackerid'=>$issue->trackerid));
                 $tcm = $DB->get_record('course_modules', array('course'=>$courseid, 'module'=>$moduleid, 'instance'=>$issue->trackerid), '*', MUST_EXIST);
-                $status = $STATUSCODES[$issue->status] ;
+                $status = $STATUSCODES[$issue->status];
 
                 $statusmsg = html_writer::tag('span', '&nbsp;'.tracker_getstring($status, 'tracker', null, $lang).'&nbsp;', array('class'=>'status_'.$status));
 

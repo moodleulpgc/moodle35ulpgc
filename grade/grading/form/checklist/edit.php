@@ -22,12 +22,11 @@
  * @subpackage checklist
  * @author     Sam Chaffee
  * @copyright  2011 Marina Glancy
- * @copyright  Copyright (c) 2012 Blackboard Inc. (http://www.moodlerooms.com)
+ * @copyright  Copyright (c) 2012 Blackboard Inc. (http://www.blackboard.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-require_once(__DIR__.'../../../../config.php');
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 require_once($CFG->dirroot . '/grade/grading/form/checklist/lib.php');
 require_once($CFG->dirroot . '/grade/grading/form/checklist/edit_form.php');
 require_once($CFG->dirroot . '/grade/grading/lib.php');

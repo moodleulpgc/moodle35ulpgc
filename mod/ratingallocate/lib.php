@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 define('ratingallocate_MOD_NAME', 'ratingallocate');
 // define('NEWMODULE_ULTIMATE_ANSWER', 42);
 
-require_once(__DIR__.'/db/db_structure.php');
+require_once(dirname(__FILE__).'/db/db_structure.php');
 use ratingallocate\db as this_db;
 
 // //////////////////////////////////////////////////////////////////////////////

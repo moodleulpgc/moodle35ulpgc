@@ -444,7 +444,7 @@ class qtype_mtf_edit_form extends question_edit_form {
         $repeatedoptions['hintshownumcorrect']['disabledif'] = array('single', 'eq', 1);
         return array($repeated, $repeatedoptions);
     }
-    
+
     /**
      * (non-PHPdoc).
      *

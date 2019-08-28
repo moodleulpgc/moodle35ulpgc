@@ -693,7 +693,7 @@ class mod_scheduler_renderer extends plugin_renderer_base {
             $actions = '';
             if ($slot->editable && (!$slot->isattended || $caneditall)) { // ecastro ULPGC
                 $url = new moodle_url($slotman->actionurl, array('what' => 'deleteslot', 'slotid' => $slot->slotid));
-                $actions .= $this->action_icon($url, new pix_icon('t/delete', get_string('delete')), 
+                $actions .= $this->action_icon($url, new pix_icon('t/delete', get_string('delete')),  
                                                 new confirm_action(get_string('confirmdelete', 'scheduler'))); // ecastro ULPGC
 
                 $url = new moodle_url($slotman->actionurl, array('what' => 'updateslot', 'slotid' => $slot->slotid));

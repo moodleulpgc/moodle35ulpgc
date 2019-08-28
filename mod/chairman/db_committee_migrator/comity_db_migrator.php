@@ -23,7 +23,7 @@
  * 
  * @author dddurand
  */
-require_once(__DIR__ . '/../../../config.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once("$CFG->dirroot/mod/chairman/lib.php");
 
 class comity_db_migrator {

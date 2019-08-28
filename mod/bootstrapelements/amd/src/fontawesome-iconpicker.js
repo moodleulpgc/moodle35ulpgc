@@ -655,127 +655,127 @@
                 return this.popover.pos(a.extend({}, d, b));
             }
             switch (b) {
-              case "inline":
-                {
-                    d = false;
-                }
-                break;
+                case "inline":
+                    {
+                        d = false;
+                    }
+                    break;
 
-              case "topLeftCorner":
-                {
-                    d.my = "right bottom";
-                    d.at = "left top";
-                }
-                break;
+                case "topLeftCorner":
+                    {
+                        d.my = "right bottom";
+                        d.at = "left top";
+                    }
+                    break;
 
-              case "topLeft":
-                {
-                    d.my = "left bottom";
-                    d.at = "left top";
-                }
-                break;
+                case "topLeft":
+                    {
+                        d.my = "left bottom";
+                        d.at = "left top";
+                    }
+                    break;
 
-              case "top":
-                {
-                    d.my = "center bottom";
-                    d.at = "center top";
-                }
-                break;
+                case "top":
+                    {
+                        d.my = "center bottom";
+                        d.at = "center top";
+                    }
+                    break;
 
-              case "topRight":
-                {
-                    d.my = "right bottom";
-                    d.at = "right top";
-                }
-                break;
+                case "topRight":
+                    {
+                        d.my = "right bottom";
+                        d.at = "right top";
+                    }
+                    break;
 
-              case "topRightCorner":
-                {
-                    d.my = "left bottom";
-                    d.at = "right top";
-                }
-                break;
+                case "topRightCorner":
+                    {
+                        d.my = "left bottom";
+                        d.at = "right top";
+                    }
+                    break;
 
-              case "rightTop":
-                {
-                    d.my = "left bottom";
-                    d.at = "right center";
-                }
-                break;
+                case "rightTop":
+                    {
+                        d.my = "left bottom";
+                        d.at = "right center";
+                    }
+                    break;
 
-              case "right":
-                {
-                    d.my = "left center";
-                    d.at = "right center";
-                }
-                break;
+                case "right":
+                    {
+                        d.my = "left center";
+                        d.at = "right center";
+                    }
+                    break;
 
-              case "rightBottom":
-                {
-                    d.my = "left top";
-                    d.at = "right center";
-                }
-                break;
+                case "rightBottom":
+                    {
+                        d.my = "left top";
+                        d.at = "right center";
+                    }
+                    break;
 
-              case "bottomRightCorner":
-                {
-                    d.my = "left top";
-                    d.at = "right bottom";
-                }
-                break;
+                case "bottomRightCorner":
+                    {
+                        d.my = "left top";
+                        d.at = "right bottom";
+                    }
+                    break;
 
-              case "bottomRight":
-                {
-                    d.my = "right top";
-                    d.at = "right bottom";
-                }
-                break;
+                case "bottomRight":
+                    {
+                        d.my = "right top";
+                        d.at = "right bottom";
+                    }
+                    break;
 
-              case "bottom":
-                {
-                    d.my = "center top";
-                    d.at = "center bottom";
-                }
-                break;
+                case "bottom":
+                    {
+                        d.my = "center top";
+                        d.at = "center bottom";
+                    }
+                    break;
 
-              case "bottomLeft":
-                {
-                    d.my = "left top";
-                    d.at = "left bottom";
-                }
-                break;
+                case "bottomLeft":
+                    {
+                        d.my = "left top";
+                        d.at = "left bottom";
+                    }
+                    break;
 
-              case "bottomLeftCorner":
-                {
-                    d.my = "right top";
-                    d.at = "left bottom";
-                }
-                break;
+                case "bottomLeftCorner":
+                    {
+                        d.my = "right top";
+                        d.at = "left bottom";
+                    }
+                    break;
 
-              case "leftBottom":
-                {
-                    d.my = "right top";
-                    d.at = "left center";
-                }
-                break;
+                case "leftBottom":
+                    {
+                        d.my = "right top";
+                        d.at = "left center";
+                    }
+                    break;
 
-              case "left":
-                {
-                    d.my = "right center";
-                    d.at = "left center";
-                }
-                break;
+                case "left":
+                    {
+                        d.my = "right center";
+                        d.at = "left center";
+                    }
+                    break;
 
-              case "leftTop":
-                {
-                    d.my = "right bottom";
-                    d.at = "left center";
-                }
-                break;
+                case "leftTop":
+                    {
+                        d.my = "right bottom";
+                        d.at = "left center";
+                    }
+                    break;
 
-              default:
-                {
-                    return false;
+                default:
+                    {
+                        return false;
                 }
                 break;
             }

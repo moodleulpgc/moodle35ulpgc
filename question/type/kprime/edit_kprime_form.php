@@ -8,11 +8,11 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
@@ -22,9 +22,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once ($CFG->dirroot . '/question/type/edit_question_form.php');
-require_once ($CFG->dirroot . '/question/type/kprime/lib.php');
-require_once ($CFG->dirroot . '/question/engine/bank.php');
+require_once($CFG->dirroot . '/question/type/edit_question_form.php');
+require_once($CFG->dirroot . '/question/type/kprime/lib.php');
+require_once($CFG->dirroot . '/question/engine/bank.php');
 
 
 /**
@@ -158,7 +158,7 @@ class qtype_kprime_edit_form extends question_edit_form {
         $this->definition_inner($mform);
 
         // TAGS - See API 3 https://docs.moodle.org/dev/Tag_API_3_Specification
-        if (class_exists('core_tag_tag')) { // Started from moodle 3.1 but we dev for 2.6+
+        if (class_exists('core_tag_tag')) { // Started from moodle 3.1 but we dev for 2.6+.
             if (core_tag_tag::is_enabled('core_question', 'question')) {
                 $mform->addElement('header', 'tagshdr', get_string('tags', 'tag'));
                 $mform->addElement('tags', 'tags', get_string('tags'),
@@ -168,7 +168,7 @@ class qtype_kprime_edit_form extends question_edit_form {
         }
 
         $this->add_interactive_settings(true, true);
-        
+
         if (!empty($this->question->id)) {
             $mform->addElement('header', 'createdmodifiedheader',
                     get_string('createdmodifiedheader', 'question'));
@@ -197,7 +197,7 @@ class qtype_kprime_edit_form extends question_edit_form {
             }
         }
         // Save and Keep Editing and Preview (if possible)
-        // LMDL-133
+        // LMDL-133.
         global $PAGE;
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'updatebutton',
@@ -301,13 +301,13 @@ class qtype_kprime_edit_form extends question_edit_form {
             $responsetexts[] = get_string('responsetext1', 'qtype_kprime');
             $responsetexts[] = get_string('responsetext2', 'qtype_kprime');
         }
-        
+
         // Add an option text editor, response radio buttons and a feedback editor for each option.
         for ($i = 1; $i <= $this->numberofrows; ++$i) {
             // Add the option editor.
             $mform->addElement('html', '<br/><br/>');
             $mform->addElement('html', '<div class="optionbox">'); // Open div.optionbox.
-            $mform->addElement('html', '<div class="option_question">'); //Open div.option_question
+            $mform->addElement('html', '<div class="option_question">'); // Open div.option_question.
             $mform->addElement('html', '<div class="optionandresponses">'); // Open div.optionbox.
             $mform->addElement('html', '<div class="optiontext">'); // Open div.optiontext.
 
@@ -366,7 +366,7 @@ class qtype_kprime_edit_form extends question_edit_form {
         $repeatedoptions['hintshownumcorrect']['disabledif'] = array('single', 'eq', 1);
         return array($repeated, $repeatedoptions);
     }
-    
+
     /**
      * (non-PHPdoc).
      *
@@ -422,9 +422,7 @@ class qtype_kprime_edit_form extends question_edit_form {
         // Check for empty option texts.
         for ($i = 1; $i <= $this->numberofrows; ++$i) {
             $optiontext = $data['option_' . $i]['text'];
-            // Remove HTML tags.
-            // $optiontext = trim(strip_tags($optiontext));
-            // LMDL-201
+            // LMDL-201.
             $optiontext = trim(strip_tags($optiontext, '<img><video><audio><iframe><embed>'));
             // Remove newlines.
             $optiontext = preg_replace("/[\r\n]+/i", '', $optiontext);

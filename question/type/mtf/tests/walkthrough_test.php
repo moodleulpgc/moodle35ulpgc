@@ -54,7 +54,7 @@ class qtype_mtf_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $mtf->options = new stdClass();
         $mtf->shuffleanswers = 0;
         $mtf->numberofrows = 2;
-		$mtf->numberofcolumns = 2;
+        $mtf->numberofcolumns = 2;
         $mtf->rows = array(
             5 => (object) array(
                 "id" => 5,

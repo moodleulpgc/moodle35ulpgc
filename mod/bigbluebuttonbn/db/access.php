@@ -18,10 +18,11 @@
  * Capabilities for BigBlueButton.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
+ * @author    Darko Miletic  (darko.miletic@gmail.com)
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -64,6 +65,44 @@ $capabilities = array(
         ),
     ),
 
+    // Ability to access instances, regardless of the type.
+    'mod/bigbluebuttonbn:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    // Ability to create instances with live meeting capabilities.
+    'mod/bigbluebuttonbn:meeting' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+        ),
+    ),
+
+    // Ability to create instances with recording capabilities.
+    'mod/bigbluebuttonbn:recording' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+        ),
+    ),
+
     // Ability to import recordings.
     'mod/bigbluebuttonbn:importrecordings' => array(
         'captype' => 'read',
@@ -72,32 +111,4 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         ),
     ),
-    
-    // Ability to generate live meeting.
-    'mod/bigbluebuttonbn:meeting' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
-            'guest' => CAP_PREVENT,
-        ),
-    ),
-    
-    
-    // Ability to record a meeting.
-    'mod/bigbluebuttonbn:recording' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_PREVENT,
-            'teacher' => CAP_PREVENT,
-            'student' => CAP_PREVENT,
-            'guest' => CAP_PREVENT,
-        ),
-    ),
-    
 );

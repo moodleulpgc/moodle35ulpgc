@@ -18,13 +18,15 @@
  * View for BigBlueButton interaction.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
+
+global $SESSION;
 
 $action = required_param('action', PARAM_TEXT);
 $id = optional_param('id', 0, PARAM_INT);
@@ -34,8 +36,11 @@ $mid = optional_param('mid', '', PARAM_TEXT);
 $rid = optional_param('rid', '', PARAM_TEXT);
 $rtype = optional_param('rtype', 'presentation', PARAM_TEXT);
 $errors = optional_param('errors', '', PARAM_TEXT);
+$timeline = optional_param('timeline', 0, PARAM_INT);
+$index = optional_param('index', 0, PARAM_INT);
+$group = optional_param('group', -1, PARAM_INT);
 
-$bbbviewinstance = bigbluebuttonbn_views_validator($id, $bn);
+$bbbviewinstance = bigbluebuttonbn_view_validator($id, $bn);
 if (!$bbbviewinstance) {
     print_error(get_string('view_error_url_missing_parameters', 'bigbluebuttonbn'));
 }
@@ -43,8 +48,79 @@ if (!$bbbviewinstance) {
 $cm = $bbbviewinstance['cm'];
 $course = $bbbviewinstance['course'];
 $bigbluebuttonbn = $bbbviewinstance['bigbluebuttonbn'];
-
 $context = context_module::instance($cm->id);
+
+require_login($course, true, $cm);
+
+$bbbsession = null;
+if (isset($SESSION->bigbluebuttonbn_bbbsession)) {
+    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
+}
+
+if ($timeline || $index) {
+    // If the user come from timeline or index page, the $bbbsession should be created or overriden here.
+    $bbbsession['course'] = $course;
+    $bbbsession['coursename'] = $course->fullname;
+    $bbbsession['cm'] = $cm;
+    $bbbsession['bigbluebuttonbn'] = $bigbluebuttonbn;
+    bigbluebuttonbn_view_bbbsession_set($context, $bbbsession);
+
+    // Validates if the BigBlueButton server is working.
+    $serverversion = bigbluebuttonbn_get_server_version();
+    if (is_null($serverversion)) {
+        if ($bbbsession['administrator']) {
+            print_error('view_error_unable_join', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/admin/settings.php?section=modsettingbigbluebuttonbn');
+            exit;
+        }
+        if ($bbbsession['moderator']) {
+            print_error('view_error_unable_join_teacher', 'bigbluebuttonbn',
+                $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+            exit;
+        }
+        print_error('view_error_unable_join_student', 'bigbluebuttonbn',
+            $CFG->wwwroot.'/course/view.php?id='.$bigbluebuttonbn->course);
+        exit;
+    }
+    $bbbsession['serverversion'] = (string) $serverversion;
+
+    // Operation URLs.
+    $bbbsession['bigbluebuttonbnURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/view.php?id=' . $bbbsession['cm']->id;
+    $bbbsession['logoutURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=logout&id='.$id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['recordingReadyURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=recording_' .
+        'ready&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['meetingEventsURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_broker.php?action=meeting' .
+        '_events&bigbluebuttonbn=' . $bbbsession['bigbluebuttonbn']->id;
+    $bbbsession['joinURL'] = $CFG->wwwroot . '/mod/bigbluebuttonbn/bbb_view.php?action=join&id=' . $cm->id .
+        '&bn=' . $bbbsession['bigbluebuttonbn']->id;
+
+    // Check status and set extra values.
+    $activitystatus = bigbluebuttonbn_view_get_activity_status($bbbsession);
+    if ($activitystatus == 'ended') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation);
+    } else if ($activitystatus == 'open') {
+        $bbbsession['presentation'] = bigbluebuttonbn_get_presentation_array(
+            $bbbsession['context'], $bbbsession['bigbluebuttonbn']->presentation, $bbbsession['bigbluebuttonbn']->id);
+    }
+
+    // Check group.
+    if ($group >= 0) {
+        $bbbsession['group'] = $group;
+        $groupname = get_string('allparticipants');
+        if ($bbbsession['group'] != 0) {
+            $groupname = groups_get_group_name($bbbsession['group']);
+        }
+
+        // Assign group default values.
+        $bbbsession['meetingid'] .= '['.$bbbsession['group'].']';
+        $bbbsession['meetingname'] .= ' ('.$groupname.')';
+    }
+
+    // Initialize session variable used across views.
+    $SESSION->bigbluebuttonbn_bbbsession = $bbbsession;
+}
 
 // Print the page header.
 $PAGE->set_context($context);
@@ -53,13 +129,6 @@ $PAGE->set_title(format_string($bigbluebuttonbn->name));
 $PAGE->set_cacheable(false);
 $PAGE->set_heading($course->fullname);
 $PAGE->blocks->show_only_fake_blocks();
-
-require_login($course, true, $cm);
-
-$bbbsession = null;
-if (isset($SESSION) && isset($SESSION->bigbluebuttonbn_bbbsession)) {
-    $bbbsession = $SESSION->bigbluebuttonbn_bbbsession;
-}
 
 switch (strtolower($action)) {
     case 'logout':
@@ -72,9 +141,20 @@ switch (strtolower($action)) {
             break;
         }
         // Moodle event logger: Create an event for meeting left.
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_LEFT, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_left'], $bigbluebuttonbn);
         // Update the cache.
         $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
+        // Check the origin page.
+        $sql = "SELECT meta FROM {bigbluebuttonbn_logs}
+                  WHERE userid = ? AND log = 'Join'
+                  ORDER BY ID DESC LIMIT 1";
+        $params = array('userid' => $bbbsession['userID']);
+        $lastaccess = $DB->get_field_sql($sql, $params);
+        $lastaccess = json_decode($lastaccess);
+        // If the user acceded from Timeline it should be redirected to the Dashboard.
+        if (isset($lastaccess->origin) && $lastaccess->origin == BIGBLUEBUTTON_ORIGIN_TIMELINE) {
+            redirect($CFG->wwwroot . '/my/');
+        }
         // Close the tab or window where BBB was opened.
         bigbluebutton_bbb_view_close_window();
         break;
@@ -83,10 +163,17 @@ switch (strtolower($action)) {
             print_error('view_error_unable_join', 'bigbluebuttonbn');
             break;
         }
+        // Check the origin page.
+        $origin = BIGBLUEBUTTON_ORIGIN_BASE;
+        if ($timeline) {
+            $origin = BIGBLUEBUTTON_ORIGIN_TIMELINE;
+        } else if ($index) {
+            $origin = BIGBLUEBUTTON_ORIGIN_INDEX;
+        }
         // See if the session is in progress.
         if (bigbluebuttonbn_is_meeting_running($bbbsession['meetingid'])) {
             // Since the meeting is already running, we just join the session.
-            bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
+            bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
             break;
         }
         // If user is not administrator nor moderator (user is steudent) and waiting is required.
@@ -132,18 +219,22 @@ switch (strtolower($action)) {
             break;
         }
         // Moodle event logger: Create an event for meeting created.
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_CREATED, $bigbluebuttonbn, $cm);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_create'], $bigbluebuttonbn);
         // Internal logger: Insert a record with the meeting created.
         $overrides = array('meetingid' => $bbbsession['meetingid']);
         $meta = '{"record":'.($bbbsession['record'] ? 'true' : 'false').'}';
         bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_CREATE, $overrides, $meta);
         // Since the meeting is already running, we just join the session.
-        bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn);
+        bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin);
         break;
     case 'play':
         $href = bigbluebutton_bbb_view_playback_href($href, $mid, $rid, $rtype);
         // Moodle event logger: Create an event for meeting left.
-        bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_RECORDING_VIEWED, $bigbluebuttonbn, $cm, ['other' => $rid]);
+        bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['recording_play'], $bigbluebuttonbn,
+            ['other' => $rid]);
+        // Internal logger: Instert a record with the playback played.
+        $overrides = array('meetingid' => $bbbsession['meetingid']);
+        bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_PLAYED, $overrides);
         // Execute the redirect.
         header('Location: '.urldecode($href));
         break;
@@ -222,6 +313,15 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
               'logoutURL' => $bbbsession['logoutURL'],
             ];
     $data['record'] = bigbluebutton_bbb_view_create_meeting_data_record($bbbsession['record']);
+    // Check if auto_start_record is enable.
+    if ($data['record'] == 'true' && $bbbsession['recordallfromstart']) {
+        $data['autoStartRecording'] = 'true';
+        // Check if hide_record_button is enable.
+        if ($bbbsession['recordhidebutton']) {
+            $data['allowStartStopRecording'] = 'false';
+        }
+    }
+
     $data['welcome'] = trim($bbbsession['welcome']);
     // Set the duration for the meeting.
     $durationtime = bigbluebutton_bbb_view_create_meeting_data_duration($bbbsession['bigbluebuttonbn']->closingtime);
@@ -241,6 +341,9 @@ function bigbluebutton_bbb_view_create_meeting_data(&$bbbsession) {
     $maxparticipants = intval($bbbsession['userlimit']);
     if ($maxparticipants > 0) {
         $data['maxParticipants'] = $maxparticipants;
+    }
+    if ($bbbsession['muteonstart']) {
+        $data['muteOnStart'] = 'true';
     }
     return $data;
 }
@@ -309,11 +412,11 @@ function bigbluebutton_bbb_view_create_meeting_metadata(&$bbbsession) {
 /**
  * Helper for preparing data used while joining the meeting.
  *
- * @param  array    $bbbsession
- * @param  object   $cm
+ * @param array    $bbbsession
  * @param object   $bigbluebuttonbn
+ * @param integer  $origin
  */
-function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn) {
+function bigbluebutton_bbb_view_join_meeting($bbbsession, $bigbluebuttonbn, $origin = 0) {
     // Update the cache.
     $meetinginfo = bigbluebuttonbn_get_meeting_info($bbbsession['meetingid'], BIGBLUEBUTTONBN_UPDATE_CACHE);
     if ($bbbsession['userlimit'] > 0 && intval($meetinginfo['participantCount']) >= $bbbsession['userlimit']) {
@@ -329,10 +432,11 @@ function bigbluebutton_bbb_view_join_meeting($bbbsession, $cm, $bigbluebuttonbn)
     $joinurl = bigbluebuttonbn_get_join_url($bbbsession['meetingid'], $bbbsession['username'],
         $password, $bbbsession['logoutURL'], null, $bbbsession['userID'], $bbbsession['clienttype']);
     // Moodle event logger: Create an event for meeting joined.
-    bigbluebuttonbn_event_log(BIGBLUEBUTTON_EVENT_MEETING_JOINED, $bigbluebuttonbn, $cm);
+    bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_join'], $bigbluebuttonbn);
     // Internal logger: Instert a record with the meeting created.
     $overrides = array('meetingid' => $bbbsession['meetingid']);
-    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides);
+    $meta = '{"origin":'.$origin.'}';
+    bigbluebuttonbn_log($bbbsession['bigbluebuttonbn'], BIGBLUEBUTTONBN_LOG_EVENT_JOIN, $overrides, $meta);
     // Before executing the redirect, increment the number of participants.
     bigbluebuttonbn_participant_joined($bbbsession['meetingid'],
         ($bbbsession['administrator'] || $bbbsession['moderator']));

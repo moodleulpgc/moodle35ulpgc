@@ -48,7 +48,7 @@ defined('MOODLE_INTERNAL') || die;
     $setting = new admin_setting_configtextarea($name, $title, $description, $default);
     $temp->add($setting);
 
-    // Section for custom javascript, restricted by profile field
+    // Section for custom javascript, restricted by profile field.
     $name = 'theme_adaptable/jssectionrestricted';
     $title = get_string('jssectionrestricted', 'theme_adaptable');
     $description = get_string('jssectionrestricteddesc', 'theme_adaptable');

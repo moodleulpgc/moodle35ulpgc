@@ -233,7 +233,7 @@ class admin_presets_base
 
         echo $OUTPUT->header();
 
-        include(__DIR__ . '/../tabs.php');
+        include(dirname(dirname(__FILE__)) . '/tabs.php');
 
         echo $OUTPUT->heading($actionstr . ': ' . $modestr, 1);
     }

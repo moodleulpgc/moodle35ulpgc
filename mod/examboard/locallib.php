@@ -2323,13 +2323,13 @@ function examboard_import_export_fields($examboard, $export = false) {
                         );
 
     if($export) {
-        $export = array('boardactive'   => get_string('boardactive', 'examboard'),
-                        'examactive'    => get_string('examactive', 'examboard'),
+        $export = array('boardactive'   => get_string('boardactivevis', 'examboard'),
+                        'examactive'    => get_string('examactivevis', 'examboard'),
                         'exemption'     => get_string('exemption', 'examboard'),
                         'confirmed'     => get_string('boardstatus', 'examboard'),
                         //'notifications' => get_string('boardnotify', 'examboard'),
                         'sortorder'     => get_string('order', 'examboard'),
-                        'grades'        => get_string('grades'),
+                        'grades'        => get_string('assessment', 'examboard'),
                         'excluded'      => get_string('excluded', 'examboard'),
                         'approved'      => get_string('approved', 'examboard'),
                        );
@@ -2745,7 +2745,7 @@ function examboard_export_exam_row(&$row) {
                             $data[$k] = '';
                         }
                     } else {
-                        $data[$k] = $examinee->{$col};
+                        $data[$k] = isset($examinee->{$col}) ? $examinee->{$col} : '';
                     }
                 }
                 $newrow["$col"] = implode($newline, $data);
@@ -2768,7 +2768,7 @@ function examboard_export_exam_row(&$row) {
                         $newrow["$col"] = '';
                     }
                 } else {
-                    $newrow["$col"] = $examinee->{$col};
+                    $newrow["$col"] = isset($examinee->{$col}) ? $examinee->{$col} : '';
                 }
             }
         } 
@@ -2781,7 +2781,7 @@ function examboard_export_exam_row(&$row) {
                     if($col == 'member') {
                         $data[$k] = $rolestr[$member->sortorder].$newline.fullname($member);
                     } else {
-                        $data[$k] = $member->{$col};
+                        $data[$k] = isset($member->{$col}) ? $member->{$col} : '';
                     }
                 }
                 $newrow["$col"] = implode($newline, $data);
@@ -2790,7 +2790,7 @@ function examboard_export_exam_row(&$row) {
                 if($col == 'member') {
                     $newrow["$col"] = fullname($member);
                 } else {
-                    $newrow["$col"] = $member->{$col};
+                    $newrow["$col"] = isset($member->{$col}) ? $member->{$col} : '';
                 }
             }
         }         
@@ -2946,7 +2946,7 @@ function examboard_export_examinations($examboard, $fromform) {
                 JOIN {examboard_board} b ON b.id = e.boardid AND b.examboardid = e.examboardid
                 $join
                 WHERE e.examboardid = :examboardid AND e.id $inexams
-                ORDER BY b.idnumber ASC, e.sessionname ASC, e.examdate ";
+                ORDER BY b.idnumber ASC, e.examperiod DESC, e.sessionname ASC, e.examdate ";
         $params['examboardid'] = $examboard->id;       
                 
         $rolestr = array();
@@ -2956,7 +2956,7 @@ function examboard_export_examinations($examboard, $fromform) {
             $rolestr[$idx] = $examboard->vocal.' '.($idx-1);
         }
         
-        $skipped = array('idnumber', 'sessionname', 'title', 'name', 'venue', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
+        $skipped = array('idnumber', 'sessionname', 'title', 'name', ' 	sessionname ', 'venue', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
         $examineefields = array('examinee', 'userlabel', 'tutor', 'othertutors', 'examineesortorder', 'grades', 'excluded', 'approved');
         $memberfields = array('member', 'role', 'deputy', 'exemption', 'confirmed', 'notifications');  
 

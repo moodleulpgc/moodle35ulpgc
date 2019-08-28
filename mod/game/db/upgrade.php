@@ -1843,7 +1843,7 @@ function xmldb_game_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, $ver, 'game');
     }
-    
+
     return true;
 }
 

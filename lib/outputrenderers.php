@@ -4173,7 +4173,6 @@ EOD;
         $subheader = null;
         $userbuttons = null;
         // Make sure to use the heading if it has been set.
-        
         if (isset($headerinfo['heading'])) {
             $heading = $headerinfo['heading'];
         }
@@ -4238,7 +4237,7 @@ EOD;
                     $this->page->requires->string_for_js('changesmadereallygoaway', 'moodle');
                 }
             } else {
-                    $heading = null;
+                $heading = null;
             }
         }
 

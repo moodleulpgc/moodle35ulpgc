@@ -23,8 +23,10 @@ M.mod_bigbluebuttonbn = M.mod_bigbluebuttonbn || {};
 M.mod_bigbluebuttonbn.recordings = {
 
     datasource: null,
-    locale: 'en',
     datatable: {},
+    locale: 'en',
+    windowVideoPlay: null,
+    table: null,
 
     /**
      * Initialise recordings code.
@@ -34,7 +36,7 @@ M.mod_bigbluebuttonbn.recordings = {
      */
     init: function(data) {
         this.datasource = new Y.DataSource.Get({
-            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_broker.php?"
+            source: M.cfg.wwwroot + "/mod/bigbluebuttonbn/bbb_ajax.php?"
         });
         if (data.recordings_html === false &&
             (data.profile_features.indexOf('all') != -1 || data.profile_features.indexOf('showrecordings') != -1)) {
@@ -42,6 +44,22 @@ M.mod_bigbluebuttonbn.recordings = {
             this.datatable.columns = data.columns;
             this.datatable.data = this.datatableInitFormatDates(data.data);
             this.datatableInit();
+            var searchform = Y.one('#bigbluebuttonbn_recordings_searchform');
+            if (searchform) {
+                searchform.delegate('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var value = null;
+                    if (e.target.get('id') == 'searchsubmit') {
+                        value = Y.one('#searchtext').get('value');
+                    } else {
+                        Y.one('#searchtext').set('value', '');
+                    }
+
+                    this.filterByText(value);
+                }, 'input[type=submit]', this);
+            }
         }
         M.mod_bigbluebuttonbn.helpers.init();
     },
@@ -59,12 +77,53 @@ M.mod_bigbluebuttonbn.recordings = {
         return data;
     },
 
+    initExtraLanguage: function(Y1) {
+        Y1.Intl.add(
+            'datatable-paginator',
+            Y1.config.lang,
+            {
+                first: M.util.get_string('view_recording_yui_first', 'bigbluebuttonbn'),
+                prev:  M.util.get_string('view_recording_yui_prev', 'bigbluebuttonbn'),
+                next:  M.util.get_string('view_recording_yui_next', 'bigbluebuttonbn'),
+                last:  M.util.get_string('view_recording_yui_last', 'bigbluebuttonbn'),
+                goToLabel:  M.util.get_string('view_recording_yui_page', 'bigbluebuttonbn'),
+                goToAction:  M.util.get_string('view_recording_yui_go', 'bigbluebuttonbn'),
+                perPage:  M.util.get_string('view_recording_yui_rows', 'bigbluebuttonbn'),
+                showAll:  M.util.get_string('view_recording_yui_show_all', 'bigbluebuttonbn')
+            }
+        );
+    },
+
+    escapeRegex: function(value) {
+        return value.replace( /[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&" );
+    },
+
+    filterByText: function(searchvalue) {
+        if (this.table) {
+            this.table.set('data', this.datatable.data);
+            if (searchvalue) {
+                var tlist = this.table.data;
+                var rsearch = new RegExp('<span>.*?' + this.escapeRegex(searchvalue) + '.*?</span>', 'i');
+                var filterdata = tlist.filter({asList: true}, function(item) {
+                    var activity = item.get('activity');
+                    var description = item.get('description');
+                    return (
+                        (activity && rsearch.test(activity)) || (description && rsearch.test(description))
+                    );
+                });
+                this.table.set('data', filterdata);
+            }
+        }
+    },
+
     datatableInit: function() {
         var columns = this.datatable.columns;
         var data = this.datatable.data;
+        var func = this.initExtraLanguage;
         YUI({
             lang: this.locale
-        }).use('datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+        }).use('intl', 'datatable', 'datatable-sort', 'datatable-paginator', 'datatype-number', function(Y) {
+            func(Y);
             var table = new Y.DataTable({
                 width: "1195px",
                 columns: columns,
@@ -72,6 +131,7 @@ M.mod_bigbluebuttonbn.recordings = {
                 rowsPerPage: 10,
                 paginatorLocation: ['header', 'footer']
             }).render('#bigbluebuttonbn_recordings_table');
+            M.mod_bigbluebuttonbn.recordings.table = table;
             return table;
         });
     },
@@ -253,6 +313,10 @@ M.mod_bigbluebuttonbn.recordings = {
             attempts: 1,
             dataset: nodeelement.getData()
         };
+        // New window for video play must be created previous to ajax requests.
+        this.windowVideoPlay = window.open('', '_blank');
+        // Prevent malicious modification over window opener to use window.open().
+        this.windowVideoPlay.opener = null;
         this.recordingAction(element, false, extras);
     },
 
@@ -307,7 +371,8 @@ M.mod_bigbluebuttonbn.recordings = {
         }
         if (data.action == 'play') {
             M.mod_bigbluebuttonbn.helpers.toggleSpinningWheelOff(data);
-            window.open(data.dataset.href, "_self");
+            // Update url in window video to show the video.
+            this.windowVideoPlay.location.href = data.dataset.href;
             return;
         }
         M.mod_bigbluebuttonbn.helpers.updateData(data);

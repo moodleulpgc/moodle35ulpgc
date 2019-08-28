@@ -51,15 +51,15 @@ class qtype_mtf_test extends advanced_testcase {
     protected function get_test_question_data() {
         $qdata = new stdClass();
         $qdata->qtype = 'mtf';
-		$qdata->name = 'MTF001';
+        $qdata->name = 'MTF001';
         $qdata->id = 5;
         $qdata->idnumber = 5;
         $qdata->category = 1;
         $qdata->contextid = 1;
         $qdata->parent = 0;
-		$qdata->createdby = 0;
-		$qdata->modifiedby = 0;
-		$qdata->length = 1;
+        $qdata->createdby = 0;
+        $qdata->modifiedby = 0;
+        $qdata->length = 1;
         $qdata->hidden = 0;
         $qdata->timecreated = "1552376610";
         $qdata->timemodified = "1552376610";
@@ -76,7 +76,7 @@ class qtype_mtf_test extends advanced_testcase {
         $qdata->options->answernumbering = 123;
         $qdata->options->shuffleanswers = 0;
         $qdata->options->numberofrows = 2;
-		$qdata->options->numberofcolumns = 2;
+        $qdata->options->numberofcolumns = 2;
         $qdata->options->rows = array(
             5 => (object) array(
                 "id" => 5,
@@ -170,7 +170,7 @@ class qtype_mtf_test extends advanced_testcase {
                 "clearwrong" => 0
             )
         );
-		return $qdata;
+        return $qdata;
     }
 
     public function test_can_analyse_responses() {

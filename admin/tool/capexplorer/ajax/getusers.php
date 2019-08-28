@@ -25,7 +25,7 @@
 
 define('AJAX_SCRIPT', true);
 
-require(__DIR__ . '/../../../../config.php');
+require(dirname(__FILE__) . '/../../../../config.php');
 
 $search = required_param('search', PARAM_TEXT);
 

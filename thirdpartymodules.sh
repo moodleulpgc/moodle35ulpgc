@@ -11,24 +11,32 @@ git submodule add https://github.com/MorrisR2/moodle_local_searchquestions.git  
 git submodule add https://github.com/MorrisR2/moodle_local_unusedquestions.git      local/unusedquestions
 
 #Office365 plugins
-git submodule add https://github.com/Microsoft/moodle-local_o365.git    local/o365
-git submodule add https://github.com/Microsoft/moodle-local_onenote.git local/onenote
+git submodule add https://github.com/Microsoft/moodle-local_o365.git            local/o365
+cd local/o365 && git checkout MOODLE_35_STABLE && cd ../../
+git submodule add https://github.com/Microsoft/moodle-local_onenote.git         local/onenote
+cd local/onenote && git checkout MOODLE_35_STABLE && cd ../../
 git submodule add https://github.com/Microsoft/moodle-auth_oidc.git             auth/oidc
+cd auth/oidc && git checkout MOODLE_35_STABLE && cd ../../
 git submodule add https://github.com/Microsoft/moodle-block_microsoft.git       blocks/microsoft
+cd blocks/microsoft && git checkout MOODLE_35_STABLE && cd ../../
 git submodule add https://github.com/PoetOS/moodle-filter_oembed.git            filter/oembed
 #branch MOODLE_33_STABLE
 cd filter/oembed && git checkout MOODLE_33_STABLE && cd ../../
 
-git submodule add https://github.com/Microsoft/moodle-repository_office365.git  repository/office365
+git submodule add https://github.com/Microsoft/moodle-repository_office365.git      repository/office365
+cd repository/office365 && git checkout MOODLE_35_STABLE && cd ../../
 git submodule add https://github.com/Microsoft/moodle-assignsubmission_onenote.git  mod/assign/submission/onenote
+cd mod/assign/submission/onenote && git checkout MOODLE_35_STABLE && cd ../../../../
 git submodule add https://github.com/Microsoft/moodle-assignfeedback_onenote.git    mod/assign/feedback/onenote
+cd mod/assign/feedback/onenote && git checkout MOODLE_35_STABLE && cd ../../../../
+git submodule add https://github.com/microsoft/moodle-profilefield_oidc.git          user/profile/field/oidc
 
 #Activities, mods
 git submodule add https://github.com/jhoopes/moodle-mod_activequiz.git                  mod/activequiz
 git submodule add https://github.com/ctchanandy/moodle-mod_advmindmap.git               mod/advmindmap
 git submodule add https://github.com/danmarsden/moodle-mod_attendance.git               mod/attendance
-#branch MOODLE_34_STABLE
-cd mod/attendance && git checkout MOODLE_34_STABLE && cd ../../
+#branch MOODLE_35_STABLE
+cd mod/attendance && git checkout MOODLE_35_STABLE && cd ../../
 
 git submodule add https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn.git   mod/bigbluebuttonbn
 git submodule add https://bitbucket.org/covuni/moodle-mod_bootstrapelements.git         mod/bootstrapelements
@@ -36,6 +44,7 @@ git submodule add https://bitbucket.org/covuni/moodle-mod_bootstrapelements.git 
 git submodule add https://github.com/oohoo/moodle-mod_chairman.git                      mod/chairman
 git submodule add https://github.com/davosmith/moodle-checklist.git                     mod/checklist
 git submodule add https://github.com/markn86/moodle-mod_customcert.git                  mod/customcert
+cd mod/customcert && git checkout MOODLE_35_STABLE && cd ../../
 git submodule add https://github.com/dasistwas/moodle-mod_datalynx.git                  mod/datalynx
 git submodule add https://github.com/troywilliams/moodle-mod_dialogue.git               mod/dialogue
 git submodule add https://github.com/bdaloukas/moodle-mod_game.git                      mod/game
@@ -43,21 +52,23 @@ git submodule add https://github.com/projectestac/moodle-mod_geogebra.git       
 git submodule add https://github.com/BLC-HTWChur/moodle-mod_groupselect.git             mod/groupselect
 git submodule add https://github.com/h5p/h5p-moodle-plugin.git                          mod/hvp
 git submodule add https://github.com/gbateson/moodle-mod_hotpot.git                     mod/hotpot
-git submodule add https://github.com/drachels/moodle-mod_hotquestion.git                mod/hotquestion
+#git submodule add https://github.com/drachels/moodle-mod_hotquestion.git                mod/hotquestion
 git submodule add https://github.com/netspotau/moodle-mod_lightboxgallery.git           mod/lightboxgallery
+cd mod/lightboxgallery && git checkout MOODLE_33_STABLE && cd ../../
 git submodule add https://github.com/Edunao/moodle-mod_masks.git                        mod/masks
 git submodule add https://github.com/learnweb/moodle-mod_moodleoverflow.git             mod/moodleoverflow
 git submodule add https://github.com/academic-moodle-cooperation/moodle-mod_offlinequiz.git  mod/offlinequiz
+cd mod/offlinequiz && git checkout MOODLE_35_STABLE && cd ../../
 git submodule add https://github.com/rwthmoodle/moodle-mod_pdfannotator.git             mod/pdfannotator
 git submodule add https://github.com/jmvedrine/moodle-mod_qcreate.git                   mod/qcreate
 git submodule add https://github.com/learnweb/moodle-mod_ratingallocate.git             mod/ratingallocate
 git submodule add https://github.com/bostelm/moodle-mod_scheduler.git                   mod/scheduler
-#branch MOODLE_33_STABLE
-cd mod/scheduler && git checkout MOODLE_33_STABLE && cd ../../
+#branch MOODLE_29_STABLE
+cd mod/scheduler && git checkout MOODLE_29_STABLE && cd ../../
 
 git submodule add https://github.com/bozoh/moodle-mod_simplecertificate.git             mod/simplecertificate
 #Branch MOODLE_34
-cd mod/simplecertificate && git checkout MOODLE_34 && cd ../../
+cd mod/simplecertificate && git checkout MOODLE_35 && cd ../../
 
 git submodule add https://github.com/frankkoch/moodle-mod_studentquiz.git               mod/studentquiz
 git submodule add https://github.com/mudrd8mz/moodle-mod_subcourse.git                  mod/subcourse
@@ -67,6 +78,7 @@ cd mod/tab && git checkout MOODLE_30_STABLE && cd ../../
 
 git submodule add https://github.com/vfremaux/moodle-mod_tracker.git                    mod/tracker
 #Fix dependencies 
+cd mod/tracker && git checkout MOODLE_30_WORKING && cd ../../
 git submodule add https://github.com/turnitin/moodle-mod_turnitintooltwo.git            mod/turnitintooltwo
 git submodule add https://github.com/jcastello46/moodle-mod_unedtrivial.git             mod/unedtrivial
 git submodule add https://github.com/jcrodriguez-dis/moodle-mod_vpl.git                 mod/vpl
@@ -90,10 +102,10 @@ git submodule add https://github.com/timhunt/moodle-quizaccess_offlinemode      
 git submodule add https://github.com/catalyst/moodle-quizaccess_passgrade               mod/quiz/accessrule/passgrade
 git submodule add https://github.com/moodleou/moodle-quizaccess_safeexambrowser.git     mod/quiz/accessrule/safeexambrowser  
 git submodule add https://github.com/daveyboond/moodle-quiz_mcq.git                     mod/quiz/report/mcq
-git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
-git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
 #branch master
 cd mod/quiz/report/mcq && git checkout master && cd ../../../../
+git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
+git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
 
 git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
 git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
@@ -134,7 +146,7 @@ git submodule add https://github.com/moodleou/moodle-tool_editrolesbycap.git    
 git submodule add https://github.com/catalyst/moodle-tool_lockstats.git                 admin/tool/lockstats
 #Fix install.xml 
 git submodule add https://github.com/ndunand/moodle-tool_mergeusers.git                 admin/tool/mergeusers
-git submodule add https://github.com/catalyst/moodle-tool_objectfs.git                  admin/tool/objectfs
+#git submodule add https://github.com/catalyst/moodle-tool_objectfs.git                  admin/tool/objectfs
 git submodule add https://github.com/moodleuulm/moodle-tool_opcache.git                 admin/tool/opcache
 git submodule add https://github.com/mudrd8mz/moodle-tool_pluginskel.git                admin/tool/pluginskel
 git submodule add https://github.com/agrowe/moodle-tool_rebuildcoursecache.git          admin/tool/rebuildcoursecache
@@ -151,9 +163,9 @@ git submodule add https://github.com/ewallah/moodle-availability_coursecompleted
 git submodule add https://github.com/ewallah/moodle-availability_language.git           availability/condition/language
 
 #Blocks
-git submodule add https://github.com/jleyva/moodle-block_configurablereports.git  blocks/configurable_reports
-#Branch MOODLE_30_STABLE
-cd blocks/configurable_reports && git checkout MOODLE_30_STABLE && cd ../../
+git submodule add https://github.com/jleyva/moodle-block_configurablereports.git    blocks/configurable_reports
+#Branch MOODLE_36_STABLE
+cd blocks/configurable_reports && git checkout MOODLE_36_STABLE && cd ../../
 git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git        blocks/admin_presets
 git submodule add https://github.com/moodleuulm/moodle-block_cohortspecifichtml.git blocks/cohortspecifichtml
 git submodule add  https://bitbucket.org/covuni/moodle-block_news_slider.git        blocks/news_slider
@@ -167,6 +179,7 @@ git submodule add https://github.com/marinaglancy/moodle-format_flexsections.git
 git submodule add https://github.com/davidherney/moodle-format_menutopic.git        course/format/menutopic
 git submodule add https://github.com/davidherney/moodle-format_onetopic.git         course/format/onetopic  
 git submodule add https://github.com/gjb2048/moodle-format_topcoll.git              course/format/topcoll
+cd course/format/topcoll && git checkout MOODLE_35 && cd ../../../
 
 # Enrolment methods
 git submodule add https://github.com/emeneo/moodle-enrol_apply.git          enrol/apply
@@ -177,17 +190,19 @@ git submodule add https://github.com/emeneo/moodle-enrol_waitlist.git       enro
 
 #Filters
 git submodule add https://github.com/eberhardt/moodle-filter_collapsible.git        filter/collapsible
-git submodule add https://github.com/eduridden/moodle-filter_fontawesome.git        filter/fontawesome
+#git submodule add https://github.com/adpe/moodle-filter_fontawesome.git            filter/fontawesome
+
 #must be upgraded v 4.7 manually, change repo when available
 git submodule add https://github.com/gthomas2/moodle-filter_imageopt.git            filter/imageopt
 git submodule add https://github.com/geoffrowland/moodle-filter_jmol.git            filter/jmol
 git submodule add https://github.com/frederic-nevers/moodle-filter_multiembed.git   filter/multiembed
-git submodule add https://github.com/JosePFs/moodle-filter_tabs.git                 filter/tabs
+#git submodule add https://github.com/JosePFs/moodle-filter_tabs.git                 filter/tabs
 git submodule add https://github.com/justinhunt/moodle-filter_generico.git          filter/generico
 
 #Advanced  Grading methods
 git submodule add  https://github.com/marcusgreen/moodle-gradingform_btec.git       grade/grading/form/btec
 git submodule add  https://github.com/moodlerooms/moodle-gradingform_checklist.git  grade/grading/form/checklist
+cd grade/grading/form/checklist && git checkout MOODLE_35_STABLE && cd ../../../../
 git submodule add  https://github.com/johndimopoulos/moodle-gradingform_erubric.git grade/grading/form/erubric
 
 #Gradebook Exports 
@@ -230,9 +245,6 @@ git submodule add https://github.com/ethz-let/moodle-qtype_kprime           ques
 git submodule add https://github.com/moodleou/moodle-qtype_pmatch.git       question/type/pmatch
 #need fix install.xml 
 git submodule add https://github.com/timhunt/moodle-qtype_pmatchreverse     question/type/pmatchreverse
-git submodule add https://github.com/maths/moodle-qtype_stack.git           question/type/stack
-#need fix install.xml 
-git submodule add https://github.com/lechunche/type_calc_sheet.git          question/type/type_calc_sheet
 git submodule add https://github.com/ethz-let/qtype_mtf.git                 question/type/mtf
 git submodule add https://github.com/gbateson/moodle-qtype_ordering.git     question/type/ordering
 #Fix install.xml 
@@ -245,7 +257,7 @@ git submodule add https://github.com/thepurpleblob/moodle-report_assign.git     
 git submodule add https://github.com/mikasmart/benchmark.git                            report/benchmark
 git submodule add https://github.com/pauln/moodle-report_componentgrades.git            report/componentgrades
 git submodule add https://github.com/moodleou/moodle-report_customsql.git               report/customsql
-git submodule add https://github.com/markheumueller/moodle-report_deviceanalytics.git   report/deviceanalytics
+#git submodule add https://github.com/markheumueller/moodle-report_deviceanalytics.git   report/deviceanalytics
 git submodule add https://github.com/vadimonus/moodle-report_extendedlog.git            report/extendedlog
 git submodule add https://github.com/ctchanandy/moodle-report_forumgraph.git            report/forumgraph
 
@@ -255,11 +267,12 @@ git submodule add https://github.com/jpahullo/moodle-repository_searchable.git  
 
 #Themes
 git submodule add https://bitbucket.org/covuni/moodle-theme_adaptable.git           theme/adaptable
-git submodule add https://github.com/moodleuulm/moodle-theme_boost_campus.git       theme/boost_campus
+#git submodule add https://github.com/moodleuulm/moodle-theme_boost_campus.git       theme/boost_campus
 git submodule add https://github.com/EduardoKrausME/moodle-theme_boost_training.git theme/boost_training
 git submodule add https://github.com/bmbrands/theme_bootstrap.git  theme/bootstrap
-git submodule add https://github.com/bmbrands/moodle-theme_elegance.git             theme/elegance
+#git submodule add https://github.com/bmbrands/moodle-theme_elegance.git             theme/elegance
 git submodule add https://github.com/gjb2048/moodle-theme_essential.git             theme/essential
+cd theme/essentien && git checkout MOODLE_35 && cd ../../
 git submodule add https://github.com/willianmano/moodle-theme_moove.git             theme/moove
-
+cd theme/moove && git checkout MOODLE_35_STABLE && cd ../../
 #git submodule add   

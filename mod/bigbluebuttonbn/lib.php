@@ -18,8 +18,8 @@
  * Library calls for Moodle and BigBlueButton.
  *
  * @package   mod_bigbluebuttonbn
- * @copyright 2010-2017 Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v2 or later
+ * @copyright 2010 onwards, Blindside Networks Inc
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
@@ -41,8 +41,8 @@ require_once($CFG->libdir.'/formslib.php');
 
 // JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
 if (!class_exists('\Firebase\JWT\JWT')) {
-    if (file_exists($CFG->libdir . '/php-jwt/src/JWT.php')) {
-        require_once($CFG->libdir . '/php-jwt/src/JWT.php');
+    if (file_exists($CFG->libdir.'/php-jwt/src/JWT.php')) {
+        require_once($CFG->libdir.'/php-jwt/src/JWT.php');
     } else {
         require_once($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php');
     }
@@ -54,14 +54,6 @@ if (!isset($CFG->bigbluebuttonbn)) {
 
 if (file_exists(dirname(__FILE__).'/config.php')) {
     require_once(dirname(__FILE__).'/config.php');
-    // Old BigBlueButtonBN cfg schema. For backward compatibility.
-    global $BIGBLUEBUTTONBN_CFG;
-    if (isset($BIGBLUEBUTTONBN_CFG)) {
-        foreach ((array) $BIGBLUEBUTTONBN_CFG as $key => $value) {
-            $cfgkey = str_replace("bigbluebuttonbn_", "", $key);
-            $CFG->bigbluebuttonbn[$cfgkey] = $value;
-        }
-    }
 }
 
 /*
@@ -84,6 +76,8 @@ const BIGBLUEBUTTONBN_LOG_EVENT_EDIT = 'Edit';
 const BIGBLUEBUTTONBN_LOG_EVENT_CREATE = 'Create';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_JOIN string of event join for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_JOIN = 'Join';
+/** @var BIGBLUEBUTTONBN_LOG_EVENT_PLAYED string of event record played for bigbluebuttonbn_logs */
+const BIGBLUEBUTTONBN_LOG_EVENT_PLAYED = 'Played';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT string of event logout for bigbluebuttonbn_logs */
 const BIGBLUEBUTTONBN_LOG_EVENT_LOGOUT = 'Logout';
 /** @var BIGBLUEBUTTONBN_LOG_EVENT_IMPORT string of event import for bigbluebuttonbn_logs */
@@ -93,7 +87,7 @@ const BIGBLUEBUTTONBN_LOG_EVENT_DELETE = 'Delete';
 /** @var BIGBLUEBUTTON_LOG_EVENT_CALLBACK string defines the bigbluebuttonbn callback event */
 const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
 /**
- * Indicates API features that the forum supports.
+ * Indicates API features that the bigbluebuttonbn supports.
  *
  * @uses FEATURE_IDNUMBER
  * @uses FEATURE_GROUPS
@@ -102,6 +96,7 @@ const BIGBLUEBUTTON_LOG_EVENT_CALLBACK = 'Callback';
  * @uses FEATURE_MOD_INTRO
  * @uses FEATURE_BACKUP_MOODLE2
  * @uses FEATURE_COMPLETION_TRACKS_VIEWS
+ * @uses FEATURE_COMPLETION_HAS_RULES
  * @uses FEATURE_GRADE_HAS_GRADE
  * @uses FEATURE_GRADE_OUTCOMES
  * @uses FEATURE_SHOW_DESCRIPTION
@@ -136,30 +131,26 @@ function bigbluebuttonbn_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $data  An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn  An object from the form in mod_form.php
  * @return int The id of the newly inserted bigbluebuttonbn record
  */
-function bigbluebuttonbn_add_instance($data) {
+function bigbluebuttonbn_add_instance($bigbluebuttonbn) {
     global $DB;
     // Excecute preprocess.
-    
-    bigbluebuttonbn_process_pre_save($data);
-    
+    bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
-    $data->meetingid = 0;
-    $data->presentation = bigbluebuttonbn_get_media_file($data);
+    $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
     // Insert a record.
-    $data->id = $DB->insert_record('bigbluebuttonbn', $data);
+    $bigbluebuttonbn->id = $DB->insert_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Encode meetingid.
-    $data->meetingid = bigbluebuttonbn_unique_meetingid_seed();
+    $bigbluebuttonbn->meetingid = bigbluebuttonbn_unique_meetingid_seed();
     // Set the meetingid column in the bigbluebuttonbn table.
-    $DB->set_field('bigbluebuttonbn', 'meetingid', $data->meetingid, array('id' => $data->id));
+    $DB->set_field('bigbluebuttonbn', 'meetingid', $bigbluebuttonbn->meetingid, array('id' => $bigbluebuttonbn->id));
     // Log insert action.
-    bigbluebuttonbn_log($data, BIGBLUEBUTTONBN_LOG_EVENT_ADD);
+    bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTONBN_LOG_EVENT_ADD);
     // Complete the process.
-    bigbluebuttonbn_process_post_save($data);
-    
-    return $data->id;
+    bigbluebuttonbn_process_post_save($bigbluebuttonbn);
+    return $bigbluebuttonbn->id;
 }
 
 /**
@@ -167,25 +158,24 @@ function bigbluebuttonbn_add_instance($data) {
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $data  An object from the form in mod_form.php
+ * @param object $bigbluebuttonbn  An object from the form in mod_form.php
  * @return bool Success/Fail
  */
-function bigbluebuttonbn_update_instance($data) {
+function bigbluebuttonbn_update_instance($bigbluebuttonbn) {
     global $DB;
-    
     // Excecute preprocess.
-    bigbluebuttonbn_process_pre_save($data);
+    bigbluebuttonbn_process_pre_save($bigbluebuttonbn);
     // Pre-set initial values.
-    $data->id = $data->instance;
-    $data->presentation = bigbluebuttonbn_get_media_file($data);
+    $bigbluebuttonbn->id = $bigbluebuttonbn->instance;
+    $bigbluebuttonbn->presentation = bigbluebuttonbn_get_media_file($bigbluebuttonbn);
     // Update a record.
-    $DB->update_record('bigbluebuttonbn', $data);
+    $DB->update_record('bigbluebuttonbn', $bigbluebuttonbn);
     // Get the meetingid column in the bigbluebuttonbn table.
-    $data->meetingid = (string)$DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $data->id));
+    $bigbluebuttonbn->meetingid = (string)$DB->get_field('bigbluebuttonbn', 'meetingid', array('id' => $bigbluebuttonbn->id));
     // Log update action.
-    bigbluebuttonbn_log($data, BIGBLUEBUTTONBN_LOG_EVENT_EDIT);
+    bigbluebuttonbn_log($bigbluebuttonbn, BIGBLUEBUTTONBN_LOG_EVENT_EDIT);
     // Complete the process.
-    bigbluebuttonbn_process_post_save($data);
+    bigbluebuttonbn_process_post_save($bigbluebuttonbn);
     return true;
 }
 
@@ -245,8 +235,6 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description.
  *
  * @param object $course
  * @param object $user
@@ -256,10 +244,7 @@ function bigbluebuttonbn_delete_instance_log($bigbluebuttonbn) {
  * @return bool
  */
 function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
-    global $DB;
-    $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
-        'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ), '*');
-    if ($completed > 0) {
+    if ($completed = bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn)) {
         return fullname($user).' '.get_string('view_message_has_joined', 'bigbluebuttonbn').' '.
             get_string('view_message_session_for', 'bigbluebuttonbn').' '.(string) $completed.' '.
             get_string('view_message_times', 'bigbluebuttonbn');
@@ -271,19 +256,30 @@ function bigbluebuttonbn_user_outline($course, $user, $mod, $bigbluebuttonbn) {
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
  *
- * @param object $course
- * @param object $user
+ * @param object|int $courseorid
+ * @param object|int $userorid
  * @param object $mod
  * @param object $bigbluebuttonbn
  *
  * @return bool
  */
-function bigbluebuttonbn_user_complete($course, $user, $mod, $bigbluebuttonbn) {
+function bigbluebuttonbn_user_complete($courseorid, $userorid, $mod, $bigbluebuttonbn) {
     global $DB;
-    $completed = $DB->count_records('bigbluebuttonbn_logs', array('courseid' => $course->id,
-        'bigbluebuttonbnid' => $bigbluebuttonbn->id, 'userid' => $user->id, 'log' => 'Join', ),
-        '*', IGNORE_MULTIPLE);
-    return $completed > 0;
+    if (is_object($courseorid)) {
+        $course = $courseorid;
+    } else {
+        $course = (object)array('id' => $courseorid);
+    }
+    if (is_object($userorid)) {
+        $user = $userorid;
+    } else {
+        $user = (object)array('id' => $userorid);
+    }
+    $sql = "SELECT COUNT(*) FROM {bigbluebuttonbn_logs} ";
+    $sql .= "WHERE courseid = ? AND bigbluebuttonbnid = ? AND userid = ? AND (log = ? OR log = ?)";
+    $result = $DB->count_records_sql($sql, array($course->id, $bigbluebuttonbn->id, $user->id,
+                                              BIGBLUEBUTTONBN_LOG_EVENT_JOIN, BIGBLUEBUTTONBN_LOG_EVENT_PLAYED));
+    return $result;
 }
 
 /**
@@ -462,7 +458,7 @@ function bigbluebuttonbn_get_view_actions() {
  * @return string[]
  */
 function bigbluebuttonbn_get_post_actions() {
-    return array('update', 'add', 'create', 'join', 'end', 'left', 'publish', 'unpublish', 'delete');
+    return array('update', 'add', 'delete');
 }
 
 /**
@@ -571,6 +567,7 @@ function bigbluebuttonbn_process_pre_save(&$bigbluebuttonbn) {
 function bigbluebuttonbn_process_pre_save_instance(&$bigbluebuttonbn) {
     $bigbluebuttonbn->timemodified = time();
     if ((integer)$bigbluebuttonbn->instance == 0) {
+        $bigbluebuttonbn->meetingid = 0;
         $bigbluebuttonbn->timecreated = time();
         $bigbluebuttonbn->timemodified = 0;
         // As it is a new activity, assign passwords.
@@ -593,6 +590,12 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->record)) {
         $bigbluebuttonbn->record = 0;
     }
+    if (!isset($bigbluebuttonbn->recordallfromstart)) {
+        $bigbluebuttonbn->recordallfromstart = 0;
+    }
+    if (!isset($bigbluebuttonbn->recordhidebutton)) {
+        $bigbluebuttonbn->recordhidebutton = 0;
+    }
     if (!isset($bigbluebuttonbn->recordings_html)) {
         $bigbluebuttonbn->recordings_html = 0;
     }
@@ -604,6 +607,9 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     }
     if (!isset($bigbluebuttonbn->recordings_preview)) {
         $bigbluebuttonbn->recordings_preview = 0;
+    }
+    if (!isset($bigbluebuttonbn->muteonstart)) {
+        $bigbluebuttonbn->muteonstart = 0;
     }
 }
 
@@ -634,6 +640,7 @@ function bigbluebuttonbn_process_post_save(&$bigbluebuttonbn) {
         bigbluebuttonbn_process_post_save_notification($bigbluebuttonbn);
     }
     bigbluebuttonbn_process_post_save_event($bigbluebuttonbn);
+    bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn);
 }
 
 /**
@@ -648,8 +655,7 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
     if (isset($bigbluebuttonbn->add) && !empty($bigbluebuttonbn->add)) {
         $action = get_string('mod_form_field_notification_msg_created', 'bigbluebuttonbn');
     }
-    $context = context_course::instance($bigbluebuttonbn->course);
-    \mod_bigbluebuttonbn\locallib\notifier::notification_process($context, $bigbluebuttonbn, $action);
+    \mod_bigbluebuttonbn\locallib\notifier::notification_process($bigbluebuttonbn, $action);
 }
 
 /**
@@ -674,9 +680,7 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     // Add evento to the calendar as openingtime is set.
     $event = new stdClass();
     $event->eventtype = BIGBLUEBUTTON_EVENT_MEETING_START;
-    if (defined('CALENDAR_EVENT_TYPE_ACTION')) {
-        $event->type = CALENDAR_EVENT_TYPE_ACTION;
-    }
+    $event->type = CALENDAR_EVENT_TYPE_ACTION;
     $event->name = get_string('calendarstarts', 'bigbluebuttonbn', $bigbluebuttonbn->name);
     $event->description = format_module_intro('bigbluebuttonbn', $bigbluebuttonbn, $bigbluebuttonbn->coursemodule);
     $event->courseid = $bigbluebuttonbn->course;
@@ -699,6 +703,22 @@ function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
     calendar_event::create($event);
 }
 
+/**
+ * Generates an event after a bigbluebuttonbn activity is completed.
+ *
+ * @param object $bigbluebuttonbn BigBlueButtonBN form data
+ *
+ * @return void
+ **/
+function bigbluebuttonbn_process_post_save_completion($bigbluebuttonbn) {
+    if (!empty($bigbluebuttonbn->completionexpected)) {
+        \core_completion\api::update_completion_date_event(
+            $bigbluebuttonbn->coursemodule,
+            'bigbluebuttonbn',
+            $bigbluebuttonbn->id, $bigbluebuttonbn->completionexpected
+          );
+    }
+}
 /**
  * Get a full path to the file attached as a preuploaded presentation
  * or if there is none, set the presentation field will be set to blank.
@@ -764,15 +784,16 @@ function bigbluebuttonbn_pluginfile($course, $cm, $context, $filearea, $args, $f
  * @return false|null false if file not valid
  */
 function bigbluebuttonbn_pluginfile_valid($context, $filearea) {
-    if ($context->contextlevel != CONTEXT_MODULE) {
+
+    // Can be in context module or in context_system (if is the presentation by default).
+    if (!in_array($context->contextlevel, array(CONTEXT_MODULE, CONTEXT_SYSTEM))) {
         return false;
     }
-    if ($filearea !== 'presentation') {
-        return false;
-    }
+
     if (!array_key_exists($filearea, bigbluebuttonbn_get_file_areas())) {
         return false;
     }
+
     return true;
 }
 
@@ -802,6 +823,49 @@ function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $arg
 }
 
 /**
+ * Helper for give access to the file configured in setting as default presentation.
+ *
+ * @param stdClass $course        course object
+ * @param stdClass $cm            course module object
+ * @param stdClass $context       context object
+ * @param array    $args          extra arguments
+ *
+ * @return array
+ */
+function bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $args) {
+
+    // The difference with the standard bigbluebuttonbn_pluginfile_filename() are.
+    // - Context is system, so we don't need to check the cmid in this case.
+    // - The area is "presentationdefault_cache".
+    if (count($args) > 1) {
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION,
+            'mod_bigbluebuttonbn',
+            'presentationdefault_cache');
+
+        $noncekey = sha1($context->id);
+        $presentationnonce = $cache->get($noncekey);
+        $noncevalue = $presentationnonce['value'];
+        $noncecounter = $presentationnonce['counter'];
+        if ($args['0'] != $noncevalue) {
+            return;
+        }
+
+        // The nonce value is actually used twice because BigBlueButton reads the file two times.
+        $noncecounter += 1;
+        $cache->set($noncekey, array('value' => $noncevalue, 'counter' => $noncecounter));
+        if ($noncecounter == 2) {
+            $cache->delete($noncekey);
+        }
+        return($args['1']);
+    }
+    require_course_login($course, true, $cm);
+    if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
+        return;
+    }
+    return implode('/', $args);
+}
+
+/**
  * Helper for getting pluginfile name.
  *
  * @param stdClass $course        course object
@@ -813,6 +877,12 @@ function bigbluebuttonbn_pluginfile_file($course, $cm, $context, $filearea, $arg
  */
 function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
     global $DB;
+
+    if ($context->contextlevel == CONTEXT_SYSTEM) {
+        // Plugin has a file to use as default in general setting.
+        return(bigbluebuttonbn_default_presentation_get_file($course, $cm, $context, $args));
+    }
+
     if (count($args) > 1) {
         if (!$bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $cm->instance))) {
             return;
@@ -850,8 +920,52 @@ function bigbluebuttonbn_pluginfile_filename($course, $cm, $context, $args) {
 function bigbluebuttonbn_get_file_areas() {
     $areas = array();
     $areas['presentation'] = get_string('mod_form_block_presentation', 'bigbluebuttonbn');
+    $areas['presentationdefault'] = get_string('mod_form_block_presentation_default', 'bigbluebuttonbn');
     return $areas;
 }
+
+/**
+ * Mark the activity completed (if required) and trigger the course_module_viewed event.
+ *
+ * @param  stdClass $bigbluebuttonbn        bigbluebuttonbn object
+ * @param  stdClass $course     course object
+ * @param  stdClass $cm         course module object
+ * @param  stdClass $context    context object
+ * @since Moodle 3.0
+ */
+function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
+
+    // Trigger course_module_viewed event.
+    $params = array(
+        'context' => $context,
+        'objectid' => $bigbluebuttonbn->id
+    );
+
+    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($params);
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
+    $event->trigger();
+
+    // Completion.
+    $completion = new completion_info($course);
+    $completion->set_module_viewed($cm);
+}
+
+/**
+ * Check if the module has any update that affects the current user since a given time.
+ *
+ * @param  cm_info $cm course module data
+ * @param  int $from the time to check updates from
+ * @param  array $filter  if we need to check only specific updates
+ * @return stdClass an object with the different type of areas indicating if they were updated or not
+ * @since Moodle 3.2
+ */
+function bigbluebuttonbn_check_updates_since(cm_info $cm, $from, $filter = array()) {
+    $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
+    return $updates;
+}
+
 
 /**
  * Get icon mapping for font-awesome.
@@ -878,18 +992,37 @@ function mod_bigbluebuttonbn_core_calendar_provide_event_action(calendar_event $
 
     require_once($CFG->dirroot . '/mod/bigbluebuttonbn/locallib.php');
 
+    // Get mod info.
     $cm = get_fast_modinfo($event->courseid)->instances['bigbluebuttonbn'][$event->instance];
 
-    // Check that the bigbluebuttonbn activity is open.
+    // Get bigbluebuttonbn activity.
     $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $event->instance), '*', MUST_EXIST);
-    $actionable = bigbluebuttonbn_get_availability_status($bigbluebuttonbn);
 
+    // Get if the user has joined in live session or viewed the recorded.
+    $usercomplete = bigbluebuttonbn_user_complete($event->courseid, $event->userid, null, $bigbluebuttonbn);
+    // Get if the room is available.
+    list($roomavailable) = bigbluebuttonbn_room_is_available($bigbluebuttonbn);
+    // Get if the user can join.
+    list($usercanjoin) = bigbluebuttonbn_user_can_join_meeting($bigbluebuttonbn);
+    // Get if the time has already passed.
+    $haspassed = $bigbluebuttonbn->openingtime < time();
+
+    // Check if the room is closed and the user has already joined this session or played the record.
+    if ($haspassed && !$roomavailable && $usercomplete) {
+        return null;
+    }
+
+    // Check if the user can join this session.
+    $actionable = ($roomavailable && $usercanjoin) || $haspassed;
+
+    // Action data.
     $string = get_string('view_room', 'bigbluebuttonbn');
     $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
     if (groups_get_activity_groupmode($cm) == NOGROUPS) {
         // No groups mode.
         $string = get_string('view_conference_action_join', 'bigbluebuttonbn');
-        $url = new \moodle_url('/mod/bigbluebuttonbn/view.php', array('id' => $cm->id));
+        $url = new \moodle_url('/mod/bigbluebuttonbn/bbb_view.php', array('action' => 'join',
+            'id' => $cm->id, 'bn' => $bigbluebuttonbn->id, 'timeline' => 1));
     }
 
     return $factory->create_instance($string, $url, 1, $actionable);

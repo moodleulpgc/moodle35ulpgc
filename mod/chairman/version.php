@@ -22,3 +22,5 @@ $plugin->cron     = 900;         // (15 minutes) Period for cron to check this m
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '5.1 (Build: 2016072100)';
 $plugin->component  = 'mod_chairman';
+
+

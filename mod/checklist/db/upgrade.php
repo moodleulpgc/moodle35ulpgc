@@ -53,7 +53,7 @@ function xmldb_checklist_upgrade($oldversion = 0) {
         $OUTPUT->notification('Processing checklist grades, this may take a while if there are many checklists...',
                               'notifysuccess');
 
-        require_once(__DIR__.'../lib.php');
+        require_once(dirname(dirname(__FILE__)).'/lib.php');
 
         // Too much debug output.
         $olddebug = $DB->get_debug();

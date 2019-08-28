@@ -21,7 +21,7 @@
  */
 namespace mod_ratingallocate\task;
 
-require_once(__DIR__.'/../../db/db_structure.php');
+require_once(dirname(__FILE__).'/../../db/db_structure.php');
 use ratingallocate\db as this_db;
 
 class send_distribution_notification extends \core\task\adhoc_task {      

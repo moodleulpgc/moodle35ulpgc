@@ -27,5 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_navbarplus';
 $plugin->version = 2019062500;
 $plugin->release = 'v3.7-r1';
+$plugin->requires = 2018051700; // ecastro ULPGC
 //$plugin->requires = 2019052000;
 $plugin->maturity = MATURITY_STABLE;
