@@ -773,7 +773,7 @@ function examboard_update_grades($examboard, $userid = 0) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
 
-    if ($examboard->save_gradegrade == 0) {
+    if ($examboard->grade == 0) {
         examboard_grade_item_update($examboard);
 
     } else if ($grades = examboard_get_user_grades($examboard, $userid)) {

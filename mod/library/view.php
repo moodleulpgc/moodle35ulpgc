@@ -63,7 +63,10 @@ $PAGE->set_activity_record($library);
 $target = null;
 $parameters = library_parameter_value_mapping($library, $cm, $course);
 $source = library_get_source_plugin($library, $parameters);
+$source->get_processed_searchpattern($parameters);
 $target = $source->get_source_content($context->id, $library->id);
+
+//print_object($target);
 
 /*
 if($repository = library_get_repository($library)) {
@@ -74,8 +77,12 @@ if($repository = library_get_repository($library)) {
 $output = $PAGE->get_renderer('mod_library');
 
 if (!$target) {
-    $filename = ($library->pathname) ? $library->pathname.'/' : '';
-    $filename .= str_replace(array_keys($parameters),array_values($parameters), $library->searchpattern);
+    //$filename = ($library->pathname) ? $library->pathname.'/' : '';
+    //$filename = ($library->pathname) ? $library->pathname.'/' : '';
+    //$filename .= str_replace(array_keys($parameters),array_values($parameters), $library->searchpattern);
+    $filename = ($source->pathname) ? $source->pathname.'/' : '';
+    $filename .= $source->searchpattern;
+    
     $output->print_filenotfound($filename);
     die;
 }
@@ -97,7 +104,7 @@ if($library->displaymode == LIBRARY_DISPLAYMODE_FILE) {
     if ($redirect && !$forceview) {
         // coming from course page or url index page
         // this redirect trick solves caching problems when tracking views ;-)
-        //$path = '/'.$context->id.'/mod_library/content/'.$library->revision.$target->get_filepath().$target->get_filename();
+        $path = '/'.$context->id.'/mod_library/content/'.$library->id.$target->get_filepath().$target->get_filename();
         $fullurl = moodle_url::make_file_url('/pluginfile.php', $path, $displaytype == RESOURCELIB_DISPLAY_DOWNLOAD);
         redirect($fullurl);
     }

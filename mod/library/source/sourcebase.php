@@ -48,9 +48,9 @@ abstract class library_source_base {
     /** @var string the repository name. */
     protected $reponame;
     /** @var string the path name. */
-    protected $pathname;
+    public $pathname;
     /** @var string item search pattern. */
-    protected $searchpattern;
+    public $searchpattern;
     /** @var int the display mode. */
     protected $displaymode;
     /** @var int the display mode. */
@@ -156,6 +156,11 @@ abstract class library_source_base {
         if(!$this->repository) {
             return array();
         }
+
+        $files = $this->repository->search($search);
+        //debugging(html_writer::tag('pre', s(print_r($files, true)), array('class' => 'notifytiny')),  DEBUG_DEVELOPER ); 
+        //print_object($files);
+        
         $files = $this->repository->search($search)['list'];
         return $files;
     }
@@ -178,6 +183,8 @@ abstract class library_source_base {
     public function get_source_files() {
     
         $search = $this->pathname ? $this->pathname.'/'.$this->searchpattern : $this->searchpattern;
+        
+        $search = $this->searchpattern;
     
         if($this->displaymode == LIBRARY_DISPLAYMODE_FILE) {
             if($files = $this->search_files($search)) {

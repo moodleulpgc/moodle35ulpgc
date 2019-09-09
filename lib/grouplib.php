@@ -231,6 +231,10 @@ function groups_get_all_groups($courseid, $userid=0, $groupingid=0, $fields='g.*
         }
     }
 
+    // check for unallowed or restricted groups for privacy // ecastro ULPGC
+    // used mainly for personal data groups
+    $allowed = has_capability('moodle/user:viewhiddendetails', context_course::instance($courseid));
+    
     if (empty($userid) && $knownfields && !$withmembers) {
         // We can use the cache.
         $data = groups_get_course_data($courseid);
@@ -249,6 +253,15 @@ function groups_get_all_groups($courseid, $userid=0, $groupingid=0, $fields='g.*
             }
         }
         // Yay! We could use the cache. One more query saved.
+        
+        if(!$allowed) { // ecastro ULPGC
+            foreach($groups as $gid => $group) {
+                if(($group->idnumber == 'C7') || ($group->idnumber == 'C56') || ($group->idnumber == 'PyR')) {
+                    unset($groups[$gid]);
+                }
+            }
+        }
+        
         return $groups;
     }
 
@@ -270,6 +283,11 @@ function groups_get_all_groups($courseid, $userid=0, $groupingid=0, $fields='g.*
     }
 
     array_unshift($params, $courseid);
+    
+    $unallowedwhere = ''; //ecastro ULPGC
+    if(!$allowed) {
+        $unallowedwhere = " AND ((g.idnumber != 'C7') AND (g.idnumber != 'C56') AND (g.idnumber != 'PyR'))";
+    }
 
     $results = $DB->get_records_sql("
             SELECT $fields
@@ -278,7 +296,7 @@ function groups_get_all_groups($courseid, $userid=0, $groupingid=0, $fields='g.*
               $groupingfrom
              WHERE g.courseid = ?
                $userwhere
-               $groupingwhere
+               $groupingwhere  $unallowedwhere
           ORDER BY g.name ASC", $params);
 
     if (!$withmembers) {

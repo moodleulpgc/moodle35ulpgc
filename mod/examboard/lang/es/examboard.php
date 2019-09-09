@@ -246,7 +246,7 @@ $string['tutoruseno'] = 'No';
 $string['tutoruseyes'] = 'Si';
 $string['tutoruserequired'] = 'Requerido';
 $string['allocation'] = 'Distribución automática';
-$string['allocation_help'] = 'Se puede distribuir a los usuariso y asignarlos a Tribunales de examen, 
+$string['allocation_help'] = 'Se puede distribuir a los usuarios y asignarlos a Tribunales de examen, 
 ya sea como examinadores o estudiantes de forma semi-automatizada y aleatoria. 
 Este parámetro controla la estrategia de distribución
 
@@ -306,22 +306,22 @@ cuando los miembros del Triibunal confirmen o declinen su participación. ';
 $string['confirmdefault'] = 'Estado de confirmación predefinido';
 $string['confirmdefault_help'] = 'Si están habilitadas las confirmaciones, define el estado inicial para los examinadores.
 
-Si el estado inciial es "Si" entonces para todo los mimebros del Tribunal el estado predefinido en "Confirmado", 
+Si el estado inciial es "Si" entonces para todo los miembros del Tribunal el estado predefinido en "Confirmado", 
 y en su caso podrán <strong>revocar</strong> la confirmación para indicar que NO pueden participar.
 
 Si el estado incial es "No" entonces se espera que cada miembro del tribunal confirme independientemente su participación (o no) en el Tribunal.
 ';
 $string['usewarnings'] = 'Envío de recordatorios';
-$string['usewarnings_help'] = 'Si el módulo ha de enviar recordatorios automáticos sobre un examen próximo y a quié se remiten. 
-Cunado se acerca la fecha de un examen por Tribubal el módulo puede emitir mensajes alos usuarios como recordatorio de la sesión de examen que se avecina. 
+$string['usewarnings_help'] = 'Si el módulo ha de enviar recordatorios automáticos sobre un examen próximo y a quién se remiten. 
+Cuando se acerca la fecha de un examen por Tribubal el módulo puede emitir mensajes a los usuarios como recordatorio de la sesión de examen que se avecina. 
 Los mensajes se pueden emitir para:
 
  * Nadie, no se emplean recordatorios.
  * Estudiantes: sólo los estudiantes reciben el recordatorio del examen próximo.
- * Examinadores: Los miembros del Tribunal recibirán un mensaje sobre su partcipación en el examen próximo.
+ * Examinadores: Los miembros del Tribunal recibirán un mensaje sobre su participación en el examen próximo.
  * Tutores: los tutores de los estudiantes (pero no aquellos) reciben el recordatorio del examen próximo.
- * Docentes: los profesores, ya sea miembros de Tribunal o Tutores reciben el aviso sober el examen por Tribunal que se aproxima.
- * Todos: todos los particpantes, en cualquier rol, examinadores, estudiantes y tutores, todos recibien el aviso de examen próximo.
+ * Docentes: los profesores, ya sea miembros de Tribunal o Tutores reciben el aviso sobre el examen por Tribunal que se aproxima.
+ * Todos: todos los participantes, en cualquier rol, examinadores, estudiantes y tutores, todos recibien el aviso de examen próximo.
 
 ';
 $string['usernone'] = 'No se emite ningún recordatorio';
