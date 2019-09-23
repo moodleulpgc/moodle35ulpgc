@@ -157,7 +157,13 @@ class studentquiz_user_filter_date extends user_filter_date {
         if (!empty($group) && !($group instanceof HTML_QuickForm_Error)) {
             $groupelements = $group->getElements();
             if (!empty($groupelements)) {
-                $dateselector = $groupelements[1]->getElements();
+                $dateselector = array();
+                foreach ($groupelements as $el) {
+                    if ($el instanceof MoodleQuickForm_date_selector) {
+                        $dateselector = $el->getElements();
+                        break;
+                    }
+                }
                 if (!empty($dateselector)) {
                     $isbefore = optional_param('timecreated_sdt', 0, PARAM_INT);
                     if ($isbefore && $isbefore['enabled']) {

@@ -23,7 +23,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG; // This class is included inside existing functions.
 require_once(dirname(__FILE__) . '/calendar_helpers.php');
+require_once($CFG->libdir .'/filelib.php');
 
 /**
  * Main class with all Attendance related info.
@@ -782,7 +784,7 @@ class mod_attendance_structure {
                     $groups = $groupid;
                 }
                 $users = get_users_by_capability($this->context, 'mod/attendance:canbelisted',
-                    $userfields.',u.id, u.firstname, u.lastname, u.email',
+                    $userfields,
                     $orderby, $startusers, $usersperpage, $groups,
                     '', false, true);
             } else {
@@ -798,7 +800,7 @@ class mod_attendance_structure {
                     $groups = $groupid;
                 }
                 $users = get_users_by_capability($this->context, 'mod/attendance:canbelisted',
-                    $userfields.',u.id, u.firstname, u.lastname, u.email',
+                    $userfields,
                     $orderby, '', '', $groups,
                     '', false, true);
             } else {

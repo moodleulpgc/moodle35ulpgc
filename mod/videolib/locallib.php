@@ -248,12 +248,12 @@ function videolib_get_encrypted_parameter($videolib, $config) {
  * @param object $videolib
  * @return plugin videolibsource class subtype
  */
-function videolib_get_source_plugin($videolib) {
+function videolib_get_source_plugin($videolib, $parameters = null) {
     global $CFG;
     include_once($CFG->dirroot.'/mod/videolib/source/'.$videolib->source.'/source.php');
     $classname = 'videolibsource_'.$videolib->source;
     
-    return new $classname($videolib);
+    return new $classname($videolib, $parameters);
 }
 
 

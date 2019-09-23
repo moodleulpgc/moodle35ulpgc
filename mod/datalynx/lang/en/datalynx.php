@@ -779,9 +779,10 @@ The following entry has been deactivated: {$a->viewlink}.';
 
 $string['message_comment_created'] = 'Hello {$a->fullname},
 
-a comment to one of your entries was added by {$a->senderprofilelink}.
+the following comment was added by {$a->senderprofilelink} to this entry: {$a->viewlink}:
 
-The following entry has been commented on: {$a->viewlink}.';
+
+{$a->commenttext}';
 $string['message_rating_added'] = 'Datalynx rating added';
 $string['message_rating_updated'] = 'Datalynx rating updated';
 
@@ -865,6 +866,7 @@ $string['thisdatalynx'] = 'This datalynx instance';
 $string['thisfield'] = 'This field';
 
 $string['fulltextsearch'] = 'Fulltextsearch';
+$string['authorsearch'] = 'Authorsearch';
 $string['fieldlist'] = 'Searchable Fields';
 $string['userfields'] = 'User defined fields';
 $string['sortable'] = 'sortable';
@@ -909,3 +911,6 @@ $string['confirmfieldgroupdelete'] = 'You are about to delete this fieldgroup!';
 $string['line'] = 'Line';
 $string['addline'] = 'Add {$a}';
 $string['hideline'] = 'Hide the last line';
+
+// Global search
+$string['search:activity'] = "Datalynx instances";

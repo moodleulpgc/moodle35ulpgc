@@ -120,6 +120,7 @@ $string['repositoryname_help'] = 'The the name of a particular instance of the r
 $string['rolesinparams'] = 'Include role names in parameters';
 $string['searchpattern'] = 'File name pattern';
 $string['searchpattern_help'] = 'A pattern to be matched by files or folders in the Document Library';
+$string['search:activity'] = 'Choice - activity information';
 $string['separator'] = 'Separator';
 $string['separatorexplain'] = 'A character that encloses the variable parameter name, for instance #shortname#';
 $string['serverurl'] = 'Server url';

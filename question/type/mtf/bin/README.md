@@ -13,6 +13,7 @@ be overwritten or deleted, the script will solely create new questions.
 ######Conditional Parameters (choose 0-n):
  - dryrun (values: 0,1)
  - migratesingleanswer (values: 0,1)
+ - includesubcategories (values: 0,1)
 
   The Dryrun Option is enabled (1) by default.
   With Dryrun enabled no changes will be made to the database.
@@ -23,6 +24,10 @@ be overwritten or deleted, the script will solely create new questions.
   With migratesingleanswer enabled those Multichoice Questions 
   with only one correct option are included into the Migration 
   to MTF as well.
+
+  includesubcategories wird in Kombination mit Migration by 
+  "categoryid" verwendet.
+  Falls aktiviert (1) werden Unterkategorien mit migriert.
 
 ######Examples
 
@@ -65,6 +70,7 @@ or deleted, the script will solely create new questions.
 ######Conditional Parameters (choose 0-n):
  - dryrun (values: 0,1)
  - autoweights (values: 0,1)
+ - includesubcategories (values: 0,1)
 
   The Dryrun Option is enabled (1) by default.
   With Dryrun enabled no changes will be made to the database.
@@ -77,6 +83,9 @@ or deleted, the script will solely create new questions.
   the SUM of all grades does not match 100%. With Autoweights enabled 
   different grades will be set to match a SUM of 100%. With Autoweights 
   disabled the affected question will be ignored in migration.
+
+  includesubcategories is used in combination with migration by categoryid.
+  If enabled all subcategories will be migrated as well.
 
 ######Examples
 

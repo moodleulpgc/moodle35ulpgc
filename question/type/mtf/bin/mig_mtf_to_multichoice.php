@@ -31,6 +31,7 @@ $categoryid = optional_param('categoryid', 0, PARAM_INT);
 $all = optional_param('all', 0, PARAM_INT);
 $dryrun = optional_param('dryrun', 1, PARAM_INT);
 $autoweights = optional_param('autoweights', 0, PARAM_INT);
+$includesubcategories = optional_param('includesubcategories', 0, PARAM_INT);
 
 @set_time_limit(0);
 @ini_set('memory_limit', '3072M');
@@ -79,6 +80,7 @@ if (($all != 1 && $courseid <= 0 && $categoryid <= 0) || $numparameters > 1 ) {
     <ul>
         <li><b>dryrun</b> (values: <i>0,1</i>)</li>
         <li><b>autoweights</b> (values: <i>0,1</i>)</li>
+        <li><b>includesubcategories</b> (values: <i>0,1</i>)</li>
     </ul>
     The Dryrun Option is enabled (1) by default.<br/>\n
     With Dryrun enabled no changes will be made to the database.<br/>\n
@@ -88,6 +90,9 @@ if (($all != 1 && $courseid <= 0 && $categoryid <= 0) || $numparameters > 1 ) {
     usually set equal. However in some cases the SUM of all grades does not match 100%.<br/>\n
     With Autoweights enabled different grades will be set to match a SUM of 100%.<br/>\n
     With Autoweights disabled the affected question will be ignored in migration.<br/><br/>\n\n
+    The IncludeSubcategories Option also is disabled (0) by default.<br/>\n
+    With includesubcategories enabled all subcategories will be included in the migration<br/>\n
+    process, if the user chooses to migrate questions by selecting a certain category.<br/><br/>\n\n
     =========================================================================================<br/><br/>\n\n
     Examples:<br/><br/>\n\n
     =========================================================================================<br/>\n
@@ -102,6 +107,8 @@ if (($all != 1 && $courseid <= 0 && $categoryid <= 0) || $numparameters > 1 ) {
         MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1<b>&dryrun=0</b>
         <li><strong>Enable Autoweights</strong>:<br/>\n
         MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1<b>&autoweights=1</b>
+        <li><strong>Enable IncludeSubcategories</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1&dryrun=0<b>&includesubcategories=1</b>
 	</ul>
     <br/>\n";
     die();
@@ -113,6 +120,8 @@ echo ($dryrun == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font colo
     "Dryrun: " . ($dryrun == 1 ? "NO changes to the database will be made!" : "Migration is being processed") . "<br/>\n";
 echo ($autoweights == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font color='red'>OFF</font>] ") .
     "Autoweights<br/><br/>\n\n";
+echo ($includesubcategories == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font color='red'>OFF</font>] ") .
+    "IncludeSubcategories<br/><br/>\n\n";
 echo "-----------------------------------------------------------------------------------------<br/>\n";
 echo "=========================================================================================<br/>\n";
 
@@ -133,7 +142,6 @@ if ($courseid > 0) {
     }
 
     $coursecontext = context_course::instance($courseid);
-    $contextid = $coursecontext->id;
 
     $categories = $DB->get_records('question_categories',
             array('contextid' => $coursecontext->id
@@ -151,12 +159,28 @@ if ($courseid > 0) {
 
 // Get the categories : Case 3.
 if ($categoryid > 0) {
-    if ($categories[$categoryid] = $DB->get_record('question_categories', array('id' => $categoryid
-    ))) {
+    if ($categories[$categoryid] = $DB->get_record('question_categories', array('id' => $categoryid))) {
+
+        $catids = [];
+
+        if ($includesubcategories == 1) {
+            $subcategories = get_subcategories($categoryid);
+            $catids = array_column($subcategories, 'id');
+            $catnames = array_column($subcategories, 'name');
+        }
+
+        array_push($catids, $categoryid);
+
         echo 'Migration of MTF questions within category "' . $categories[$categoryid]->name . "\"<br/>\n";
-        $sql .= ' AND category = :category ';
-        $params = array('category' => $categoryid);
-        $contextid = $DB->get_field('question_categories', 'contextid', array('id' => $categoryid));
+
+        if ($includesubcategories == 1) {
+            echo "Also migrating subcategories:<br>\n";
+            echo implode(",<br>", $catnames) . "<br>\n";
+            echo "=========================================================================================<br/>\n";
+        }
+
+        list($csql, $params) = $DB->get_in_or_equal($catids);
+        $sql .= " AND category $csql ";
     } else {
         echo "<br/>[<font color='red'>ERR</font>] Question category with ID " . $categoryid . " not found<br/>\n";
         die();
@@ -219,6 +243,7 @@ foreach ($questions as $question) {
 
             // Get contextid from question category.
             $contextid = $DB->get_field('question_categories', 'contextid', array('id' => $question->category));
+
             if (!isset($contextid)) {
                 echo "<br/>[<font color='red'>ERR</font>] No context id found for this question.";
                 continue;
@@ -379,6 +404,19 @@ echo "SCRIPT DONE: Time needed: " . round(microtime(1) - $starttime, 4) . " seco
 echo $nummigrated . "/" . count($questions) . " questions " . ($dryrun == 1 ? "would be " : null) . "migrated.<br/>\n";
 echo "=========================================================================================<br/>\n";
 die();
+
+// Getting the subcategories of a certain category.
+function get_subcategories($categoryid) {
+    global $DB;
+
+    $subcategories = $DB->get_records('question_categories', array('parent' => $categoryid), 'id');
+
+    foreach ($subcategories as $subcategory) {
+        $subcategories = array_merge($subcategories, get_subcategories($subcategory->id));
+    }
+
+    return $subcategories;
+}
 
 // Mapping the mtf weights to multichoice fractions.
 // This function checks for possible mapping problems.

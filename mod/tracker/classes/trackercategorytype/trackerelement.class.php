@@ -512,17 +512,19 @@ abstract class trackerelement {
             $currentmap[$oid] = $option->description;
         }
         $first = reset($this->options);
-        $sortorder = $first->sortorder;
-        core_collator::asort($currentmap);
-        foreach($currentmap as $oid => $name) {
-            $option = $this->options[$oid];
-            if($option->sortorder != $sortorder) {
-                $option->sortorder = $sortorder;
-                if($DB->set_field('tracker_elementitem', 'sortorder', $sortorder, array('id'=>$oid, 'elementid'=>$this->id))) {
-                    $this->options[$oid] = $option;
+        if(isset($first->sortorder)) {
+            $sortorder = $first->sortorder;
+            core_collator::asort($currentmap);
+            foreach($currentmap as $oid => $name) {
+                $option = $this->options[$oid];
+                if($option->sortorder != $sortorder) {
+                    $option->sortorder = $sortorder;
+                    if($DB->set_field('tracker_elementitem', 'sortorder', $sortorder, array('id'=>$oid, 'elementid'=>$this->id))) {
+                        $this->options[$oid] = $option;
+                    }
                 }
+                $sortorder +=1;
             }
-            $sortorder +=1;
         }
 
         return $this->options;

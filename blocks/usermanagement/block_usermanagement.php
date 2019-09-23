@@ -129,6 +129,7 @@
     function cron() {
         global $CFG, $DB;
     /// we have one initial $status
+        mtrace("\nStarting block_usermanagement cron");
         $status = true;
         require_once($CFG->dirroot.'/group/lib.php');
         $config = get_config('block_usermanagement');

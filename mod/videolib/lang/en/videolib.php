@@ -51,6 +51,7 @@ $string['displayselectexplain'] = 'Select display type.';
 $string['entryadded'] = 'Added one video key entry';
 $string['entryupdated'] = 'Updated video key entry';
 $string['dberror'] = 'Video key operation NOT performed due to database error.';
+$string['emptymessage'] = 'Video key {$a} not found.';
 $string['eventmappingdeleted'] = 'Deleted source mapping';
 $string['eventmappingdownloaded'] = 'Downloaded source mapping';
 $string['eventmappingmapped'] = 'Mapped source mapping';

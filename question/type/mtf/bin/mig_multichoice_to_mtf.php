@@ -31,6 +31,7 @@ $categoryid = optional_param('categoryid', 0, PARAM_INT);
 $all = optional_param('all', 0, PARAM_INT);
 $dryrun = optional_param('dryrun', 1, PARAM_INT);
 $migratesingle = optional_param('migratesingleanswer', 0, PARAM_INT);
+$includesubcategories = optional_param('includesubcategories', 0, PARAM_INT);
 
 @set_time_limit(0);
 @ini_set('memory_limit', '3072M');
@@ -80,39 +81,46 @@ if (($all != 1 && $courseid <= 0 && $categoryid <= 0) || $numparameters > 1 ) {
     <ul>
         <li><b>dryrun</b> (values: <i>0,1</i>)</li>
         <li><b>migratesingleanswer</b> (values: <i>0,1</i>)</li>
+        <li><b>includesubcategories</b> (values: <i>0,1</i>)</li>
     </ul>
     The Dryrun Option is enabled (1) by default.<br/>\n
     With Dryrun enabled no changes will be made to the database.<br/>\n
     Use Dryrun to receive information about possible issues before migrating.<br/><br/>\n\n
     The MigrateSingleAnswer Option is disabled (0) by default.<br/>\n
     With migratesingleanswer enabled those Multichoice Questions with only one correct option<br/>\n
-    are included into the Migration to MTF as well.<br/><br/>\n\n
+    are included into the Migration to MTF as well.<br/>\n
+    The IncludeSubcategories Option also is disabled (0) by default.<br/>\n
+    With includesubcategories enabled all subcategories will be included in the migration<br/>\n
+    process, if the user chooses to migrate questions by selecting a certain category.<br/><br/>\n\n
     =========================================================================================<br/><br/>\n\n
     Examples:<br/><br/>\n\n
     =========================================================================================<br/>\n
-	<ul>
+    <ul>
         <li><strong>Migrate MTF Questions in a specific course</strong>:<br/>\n
-        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?<b>courseid=55</b>
+        MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?<b>courseid=55</b>
         <li><strong>Migrate MTF Questions in a specific category</strong>:<br/>\n
-        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?<b>categoryid=1</b>
+        MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?<b>categoryid=1</b>
         <li><strong>Migrate all MTF Questions</strong>:<br/>\n
-        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?<b>all=1</b>
+        MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?<b>all=1</b>
         <li><strong>Disable Dryrun</strong>:<br/>\n
-        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1<b>&dryrun=0</b>
+        MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?all=1<b>&dryrun=0</b>
         <li><strong>Enable MigrateSingleAnswer</strong>:<br/>\n
-        MOODLE_URL/question/type/mtf/bin/mig_mtf_to_multichoice.php?all=1&dryrun=0<b>&migratesingleanswer=1</b>
-	</ul>
+        MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?all=1&dryrun=0<b>&migratesingleanswer=1</b>
+        <li><strong>Enable IncludeSubcategories</strong>:<br/>\n
+        MOODLE_URL/question/type/mtf/bin/mig_multichoice_to_mtf.php?all=1&dryrun=0<b>&includesubcategories=1</b>
+    </ul>
     <br/>\n";
     die();
 }
-
 
 // Parameter Information.
 echo "-----------------------------------------------------------------------------------------<br/><br/>\n\n";
 echo ($dryrun == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font color='red'>OFF</font>] ") .
     "Dryrun: " . ($dryrun == 1 ? "NO changes to the database will be made!" : "Migration is being processed") . "<br/>\n";
 echo ($migratesingle == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font color='red'>OFF</font>] ") .
-    "MigrateSingleAnswer<br/><br/>\n\n";
+    "MigrateSingleAnswer<br/>\n";
+echo ($includesubcategories == 1 ? "[<font style='color:#228d00;'>ON </font>] " : "[<font color='red'>OFF</font>] ") .
+    "IncludeSubcategories<br/><br/>\n\n";
 echo "-----------------------------------------------------------------------------------------<br/>\n";
 echo "=========================================================================================<br/>\n";
 
@@ -135,7 +143,6 @@ if ($courseid > 0) {
     }
 
     $coursecontext = context_course::instance($courseid);
-    $contextid = $coursecontext->id;
 
     $categories = $DB->get_records('question_categories', array('contextid' => $coursecontext->id));
 
@@ -154,10 +161,27 @@ if ($courseid > 0) {
 // Get the categories : Case 3.
 if ($categoryid > 0) {
     if ($categories[$categoryid] = $DB->get_record('question_categories', array('id' => $categoryid))) {
+
+        $catids = [];
+
+        if ($includesubcategories == 1) {
+            $subcategories = get_subcategories($categoryid);
+            $catids = array_column($subcategories, 'id');
+            $catnames = array_column($subcategories, 'name');
+        }
+
+        array_push($catids, $categoryid);
+
         echo 'Migration of MTF questions within category "' . $categories[$categoryid]->name . "\"<br/>\n";
-        $sql .= ' AND category = :category ';
-        $params = array('category' => $categoryid);
-        $contextid = $DB->get_field('question_categories', 'contextid', array('id' => $categoryid));
+
+        if ($includesubcategories == 1) {
+            echo "Also migrating subcategories:<br>\n";
+            echo implode(",<br>", $catnames) . "<br>\n";
+            echo "=========================================================================================<br/>\n";
+        }
+
+        list($csql, $params) = $DB->get_in_or_equal($catids);
+        $sql .= " AND category $csql ";
     } else {
         echo "<br/>[<font color='red'>ERR</font>] Question category with ID " . $categoryid . " not found<br/>\n";
         die();
@@ -184,7 +208,6 @@ foreach ($questions as $question) {
     $question->oldid = $question->id;
     $question->oldname = $question->name;
 
-
     // Getting related question data from database.
     $multichoiceoptions = $DB->get_record('qtype_multichoice_options', array('questionid' => $question->oldid));
     $questionanswers = $DB->get_records('question_answers', array('question' => $question->oldid), ' id ASC ');
@@ -200,7 +223,6 @@ foreach ($questions as $question) {
         $rownumber = $questionweights["rownumber"];
     }
 
-
     // If weights are not mapable, skip the question and continue; with the next iteration.
     if ($questionweights["error"]) {
         echo '[<font style="color:#ff0909;">ERR</font>] - question <i>"' . $question->oldname .
@@ -213,7 +235,6 @@ foreach ($questions as $question) {
     } else {
         $nummigrated++;
     }
-
 
     // If Dryrun is disabled, changes to the database are made from this point on.
     if ($dryrun == 0) {
@@ -402,6 +423,19 @@ echo "==========================================================================
 echo "SCRIPT DONE: Time needed: " . round(microtime(1) - $starttime, 4) . " seconds.<br/>\n";
 echo $nummigrated . "/" . count($questions) . " questions " . ($dryrun == 1 ? "would be " : null) . "migrated.<br/>\n";
 echo "=========================================================================================<br/>\n";
+
+// Getting the subcategories of a certain category.
+function get_subcategories($categoryid) {
+    global $DB;
+
+    $subcategories = $DB->get_records('question_categories', array('parent' => $categoryid), 'id');
+
+    foreach ($subcategories as $subcategory) {
+        $subcategories = array_merge($subcategories, get_subcategories($subcategory->id));
+    }
+
+    return $subcategories;
+}
 
 // Mapping the multichoice fractions to mtf weights.
 // This function checks for possible mapping problems.

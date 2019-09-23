@@ -55,6 +55,7 @@ Las opciones pueden incluir:
 $string['entryadded'] = 'Añadida una entrada de clave de vídeo';
 $string['entryupdated'] = 'Actualizada entrada de clave de vídeo';
 $string['dberror'] = 'Operación clave de vídeo no realizada por un erroroen la base de datos.';
+$string['emptymessage'] = 'Clave de vídeo {$a} no encontrada.';
 $string['eventmappingdeleted'] = 'Borrado mapeo de fuente';
 $string['eventmappingdownloaded'] = 'Descargado mapeo de fuente';
 $string['eventmappingmapped'] = 'Mapeo de fuente establecido';

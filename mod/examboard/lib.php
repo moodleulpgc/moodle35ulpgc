@@ -719,7 +719,7 @@ function examboard_get_user_grades($examboard, $userid=0) {
     }
     
     $sql = "SELECT e.*
-            FROM {examboard_exams}  e 
+            FROM {examboard_exam}  e 
             JOIN {examboard_grades} g ON g.examid = e.id
             WHERE e.examboardid = :examboardid  AND e.active = 1
             AND EXISTS (SELECT 1 FROM {examboard_grades} g WHERE g.examid = e.id $userwhere)

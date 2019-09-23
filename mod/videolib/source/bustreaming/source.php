@@ -65,6 +65,8 @@ class videolibsource_bustreaming extends videolib_source_base {
     }
     
     public function show() {
+        
+    
         if($this->videourl) {
             $iframeattrs = [
                 'src' => $this->videourl,
@@ -79,10 +81,10 @@ class videolibsource_bustreaming extends videolib_source_base {
             ];    
             $iframe = html_writer::tag('iframe', '', $iframeattrs);
         } else {
-            $iframe = get_string("emptymessage", 'videolib');
+            $iframe = get_string('emptymessage', 'videolib', $this->searchpattern);
         }
     
-        return html_writer::div($iframe, ' videolibvideo ');
+        return html_writer::div($iframe, ' videolibvideo video-responsive ');
     }
 
 

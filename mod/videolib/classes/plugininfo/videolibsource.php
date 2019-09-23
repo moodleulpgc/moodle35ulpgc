@@ -82,7 +82,7 @@ class videolibsource extends base {
     public function uninstall_cleanup() {
         global $DB;
 
-        $DB->delete_records('videolib_plugin_config', array('plugin'=>$this->name, 'subtype'=>'videolibsource'));
+        //$DB->delete_records('videolib_plugin_config', array('plugin'=>$this->name, 'subtype'=>'videolibsource'));
 
         parent::uninstall_cleanup();
     }

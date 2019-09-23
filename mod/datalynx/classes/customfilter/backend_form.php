@@ -46,12 +46,14 @@ class backend_form extends base_form {
             $customfilter->timecreated_sortable = false;
             $customfilter->timemodified = false;
             $customfilter->timemodified_sortable = false;
+            $customfilter->authorsearch = false;
             $customfilter->approve = false;
             $customfilter->status = false;
             $customfilter->fieldlist = "";
         }
 
         $name = empty($customfilter->name) ? get_string('filternew', 'datalynx') : $customfilter->name;
+        $customfilter->authorsearch = !isset($formdata->authorsearch) ? 0 : $customfilter->authorsearch;
 
         $mform = &$this->_form;
 
@@ -91,6 +93,10 @@ class backend_form extends base_form {
         $mform->setDefault('timemodified', $customfilter->timemodified);
         $mform->setType('timemodified_sortable', PARAM_INT);
         $mform->setDefault('timemodified_sortable', $customfilter->timemodified_sortable);
+
+        $mform->addElement('advcheckbox', 'authorsearch', get_string('authorsearch', 'datalynx'));
+        $mform->setType('authorsearch', PARAM_INT);
+        $mform->setDefault('authorsearch', $customfilter->authorsearch);
 
         $mform->addElement('advcheckbox', 'approve', get_string('approved', 'datalynx'));
         $mform->setType('approve', PARAM_INT);

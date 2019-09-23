@@ -425,6 +425,30 @@ function xmldb_local_ulpgccore_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018061800, 'local', 'ulpgccore');
     }
 
+/*    
+    if ($oldversion < 2018061800) {
+        $tables = array('course' => ['useconditionals', 'uselabel', 'personalizedlabel', 'departamento'],
+                        'course_categories' => ['faculty', 'degree'],
+                        'question' => ['creatoridnumber', 'modifieridnumber']
+                    );
+    
+        foreach($tables as $table => $fields) {}
+    
+            // load table
+            $xmldbtable = new xmldb_table($table); 
+            //useconditionals 	uselabel 	personalizedlabel 	departamento
+            // drop fields
+            foreach($fields as $field) {
+                if ($dbman->field_exists($xmldbtable, $field)) {
+                    $xmldbfield = $xmldbtable->getField($field); 
+                    $dbman->drop_field($xmldbtable, $xmldbfield);
+                }
+            }
+        }
+    
+        upgrade_plugin_savepoint(true, 2018061800, 'local', 'ulpgccore');
+    }
+*/    
     
     return true;
 }
