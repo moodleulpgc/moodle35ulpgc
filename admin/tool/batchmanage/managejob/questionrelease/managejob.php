@@ -425,7 +425,9 @@ class batchmanage_managejob_questionrelease extends batchmanage_managejob_plugin
                 $DB->update_record('local_ulpgccore_questions', $uq);
             } else {
                 $uq->qsource = $CFG->wwwroot;
+                $uq->questionid = $q->id;
                 $uq->sourceqid = $q->id;
+                
                 $DB->insert_record('local_ulpgccore_questions', $uq);
             }
         }
@@ -469,7 +471,7 @@ class batchmanage_managejob_questionrelease extends batchmanage_managejob_plugin
         if($update) {
             $DB->update_record('question', $q);
         }
-            return $q->contextid;
+        return $q->contextid;
     }    
     
 }

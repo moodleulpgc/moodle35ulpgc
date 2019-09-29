@@ -97,3 +97,17 @@ $string['enclosure_help'] = 'Carácter circundante de cada campo en texto y fich
 
 En ficheros CSV cada campo multipalabra puede estar circundado por un carácter que marca el inicio y final del campo. 
 Es un detalle opcional. Si se utiliza, debe ser un único carácter, no un conjunto de letras, usualmente ["] o [\'].';
+$string['task_rolesyncgroups'] = 'Sincronizar grupos de Portada por rol';
+$string['task_cohortsyncgroups'] = 'Sincronizar grupos de Portada por cohorte';
+$string['enablefpgroupsfromcohort'] = 'Habilitar sincronización de grupos por cohorte';
+$string['explainenablefpgroupsfromcohort'] = 'Si se habilita, puede seleccionar unas cohortes y sus miembros se asignaran como miembros de un grupo de la página principal con el mismo código de identificación.';
+$string['fpgroupscohorts'] = 'Cohortes a sincronizar con grupos de Portada';
+$string['explainfpgroupscohorts'] = 'Se creará un grupo en la Portada (curso de sitio) para cada cohorte, con sus miembros sincronizados. 
+Los usuarios añadidos manualmente podrán ser eliminados también manualmente.';
+$string['enrolmentkey'] = 'Sincronización de grupos por rol';
+$string['explainenrolmentkey'] = 'Una clave de matriculación para identificar los grupos de Portada que serán poblados a partir de asignaciones de rol de los usuarios. 
+Dejar vacío para deshabilitar y no usar roles como mecanismo de pertenencia a grupos de Portada.';
+$string['grouproles'] = 'Roles para el grupo {$a}';
+$string['explaingrouproles'] = 'The users with the selected roles, in any context, will be synched as group members in group {$a}. 
+Leave empty to disable and not use roles as frontpage group assignment mechanism.';
+

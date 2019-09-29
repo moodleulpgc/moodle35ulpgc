@@ -108,3 +108,17 @@ $string['enclosure_help'] = 'Character enclosing text fields in CSV texts and fi
 
 In CSV files multi word fields may be enclosed by a character that marks field start and end. 
 It\'s an optional feature. If present it mustbe a single character, usually ["] or [\'].';
+$string['task_rolesyncgroups'] = 'Synch frontpage groups by role';
+$string['task_cohortsyncgroups'] = 'Synch frontpage groups by cohort';
+$string['enablefpgroupsfromcohort'] = 'Enable frontpage groups synch from cohorts';
+$string['explainenablefpgroupsfromcohort'] = 'If enabled, you may choose some cohorts and their members will be added as members of a frontpage group of the same name and idnumber';
+$string['fpgroupscohorts'] = 'Cohorts to synch with frontpage groups';
+$string['explainfpgroupscohorts'] = 'There will be a frontpage group for each selected cohort. The members will be synced. You may add o remove users to group manually.';
+$string['enrolmentkey'] = 'Frontpage groups synch by role';
+$string['explainenrolmentkey'] = 'An enrolment key to identify frontpage groups to be populated from users roles. 
+Leave empty to disable and not use roles as frontpage group assignment mechanism.';
+$string['grouproles'] = 'Roles para el grupo {$a}';
+$string['explaingrouproles'] = 'The users with the selected roles, in any context, will be synched as group members in group {$a}. 
+Leave empty to disable and not use roles as frontpage group assignment mechanism.';
+
+
