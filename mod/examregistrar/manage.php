@@ -265,7 +265,7 @@ if($upload) {
 
                 if($success) {
                     if(is_int($success) && $item = (int)$success) {
-                        $eventdata['objectid'] = abs($item);
+                        //$eventdata['objectid'] = abs($item);
                         $event = ($item > 0) ? \mod_examregistrar\event\manage_created::created($eventdata, 'examregistar_'.$upload) :
                                                     \mod_examregistrar\event\manage_updated::created($eventdata, 'examregistar_'.$upload);
                         $event->trigger();

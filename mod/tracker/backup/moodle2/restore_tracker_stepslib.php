@@ -102,7 +102,16 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->course = $this->get_courseid();
 
         // The data is actually inserted into the database later in inform_new_usage_id.
-        $newitemid = $DB->insert_record('tracker_element', $data);
+        $params = array();
+        foreach(array('course', 'name', 'type', 'description') as $field) {
+            $params[$field] = $data->{$field};
+        }
+        if(!$records = $DB->get_records('tracker_element', $params)) {
+            $newitemid = $DB->insert_record('tracker_element', $data);
+        } else {
+            $record = reset($records);
+            $newitemid = $record->id;
+        }
         $this->set_mapping('tracker_element', $oldid, $newitemid, false); // Has no related files
     }
 
@@ -115,7 +124,17 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->elementid = $this->get_mappingid('tracker_element', $data->elementid);
 
         // The data is actually inserted into the database later in inform_new_usage_id.
-        $newitemid = $DB->insert_record('tracker_elementitem', $data);
+        $params = array();
+        foreach(array('elementid', 'name', 'description') as $field) {
+            $params[$field] = $data->{$field};
+        }        
+        if(!$records = $DB->get_records('tracker_elementitem', $params)) {
+            $newitemid = $DB->insert_record('tracker_elementitem', $data);
+        } else {
+            $record = reset($records);
+            $newitemid = $record->id;
+        }
+
         $this->set_mapping('tracker_elementitem', $oldid, $newitemid, false); // Has no related files
     }
 

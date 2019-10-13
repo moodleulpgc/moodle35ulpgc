@@ -140,7 +140,7 @@ class batchmanage_managejob_qcatdelete extends batchmanage_managejob_plugin {
         if($data && $category) {
             $questionids = $DB->get_records_select_menu('question',
                                         'category = ? AND (parent = 0 OR parent = id)', array($category->id), '', 'id,1');
-            $childs = $DB_>record_exists('question_categories', array("parent" => $category->id));
+            $childs = $DB->record_exists('question_categories', array("parent" => $category->id));
             
             question_remove_stale_questions_from_category($category->id);
                                         

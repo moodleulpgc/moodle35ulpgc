@@ -49,6 +49,15 @@ Options:
 Example:
 $sudo -u www-data php crawl-as.php --url=https://host.example/
 ';
+$string['clicrawlerhelp'] = 'Run the crawler manually without having to wait for the scheduled task.
+
+Options:
+-h, --help          Print out this help
+--verbose=<level>   Verbosity level (0 = Quiet, 1 = Standard verbosity, 2 = Extended verbosity), Default: 1
+
+Example:
+$sudo -u www-data php crawler.php --verbose=1
+';
 $string['clierror'] = 'Error: {$a}';
 $string['cliscrapeashelp'] = 'Scrape the URL as the robot would see it, but do not process/queue it.
 
@@ -129,6 +138,11 @@ $string['outgoingurls'] = 'Outgoing URLs';
 $string['progress'] = 'Progress';
 $string['progresseta'] = '{$a->percent}; ETA is {$a->eta}';
 $string['pluginname'] = 'Link crawler robot';
+$string['priority'] = 'Priority';
+$string['defaultpriority'] = 'Low';
+$string['normalpriority'] = 'Normal';
+$string['highpriority'] = 'High';
+$string['custompriority'] = 'Custom: {$a}';
 $string['queued'] = 'Queued URLs';
 $string['queued_header'] = '<p>The title and course are only known if the URL has been seen on a previous crawl.</p>';
 $string['recent'] = 'Recently crawled URLs';

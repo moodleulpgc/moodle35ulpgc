@@ -2888,11 +2888,11 @@ function examregistrar_loadcsv_elementscheck($record, $field, $elementtype, $ign
     global $DB;
 
     $eventdata = array();
-    $eventdata['objecttable'] = 'examregistrar_elements';
+    //$eventdata['objecttable'] = 'examregistrar_elements';
     list($course, $cm) = get_course_and_cm_from_instance($record->examregid, 'examregistrar');
     $context = context_module::instance($cm->id);
     $eventdata['context'] = $context;
-    $eventdata['other'] = array();
+    $eventdata['other'] = array('edit'=>'elements');
     
     $elementid = 0;
     /// now integrity checks
@@ -2904,8 +2904,8 @@ function examregistrar_loadcsv_elementscheck($record, $field, $elementtype, $ign
                 unset($element->id);
             }
             if($elementid = $DB->insert_record('examregistrar_elements', $element)) {
-                $eventdata['objectid'] = $element->id;
-                $event = \mod_examregistrar\event\manage_created::create($eventdata);
+                //$eventdata['objectid'] = $element->id;
+                $event = \mod_examregistrar\event\manage_created::created($eventdata);
                 $event->trigger();
             }
         } else {
@@ -2919,8 +2919,9 @@ function examregistrar_loadcsv_elementscheck($record, $field, $elementtype, $ign
             $element->type = $elementtype;
             $element->id = $eid;
             if($DB->update_record('examregistrar_elements', $element)) {
-                $eventdata['objectid'] = $element->id;
-                $event = \mod_examregistrar\event\manage_updated::create($eventdata);
+                //$eventdata['objectid'] = $element->id;
+                //$eventdata['objecttable'] = 'examregistrar_elements';
+                $event = \mod_examregistrar\event\manage_updated::created($eventdata);
                 $event->trigger();
             }
         } else {
@@ -2971,6 +2972,8 @@ function examregistrar_loadcsv_elements($examregistrar, $data, $ignoremodified) 
  * @return mixed item string if error int > 0 insert,  < 0 update
  */
 function examregistrar_saveupdate_csvloaded_item($record, $table, $update = false) {
+    global $DB; 
+
     $item = false;
     $table = 'examregistrar_'.$table;
     if($update) {
@@ -3768,7 +3771,7 @@ function examregistrar_generateexams_fromcourses($examregistrar, $options) {
         list($course, $cm) = get_course_and_cm_from_instance($examregistrar, 'examregistrar');
         $context = context_module::instance($cm->id);
         $eventdata['context'] = $context;
-        $eventdata['other'] = array();
+        $eventdata['other'] = array('edit'=>'exams');
     
         $updated = 0;
         $added = 0;
@@ -3776,11 +3779,11 @@ function examregistrar_generateexams_fromcourses($examregistrar, $options) {
         foreach($modified as $key => $item) {
             $eventdata['objectid'] = $key;
             switch($item) {
-                case 2 : $event = \mod_examregistrar\event\manage_created::create($eventdata);
+                case 2 : $event = \mod_examregistrar\event\manage_created::created($eventdata, 'examregistrar_exams');
                         break;
-                case 3 : $event = \mod_examregistrar\event\manage_deleted::create($eventdata);
+                case 3 : $event = \mod_examregistrar\event\manage_deleted::created($eventdata, 'examregistrar_exams');
                         break;
-                default: $event = \mod_examregistrar\event\manage_updated::create($eventdata);
+                default: $event = \mod_examregistrar\event\manage_updated::created($eventdata, 'examregistrar_exams');
             }
             $event->trigger();
             

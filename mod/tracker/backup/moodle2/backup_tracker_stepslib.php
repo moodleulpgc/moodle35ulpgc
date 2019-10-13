@@ -44,7 +44,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $elements = new backup_nested_element('elements');
 
         $element = new backup_nested_element('element', array('id'), array(
-            'name', 'description', 'type'));
+            'name', 'description', 'type', 'paramint1', 'paramint2', 'paramchar1', 'paramchar2')); // ecastro ULPGC
 
         $elementitems = new backup_nested_element('elementitems');
 
@@ -54,7 +54,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $usedelements = new backup_nested_element('usedelements');
 
         $usedelement = new backup_nested_element('usedelement', array('id'), array(
-            'trackerid', 'elementid', 'sortorder', 'canbemodifiedby', 'active'));
+            'trackerid', 'elementid', 'sortorder', 'canbemodifiedby', 'active', 'mandatory', 'private')); // ecastro ULPGC
 
         $issues = new backup_nested_element('issues');
 
