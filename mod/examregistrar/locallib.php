@@ -633,7 +633,7 @@ function examregistrar_review_addissue($examregistrar, $course, $examfile, $trac
             $eventdata['other']['issueid'] = $issueid;
             $eventdata['other']['idnumber'] = $examfile->idnumber;
             $eventdata['other']['examregid'] = $examregistrar->id;
-            $event = \mod_examregistrar\event\examfiles_synced::create($eventdata);
+            $event = \mod_examregistrar\event\examfile_synced::create($eventdata);
             $event->trigger();
         }
     }
@@ -973,9 +973,9 @@ function examregistrar_get_course_instance($exam) {
             JOIN {examregistrar} e ON cm.instance = e.id AND cm.course = e.course
             JOIN {course_sections} cs ON cs.id = cm.section
             WHERE cm.module = :module AND cm.course = :course AND e.primaryreg = :primary
-                    AND e.programme = :programme AND e.annuality = :annuality
+                    AND e.annuality = :annuality
             ORDER BY cs.section ASC ";
-    $params = array('module'=>$module, 'primary'=>$primary, 'course'=>$exam->courseid, 'programme'=>$exam->programme, 'annuality'=>$exam->annuality);
+    $params = array('module'=>$module, 'primary'=>$primary, 'course'=>$exam->courseid, 'annuality'=>$exam->annuality);
     if($mods = $DB->get_records_sql_menu($sql, $params, 0, 1)) {
         return reset($mods);
     }
@@ -1180,6 +1180,8 @@ function examregistrar_booking_seating_qc($sessionid, $bookedsite = 0, $sort='')
 function examregistrar_set_location_tree($locationid) {
     global $DB;
 
+    print_object("Entrando en locationid $locationid");
+    
     $location = $DB->get_record('examregistrar_locations', array('id'=>$locationid), '*', MUST_EXIST);
     $oldpath = $location->path;
     $path = $location->path;
@@ -1200,12 +1202,21 @@ function examregistrar_set_location_tree($locationid) {
             }
             $location->parent = $parent;
         }
+    } else {
+        $path = '/'.$location->id;
+        $depth = count(explode('/', $path)) - 1;
+        $location->path = $path;
+        $location->depth = $depth;
+    }
+
+    if($location->depth && $location->path) {
         $success = $DB->update_record('examregistrar_locations', $location);
     }
 
     if($success && ($path != $oldpath)) {
         //rebuild children's paths
         examregistrar_rebuild_location_paths($location);
+        
     }
     return $success;
 }
@@ -1305,6 +1316,8 @@ function examregistrar_is_venue_single_room($venue, $returnids=true) {
         if(count($rooms) === 1) {
             $room = reset($rooms);
         }
+    } else {
+        \core\notification::error(get_string('venueerror', 'examregistrar'));
     }
     
     return $room;
@@ -2219,8 +2232,9 @@ function examregistrar_get_potential_staffers($examregistrar, $roomid, $newrole=
 
     $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
     $users = get_users_by_capability($context, 'mod/examregistrar:beroomstaff', $fields, 'lastname ASC');
-    if($categories = explode(',', $config->staffcats)) {
-        //$users = array();
+    $categories = null;
+    $categories =  !is_array($config->staffcats) ? explode(',', $config->staffcats) : $config->staffcats;
+    if($categories) {
         foreach($categories as $category) {
             $select = ' c.category = :category AND c.visible = 1 ';
             if($config->excludecourses) {
@@ -3049,9 +3063,11 @@ function examregistrar_loadcsv_locations($examregistrar, $data, $ignoremodified,
         $record->visible = (int)$record->visible;
     }
 
-    /// TODO   update path & depth  TODO ///
+    if($record->id = examregistrar_saveupdate_csvloaded_item($record, 'locations', $update)) {
+        examregistrar_set_location_tree($record->id);
+    }
 
-    return examregistrar_saveupdate_csvloaded_item($record, 'locations', $update);
+    return $record->id;
 }
 
 

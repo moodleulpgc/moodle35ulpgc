@@ -147,12 +147,12 @@ function quiz_makeexam_validate_questions($examfileid) {
     if($validate && $tagvalidated) {
         foreach($validate as $qid) {
             if($tagrejected) {
-                $tag = core_tag_tag::get($tagrejected);
-                core_tag_tag::remove_item_tag('', 'question', $qid, $tagrejected->rawname, $userid);
+                //$tag = core_tag_tag::get($tagrejected->id);
+                core_tag_tag::remove_item_tag('core_question', 'question', $qid, $tagrejected->rawname, $userid);
             }
             if($tagnoreview) {
-                $tag = core_tag_tag::get($tagnoreview);
-                core_tag_tag::remove_item_tag('', 'question', $qid, $tagnoreview->rawname, $userid);
+                //$tag = core_tag_tag::get($tagnoreview->id);
+                core_tag_tag::remove_item_tag('core_question', 'question', $qid, $tagnoreview->rawname, $userid);
             }
             
             core_tag_tag::add_item_tag('core_question', 'question', $qid, $context, $tagvalidated->rawname, $reviewerid);

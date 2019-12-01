@@ -342,8 +342,13 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
             $output .= html_writer::empty_tag('br');
             $output .= html_writer::tag('span', $date, ['class' => 'date']);
         } else {
-            $author = user_get_users_by_id(array($question->createdby))[$question->createdby];
-            $output .= fullname($author);
+            $author = core_user::get_user($question->createdby);
+            if ($author) {
+                $output .= html_writer::tag('span', fullname($author));
+            } else {
+                // Cannot find the user. Leave it blank.
+                $output .= html_writer::tag('span', '');
+            }
             $output .= html_writer::empty_tag('br');
             $output .= html_writer::tag('span', $date, ['class' => 'date']);
         }
@@ -360,28 +365,25 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_state_column($question, $baseurl, $rowclasses) {
-        switch ($question->state) {
-            case studentquiz_helper::STATE_DISAPPROVED:
-                // Disapproved
-                $state = 'state_disapproved';
-                break;
-            case studentquiz_helper::STATE_APPROVED:
-                // Approved.
-                $state = 'state_approved';
-                break;
-            case studentquiz_helper::STATE_NEW:
-                // New.
-                $state = 'state_new';
-                break;
-            case studentquiz_helper::STATE_CHANGED:
-                // Changed.
-                $state = 'state_changed';
-                break;
-            default:
-                throw new coding_exception('Invalid question state');
+        // Moodle doesn't process "empty" objects in restore. So questions from older backups can have no question state
+        // assigned. Need to figure out for the calculation, if it's fine to handle them just as new or if the question
+        // table has to have an entry. Ref: https://github.com/frankkoch/moodle-mod_studentquiz/issues/172
+        if (is_null($question->state) || $question->state === "") {
+            $question->state = studentquiz_helper::STATE_NEW;
         }
-        $title = get_string('state_change_tooltip', 'studentquiz', get_string($state, 'studentquiz'));
-        $content = $this->output->pix_icon($state, '', 'studentquiz');
+
+        if (!in_array(intval($question->state), array(
+            studentquiz_helper::STATE_DISAPPROVED,
+            studentquiz_helper::STATE_APPROVED,
+            studentquiz_helper::STATE_NEW,
+            studentquiz_helper::STATE_CHANGED,
+        ))) {
+            throw new coding_exception('Invalid question state `'.$question->state.'` for question `'.$question->id.'`');
+        }
+
+        $statename = studentquiz_helper::$statename[intval($question->state)];
+        $title = get_string('state_change_tooltip_'.$statename, 'studentquiz');
+        $content = $this->output->pix_icon('state_'.$statename, '', 'studentquiz');
 
         if (question_has_capability_on($question, 'editall')) {
             $url = new moodle_url($baseurl, [
@@ -1563,7 +1565,7 @@ class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
                     studentquiz_helper::STATE_DELETE => get_string('delete')
             ];
             $output .= html_writer::start_span('change-question-state');
-            $output .= html_writer::tag('label', 'Change state', ['for' => 'statetype']);
+            $output .= html_writer::tag('label', get_string('state_toggle', 'studentquiz'), ['for' => 'statetype']);
             $output .= html_writer::select($states, 'statetype');
             $output .= html_writer::tag('button', 'Submit',
                     ['type' => 'button', 'class' => 'btn btn-secondary', 'id' => 'change_state', 'data-questionid' => $questionid,

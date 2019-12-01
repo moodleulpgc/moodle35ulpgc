@@ -268,6 +268,9 @@ abstract class qtype_combined_combiner_base {
      * @return array
      */
     protected function add_prefixes_to_response_array($substep, $response) {
+        if ($response === null) {
+            return [];
+        }
         $keysadded = array();
         foreach ($response as $key => $value) {
             $keysadded[$substep->add_prefix($key)] = $value;
@@ -369,10 +372,11 @@ class qtype_combined_type_manager {
     }
 
     /**
-     * @return string the default question text when you first open the form. Also used to determine what subq form fragments
-     * should be shown when you first start to create a question.
+     * Get examples of a placeholder for each possible type of sub-question.
+     *
+     * @return string example placeholders.
      */
-    public static function default_question_text() {
+    public static function get_example_placeholders() {
         $i = 1;
         $codes = array();
         self::find_and_load_all_combinable_qtype_hook_classes();
@@ -380,10 +384,10 @@ class qtype_combined_type_manager {
         sort($identifiers);
         foreach ($identifiers as $identifier) {
             $type = self::$combinableplugins[$identifier];
-            $codes[] = $type->embedded_code_for_default_question_text($i);
+            $codes[] = html_writer::span($type->embedded_code_for_default_question_text($i), 'qtype_combined-sample-placeholder');
             $i++;
         }
-        return join("\n\n", $codes);
+        return implode(" ", $codes);
     }
 
     /**

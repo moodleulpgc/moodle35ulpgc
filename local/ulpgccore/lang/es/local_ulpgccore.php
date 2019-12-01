@@ -266,6 +266,6 @@ Se crea una preferencia de usuario para llevar un registro.';
 $string['alertmessage'] = 'Mensaje global';
 $string['danger'] = 'Aviso';
 $string['dismissalert'] = 'Confirmar visualización';
-
-
-
+$string['mailednotviewed'] = 'Foros: correo NO leído';
+$string['explainmailednotviewed'] = 'Si se activa, entonces NO se considerará un mensaje en foro como leído cuando se envía por e-mail (como hace Moodle), 
+sino que se presentará como no leído en el interfaz aunque se haya enviado antes por e-mail, hasta que sea visto en el interfaz.';

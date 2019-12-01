@@ -15,15 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @package qtype_kprime
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+* @package      qtype_kprime
+* @author       Amr Hourani (amr.hourani@id.ethz.ch)
+ *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
+* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
+* @author       Andreas Hruska (andreas.hruska@edaktik.at)
+* @copyright    2016 ETHZ {@link http://ethz.ch/}
+* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
+* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_kprime';
-$plugin->version = 2019061700;
+$plugin->version = 2019112000;
 $plugin->requires = 2013111904; // Moodle >=2.6.4.
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '2.3 for Moodle 3.4+';

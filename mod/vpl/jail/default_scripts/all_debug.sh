@@ -9,6 +9,14 @@
 
 cp common_script.sh common_script.sav
 cat common_script.sh > all_execute
+. common_script.sh
+
+#Remove student files
+for FILENAME in $VPL_SUBFILES
+do
+	rm "$FILENAME" &>/dev/null
+done
+
 NG=0
 NNG=0
 NEG=0
@@ -16,8 +24,6 @@ LANGGEN=""
 LANGNGEN=""
 LANGEG=""
 FILES=*_hello.sh
-SFDIR=/tmp/.saved$USERID
-mkdir $SFDIR
 touch .guierrors
 for HELLOSCRIPT in $FILES
 do
@@ -27,29 +33,27 @@ do
 	VPLEXE=$(echo "$HELLOSCRIPT" | sed -r "s/_hello.sh$/_execute.sh/")
 	VPLDEBEXE=$(echo "$HELLOSCRIPT" | sed -r "s/_hello.sh$/_debexecute.sh/")
 	echo -n "$LANGUAGE:"
+	VPL_SUBFILE0=
+	VPL_SUBFILE1=
 	rm .curerror &>/dev/null
 	. $HELLOSCRIPT gui &>.curerror
 	if [ "$VPL_SUBFILE0" == "" ] ; then
+		echo " No hello program"
 		continue
 	fi
 	cp common_script.sav common_script.sh
-	echo "export VPL_SUBFILE0=$VPL_SUBFILE0" >> common_script.sh
-	echo "export SOURCE_FILE0=$VPL_SUBFILE0" >> common_script.sh
-	echo "export VPL_SUBFILES=$VPL_SUBFILE0" >> common_script.sh
+	echo "export VPL_SUBFILE0=\"$VPL_SUBFILE0\"" >> common_script.sh
+	echo "export VPL_SUBFILE1=\"$VPL_SUBFILE1\"" >> common_script.sh
+	echo "export SOURCE_FILE0=\"$VPL_SUBFILE0\"" >> common_script.sh
+	echo "export SOURCE_FILE1=\"$VPL_SUBFILE1\"" >> common_script.sh
 	eval ./$RUNSCRIPT batch &>>.curerror
 	if [ -f vpl_wexecution ] ; then
-		if [ -f "$VPL_SUBFILE0" ] ; then
-			mv $VPL_SUBFILE0 $SFDIR
-		fi
 		let "NG=NG+1"
 		LANGGEN="$LANGGEN $LANGUAGE"
 		mv vpl_wexecution $VPLEXE
 		echo -n " Compiled for run with GUI"
 		echo "echo \"Launching $LANGUAGE\"" >> all_execute
 		echo "/bin/bash ./$VPLEXE" >> all_execute
-		echo "if [ -f $VPL_SUBFILE0 ] ; then" >> all_execute
-		echo "rm $VPL_SUBFILE0" >> all_execute
-		echo "fi" >> all_execute
 	elif [ -f vpl_execution ] ; then
 		echo -n " Compiled for run with TUI => removed"
 		rm vpl_execution
@@ -60,7 +64,7 @@ do
 		let "NEG=NEG+1"
 		LANGEG="$LANGEG $LANGUAGE"
 	fi
-    if [ -f ./$DEBUGSCRIPT ] ; then
+    if [ -f "$DEBUGSCRIPT" ] ; then
     	cp $RUNSCRIPT vpl_run.sh
 		eval ./$DEBUGSCRIPT batch &>>.curerror
 		if [ -f vpl_wexecution ] ; then
@@ -69,7 +73,7 @@ do
 			mv vpl_wexecution $VPLDEBEXE
 			echo -n " Compiled for debug with GUI"
 			echo "echo \"Launching debuger for $LANGUAGE\"" >> all_execute
-			echo "/bin/bash ./$VPLDEBEXE" >> all_execute
+			echo "./$VPLDEBEXE" >> all_execute
 		fi
     fi
     echo
@@ -81,11 +85,7 @@ done
 echo "echo \"Finsh. Press enter\"" >> all_execute
 echo "read" >> all_execute
 chmod +x all_execute
-mv $SFDIR/* . &>/dev/null
-rmdir $SFDIR
-cat common_script.sh > vpl_wexecution
-echo "x-terminal-emulator -e ./all_execute" >> vpl_wexecution
-chmod +x vpl_wexecution
+mv all_execute vpl_wexecution
 if [ "$LANGGEN" != "" ] ; then
 	echo "Generated GUI program(s) for $NG language(s): $LANGGEN"
 fi

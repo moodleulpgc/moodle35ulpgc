@@ -425,30 +425,51 @@ function xmldb_local_ulpgccore_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2018061800, 'local', 'ulpgccore');
     }
 
-/*    
-    if ($oldversion < 2018061800) {
+    if ($oldversion < 2019102500) {
+    
+        $tables = array('admin_moroso', 'assign_mahara_submit_views', 'dialogue_conversations_old', 
+                        'dialogue_entries_old', 'dialogue_read_old', 'examregistrar_sessions', 'holidays', 
+                        'local_globalmessages_seen', 'local_o365_aaduserdata', 'log_sincro', 'paintweb_images', 
+                        'pending_duties', 'usertours_steps', 'usertours_tours', 'user_tf_1819');
+
+        foreach($tables as $table) {
+            // load table
+            $xmldbtable = new xmldb_table($table); 
+            if ($dbman->table_exists($xmldbtable)) {
+                $dbman->drop_table($xmldbtable);
+            }
+        }
+    
         $tables = array('course' => ['useconditionals', 'uselabel', 'personalizedlabel', 'departamento'],
-                        'course_categories' => ['faculty', 'degree'],
-                        'question' => ['creatoridnumber', 'modifieridnumber']
+                        'course_categories' => ['faculty', 'degree', 'faculty_degree'],
+                        'question' => ['creatoridnumber', 'modifieridnumber'],
+                        'scheduler' => ['usenotes'],
+                        'scheduler_appointment' => ['teachernote', 'teachernoteformat'],
+                        'simplecertificate' => ['coursehours'],
+                        'user' => ['zipcode'],
                     );
     
-        foreach($tables as $table => $fields) {}
+        foreach($tables as $table => $fields) {
     
             // load table
             $xmldbtable = new xmldb_table($table); 
-            //useconditionals 	uselabel 	personalizedlabel 	departamento
-            // drop fields
+            
             foreach($fields as $field) {
-                if ($dbman->field_exists($xmldbtable, $field)) {
-                    $xmldbfield = $xmldbtable->getField($field); 
+                $xmldbfield = new xmldb_field($field);
+                if ($dbman->field_exists($xmldbtable, $xmldbfield)) {
                     $dbman->drop_field($xmldbtable, $xmldbfield);
                 }
             }
         }
+        
+        foreach(array('mod_ULPGC%', 'auth_auth%', 'tool_pid') as $name) {
+            $select = $DB->sql_like('plugin', '?');
+            $DB->delete_records_select('config_plugins', $select, array($name));
+        }
     
-        upgrade_plugin_savepoint(true, 2018061800, 'local', 'ulpgccore');
+        upgrade_plugin_savepoint(true, 2019102500, 'local', 'ulpgccore');
     }
-*/    
+
     
     return true;
 }

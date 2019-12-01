@@ -472,7 +472,35 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015111110, 'tracker');
     }
-    
+ 
+ 
+    if ($result && $oldversion < 2015111112) {
+        
+        $chunks = array();
+        $sql = "SELECT te.id, te.course
+                FROM {tracker_element} te 
+                LEFT JOIN {tracker_elementused} tu ON te.id = tu.elementid 
+                
+                WHERE tu.id IS NULL AND EXISTS(SELECT 1 FROM {tracker_element} t2
+                                                    WHERE t2.id <> te.id AND 
+                                                    (t2.course = te.course AND t2.name = te.name AND t2.type = te.type
+                                                    ))  
+                ";
+        if($elements = $DB->get_records_sql_menu($sql, array())) { 
+            $chunks = array_chunk(array_keys($elements), 250); 
+        }
+        
+        foreach($chunks as $chunk) {
+            if ($DB->delete_records_list('tracker_element', 'id', $chunk)) {
+                $DB->delete_records_list('tracker_elementitem', 'elementid', $chunk);
+            }
+        }
+ 
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015111112, 'tracker');
+    }
+ 
+ 
     return $result;
 }
 

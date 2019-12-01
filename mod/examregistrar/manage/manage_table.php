@@ -34,7 +34,7 @@ require_once($CFG->libdir.'/tablelib.php');
  * @copyright 2010 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class examregistar_management_table extends flexible_table {
+class examregistrar_management_table extends flexible_table {
     /** @var moodle_url the URL of outer form for this table. */
     protected $wrapurl;
 

@@ -55,8 +55,9 @@ class manage_created extends \core\event\base {
         $oid = isset($data['objectid']) ? $data['objectid'] : null;
         unset($data['objectid']);
         unset($data['objecttable']);
-        
-        $event = parent::create($data);
+
+
+        $event = self::create($data);
         
         if($table) {
             $event->data['objectid'] = $oid;

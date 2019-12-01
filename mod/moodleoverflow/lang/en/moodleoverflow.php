@@ -382,6 +382,15 @@ $string['privacy:discussionsubscriptionpreference'] = 'You have chosen the follo
 $string['privacy:readtrackingdisabled'] = 'You have chosen to not track which posts that you have read within this forum.';
 $string['privacy:postwasread'] = 'This post was first read on {$a->firstread} and most recently read on {$a->lastread}';
 
+$string['scalefactor'] = 'Scale factor';
+$string['scalefactor_help'] = 'The user rating is divided by the scale factor to obtain each user\'s grade. If the resulting grade is greater than the maximum grade, the value is limited to the specified maximum grade';
+$string['scalefactorerror'] = 'Scale factor must be a positive integer different than 0';
+$string['grademaxgradeerror'] = 'Maximum grade must be a positive integer different than 0';
+$string['updategrades'] = 'Update grades';
+$string['gradesreport'] = 'Grades report';
+$string['gradesupdated'] = 'Grades updated';
+$string['taskupdategrades'] = 'Moodleoverflow maintenance job to update grades';
+
 // Completion
 $string['completiondiscussions'] = 'Student must create discussions:';
 $string['completiondiscussionsdesc'] = 'Student must create at least {$a} discussion(s)';
@@ -395,9 +404,3 @@ $string['completionanswers'] = 'Student must post answers:';
 $string['completionanswersdesc'] = 'Student must post at least {$a} answers';
 $string['completionanswersgroup'] = 'Require answers';
 $string['completionanswershelp'] = 'requiring answers to complete';
-
-
-
-
-
-

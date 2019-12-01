@@ -45,13 +45,13 @@ abstract class qtype_pmatch_spell_checker {
     protected static $checkers = array();
 
     /** @var string Value in the database define that do not check the spelling. */
-    const DO_NOT_CHECK_OPTION = '-'; // removed public ecastro ULPGC compatibility PHP 7.0
+    const DO_NOT_CHECK_OPTION = '-';
 
     /** @var string Value in the database define that the server do not use any spell check library. */
-    const NULL_SPELL_CHECK = 'null'; // removed public ecastro ULPGC compatibility PHP 7.0
+    const NULL_SPELL_CHECK = 'null';
 
     /** @var string Regex string to get only needed dictionaries with format: xx or xx_YY Example: en or en_US. */
-    const LANGUAGE_FILTER_REGEX = '~^([a-z]+)(_[A-Z]+)?~'; // removed public ecastro ULPGC compatibility PHP 7.0
+    const LANGUAGE_FILTER_REGEX = '~^([a-z]+)(_[A-Z]+)?~';
 
     /**
      * Spell-check a word.

@@ -225,7 +225,19 @@ class quiz_gradingempty_report extends quiz_default_report {
 
         echo $OUTPUT->heading(get_string('questionsthatneedgrading', 'quiz_gradingempty'), 3);
         
-        $statecounts = $this->get_question_state_summary(array_keys($this->questions));
+        //$statecounts = $this->get_question_state_summary(array_keys($this->questions));
+        // ecastro ULPGC, only essay questions listed
+        $statecounts = array();
+        foreach($this->questions as $key => $question) {
+            if(strpos($question->qtype, 'essay') !== false) {
+                $statecounts[] = $key;
+            }
+        }
+        
+        if($statecounts) {
+            $statecounts = $this->get_question_state_summary($statecounts);
+        }
+        // end ecastro
         
         $url = $this->list_questions_url();
         $url->param('grade', true);

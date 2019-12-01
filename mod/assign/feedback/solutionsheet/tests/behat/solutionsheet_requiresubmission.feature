@@ -1,4 +1,4 @@
-@assignfeedback @assignfeedback_solutionsheet
+@assignfeedback @assignfeedback_solutionsheet @_file_upload
 Feature: In an assignment, students can see solutions only if they have made a submission
   In order to see solution sheets
   As a student
@@ -41,7 +41,7 @@ Feature: In an assignment, students can see solutions only if they have made a s
       | Online text | My submission. |
     And I press "Save changes"
     And I log out
-    
+
   @javascript
   Scenario: Students can see the solution when unhidden and when they have made a submission.
     When I log in as "student1"

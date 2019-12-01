@@ -103,16 +103,32 @@ class restore_qtype_mtf_plugin extends restore_qtype_plugin {
     public function process_column($data) {
         global $DB;
 
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->questionid = $this->get_new_parentid('question');
-        $newitemid = $DB->insert_record('qtype_mtf_columns', $data);
-        $this->set_mapping('qtype_mtf_columns', $oldid, $newitemid);
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
+
+        if ($this->is_question_created()) {
+            $data->questionid = $newquestionid;
+            $newitemid = $DB->insert_record('qtype_mtf_columns', $data);
+        } else {
+            $originalrecords = $DB->get_records('qtype_mtf_columns', array('questionid' => $newquestionid));
+            foreach ($originalrecords as $record) {
+                if ($data->number == $record->number) {
+                    $newitemid = $record->id;
+                }
+            }
+        }
+        if (!$newitemid) {
+            $info = new stdClass();
+            $info->filequestionid = $oldquestionid;
+            $info->dbquestionid = $newquestionid;
+            $info->answer = $data->responsetext;
+            throw new restore_step_exception('error_question_answers_missing_in_db', $info);
+        } else {
+            $this->set_mapping('qtype_mtf_columns', $oldid, $newitemid);
+        }
     }
 
     /**
@@ -121,17 +137,32 @@ class restore_qtype_mtf_plugin extends restore_qtype_plugin {
     public function process_row($data) {
         global $DB;
 
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->questionid = $this->get_new_parentid('question');
-        $newitemid = $DB->insert_record('qtype_mtf_rows', $data);
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
 
-        $this->set_mapping('qtype_mtf_rows', $oldid, $newitemid);
+        if ($this->is_question_created()) {
+            $data->questionid = $newquestionid;
+            $newitemid = $DB->insert_record('qtype_mtf_rows', $data);
+        } else {
+            $originalrecords = $DB->get_records('qtype_mtf_rows', array('questionid' => $newquestionid));
+            foreach ($originalrecords as $record) {
+                if ($data->number == $record->number) {
+                    $newitemid = $record->id;
+                }
+            }
+        }
+        if (!$newitemid) {
+            $info = new stdClass();
+            $info->filequestionid = $oldquestionid;
+            $info->dbquestionid = $newquestionid;
+            $info->answer = $data->optiontext;
+            throw new restore_step_exception('error_question_answers_missing_in_db', $info);
+        } else {
+            $this->set_mapping('qtype_mtf_rows', $oldid, $newitemid);
+        }
     }
 
     /**
@@ -140,23 +171,39 @@ class restore_qtype_mtf_plugin extends restore_qtype_plugin {
     public function process_weight($data) {
         global $DB;
 
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->questionid = $this->get_new_parentid('question');
-        $newitemid = $DB->insert_record('qtype_mtf_weights', $data);
-        $this->set_mapping('qtype_mtf_weights', $oldid, $newitemid);
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
+
+        if ($this->is_question_created()) {
+            $data->questionid = $newquestionid;
+            $newitemid = $DB->insert_record('qtype_mtf_weights', $data);
+        } else {
+            $originalrecords = $DB->get_records('qtype_mtf_weights', array('questionid' => $newquestionid));
+            foreach ($originalrecords as $record) {
+                if ($data->rownumber == $record->rownumber
+                    && $data->columnnumber == $record->columnnumber) {
+                    $newitemid = $record->id;
+                }
+            }
+        }
+        if (!$newitemid) {
+            $info = new stdClass();
+            $info->filequestionid = $oldquestionid;
+            $info->dbquestionid = $newquestionid;
+            $info->answer = $data->weight;
+            throw new restore_step_exception('error_question_answers_missing_in_db', $info);
+        } else {
+            $this->set_mapping('qtype_mtf_weights', $oldid, $newitemid);
+        }
     }
 
     public function recode_response($questionid, $sequencenumber, array $response) {
         if (array_key_exists('_order', $response)) {
             $response['_order'] = $this->recode_option_order($response['_order']);
         }
-
         return $response;
     }
 
@@ -172,11 +219,8 @@ class restore_qtype_mtf_plugin extends restore_qtype_plugin {
         foreach (explode(',', $order) as $id) {
             if ($newid = $this->get_mappingid('qtype_mtf_rows', $id)) {
                 $neworder[] = $newid;
-            } else {
-                $neworder[] = $id;
             }
         }
-
         return implode(',', $neworder);
     }
 

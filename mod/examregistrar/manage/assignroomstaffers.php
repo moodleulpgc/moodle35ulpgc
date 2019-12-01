@@ -102,7 +102,7 @@ require_capability('mod/examregistrar:manageseats', $context);
 $config = examregistrar_get_instance_configdata($examregistrar);
 
 ///////////////////////////////////////////////////////////////////////////////assign_
-$defaultrole = $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$examregprimaryid, 'type'=>'roleitem', 'idnumber'=>$config->defaultrole)));
+$defaultrole = $DB->get_field('examregistrar_elements', 'id', array('examregid'=>$examregprimaryid, 'type'=>'roleitem', 'idnumber'=>$config->defaultrole));
 
 $session   = optional_param('session', 0, PARAM_INT);
 $roomid   = optional_param('room', 0, PARAM_INT);
@@ -144,7 +144,9 @@ $potentialmembers  = array();
 
 $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
 $users = get_users_by_capability($context, 'mod/examregistrar:beroomstaff', $fields, 'lastname ASC');
-if($categories = explode(',', $config->staffcats)) {
+$categories = null;
+$categories =  !is_array($config->staffcats) ? explode(',', $config->staffcats) : $config->staffcats;
+if($categories) {
     $ulpgc = get_config('local_ulpgccore', 'version');
     foreach($categories as $category) {
         $joinulpgc = ($ulpgc) ? " LEFT JOIN {local_ulpgccore_course} uc ON c.id = uc.courseid " : '';

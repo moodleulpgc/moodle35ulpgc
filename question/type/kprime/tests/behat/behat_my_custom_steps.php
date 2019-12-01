@@ -14,6 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+* @package      qtype_kprime
+* @author       Amr Hourani (amr.hourani@id.ethz.ch)
+ *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
+* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
+* @author       Andreas Hruska (andreas.hruska@edaktik.at)
+* @copyright    2016 ETHZ {@link http://ethz.ch/}
+* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
+* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
 
 use Behat\Behat\Context\Step\Given as Given,

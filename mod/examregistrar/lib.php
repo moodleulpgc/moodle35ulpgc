@@ -651,6 +651,46 @@ function examregistrar_tracker_add_issues($examregistrar, $course = 0) {
 
 
 /**
+ * delete tracker review issues orphan, without an examfile
+ * Search if any examfiles of exams presented in an examregistrar programme
+ * corresponds to the issueid, delete if not.
+ *
+ * @param object $examregistrar the examregistrar object
+ * @param object $course the course object containing teh examregistrar instance
+ * @return object tracker record
+ **/
+function examregistrar_tracker_delete_issues($examregistrar, $course = 0) {
+    global $CFG, $DB;
+
+    $tracker = '';
+    if(!$course) {
+        $course = $DB->get_record('course', array('id'=>$examregistrar->course));
+    }
+    if($course) {
+        $tracker = examregistrar_get_review_tracker($examregistrar, $course);
+    }
+    
+    if($tracker) {
+        $sql = "SELECT ti.id, ti.summary, ef.idnumber  
+                FROM {tracker_issue} ti 
+                LEFT JOIN {examregistrar_examfiles} ef ON ef.reviewid = ti.id 
+                WHERE ti.trackerid = :trackerid AND ti.status < 4 AND ef.idnumber IS NULL AND ef.examid IS NULL
+                ";
+        $params = array('trackerid' => $tracker->id);
+        
+        if($issues = $DB->get_records_sql($sql, $params)) {
+            include_once($CFG->dirroot.'/mod/tracker/locallib.php');    
+            $cm = get_coursemodule_from_instance('tracker', $tracker->id, $tracker->course, false, MUST_EXIST);
+            $context = context_module::instance($cm->id);
+            foreach($issues as $issue) {
+                tracker_remove_issue($tracker, $issue->id, $context->id);
+            }
+        }
+    }
+}
+
+
+/**
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
  * as sending out mail, toggling flags etc ...
@@ -677,7 +717,7 @@ function examregistrar_cron () {
         foreach($registrars as $key => $registrar) {
             mtrace("... adding missing review issues for examregistrar {$registrar->name} ({$registrar->id})");
             examregistrar_tracker_add_issues($registrar);
-
+            examregistrar_tracker_delete_issues($registrar);
         }
     }
 

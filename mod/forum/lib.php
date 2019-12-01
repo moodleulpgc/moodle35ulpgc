@@ -505,6 +505,10 @@ function forum_cron() {
         $digests[$thisrow->forum][$thisrow->userid] = $thisrow->maildigest;
     }
     $digestsset->close();
+    
+    // ecastro ULPGC consider mailed as viewed or not
+    $mailedisviewed = !get_config('local_ulpgccore', 'mailednotviewed');
+    
 
     // Create the generic messageinboundgenerator.
     $messageinboundgenerator = new \core\message\inbound\address_manager();
@@ -890,7 +894,7 @@ function forum_cron() {
                     $mailcount[$post->id]++;
 
                     // Mark post as read if forum_usermarksread is set off.
-                    if (!$CFG->forum_usermarksread) {
+                    if (!$CFG->forum_usermarksread && $mailedisviewed) { // ecastro ULPGC
                         $userto->markposts[$post->id] = $post->id;
                     }
                 }
@@ -1173,7 +1177,7 @@ function forum_cron() {
                             $posthtml .= $htmldigestfullout->render($data);
 
                             // Create an array of postid's for this user to mark as read.
-                            if (!$CFG->forum_usermarksread) {
+                            if (!$CFG->forum_usermarksread  && $mailedisviewed) { // ecastro ULPGC
                                 $userto->markposts[$post->id] = $post->id;
                             }
                         }

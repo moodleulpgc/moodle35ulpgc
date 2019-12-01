@@ -1,4 +1,4 @@
-@assignfeedback @assignfeedback_solutionsheet
+@assignfeedback @assignfeedback_solutionsheet @_file_upload
 Feature: In an assignment, teachers can not upload solution sheets without capability
   In order to provide solutions
   As a teacher

@@ -83,5 +83,26 @@ function xmldb_local_ulpgcgroups_upgrade($oldversion) {
          upgrade_plugin_savepoint(true, 2016020100, 'local', 'ulpgcgroups');
     }
 
+    
+    
+    if ($oldversion < 2019102500) {
+        $tables = array('groups' => ['enrol', 'cod_grupo', 'component', 'itemid'],
+                        'groups_members' => ['enrol'],
+                    );
+    
+        foreach($tables as $table => $fields) {
+            // load table
+            $xmldbtable = new xmldb_table($table); 
+            foreach($fields as $field) {
+                $xmldbfield = new xmldb_field($field);
+                if ($dbman->field_exists($xmldbtable, $xmldbfield)) {
+                    $dbman->drop_field($xmldbtable, $xmldbfield);
+                }
+            }
+        }
+    
+         upgrade_plugin_savepoint(true, 2019102500, 'local', 'ulpgcgroups');
+    }
+    
     return true;
 }

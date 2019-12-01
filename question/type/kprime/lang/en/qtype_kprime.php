@@ -15,13 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package qtype_kprime
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+* @package      qtype_kprime
+* @author       Amr Hourani (amr.hourani@id.ethz.ch)
+ *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
+* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
+* @author       Andreas Hruska (andreas.hruska@edaktik.at)
+* @copyright    2016 ETHZ {@link http://ethz.ch/}
+* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
+* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['configintro'] = 'Default values for kprime questions.';
 $string['configscoringmethod'] = 'Default scoring method for kprime questions.';
 $string['configshuffleanswers'] = 'Default setting for option shuffling in kprime questions.';
+$string['deletedchoice'] = 'This choice was deleted after the attempt was started.';
 $string['enterfeedbackhere'] = 'Enter feedback here.';
 $string['entergeneralfeedbackhere'] = 'Enter general feedback here.';
 $string['enteroptionhere'] = '';
@@ -34,7 +40,7 @@ $string['maxpoints'] = 'Max. points';
 $string['mustsupplyresponses'] = 'You must supply values for all responses.';
 $string['mustsupplyvalue'] = 'You must supply a value here.';
 $string['optionno'] = 'Option {$a}';
-$string['pluginname'] = 'Kprime(ETH)';
+$string['pluginname'] = 'Kprime (ETH)';
 $string['pluginname_help'] = 'Kprime questions consist of an item stem and four corresponding options. For each option students have to decide whether it is "true" or "false".';
 $string['pluginname_link'] = 'question/type/kprime';
 $string['pluginnameadding'] = 'Adding a Kprime question';
@@ -49,11 +55,16 @@ $string['responsetext2'] = 'False';
 $string['responsetexts'] = 'Judgement options';
 $string['save'] = 'Save';
 $string['scoringkprime'] = 'Kprime';
+$string['scoringkprime_help'] = 'The student receives full marks if all responses are correct, a 50% mark if all save one response are correct, and zero points otherwise.';
 $string['scoringkprimeonezero'] = 'Kprime1/0';
+$string['scoringkprimeonezero_help'] = 'The student receives full marks if all responses are correct, and zero points otherwise.';
+$string['scoringsubpoints'] = 'Subpoints';
+$string['scoringsubpoints_help'] = 'The student is awarded subpoints for each correct response.';
+$string['showscoringmethod'] = 'Show scoring method';
+$string['showscoringmethod_help'] = 'If this setting is enabled, students will see the scoring method in quizes';
 $string['scoringmethod'] = 'Scoring method';
 $string['scoringmethod_help'] = '<strong>Kprime:</strong> The student receives full marks if all responses are correct, a 50% mark if all save one response are correct, and zero points otherwise.<br/><strong>Kprime 1/0:</strong> The student receives full marks if all responses are correct, and zero points otherwise.
         <br/><strong>Subpoints:</strong> The student is awarded subpoints for each correct response.';
-$string['scoringsubpoints'] = 'Subpoints';
 $string['shuffleanswers'] = 'Shuffle options';
 $string['shuffleanswers_help'] = 'If enabled, the order of the options is randomly shuffled for each attempt,
          provided that "Shuffle within questions" in the activity settings is also enabled.';

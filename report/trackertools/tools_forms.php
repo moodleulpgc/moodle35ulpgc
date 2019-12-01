@@ -1206,6 +1206,42 @@ class report_trackertools_deletetask_form extends report_trackertools_form {
         $this->add_action_buttons(true, get_string('deletetaskconfirmed', 'report_trackertools')); 
         
     }
-
-
 }
+
+
+/**
+ * Remove selected issues from Tracker 
+ *
+ * @package    report_trackertools
+ * @copyright  2017 Enrique Castro @ULPGC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class report_trackertools_delissues_form extends report_trackertools_form {
+
+    /**
+     * Form definition
+     */
+    function definition() {
+        $mform =& $this->_form;
+        
+        list($cmid, $tracker, $elements) = $this->get_form_parameters();
+
+        $this->add_issue_search();
+        
+        $this->add_issue_search('confirmsearch');
+        
+        $this->add_hidden_elements($cmid, 'delissues');
+    
+        $this->add_action_buttons(true, get_string('delissues', 'report_trackertools'));          
+    }
+    
+    function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+        
+        if(($data['confirmsearch'] != $data['issuesearch']) || ($data['issuesearch'] === '')) {
+            $errors['confirmsearch'] = get_string('confirmsearcherror', 'report_trackertools');
+        }
+        return $errors;
+    }
+    
+} 

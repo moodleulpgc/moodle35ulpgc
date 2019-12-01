@@ -446,7 +446,10 @@ if($synch) {
                         break;
             case 'reject' : $success = examregistrar_examstatus_synchronize(EXAM_STATUS_REJECTED, ABANDONNED, TRANSFERED, array_keys($courses));
                         break;
-            case 'create' : break;
+            case 'delete' : examregistrar_tracker_delete_issues($examregistrar, $course);
+                        break;
+            case 'create' : examregistrar_tracker_add_issues($examregistrar, $course);  
+                        break;
         }
         $eventdata = array();
         $eventdata['context'] = $context;
@@ -456,7 +459,7 @@ if($synch) {
         $eventdata['other']['tab'] = $tab;
         $event = \mod_examregistrar\event\manage_action::create($eventdata);
         $event->trigger();
-        examregistrar_tracker_add_issues($examregistrar, $course);
+        
     }
 }
 
@@ -473,7 +476,8 @@ if($examregistrar->workmode != EXAMREGISTRAR_MODE_VIEW) {
         echo $output->container_start(' examreviewsynchronize clearfix ');
             $synchmenu = array('approve' => get_string('approve', 'examregistrar'),
                             'reject' => get_string('reject', 'examregistrar'),
-                            'create' => get_string('addissues', 'examregistrar'));
+                            'create' => get_string('addissues', 'examregistrar'),
+                            'delete' => get_string('delissues', 'examregistrar'));
 
             $select = new single_select(new moodle_url($baseurl), 'synch', $synchmenu);
             $select->label = get_string('status_synch', 'examregistrar');

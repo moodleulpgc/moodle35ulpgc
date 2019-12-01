@@ -6,9 +6,11 @@
 # Author Juan Carlos Rodríguez-del-Pino <jcrodriguez@dis.ulpgc.es>
 
 # @vpl_script_description Using "php -n -f" with the first file or on serve if index.php exists
+
 # load common script and check programs
 . common_script.sh
-check_program php5 php
+
+check_program php php5
 PHP=$PROGRAM
 if [ "$1" == "version" ] ; then
 	echo "#!/bin/bash" > vpl_execution
@@ -16,9 +18,20 @@ if [ "$1" == "version" ] ; then
 	chmod +x vpl_execution
 	exit
 fi
-check_program x-www-browser firefox
-BROWSER=$PROGRAM
+
+get_source_files php
+IFS=$'\n'
+for file_name in $SOURCE_FILES
+do
+	php -l "$file_name" > /dev/null
+done
+IFS=$SIFS
+
 if [ -f index.php ] ; then
+	check_program x-www-browser firefox
+	BROWSER=$PROGRAM
+	compile_typescript
+	compile_scss
 	PHPCONFIGFILE=$($PHP -i 2>/dev/null | grep "Loaded Configuration File" | sed 's/^[^\/]*//' )
 	if [ "$PHPCONFIGFILE" == "" ] ; then
 		touch .php.ini
@@ -56,20 +69,22 @@ header(':', true, 404);
 <body><h1>404 Not found</h1><p>The requested resource <code><?php echo "'$pclean'"; ?></code> 
 was not found on this server</body></html>
 END_OF_PHP
-while true; do
-   	PHPPORT=$((6000+$RANDOM%25000))
-   	netstat -tln | grep -q ":$PHPPORT "
-   	[ "$?" != "0" ] && break
-done
-cat > vpl_wexecution <<END_OF_SCRIPT
+	while true; do
+	   	PHPPORT=$((6000+$RANDOM%25000))
+	   	netstat -tln | grep -q ":$PHPPORT "
+	   	[ "$?" != "0" ] && break
+	done
+	cat common_script.sh > vpl_wexecution
+	cat >> vpl_wexecution <<END_OF_SCRIPT
 #!/bin/bash
 $PHP -c .php.ini -S "127.0.0.1:$PHPPORT" .router.php &
 $BROWSER "127.0.0.1:$PHPPORT"
+wait_end $BROWSER
 END_OF_SCRIPT
     chmod +x vpl_wexecution
 else
 	get_first_source_file php
     cat common_script.sh > vpl_execution
-    echo "$PHP -n -f $FIRST_SOURCE_FILE \$@" >>vpl_execution
+    echo "$PHP -n -f "\"$FIRST_SOURCE_FILE\"" \$@" >>vpl_execution
     chmod +x vpl_execution
 fi

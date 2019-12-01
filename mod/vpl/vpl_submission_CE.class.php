@@ -128,7 +128,7 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         $path = dirname( __FILE__ ) . '/jail/default_scripts/';
         $scripttype = self::$scriptname [$script];
         $field = $scripttype . 'script';
-        if ( $data->$field > '' ) {
+        if ( isset($data->$field) &&  $data->$field > '' ) {
             $pln = $vplinstance->$field;
         }
         $filename = $path . $pln . '_' . $scripttype . '.sh';
@@ -236,7 +236,7 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         }
         // Add jailserver list.
         if ($vpl->get_instance()->jailservers > '') {
-            $data->jailservers .= "\n" . $vpl->get_instance()->jailservers;
+            $data->jailservers = $vpl->get_instance()->jailservers . "\n" . $data->jailservers;
         }
         if ( $vplinstance->runscript > '' ) {
             $data->runscript = $vplinstance->runscript;
@@ -344,6 +344,11 @@ class mod_vpl_submission_CE extends mod_vpl_submission {
         if (! function_exists( 'xmlrpc_encode_request' )) {
             throw new Exception( 'Inernal server error: PHP XMLRPC requiered' );
         }
+
+        $plugin = new stdClass();
+        require(dirname( __FILE__ ) . '/version.php');
+        $data->pluginversion = $plugin->version;
+
         $request = xmlrpc_encode_request( $action, $data, array (
                 'encoding' => 'UTF-8'
         ) );

@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019080200;             // If version == 0 then module will not be installed
+$plugin->version   = 2019102500;             // If version == 0 then module will not be installed
 $plugin->requires  = 2013051403;            // Requires this Moodle version
 $plugin->cron      = 600;                  // Period for cron to check this module (secs)
 $plugin->component = 'mod_examregistrar'; // To check on upgrade, that module sits in correct place

@@ -16,6 +16,7 @@ $string['trackertools:import'] = 'Importar incidencias';
 $string['trackertools:download'] = 'Exportar ficheros';
 $string['trackertools:manage'] = 'Gestionar campos ';
 $string['trackertools:warning'] = 'Realizar advertencias';
+$string['trackertools:bulkdelete'] = 'Borrrar entradas en bloque';
 
 // settings
 $string['settings'] = 'Opciones de Herramientas de incidencias';
@@ -89,6 +90,11 @@ $string['assignedtasks'] = 'Asignaciones automatizadas de Gestores';
 $string['assignquery'] = 'Busqueda';
 $string['assignuser'] = 'Gestor';
 $string['addassigntask'] = 'Agregar una asignación de Gestor';
+$string['removedissues'] = 'Borradas {$a} entradas en total';
+$string['delissues'] = 'Borrar entradas';
+$string['delissues_help'] = 'Borrado masivo de entradas del Gestor. 
+
+Puede especificar que entradas serán borradas realizando una búsqueda previa. ';
 $string['deletetaskconfirmed'] = 'Delete assignation';
 $string['deletetask'] = 'Borrar una asignación de Gestor';
 $string['deletetask_help'] = 'Borrar una asignación en la tabla de asignaciones de Gestor automatizadas. 
@@ -310,6 +316,7 @@ $string['eventreportviewed'] = 'Herramienta Trackertools vista';
 $string['eventreportdownload'] = 'Trackertools descargar/exportar entradas';
 $string['eventreportsent'] = 'Trackertools enviadas alertas';
 $string['eventreportcreated'] = 'Trackertools creadas/importadas entradas en bloque';
+$string['eventreportdeleted'] = 'Trackertools borradas entradas en masa';
 $string['eventreportupdated'] = 'Trackertools actualizadas entradas en bloque';
 $string['eventreportloadoptions'] = 'Trackertools cargadas opciones para campo';
 $string['eventreporttaskassign'] = 'Trackertools asignación automática de Gestor';

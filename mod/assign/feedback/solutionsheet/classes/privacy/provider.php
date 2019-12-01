@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for mod_folder.
+ * Privacy Subsystem implementation for assignfeedback_solutionsheet.
  *
  * @package   assignfeedback_solutionsheet
  * @copyright 2018 Henning Bostelmann
@@ -26,6 +26,8 @@ namespace assignfeedback_solutionsheet\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Null provider for assignfeedback_solutionsheet.
+ *
  * The assignfeedback_solutionsheet module does not store any personal data.
  * It only stores metadata (the solutionsheet and its configuration) which are not
  * considered "personal", in line with Moodle Core's handling of mod_folder, mod_resource etc.

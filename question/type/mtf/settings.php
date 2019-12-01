@@ -26,21 +26,24 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot . '/question/type/mtf/lib.php');
 
     // Introductory explanation that all the settings are defaults for the edit_mtf_form.
-    $settings->add(
-            new admin_setting_heading('configintro', '', get_string('configintro', 'qtype_mtf')));
+    $settings->add(new admin_setting_heading('configintro', '', get_string('configintro', 'qtype_mtf')));
+
     // Scoring methods.
     $options = array('mtfonezero' => get_string('scoringmtfonezero', 'qtype_mtf'),
         'subpoints' => get_string('scoringsubpoints', 'qtype_mtf')
     );
 
-    $settings->add(
-            new admin_setting_configselect('qtype_mtf/scoringmethod',
-                    get_string('configscoringmethod', 'qtype_mtf'),
-                    get_string('scoringmethod_help', 'qtype_mtf'), 'subpoints', $options));
+    $settings->add(new admin_setting_configselect('qtype_mtf/scoringmethod',
+        get_string('configscoringmethod', 'qtype_mtf'),
+        get_string('scoringmethod_help', 'qtype_mtf'), 'subpoints', $options));
+
+    // Show Scoring Method in quizes.
+    $settings->add(new admin_setting_configcheckbox('qtype_mtf/showscoringmethod',
+        get_string('showscoringmethod', 'qtype_mtf'),
+        get_string('showscoringmethod_help', 'qtype_mtf'), 0));
 
     // Shuffle options.
-    $settings->add(
-            new admin_setting_configcheckbox('qtype_mtf/shuffleanswers',
-                    get_string('shuffleanswers', 'qtype_mtf'),
-                    get_string('shuffleanswers_help', 'qtype_mtf'), 1));
+    $settings->add(new admin_setting_configcheckbox('qtype_mtf/shuffleanswers',
+        get_string('shuffleanswers', 'qtype_mtf'),
+        get_string('shuffleanswers_help', 'qtype_mtf'), 1));
 }

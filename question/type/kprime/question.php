@@ -15,13 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @package qtype_kprime
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+* @package      qtype_kprime
+* @author       Amr Hourani (amr.hourani@id.ethz.ch)
+ *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
+* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
+* @author       Andreas Hruska (andreas.hruska@edaktik.at)
+* @copyright    2016 ETHZ {@link http://ethz.ch/}
+* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
+* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
+defined('MOODLE_INTERNAL') || die();
 
 class qtype_kprime_question extends question_graded_automatically_with_countback {
 
@@ -69,19 +73,19 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
         // Add any missing answers. Sometimes people edit questions after they
         // have been attempted which breaks things.
         // Retrieve the question rows (mtf options).
-
-        if (!isset($this->rows[$this->order[0]])) {
-            global $DB;
-            $rows = $DB->get_records('qtype_kprime_rows',
-                    array('questionid' => $this->id
-                    ), 'number ASC', 'id, number', 0, $this->numberofrows);
-
-            $arr = array();
-            foreach ($rows as $r) {
-                $arr[$r->number - 1] = $r->id;
+        for ($i = 0; $i < count($this->order); $i++) {
+            if (isset($this->rows[$this->order[$i]])) {
+                continue;
             }
-            unset($this->order);
-            $this->order = $arr;
+            $a = new stdClass();
+            $a->id = 0;
+            $a->questionid = $this->id;
+            $a->number = -1;
+            $a->optiontext = html_writer::span(get_string('deletedchoice', 'qtype_sc'), 'notifyproblem');
+            $a->optiontextformat = FORMAT_HTML;
+            $a->optionfeedback = "";
+            $a->optionfeedbackformat = FORMAT_HTML;
+            $this->rows[$this->order[$i]] = $a;
             $this->editedquestion = 1;
         }
     }
@@ -167,7 +171,11 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
     public function weight($row = null, $col = null) {
         $rownumber = is_object($row) ? $row->number : $row;
         $colnumber = is_object($col) ? $col->number : $col;
-        $weight = (float) $this->weights[$rownumber][$colnumber]->weight;
+        if (isset($this->weights[$rownumber][$colnumber])) {
+            $weight = (float) $this->weights[$rownumber][$colnumber]->weight;
+        } else {
+            $weight = 0;
+        }
 
         return $weight;
     }

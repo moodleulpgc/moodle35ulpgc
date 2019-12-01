@@ -1116,7 +1116,7 @@ function report_trackertools_setfield_issues($course, $tracker, $fromform) {
             if($element = $elements[$elementkey]) {
                 //OK, we have an avtive element, update it 
                 if(!$issues) {
-                    $issues = $DB->get_records_select('tracker_issue', $issuewhere, $params, 'id, status');
+                    $issues = $DB->get_records_select('tracker_issue', $issuewhere, $params, 'id', 'id, status');
                 }
                 foreach($issues as $issue) {
                     $fromform->issueid = $issue->id;
@@ -1130,6 +1130,33 @@ function report_trackertools_setfield_issues($course, $tracker, $fromform) {
     
     return $message;
 }
+
+
+/**
+ * Remove issues and releted data in bulk issues
+ *
+ * @param stdClass $course object
+ * @param stdClass $tracker module record on database
+ * @param stdClass $fromform object with data from user input form
+ * @return string notice message of success
+ */
+function report_trackertools_delete_issues($course, $tracker, $fromform) {
+    global $DB;
+    
+    list($issuewhere, $params) = report_trackertools_issue_where_sql($tracker->id, $fromform, '');
+    $issues = $DB->get_records_select('tracker_issue', $issuewhere, $params, 'id', 'id, reportedby, assignedto, status');
+    
+    $deleted = 0;
+    $context = context_module::instance($fromform->id);
+    foreach($issues as $issue) {
+        if(tracker_remove_issue($tracker, $issue->id, $context->id)) {
+            $deleted++;
+        }
+    }
+
+    return $deleted;
+}
+
 
 
 /**

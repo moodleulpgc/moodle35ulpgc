@@ -313,4 +313,6 @@ $string['explainalertdismiss'] = 'If enabled, a button is shown to permanently d
 $string['alertmessage'] = 'Alert message';
 $string['danger'] = 'Danger';
 $string['dismissalert'] = 'Permanent dismiss';
-
+$string['mailednotviewed'] = 'Forum mailed NOT viewed';
+$string['explainmailednotviewed'] = 'If checked, then mailed post will not be treated as viewed (as moodle does), 
+and forum post mailed will be presented as unread when first displaying the forum after post mailed.';

@@ -15,12 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package qtype_kprime
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+* @package      qtype_kprime
+* @author       Amr Hourani (amr.hourani@id.ethz.ch)
+ *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
+* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
+* @author       Andreas Hruska (andreas.hruska@edaktik.at)
+* @copyright    2016 ETHZ {@link http://ethz.ch/}
+* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
+* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Restore plugin class that provides the necessary information
@@ -102,16 +107,32 @@ class restore_qtype_kprime_plugin extends restore_qtype_plugin {
     public function process_column($data) {
         global $DB;
 
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->questionid = $this->get_new_parentid('question');
-        $newitemid = $DB->insert_record('qtype_kprime_columns', $data);
-        $this->set_mapping('qtype_kprime_columns', $oldid, $newitemid);
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
+
+        if ($this->is_question_created()) {
+            $data->questionid = $newquestionid;
+            $newitemid = $DB->insert_record('qtype_kprime_columns', $data);
+        } else {
+            $originalrecords = $DB->get_records('qtype_kprime_columns', array('questionid' => $newquestionid));
+            foreach ($originalrecords as $record) {
+                if ($data->number == $record->number) {
+                    $newitemid = $record->id;
+                }
+            }
+        }
+        if (!$newitemid) {
+            $info = new stdClass();
+            $info->filequestionid = $oldquestionid;
+            $info->dbquestionid = $newquestionid;
+            $info->answer = $data->responsetext;
+            throw new restore_step_exception('error_question_answers_missing_in_db', $info);
+        } else {
+            $this->set_mapping('qtype_kprime_columns', $oldid, $newitemid);
+        }
     }
 
     /**
@@ -120,17 +141,32 @@ class restore_qtype_kprime_plugin extends restore_qtype_plugin {
     public function process_row($data) {
         global $DB;
 
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->questionid = $this->get_new_parentid('question');
-        $newitemid = $DB->insert_record('qtype_kprime_rows', $data);
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
 
-        $this->set_mapping('qtype_kprime_rows', $oldid, $newitemid);
+        if ($this->is_question_created()) {
+            $data->questionid = $newquestionid;
+            $newitemid = $DB->insert_record('qtype_kprime_rows', $data);
+        } else {
+            $originalrecords = $DB->get_records('qtype_kprime_rows', array('questionid' => $newquestionid));
+            foreach ($originalrecords as $record) {
+                if ($data->number == $record->number) {
+                    $newitemid = $record->id;
+                }
+            }
+        }
+        if (!$newitemid) {
+            $info = new stdClass();
+            $info->filequestionid = $oldquestionid;
+            $info->dbquestionid = $newquestionid;
+            $info->answer = $data->optiontext;
+            throw new restore_step_exception('error_question_answers_missing_in_db', $info);
+        } else {
+            $this->set_mapping('qtype_kprime_rows', $oldid, $newitemid);
+        }
     }
 
     /**
@@ -139,23 +175,39 @@ class restore_qtype_kprime_plugin extends restore_qtype_plugin {
     public function process_weight($data) {
         global $DB;
 
-        if (!$this->is_question_created()) {
-            return;
-        }
-
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->questionid = $this->get_new_parentid('question');
-        $newitemid = $DB->insert_record('qtype_kprime_weights', $data);
-        $this->set_mapping('qtype_kprime_weights', $oldid, $newitemid);
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
+
+        if ($this->is_question_created()) {
+            $data->questionid = $newquestionid;
+            $newitemid = $DB->insert_record('qtype_kprime_weights', $data);
+        } else {
+            $originalrecords = $DB->get_records('qtype_kprime_weights', array('questionid' => $newquestionid));
+            foreach ($originalrecords as $record) {
+                if ($data->rownumber == $record->rownumber
+                    && $data->columnnumber == $record->columnnumber) {
+                    $newitemid = $record->id;
+                }
+            }
+        }
+        if (!$newitemid) {
+            $info = new stdClass();
+            $info->filequestionid = $oldquestionid;
+            $info->dbquestionid = $newquestionid;
+            $info->answer = $data->weight;
+            throw new restore_step_exception('error_question_answers_missing_in_db', $info);
+        } else {
+            $this->set_mapping('qtype_kprime_weights', $oldid, $newitemid);
+        }
     }
 
     public function recode_response($questionid, $sequencenumber, array $response) {
         if (array_key_exists('_order', $response)) {
             $response['_order'] = $this->recode_option_order($response['_order']);
         }
-
         return $response;
     }
 
@@ -171,11 +223,8 @@ class restore_qtype_kprime_plugin extends restore_qtype_plugin {
         foreach (explode(',', $order) as $id) {
             if ($newid = $this->get_mappingid('qtype_kprime_rows', $id)) {
                 $neworder[] = $newid;
-            } else {
-                $neworder[] = $id;
             }
         }
-
         return implode(',', $neworder);
     }
 

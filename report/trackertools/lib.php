@@ -75,6 +75,11 @@ function report_trackertools_extend_navigation_module($navigation, $cm) {
         $url->param('a', 'setfield');
         $node->add(get_string('setfield', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolssetfield', new pix_icon('t/editstring', ''));
         
+        if(has_capability('report/trackertools:bulkdelete', $context)) {
+            $url->param('a', 'delissues');
+            $node->add(get_string('delissues', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsdelissues', new pix_icon('t/delete', ''));
+        }
+        
         $rurl = new moodle_url(me());
         if(($rurl->get_param('view') == 'admin') && ($eid = $rurl->get_param('elementid'))  && ($rurl->get_param('what') == 'viewelementoptions')) {
             $rurl = new moodle_url('/report/trackertools/loadfield.php', array('id'=>$cm->id, 'eid'=>$eid));
@@ -98,10 +103,13 @@ function report_trackertools_extend_navigation_module($navigation, $cm) {
             $url->param('a', 'warning');
             $node->add(get_string('warning', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolswarning', new pix_icon('i/info', ''));
         }
-        
+/*        
         $url->param('a', 'assigntasktable');
         $node->add(get_string('assigntasktable', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsassigntasktable', new pix_icon('t/assignroles', ''));
-    
+
+        $url->param('a', 'deletetask');
+        $node->add(get_string('deletetask', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsdeletetask', new pix_icon('t/delete', ''));
+*/        
         $url->param('a', 'mailoptions');
         $node->add(get_string('mailoptions', 'report_trackertools'), clone $url, navigation_node::TYPE_SETTING, null, 'trackertoolsmailoptions', new pix_icon('t/email', ''));
 

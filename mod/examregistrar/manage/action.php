@@ -281,7 +281,7 @@ if($action == 'sessionrooms' || $action == 'roomstaffers') {
                         $eventdata['context'] = $context;
                         $eventdata['other'] = array();
                         $eventdata['other']['edit'] = 'exams';
-                        \mod_examregistrar\event\manage_created::created($eventdata, 'examregistar_'.$upload);
+                        \mod_examregistrar\event\manage_created::created($eventdata, 'examregistrar_'.$upload);
                         $event->trigger();
                     }
                     

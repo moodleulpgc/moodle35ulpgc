@@ -1731,6 +1731,8 @@ class quiz_makeexam_report extends quiz_default_report {
             $examattempt->examfileid = $newid;
             $examattempt->timesubmitted = $now;
             $DB->update_record('quiz_makeexam_attempts', $examattempt);
+            
+            $examregistrar = $this->get_examregistrar_instance($cm, $course);
 
             // now we can generate & store exam PDF  files
             $fs = get_file_storage();
@@ -1741,17 +1743,17 @@ class quiz_makeexam_report extends quiz_default_report {
                 'filearea' => 'exam',
                 'itemid' => $newid,               // the id of the new examfile entry
                 'filepath' => '/',
-                'filename' => examregistrar_file_set_nameextension($examfile->idnumber, 'exam'));
+                'filename' => examregistrar_file_set_nameextension($examregistrar, $examfile->idnumber, 'exam'));
 
             // Create file containing no responses
             $fs->create_file_from_string($fileinfo, $this->generate_pdf($quiz, $quizattemptid, $examid, $examattempt->id, 'exam', true));
             // Create file containing  correct answers
             $fileinfo['filepath'] = '/answers/';
-            $fileinfo['filename'] = examregistrar_file_set_nameextension($examfile->idnumber, 'answers');
+            $fileinfo['filename'] = examregistrar_file_set_nameextension($examregistrar, $examfile->idnumber, 'answers');
             $fs->create_file_from_string($fileinfo, $this->generate_pdf($quiz, $quizattemptid, $examid, $examattempt->id, 'answers', true));
             // Create file containing  correct answers
             $fileinfo['filepath'] = '/key/';
-            $fileinfo['filename'] = examregistrar_file_set_nameextension($examfile->idnumber, 'key');
+            $fileinfo['filename'] = examregistrar_file_set_nameextension($examregistrar, $examfile->idnumber, 'key');
             //$fs->create_file_from_string($fileinfo, $this->generate_pdf($quiz, $quizattemptid, $examid, $examattempt->id, 'key', true));
 
             $eventdata = array();
@@ -1764,11 +1766,8 @@ class quiz_makeexam_report extends quiz_default_report {
             $eventdata['other']['idnumber'] = $examfile->idnumber;
             $event = \quiz_makeexam\event\exam_submitted::create($eventdata);
             $event->trigger();
-
-            
             
             // now create tracker issue for examfile
-            $examregistrar = $this->get_examregistrar_instance($cm, $course);
             $issueid = examregistrar_review_addissue($examregistrar, $course, $examfile);
             if($issueid == 0 ) {
                 $message = get_string('noreviewmod', 'quiz_makeexam');

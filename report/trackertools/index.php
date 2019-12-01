@@ -113,6 +113,12 @@ switch($action) {
                     $capability = 'report/trackertools:warning';
                     $actionform = 'report_trackertools_warning_form';
                     break;
+    case 'delissues' :
+                    $capability = 'report/trackertools:manage';
+                    $actionform = 'report_trackertools_delissues_form';
+                    break;
+                    
+                    
 }
 
 require_capability($capability, $context);
@@ -310,6 +316,21 @@ if ($mform->is_cancelled()) {
         $event->trigger();
         
         $message = get_string('warnedissues', 'report_trackertools', $count);
+        if(!$count) {
+            redirect($returnurl, $message, null, \core\output\notification::NOTIFY_ERROR);
+        }
+        
+        redirect($returnurl, $message);
+        
+    } elseif($action == 'delissues') {
+        $count = report_trackertools_delete_issues($course, $tracker, $fromform);
+        
+        // Trigger a report event.
+        $eventdata['other']['count'] = $count;
+        $event = \report_trackertools\event\issues_deleted::create($eventdata);
+        $event->trigger();
+        
+        $message = get_string('removedissues', 'report_trackertools', $count);
         if(!$count) {
             redirect($returnurl, $message, null, \core\output\notification::NOTIFY_ERROR);
         }

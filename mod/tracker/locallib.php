@@ -1014,6 +1014,67 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
     return $DB->count_records_sql($sql);
 }
 
+
+/**
+ * removes an issue and related data
+ * @param object $tracker
+ * @param int $issueid
+ * @param int $contextid
+ */
+function tracker_remove_issue($tracker, $issueid, $contextid) {
+    global $DB;
+
+    $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
+
+    $DB->delete_records('tracker_issue', array('id' => $issueid));
+    $DB->delete_records('tracker_issuedependancy', array('childid' => $issueid));
+    $DB->delete_records('tracker_issuedependancy', array('parentid' => $issueid));
+    $attributeids = $DB->get_records('tracker_issueattribute', array('issueid' => $issueid), 'id', 'id,id');
+    $DB->delete_records('tracker_issueattribute', array('issueid' => $issueid));
+    $commentids = $DB->get_records('tracker_issuecomment', array('issueid' => $issueid), 'id', 'id,id');
+    $DB->delete_records('tracker_issuecomment', array('issueid' => $issueid));
+    $DB->delete_records('tracker_issueownership', array('issueid' => $issueid));
+    $DB->delete_records('tracker_state_change', array('issueid' => $issueid));
+
+    if(!(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview'))) {
+        // lower priority of every issue above
+        $sql = "
+            UPDATE
+                {tracker_issue}
+            SET
+                resolutionpriority = resolutionpriority - 1
+            WHERE
+                trackerid = ? AND
+                resolutionpriority > ?
+        ";
+        $DB->execute($sql, array($tracker->id, $maxpriority));
+    }
+
+    // todo : send notification to all cced
+
+    $DB->delete_records('tracker_issuecc', array('issueid' => $issueid));
+
+    // clear all associated fileareas
+
+    $fs = get_file_storage();
+    $fs->delete_area_files($contextid, 'mod_tracker', 'issuedescription', $issueid);
+    $fs->delete_area_files($contextid, 'mod_tracker', 'issueresolution', $issueid);
+
+    if ($attributeids) {
+        foreach ($attributeids as $attributeid => $void) {
+            $fs->delete_area_files($contextid, 'mod_tracker', 'issueattribute', $issueid);
+        }
+    }
+
+    if ($commentids) {
+        foreach ($commentids as $commentid => $void) {
+            $fs->delete_area_files($context->id, 'mod_tracker', 'issuecomment', $commentid);
+        }
+    }
+    
+    return true;
+}
+
 // User related
 
 /**

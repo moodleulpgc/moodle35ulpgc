@@ -159,22 +159,35 @@ $elements = $DB->get_records_sql($select.$sql.$where.$sort, $params, $table->get
 if($elements) {
     foreach($elements as $element) {
         $data = array();
+        $rowclass = '';
         $data[] = $table->col_checkbox($element);
         $data[] = $table->col_formatitem($element->locationname, $element->locationidnumber);
         $data[] = $table->col_formatitem($element->locationtypename, $element->locationtypeidnumber);
         $data[] = $element->seats;
         if($element->parent) {
-            $data[] = $table->col_formatitem($element->parentname, $element->parentidnumber);
+            $parent = $table->col_formatitem($element->parentname, $element->parentidnumber);
         } else {
-            $data[] = get_string('none');
+            $parent = get_string('none');
+        } 
+        $s= substr_count($element->path, '/');
+        if(empty($element->path) || ($element->depth != $s) ) {
+            //$rowclass .= 'text-danger';
+            
+            $parent .= ' <br/>'.html_writer::span(get_string('hierachyerror', 'examregistrar'), 'label label-important');
+            
+            //<span class="label label-important">Important</span>
         }
+        $data[] = $parent;
+        
         $data[] = format_text($element->address, $element->addressformat, array('filter'=>false, 'para'=>false));
         $staffers = examregistrar_get_room_staffers($element->id);
         $data[] = examregistrar_format_room_staffers($staffers, $manageurl, $examregprimaryid);
-        $rowclass = '';
+        
         if(!$element->visible) {
-            $rowclass = 'dimmed_text';
+            $rowclass .= 'dimmed_text';
         }
+        
+        
 
         $visible = -$element->id;
         $visicon = 'show';

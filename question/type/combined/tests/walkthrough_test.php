@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -276,6 +277,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $combined = new qtype_combined_question();
 
         test_question_maker::initialise_a_question($combined);
+        $combined->contextid = context_system::instance()->id;
 
         $combined->name = 'Selection from drop down list question';
         $combined->questiontext = 'Type &#x5b;&#x5b;2:pmatch&#x5d;&#x5d; in the first box, ' .
@@ -298,6 +300,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $pmatch = new qtype_pmatch_question();
         test_question_maker::initialise_a_question($pmatch);
         $pmatch->qtype = question_bank::get_qtype('pmatch');
+        $pmatch->contextid = $combined->contextid;
         $pmatch->name = '1';
         $pmatch->questiontext = '';
         $pmatch->generalfeedback = '';
@@ -305,7 +308,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $pmatch->answers = array(
             13 => new question_answer(13, 'match(frog)', 1.0, '', FORMAT_HTML),
         );
-        $pmatch->applydictionarycheck = false;
+        $pmatch->applydictionarycheck = qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION;
         $subq->question = $pmatch;
 
         // Second pmatch subquestion.
@@ -314,6 +317,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $pmatch = new qtype_pmatch_question();
         test_question_maker::initialise_a_question($pmatch);
         $pmatch->qtype = question_bank::get_qtype('pmatch');
+        $pmatch->contextid = $combined->contextid;
         $pmatch->name = '2';
         $pmatch->questiontext = '';
         $pmatch->generalfeedback = '';
@@ -321,7 +325,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $pmatch->answers = array(
                 14 => new question_answer(13, 'match(toad)', 1.0, '', FORMAT_HTML),
         );
-        $pmatch->applydictionarycheck = false;
+        $pmatch->applydictionarycheck = qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION;
         $subq->question = $pmatch;
 
         // Start an attempt.
@@ -368,6 +372,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $combined = new qtype_combined_question();
 
         test_question_maker::initialise_a_question($combined);
+        $combined->contextid = context_system::instance()->id;
 
         $combined->name = 'Selection from drop down list question';
         $combined->questiontext = 'Tricky: [[1:selectmenu:1]][[2:pmatch]][[1:selectmenu:1]].';
@@ -412,6 +417,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $pmatch = new qtype_pmatch_question();
         test_question_maker::initialise_a_question($pmatch);
         $pmatch->qtype = question_bank::get_qtype('pmatch');
+        $pmatch->contextid = $combined->contextid;
         $pmatch->defaultmark = 0.5;
         $pmatch->name = '1';
         $pmatch->questiontext = '';
@@ -420,7 +426,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
         $pmatch->answers = array(
                 13 => new question_answer(13, 'match(frog)', 1.0, '', FORMAT_HTML),
         );
-        $pmatch->applydictionarycheck = false;
+        $pmatch->applydictionarycheck = qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION;
         $subq->question = $pmatch;
 
         // Start an attempt.
@@ -1542,7 +1548,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
                 1 => new question_answer(1, 'match(Number ten)', 1, '', FORMAT_HTML),
         );
         $pmatch->generalfeedback = '';
-        $pmatch->applydictionarycheck = false;
+        $pmatch->applydictionarycheck = qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION;
         $pmatch->pmatchoptions->converttospace = ':';
         $pmatch->pmatchoptions->set_synonyms(array((object)array('word' => 'ten', 'synonyms' => '10')));
         $pmatch->pmatchoptions->ignorecase = true;
@@ -1576,7 +1582,7 @@ class qtype_combined_walkthrough_test extends qbehaviour_walkthrough_test_base {
                 2 => new question_answer(2, 'match(Number nine)', 1, '', FORMAT_HTML),
         );
         $pmatch2->generalfeedback = '';
-        $pmatch2->applydictionarycheck = false;
+        $pmatch->applydictionarycheck = qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION;
         $pmatch2->pmatchoptions->ignorecase = false;
         $subq2->question = $pmatch2;
 

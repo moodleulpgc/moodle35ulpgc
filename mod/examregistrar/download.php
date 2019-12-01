@@ -83,7 +83,11 @@ $rsort = optional_param('rsort', '', PARAM_ALPHANUMEXT);
 $esort = optional_param('esort', '', PARAM_ALPHANUMEXT);
 $voucher   = optional_param('v', '', PARAM_ALPHANUMEXT);
 
-require_capability('mod/examregistrar:download', $context);
+if($download == 'voucher' && $voucher) {
+    require_capability('mod/examregistrar:book', $context);
+} else {
+    require_capability('mod/examregistrar:download', $context);
+}
 
 $SESSION->nameformat = 'lastname';
 
@@ -889,6 +893,7 @@ function examregistrar_voucher_printpdf($baseurl, $context, $voucherparam, $outp
     $booking = $DB->get_record('examregistrar_bookings', array('id' => $voucher->bookingid), '*', MUST_EXIST);
     $exam = $DB->get_record('examregistrar_exams', array('id' => $booking->examid), '*', MUST_EXIST);
     $user = $DB->get_record('user', array('id' => $booking->userid), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('examregistrar', $examregistrar->id, $examregistrar->course, false, MUST_EXIST);
     
     $exam = new examregistrar_exam($exam);
     
@@ -954,7 +959,7 @@ function examregistrar_voucher_printpdf($baseurl, $context, $voucherparam, $outp
     // QR code section
     $pdf->writeHTML(get_string('voucherqr', 'examregistrar'), false, false, true, false, '');
     $pdf->Ln(10);    
-    $qrcodeurl = new moodle_url('/mod/examregistrar/view.php', array('id'=>1, 'tab'=>'session', 'action'=>'checkvoucher', 
+    $qrcodeurl = new moodle_url('/mod/examregistrar/view.php', array('id'=>$cm->id, 'tab'=>'session', 'action'=>'checkvoucher', 
                 'vouchernum'=>$voucherparam, 'code'=>$crccode));
     //$barcode = new TCPDF2DBarcode($qrcodeurl->out(), 'QRCODE');
     //$image = $barcode->getBarcodePngData(15, 15);

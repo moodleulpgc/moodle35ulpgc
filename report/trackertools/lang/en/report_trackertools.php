@@ -16,6 +16,7 @@ $string['trackertools:export'] = 'Export issues';
 $string['trackertools:download'] = 'Download issue files';
 $string['trackertools:manage'] = 'Manage issue data';
 $string['trackertools:warning'] = 'Issue warnings to users';
+$string['trackertools:bulkdelete'] = 'Bulk delete issues';
 
 // settings
 $string['settings'] = 'Tracker tools settings';
@@ -78,6 +79,11 @@ $string['assignedtasks'] = 'Automated Developer assignations';
 $string['assignquery'] = 'Search query';
 $string['assignuser'] = 'Developer';
 $string['addassigntask'] = 'Add new automated assignation';
+$string['removedissues'] = 'Bulk deleted {$a} issues';
+$string['delissues'] = 'Delete issues';
+$string['delissues_help'] = 'Bulk delete many issues at once. 
+
+You may specify which issues to delete by performing a previous search.';
 $string['deletetaskconfirmed'] = 'Delete assignation';
 $string['deletetask'] = 'Delete an automated assignation';
 $string['deletetask_help'] = 'Delete an entry in the automated assignations table';
@@ -284,6 +290,7 @@ $string['eventreportviewed'] = 'Trackertools report viewed';
 $string['eventreportdownload'] = 'Trackertools download/export issues';
 $string['eventreportsent'] = 'Trackertools alerts sent';
 $string['eventreportcreated'] = 'Trackertools bulk issues created/imported';
+$string['eventreportdeleted'] = 'Trackertools bulk issues deleted';
 $string['eventreportupdated'] = 'Trackertools bulk update issues';
 $string['eventreportloadoptions'] = 'Trackertools loaded field options';
 $string['eventreporttaskassign'] = 'Trackertools automated developer assignation';

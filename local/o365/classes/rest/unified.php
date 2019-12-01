@@ -362,7 +362,7 @@ class unified extends \local_o365\rest\o365api {
             'notebook' => 'https://'.$url.'/_layouts/groupstatus.aspx?id='.$objectid.'&target=notebook',
             'conversations' => 'https://outlook.office.com/owa/?path=/group/'.$group['mail'].'/mail',
             'calendar' => 'https://outlook.office365.com/owa/?path=/group/'.$group['mail'].'/calendar',
-            'team' => 'https://team.microsoft.com', // todo get team URL.
+            'team' => 'https://team.microsoft.com',
         ];
         return $o365urls;
     }
@@ -630,6 +630,7 @@ class unified extends \local_o365\rest\o365api {
             'department',
             'companyName',
             'preferredLanguage',
+            'employeeId',
         ];
     }
 
@@ -1731,6 +1732,7 @@ class unified extends \local_o365\rest\o365api {
                 'businessPhones',
                 'facsimileTelephoneNumber',
                 'mobilePhone',
+                'employeeId',
             ];
             $context = 'https://graph.microsoft.com/v1.0/$metadata#users(';
             $context = $context.join(',', $params).')/$entity';
@@ -1892,42 +1894,189 @@ class unified extends \local_o365\rest\o365api {
      * Create a team.
      *
      * @param $groupobjectid
-     *
      * @return array|null|string
-     * @throws \moodle_exception
      */
     public function create_team($groupobjectid) {
         $teamdata = [
-            'funSettings' => [
-                'allowGiphy' => true,
-                'giphyContentRating' => 'strict',
-                'allowStickersAndMemes' => true,
-                'allowCustomMemes' => true,
-            ],
-            'guestSettings' => [
-                'allowCreateUpdateChannels' => true,
-                'allowDeleteChannels' => true,
-            ],
-            'memberSettings' => [
-                'allowCreateUpdateChannels' => true,
-                'allowDeleteChannels' => true,
-                'allowAddRemoveApps' => true,
-                'allowCreateUpdateRemoveTabs' => true,
-                'allowCreateUpdateRemoveConnectors' => true,
-            ],
-            'messagingSettings' => [
-                'allowUserEditMessages' => true,
-                'allowUserDeleteMessages' => true,
-                'allowOwnerDeleteMessages' => true,
-                'allowTeamMentions' => true,
-                'allowChannelMentions' => true,
-            ],
+            'template@odata.bind' => "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+            'group@odata.bind' => "https://graph.microsoft.com/v1.0/groups('{$groupobjectid}')",
         ];
 
-        $response = $this->betaapicall('put', '/groups/' . $groupobjectid . '/team',
-            ['file' => json_encode($teamdata)]);
-        $expectedparams = ['id' => null];
+        // Create a group first.
+        $this->betaapicall('post', '/teams', json_encode($teamdata));
+
+        if ($this->httpclient->info['http_code'] == 202) {
+            // If response is 202 Accepted, return response.
+            return $this->httpclient->response;
+        } else {
+            // Error.
+            return false;
+        }
+    }
+
+    /**
+     * Provision an app in a team.
+     *
+     * @param $groupobjectid
+     * @param $appid
+     *
+     * @return array|string|null
+     * @throws \moodle_exception
+     */
+    public function provision_app($groupobjectid, $appid) {
+        $endpoint = '/teams/' . $groupobjectid . '/installedApps';
+        $data = [
+            'teamsApp@odata.bind' => $this->get_apiuri() . '/beta/appCatalogs/teamsApps/' . $appid,
+        ];
+        $response = $this->betaapicall('post', $endpoint, json_encode($data));
+
+        return $response;
+    }
+
+    /**
+     * Return the ID of the app with the given internalId in the catalog.
+     *
+     * @param $externalappid
+     *
+     * @return |null
+     * @throws \moodle_exception
+     */
+    public function get_catalog_app_id($externalappid) {
+        $moodleappid = null;
+
+        $endpoint = '/appCatalogs/teamsApps?$filter=externalId' . rawurlencode(' eq \'' . $externalappid . '\'');
+        $response = $this->betaapicall('get', $endpoint);
+        $expectedparams = ['value' => null];
         $response = $this->process_apicall_response($response, $expectedparams);
+        if (count($response['value']) > 0) {
+            $moodleapp = array_shift($response['value']);
+            $moodleappid = $moodleapp['id'];
+        }
+
+
+        return $moodleappid;
+    }
+
+    /**
+     * Return the ID of the general channel of the team.
+     *
+     * @param $groupobjectid
+     *
+     * @return |null
+     * @throws \moodle_exception
+     */
+    public function get_general_channel_id($groupobjectid) {
+        $generalchannelid = null;
+
+        $endpoint = '/teams/' . $groupobjectid . '/channels?$filter=displayName' . rawurlencode(' eq \'General\'');
+        $response = $this->betaapicall('get', $endpoint);
+        $expectedparams = ['value' => null];
+        $response = $this->process_apicall_response($response, $expectedparams);
+        if (count($response['value']) > 0) {
+            $generalchannel = array_shift($response['value']);
+            $generalchannelid = $generalchannel['id'];
+        }
+
+        return $generalchannelid;
+    }
+
+    /**
+     * Add a Moodle tab for the Moodle course to a channel.
+     *
+     * @param $groupobjectid
+     * @param $channelid
+     * @param $appid
+     * @param $moodlecourseid
+     *
+     * @return array|string|null
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    public function add_moodle_tab_to_channel($groupobjectid, $channelid, $appid, $moodlecourseid) {
+        global $CFG;
+
+        $tabconfiguration = [
+            'entityId' => 'course_' . $moodlecourseid,
+            'contentUrl' => $CFG->wwwroot . '/local/o365/teams_tab.php?id=' . $moodlecourseid,
+            'websiteUrl' => $CFG->wwwroot . '/course/view.php?id=' . $moodlecourseid,
+        ];
+
+        return $this->add_tab_to_channel($groupobjectid, $channelid, $appid, $tabconfiguration);
+    }
+
+    /**
+     * Add a tab of app to a channel.
+     *
+     * @param $groupobjectid
+     * @param $channelid
+     * @param $appid
+     * @param $tabconfiguration
+     *
+     * @return array|string|null
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    public function add_tab_to_channel($groupobjectid, $channelid, $appid, $tabconfiguration) {
+        $endpoint = '/teams/' . $groupobjectid . '/channels/' . $channelid . '/tabs';
+        $requestparams = [
+            'displayName' => get_string('tab_moodle', 'local_o365'),
+            'teamsApp@odata.bind' => $this->get_apiuri() . '/beta/appCatalogs/teamsApps/' . $appid,
+            'configuration' => $tabconfiguration,
+        ];
+
+        $response = $this->betaapicall('post', $endpoint, json_encode($requestparams));
+        $expectedresponse = ['id' => null];
+        $response = $this->process_apicall_response($response, $expectedresponse);
+
+        return $response;
+    }
+
+
+    /**
+     * Create a class team.
+     *
+     * @param string $displayname
+     * @param string $description
+     * @param array $ownerids
+     * @param null $extra
+     * @return array|string|null
+     */
+    public function create_class_team($displayname, $description, $ownerids, $extra = null) {
+        $owneridparam = [];
+        foreach ($ownerids as $ownerid) {
+            $owneridparam[] = "https://graph.microsoft.com/beta/users/{$ownerid}";
+        }
+        $teamdata = [
+            'template@odata.bind' => "https://graph.microsoft.com/beta/teamsTemplates('educationClass')",
+            'displayName' => $displayname,
+            'description' => $description,
+            'owners@odata.bind' => $owneridparam,
+        ];
+
+        if (!empty($extra) && is_array($extra)) {
+            foreach ($extra as $name => $value) {
+                $teamdata[$name] = $value;
+            }
+        }
+
+        if (empty($teamdata['description'])) {
+            unset($teamdata['description']);
+        }
+
+        $response = $this->betaapicall('post', '/teams', json_encode($teamdata));
+
+        if (array_key_exists('Location', $response)) {
+            $location = $response['Location'];
+            $locationparts = explode('/', $location);
+            foreach ($locationparts as $locationpart) {
+                if (substr($locationpart, 0, 5) == 'teams') {
+                    $response = [];
+                    $response['id'] = substr($locationpart, 7, 36);
+                    return $response;
+                }
+            }
+        }
+
         return $response;
     }
 }

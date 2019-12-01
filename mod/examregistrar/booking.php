@@ -396,7 +396,7 @@ if($formdata = $mform->get_data()) {
                 list($attend->site, $notused) = examregistrar_get_namecodefromid($record->bookedsite, 'locations', 'location');
                 $vouchername = '';
                 if(isset($voucher->id) && $voucher->id) {
-                    $icon = new pix_icon('t/download', get_string('voucherdownld', 'examregistar'), 'core', null); 
+                    $icon = new pix_icon('t/download', get_string('voucherdownld', 'examregistrar'), 'core', null); 
                     $vouchernum = str_pad($voucher->examregid, 4, '0', STR_PAD_LEFT).'-'.$voucher->uniqueid;
                     $downloadurl = new moodle_url('/mod/examregistrar/download.php', array('id' => $cm->id, 'down'=>'voucher', 'v'=>$vouchernum));
                     $vouchernum = $OUTPUT->action_link($downloadurl, $vouchernum, null, array('class'=>'voucherdownload'), $icon);

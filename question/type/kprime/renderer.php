@@ -15,14 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package qtype_kprime
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+* @package      qtype_kprime
+* @author       Amr Hourani (amr.hourani@id.ethz.ch)
+ *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
+* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
+* @author       Andreas Hruska (andreas.hruska@edaktik.at)
+* @copyright    2016 ETHZ {@link http://ethz.ch/}
+* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
+* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/outputcomponents.php');
-
 
 /**
  * Subclass for generating the bits of output specific to kprime questions.
@@ -195,6 +200,36 @@ class qtype_kprime_renderer extends qtype_renderer {
 
         $result .= html_writer::table($table, true);
 
+        if (!empty(get_config('qtype_kprime')->showscoringmethod)) {
+            $result .= $this->showscoringmethod($question);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns a string containing the rendererd question's scoring method.
+     * Appends an info icon containing information about the scoring method.
+     * @param qtype_sc_question $question
+     * @return string
+     */
+    private function showscoringmethod($question) {
+        global $OUTPUT;
+
+        $result = '';
+
+        if (get_string_manager()->string_exists('scoring' . $question->scoringmethod, 'qtype_kprime')) {
+            $outputscoringmethod = get_string('scoring' . $question->scoringmethod, 'qtype_kprime');
+        } else {
+            $outputscoringmethod = $question->scoringmethod;
+        }
+
+        if (get_string_manager()->string_exists('scoring' . $question->scoringmethod . '_help', 'qtype_kprime')) {
+            $result .= html_writer::tag('div',
+                '<br>'. get_string('scoringmethod', 'qtype_kprime'). ': <b>' . ucfirst($outputscoringmethod) . '</b>' .
+                $OUTPUT->help_icon('scoring' . $question->scoringmethod, 'qtype_kprime'),
+                array('id' => 'scoringmethodinfo_q' . $question->id));
+        }
         return $result;
     }
 
@@ -239,7 +274,17 @@ class qtype_kprime_renderer extends qtype_renderer {
 
         foreach ($question->order as $key => $rowid) {
             $row = $question->rows[$rowid];
-            $correctcolumn = $question->columns[$correctresponse[$rowid]];
+
+            if (isset($correctresponse[$rowid])) {
+                if (isset($question->columns[$correctresponse[$rowid]])) {
+                    $correctcolumn = $question->columns[$correctresponse[$rowid]];
+                }
+            } else {
+                $correctcolumn = new stdClass();
+                $correctcolumn->responsetextformat = 1;
+                $correctcolumn->responsetext = get_string('false', 'qtype_mtf');
+                $correctcolumn->id = $rowid;
+            }
 
             $result[] = ' ' .
                      $question->make_html_inline(

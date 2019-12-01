@@ -58,6 +58,15 @@ $capabilities = array(
         )
     ),
 
+    'report/trackertools:bulkdelete' => array(
+        'riskbitmask' => RISK_MANAGETRUST|RISK_PERSONAL|RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     'report/trackertools:warning' => array(
         'riskbitmask' => RISK_MANAGETRUST|RISK_PERSONAL|RISK_XSS,
         'captype' => 'write',

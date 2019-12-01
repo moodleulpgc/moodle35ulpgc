@@ -159,6 +159,10 @@ elseif ($action == 'delete') {
     }
     
     if(confirm_sesskey()) {
+        tracker_remove_issue($tracker, $issueid, $context->id);
+        
+        /*
+    
         $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
 
         $DB->delete_records('tracker_issue', array('id' => $issueid));
@@ -206,6 +210,7 @@ elseif ($action == 'delete') {
                 $fs->delete_area_files($context->id, 'mod_tracker', 'issuecomment', $commentid);
             }
         }
+        */
     }
     // ecastro ULPGC
     redirect($url);

@@ -51,12 +51,13 @@ echo $OUTPUT->header();
 
 $enabled = get_config('tool_lockstats', 'enable');
 if (!$enabled) {
-    echo $OUTPUT->notification(get_string('errornotenabled', 'tool_lockstats'), 'warning');
+    echo $OUTPUT->notification(get_string('errornotenabled', 'tool_lockstats',
+        $CFG->wwwroot.'/admin/settings.php?section=tool_lockstats_settings'), 'warning');
 }
 
 
 
-if ($CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
+if (!array_key_exists('lock_factory', $CFG) || $CFG->lock_factory != "\\tool_lockstats\\proxy_lock_factory") {
     echo $OUTPUT->notification(get_string('errornolockfactory', 'tool_lockstats'), 'error');
 }
 

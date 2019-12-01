@@ -10,18 +10,21 @@
 . common_script.sh
 check_program swipl
 if [ "$1" == "version" ] ; then
+	PROLOGVERSIONOUTPUT=.vpl_prolog_version_output
 	echo "#!/bin/bash" > vpl_execution
-	echo "swipl -v" >> vpl_execution
+	echo "swipl -v < /dev/null &> $PROLOGVERSIONOUTPUT" >> vpl_execution
+	echo "head -n2 $PROLOGVERSIONOUTPUT" >> vpl_execution
+	echo "rm $PROLOGVERSIONOUTPUT" >> vpl_execution
 	chmod +x vpl_execution
 	exit
 fi
 get_first_source_file pro pl
-swipl -q -s $FIRST_SOURCE_FILE -t halt 1 > /dev/null < /dev/null
+swipl -q -s "$FIRST_SOURCE_FILE" -t halt 1 > /dev/null < /dev/null
 cat common_script.sh > vpl_execution
 if [ "$1" == "batch" ] ; then
-	echo "swipl -q -L32M -s $FIRST_SOURCE_FILE -t vpl_hello" >>vpl_execution
+	echo "swipl -q -L32M -s \"$FIRST_SOURCE_FILE\" -t vpl_hello" >>vpl_execution
 else
-	echo "swipl -q -L32M -s $FIRST_SOURCE_FILE" >>vpl_execution
+	echo "swipl -q -L32M -s \"$FIRST_SOURCE_FILE\"" >>vpl_execution
 fi
 
 chmod +x vpl_execution

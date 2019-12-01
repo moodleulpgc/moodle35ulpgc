@@ -30,6 +30,8 @@ if ($hassiteconfig) {
     
     $temp->add(new \admin_setting_configcheckbox('local_ulpgccore/enableupdateldap', get_string('updateldap','local_ulpgccore'), get_string('explainupdateldap','local_ulpgccore'), 0));
     
+    $temp->add(new \admin_setting_configcheckbox('local_ulpgccore/mailednotviewed', get_string('mailednotviewed','local_ulpgccore'), get_string('explainmailednotviewed','local_ulpgccore'), 0));
+    
     $temp->add(new \admin_setting_configtext('local_ulpgccore/manuales', get_string('repomanuals','local_ulpgccore'), get_string('explainrepomanuals','local_ulpgccore'), '/repository/manuales'));
     
     $temp->add(new \admin_setting_configtext('local_ulpgccore/croncheck', get_string('croncheck','local_ulpgccore'), get_string('explaincroncheck','local_ulpgccore'), '0'));

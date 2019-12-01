@@ -26,10 +26,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018081117;
+$plugin->version = 2019102116;
 $plugin->cron    = 300; // Cron check this plugin every 5 minutes.
 $plugin->requires = 2014051200; // Moodle 2.7!
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.3.4';
+$plugin->release = '3.3.5';
 
 $plugin->component = 'mod_vpl';

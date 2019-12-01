@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 Enrique Castro @ ULPGC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class examfiles_synced extends examfile_created {
+class examfile_synced extends examfile_created {
 
     /**
      * Returns description of what happened.

@@ -265,9 +265,9 @@ if($upload) {
 
                 if($success) {
                     if(is_int($success) && $item = (int)$success) {
-                        //$eventdata['objectid'] = abs($item);
-                        $event = ($item > 0) ? \mod_examregistrar\event\manage_created::created($eventdata, 'examregistar_'.$upload) :
-                                                    \mod_examregistrar\event\manage_updated::created($eventdata, 'examregistar_'.$upload);
+                        $eventdata['objectid'] = abs($item);
+                        $event = ($item > 0) ? \mod_examregistrar\event\manage_created::created($eventdata, 'examregistrar_'.$upload) :
+                                                    \mod_examregistrar\event\manage_updated::created($eventdata, 'examregistrar_'.$upload);
                         $event->trigger();
                         $insertcount +=1;
                     } elseif(is_string($success)) {
@@ -363,7 +363,7 @@ if($upload) {
     
     $delay = 5;
     if($edit && $itemid) {
-            ////print_object('Entrando en $edit && $itemid');
+            print_object("Entrando en $edit && $itemid");
             $formclass = 'examregistrar_'.$itemname.'_form';
             $mform = new $formclass(null, array('exreg' => $examregistrar, 'item'=>$itemid, 'cmid'=>$cm->id));
             $element = false;
@@ -393,7 +393,6 @@ if($upload) {
                 unset($eventdata['other']['name']);
                 if($element) { // this means itemid > 0 and record exists, over-write & update
                     $data->id = $element->id;
-                    ////print_object('Add INSERT');
                     if($success = $DB->update_record($itemtable, $data)) {
                         $eventdata['objectid'] = $data->id;
                         $event = \mod_examregistrar\event\manage_updated::created($eventdata, $itemtable);
@@ -401,13 +400,14 @@ if($upload) {
                     }
 
                 } else {
-                    ////print_object('UPDATE item');
                     if($data->id = $DB->insert_record($itemtable, $data)) {
                         $eventdata['objectid'] = $data->id;
                         $event = \mod_examregistrar\event\manage_created::created($eventdata, $itemtable);
                         $event->trigger();
                     }
                 }
+                print_object("Entrando en dataid {$data->id} && table {$itemtable}");
+                
                 if($data->id && $itemtable == 'examregistrar_locations') {
                     examregistrar_set_location_tree($data->id);
                 }
@@ -494,13 +494,13 @@ if($upload) {
             die;
         } elseif(confirm_sesskey()){
             /// confirmed, proceed with action
+            unset($eventdata['other']['name']); 
             if($batch == 'hide' || $batch == 'show') {
                 $visible = ($batch == 'show') ? 1 : 0;
                 list($insql, $inparams) = $DB->get_in_or_equal($items);
                 $DB->set_field_select($itemtable, 'visible', $visible, " id $insql ", $inparams);
             } elseif($batch == 'delete') {
                 $DB->delete_records_list($itemtable, 'id', $items);
-                    unset($eventdata['other']['name']); 
                     foreach($items as $i) {
                         $eventdata['objectid'] = $i;
                         $event = \mod_examregistrar\event\manage_deleted::created($eventdata, $itemtable);
@@ -543,7 +543,7 @@ $event = \mod_examregistrar\event\manage_viewed::created($eventdata);
 $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
 
-$table = new examregistar_management_table('examregistrar-manage-edit-'.$edit.$examregistrar->id);
+$table = new examregistrar_management_table('examregistrar-manage-edit-'.$edit.$examregistrar->id);
 
 $filename = clean_filename('examregistrar_table_'.$edit.'_'.userdate(time(), '%Y%m%d-%H%M'));
 $table->is_downloading($download, $filename, $edit);

@@ -8,8 +8,11 @@
 # @vpl_script_description Using "perl -d" with first file
 # load common script and check programs
 . common_script.sh
+if [ "$1" == "version" ] ; then
+	exit
+fi
 check_program perl
 get_first_source_file perl prl
 cat common_script.sh > vpl_execution
-echo "perl -d $FIRST_SOURCE_FILE" >>vpl_execution
+echo "perl -d \"$FIRST_SOURCE_FILE\"" >>vpl_execution
 chmod +x vpl_execution

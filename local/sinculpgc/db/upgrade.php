@@ -38,7 +38,6 @@ function xmldb_local_sinculpgc_upgrade($oldversion) {
             // Adding fields to table local_sinculpgc_user.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-            $table->add_field('dni', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
             $table->add_field('category', XMLDB_TYPE_CHAR, '30', null, XMLDB_NOTNULL, null, null);
             $table->add_field('dedication', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('totaldedication', XMLDB_TYPE_NUMBER, '10, 5', null, XMLDB_NOTNULL, null, '0');
@@ -116,5 +115,15 @@ function xmldb_local_sinculpgc_upgrade($oldversion) {
          upgrade_plugin_savepoint(true, 2016030500, 'local', 'sinculpgc');
     }
 
+    if ($oldversion < 2019102500) {
+        $table = new xmldb_table('local_sinculpgc_user');
+        $field = new xmldb_field('dni');
+        if ($dbman->field_exists($table, $field)) {
+            //$dbman->drop_field($table, $field);
+        }
+   
+         upgrade_plugin_savepoint(true, 2019102500, 'local', 'sinculpgc');
+    }
+    
     return true;
 }
