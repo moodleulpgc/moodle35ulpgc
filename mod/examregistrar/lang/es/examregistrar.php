@@ -975,3 +975,4 @@ $string['savedroomsdata'] = 'Guardados datos de asistencia para {$a} Aulas/Sedes
 $string['saveduserdata'] = 'Guardados datos de asistencia para {$a} usuarios.';
 $string['globaldata'] = 'Datos globales';
 $string['hierachyerror'] = 'Jerarquía anómala';
+$string['venueerror'] = 'Error en Sede de sala única';

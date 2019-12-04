@@ -1316,7 +1316,7 @@ function examregistrar_is_venue_single_room($venue, $returnids=true) {
         if(count($rooms) === 1) {
             $room = reset($rooms);
         }
-    } else {
+    } elseif(!empty($venue)) {
         \core\notification::error(get_string('venueerror', 'examregistrar'));
     }
     

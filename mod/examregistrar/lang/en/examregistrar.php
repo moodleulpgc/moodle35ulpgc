@@ -1066,4 +1066,4 @@ $string['saveduserdata'] = 'Saved attendance data for {$a} students.';
 $string['savedexamsdata'] = 'Saved attendance data for {$a} exams.';
 $string['globaldata'] = 'Site data';
 $string['hierachyerror'] = 'Wrong hierarchy';
-$string['venuerror'] = 'Single room venue error';
+$string['venueerror'] = 'Single room venue error';
