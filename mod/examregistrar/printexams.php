@@ -347,7 +347,7 @@ if($display) {
     // examlist display
 
     $courses = examregistrar_get_user_courses($examregistrar, $course, $printparams, array('mod/examregistrar:submit', 'mod/examregistrar:download'), $canviewall);
-
+    
     echo $output->exams_item_selection_form($examregistrar, $course, $printurl, $printparams, 'period, session, venue');
     if($canviewall) {
         echo $output->exams_courses_selector_form($examregistrar, $course, $printurl, $printparams);
@@ -376,9 +376,8 @@ if($display) {
             echo $output->container_end();
 
             echo $output->container_start(' clearfix ');
-            $baseurl->param('action', 'checkvoucher');
-            echo $output->container($output->single_button($baseurl, get_string('checkvoucher', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
-            $baseurl->remove_params('action');
+            $vurl = new moodle_url($baseurl, array('id'=>$cm->id, 'tab'=>'session', 'session'=>$session, 'venue'=>$bookedsite, 'action'=>'checkvoucher'));
+            echo $output->container($output->single_button($vurl, get_string('checkvoucher', 'examregistrar'), 'post', array('class'=>' singlelinebutton ')), ' allocatedroomheaderright ');
             echo $output->container_end();
             
             /*
