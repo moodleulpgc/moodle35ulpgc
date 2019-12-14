@@ -352,11 +352,9 @@ class assign_submission_peers extends assign_submission_plugin {
                     'pluginsubtype'=>'assignsubmission',
                     'pluginaction'=>'table',
                     );
-            $groups = groups_print_activity_menu($cm, new moodle_url('/mod/assign/view.php', $params), true);
-            
-            $groups = str_replace('class="select autosubmit singleselect" name="group"', 'onchange="this.form.submit()"  class="select autosubmit singleselect" name="group"', $groups);
-            
-            //onchange='this.form.submit()
+            $groups = groups_print_activity_menu($cm, new moodle_url('/mod/assign/view.php', $params), true);            
+            //onchange='this.form.submit() 
+            $groups = str_replace('name="group"', ' onchange="this.form.submit()"  name="group"', $groups);
 
             $perpage = get_user_preferences('assign_perpage', 200);
             $filter = ''; //$assign->get_user_filter_preferences(); //get_user_preferences('assign_filter', '');

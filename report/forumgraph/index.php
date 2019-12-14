@@ -90,12 +90,12 @@ if (!$school) {
 
 // school menu
 $schooloptions = report_forumgraph_get_schooloptions();
-$schoolmenu = html_writer::select($schooloptions, "school", $school, get_string('choose', 'report_forumgraph'), array('onchange'=>'loadCourseMenu(this.options[this.selectedIndex].value);loadForumMenu(0);'));
+$schoolmenu = html_writer::select($schooloptions, "school", $school, get_string('choose', 'report_forumgraph'), array('onchange'=>'loadCourseMenu(this.options[this.selectedIndex].value);'));
 
 // course menu
 if ($course || (!$course && $school)) {
     $courses = array();
-    $coursenames = array();
+    $coursenames = array($course=>$course_obj->fullname); // ecastro ULPGC coursemenu JS malfunction
     
     // 20140721: get courses under first level of category
     if ($first_level_courses = get_courses($school, 'c.sortorder ASC', 'c.id,c.sortorder,c.visible,c.fullname,c.shortname,c.summary')) {
@@ -112,6 +112,7 @@ if ($course || (!$course && $school)) {
     
     report_forumgraph_get_category_courses($school, $courses, $coursenames);
     $coursemenu = html_writer::select($coursenames, 'course', $course, get_string('choose', 'report_forumgraph'), array('onchange'=>'loadForumMenu(this.options[this.selectedIndex].value)'));
+    
 } else {
     $coursemenu = html_writer::select(array(), 'course', $course, get_string('choose', 'report_forumgraph'), array('onchange'=>'loadForumMenu(this.options[this.selectedIndex].value)'));
 }
@@ -130,7 +131,8 @@ $PAGE->set_heading(get_string('forumgraph', 'report_forumgraph').$displaycoursen
 echo $OUTPUT->header();
 
 // Submit buttons
-$submit = '<input type="submit" value="'.get_string('view').'" />';
+$submit = '<input type="hidden" name="course" value="'.$course.'" />'; // ecastro ULPGC solve JS malfunction
+$submit .= '<input type="submit" value="'.get_string('view').'" />';
 
 echo '<form action="index.php" method="post">'."\n";
 echo '<div>';

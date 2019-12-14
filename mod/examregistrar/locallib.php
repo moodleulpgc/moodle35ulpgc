@@ -1180,8 +1180,6 @@ function examregistrar_booking_seating_qc($sessionid, $bookedsite = 0, $sort='')
 function examregistrar_set_location_tree($locationid) {
     global $DB;
 
-    print_object("Entrando en locationid $locationid");
-    
     $location = $DB->get_record('examregistrar_locations', array('id'=>$locationid), '*', MUST_EXIST);
     $oldpath = $location->path;
     $path = $location->path;

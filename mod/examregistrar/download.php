@@ -892,10 +892,11 @@ function examregistrar_voucher_printpdf($baseurl, $context, $voucherparam, $outp
     $voucher = $DB->get_record('examregistrar_vouchers', array('examregid' => $rid, 'uniqueid' => $uniqueid), '*', MUST_EXIST);
     $booking = $DB->get_record('examregistrar_bookings', array('id' => $voucher->bookingid), '*', MUST_EXIST);
     $exam = $DB->get_record('examregistrar_exams', array('id' => $booking->examid), '*', MUST_EXIST);
+    
     $user = $DB->get_record('user', array('id' => $booking->userid), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('examregistrar', $examregistrar->id, $examregistrar->course, false, MUST_EXIST);
     
-    $exam = new examregistrar_exam($exam);
+    $course = $DB->get_record('course', array('id' => $exam->courseid), 'id, shortname, fullname', MUST_EXIST);
     
     $canbook = has_capability('mod/examregistrar:book',  $context);
     $canbookothers = has_capability('mod/examregistrar:bookothers',  $context);
@@ -919,11 +920,9 @@ function examregistrar_voucher_printpdf($baseurl, $context, $voucherparam, $outp
     // ---------------------------------------------------------
 
     $pdf->replaces['programme'] = $exam->programme;
-    $pdf->replaces['shortname'] = $exam->get_exam_name(false, true, false, false); //$exam->shortname;
-    $pdf->replaces['fullname'] = $exam->fullname;
-    $pdf->replaces['callnum'] = $exam->callnum;
-    $pdf->replaces['examscope'] = $exam->examscope;
-
+    $pdf->replaces['shortname'] = $course->shortname;
+    $pdf->replaces['fullname'] = $course->fullname;
+    
     $header = examregistrar_explode_header($pdf->template['header'], $pdf->replaces);
     $main = examregistrar_str_replace($pdf->replaces, $pdf->template['examtitle']);
     

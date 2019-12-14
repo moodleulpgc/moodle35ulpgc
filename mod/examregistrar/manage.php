@@ -363,7 +363,6 @@ if($upload) {
     
     $delay = 5;
     if($edit && $itemid) {
-            print_object("Entrando en $edit && $itemid");
             $formclass = 'examregistrar_'.$itemname.'_form';
             $mform = new $formclass(null, array('exreg' => $examregistrar, 'item'=>$itemid, 'cmid'=>$cm->id));
             $element = false;
@@ -406,7 +405,6 @@ if($upload) {
                         $event->trigger();
                     }
                 }
-                print_object("Entrando en dataid {$data->id} && table {$itemtable}");
                 
                 if($data->id && $itemtable == 'examregistrar_locations') {
                     examregistrar_set_location_tree($data->id);

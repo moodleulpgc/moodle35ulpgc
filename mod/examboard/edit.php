@@ -121,7 +121,7 @@ die();
 */
 
 // actions not requiring interface form
-$actions = array('examhide', 'userup', 'userdown', 'usertoggle', 'reorder', 'memberup', 'memberdown', 'delmember', 'boardtoggle');
+$actions = array('examhide', 'examshow', 'userup', 'userdown', 'usertoggle', 'reorder', 'memberup', 'memberdown', 'delmember', 'boardtoggle');
 
 $eventparams = array(
     'context' => $context,
@@ -129,10 +129,10 @@ $eventparams = array(
 );
 
 if($examid && in_array($action, $actions)) {
-    if($action == 'examhide') {
-        $DB->set_field('examboard_exam', 'active', 0, array('id' => $examid));
-    } elseif($action == 'examshow') {
-        $DB->set_field('examboard_exam', 'active', 1, array('id' => $examid));
+    if($action == 'examhide' || $action == 'examshow') {
+        $toggle = ($action == 'examshow') ? 1 : 0;
+        $DB->set_field('examboard_exam', 'active', $toggle, array('id' => $examid));
+        $returnurl->remove_params('view', 'item');
     } elseif($action == 'userup') {
         if($userid = optional_param('user', 0, PARAM_INT)) {
             $params = array('examid'=>$examid, 'userid'=>$userid);

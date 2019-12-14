@@ -399,7 +399,7 @@ function xmldb_examregistrar_upgrade($oldversion) {
         
         $tables = array('examregistrar_exams' => ['shortname', 'aacada', 'conv', 'parcial'],
                         'examregistrar_locations' => ['idnumber'],
-                        'examregistrar_periods' => ['idnumber', 'term'],
+                        'examregistrar_periods' => ['idnumber'],
                         'examregistrar_seating_rules' => ['locationid'],
                         'examregistrar_session_rooms' => ['locationid'],
                         'examregistrar_session_seats' => ['locationid'],

@@ -1301,7 +1301,7 @@ class renderer extends plugin_renderer_base {
         
         // hide/show
             $str = ($user->excluded) ? get_string('include', 'examboard') : get_string('exclude', 'examboard');
-            $icon =  ($user->excluded) ? 'i/hide' :  'i/show';
+            $icon =  ($user->excluded) ? 'i/show' :  'i/hide';
             $toggleaction = ($user->excluded) ? get_string('usershow', 'examboard') : get_string('userhide', 'examboard');
             $toggleaction = new \confirm_action($toggleaction);
 
@@ -1608,7 +1608,10 @@ class renderer extends plugin_renderer_base {
             $name = $exam->active ? 'hide' : 'show';
             $url->param('action', 'exam'.$name);
             $icon = new pix_icon('t/'.$name, get_string($name), 'core', $attributes);
-            $action .=  '&nbsp; '.$this->output->action_icon($url, $icon);
+            $toggleaction = ($exam->active) ? get_string('examhide', 'examboard') : get_string('examshow', 'examboard');
+            $toggleaction = new \confirm_action($toggleaction);
+            
+            $action .=  '&nbsp; '.$this->output->action_icon($url, $icon, $toggleaction);
             
         // delete
             $deleteaction = new \confirm_action(get_string('examdeleteconfirm', 'examboard'));

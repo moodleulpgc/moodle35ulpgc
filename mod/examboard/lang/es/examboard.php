@@ -34,6 +34,8 @@ $string['exempted'] = 'Eximido';
 $string['exempted_help'] = 'Marcar si este usuario ha sido eximido de sus deberes como miembro del Tribunal.';
 $string['exclude'] = 'Excluir al estudiante de la evaluación';
 $string['include'] = 'Incluir al estudiante en la evaluación';
+$string['examhide'] = 'Ocultar un Examen impide a los usuarios sin capacidades extra el acceder al mismo (Miembros del Tribunal o estudiantes)';
+$string['examshow'] = 'Mostrar un Examen ocultopermite el acceso y trabajo por parte de Miembros del Tribunal y estudiantes';
 $string['userhide'] = 'Excluir a un estudiante de la evaluación impide que los Profesores puedan emitir calificaciones, 
 pero permite el acceso a los ítems entregados por el estudiante, si existen';
 $string['usershow'] = 'Incluir a un usuario en la evaluación permite a los Profesores evaluar y calificar al estudiante';
