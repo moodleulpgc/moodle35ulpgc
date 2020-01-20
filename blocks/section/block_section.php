@@ -22,8 +22,10 @@
  * @copyright  2013 onwards Nathan Robbins (https://github.com/nrobbins)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
 class block_section extends block_list {
-    function init(){
+    public function init() {
         $this->title = get_string('pluginname', 'block_section');
     }
     
@@ -38,8 +40,23 @@ class block_section extends block_list {
                 $this->config = new stdClass;
             }
             $this->config->section = 0;
+            $this->section = 0;
+        } else {
+            $this->section = $this->config->section;
         }
+    }
 
+    
+    public function applicable_formats() {
+        return [
+                'course-view' => false, // ecastro ULPGC
+				'site-index' => true, 
+                'my' => true
+               ];
+    }
+    
+    public function instance_allow_multiple() {
+        return true;
     }
 
     function user_can_addto($page) {
@@ -49,20 +66,7 @@ class block_section extends block_list {
         }
 
         return parent::user_can_addto($page);
-    }
-    
-    function applicable_formats() { // ecastro ULPGC my
-        return array(
-				'course-view' => false,
-				'site-index' => true, 
-				'my' => true,
-				);
-    }
-    
-    public function instance_allow_multiple() {
-        return true;
-    }
-    
+    }    
     /**
      * Default return is false - header will be shown
      * @return boolean
@@ -91,62 +95,57 @@ class block_section extends block_list {
         return false;
     }
     
-    function get_content() {
-        global $USER, $CFG, $DB, $OUTPUT, $COURSE, $PAGE;
+    public function get_content() {
+        global $USER, $CFG, $DB, $OUTPUT, $PAGE;
 
-        if ($this->content !== NULL) {
+        if ($this->content !== null) {
             return $this->content;
         }
 
         $this->content = new stdClass();
-        $this->content->items = array();
-        $this->content->icons = array();
+        $this->content->items = [];
+        $this->content->icons = [];
         $this->content->footer = '';
 
         if (empty($this->instance)) {
             return $this->content;
         }
 
-        if(!empty($this->config->course) && ($DB->get_record('course', array('id'=>$this->config->course)) != null)){
-            $course = $DB->get_record('course', array('id'=>$this->config->course));
+        if (!empty($this->config->course) && ($DB->get_record('course', ['id' => $this->config->course]) != null)) {
+            $course = $DB->get_record('course', ['id' => $this->config->course]);
         } else {
             $course = $this->page->course;
         }
         
         require_once($CFG->dirroot.'/course/lib.php');
 
+        // ecastro ULPGC
         $courserenderer = $PAGE->get_renderer('core', 'course');
-
         $context = context_course::instance($course->id);
         $isediting = $this->page->user_is_editing() && has_capability('moodle/course:manageactivities', $context);
-        $modinfo = get_fast_modinfo($course);
 
+        $modinfo = get_fast_modinfo($course);
 
 /// extra fast view mode
         if (!$isediting) {
-            if (!empty($modinfo->sections[$this->config->section])) {
-                $options = array('overflowdiv'=>true);
-                foreach($modinfo->sections[$this->config->section] as $cmid) {
-                    $cm = $modinfo->cms[$cmid];
+            if (!empty($modinfo->sections[$this->section])) {
+                foreach ($modinfo->sections[$this->section] as $cmid) {
+                   $cm = $modinfo->cms[$cmid];
                     if (!$cm->uservisible) {
                         continue;
                     }
 
-                    //list($content, $instancename) = get_print_section_cm_text($cm, $course);
-                    $content = $cm->get_formatted_content(array('overflowdiv' => true, 'noclean' => true));
-                    $after = $cm->afterlink; // ecastro ULPGC
-                    $instancename = $cm->get_formatted_name();
+                   $cminfo = \cm_info::create($cm);
 
-
-                    if (!($url = $cm->url)) {  // ecastro ULPGC
-                        $this->content->items[] = $content;
+                    if (!($url = $cm->url)) {
+                    $this->content->items[] = $cminfo->get_formatted_content(array('overflowdiv' => true, 'noclean' => true)); // ecastro ULPGC
                         $this->content->icons[] = '';
                     } else {
                         $linkcss = $cm->visible ? '' : ' class="dimmed" ';
-                        //Accessibility: incidental image - should be empty Alt text
+                    // Accessibility: incidental image - should be empty Alt text
                         $icon = '<img src="' . $cm->get_icon_url() . '" class="icon" alt="" />&nbsp;';
                         $this->content->items[] = '<a title="'.$cm->modplural.'" '.$linkcss.' '.$cm->extra.
-                                ' href="' . $url . '">' . $icon . $instancename . '</a>'.$after;
+                            ' href="' . $url . '">' . $icon . $cminfo->get_formatted_name() . '</a>'.$cm->afterlink;
                     }
                 }
             }

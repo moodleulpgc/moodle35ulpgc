@@ -23,8 +23,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['section:addinstance'] = 'Add a new Section block';
-$string['section:myaddinstance'] = 'Add a new Section block to My home';
+defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Section';
 $string['blocksettings'] = 'Settings';
 $string['blockcourse'] = 'Course ID';
@@ -35,5 +34,7 @@ $string['blocktitle'] = 'Title';
 $string['blocktitle_help'] = 'The title for this instance of the block. Appears in the block header.';
 $string['blockteacheredit'] = 'Teachers Can Edit This Block';
 $string['section:addinstance'] = 'Add a Section block';
+$string['section:myaddinstance'] = 'Add a Section block to Dashboard';
+$string['privacy:metadata'] = 'The Section block plugin does not store any personal data.';
 $string['section:editsections'] = 'Able to set the displayed section';
 $string['section:editcourses'] = 'Able to set the course the section is displayed from';

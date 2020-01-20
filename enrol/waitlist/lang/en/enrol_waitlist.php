@@ -109,6 +109,7 @@ $string['manage::assign'] = "Assign";
 $string['nocursefields'] = "No fields";
 $string['profilefield'] = "Field";
 $string['privacy:metadata:user_enrol_waitlist']='Stores user metadata in userid field';
+$string['task:update_enrolments'] = 'Update waitlist-enrolments';
 
 // ecastro ULPGC 
 $string['usewaitlist'] = 'Use waitlist';

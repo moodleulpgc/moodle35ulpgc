@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018021813;
+$plugin->version = 2020010701;
 $plugin->requires = 2016120500;
-$plugin->release = 'V3.1';
+$plugin->release = 'V2.11';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'theme_boost_training';
 

@@ -251,8 +251,14 @@ class studentquiz_bank_view extends \core_question\bank\view {
                                 $type = 'state';
                                 $value = $state;
                             }
+
                             mod_studentquiz_change_state_visibility($questionid, $type, $value);
                             mod_studentquiz_state_notify($questionid, $this->course, $this->cm, $type);
+
+                            // Additionally always unhide the question when it got approved
+                            if ($state == studentquiz_helper::STATE_APPROVED) {
+                                mod_studentquiz_change_state_visibility($questionid, 'hidden', 0);
+                            }
                         }
                     }
                     $this->baseurl->remove_params('approveselected');
@@ -733,10 +739,8 @@ class studentquiz_bank_view extends \core_question\bank\view {
             $this->fields[] = new \user_filter_checkbox('createdby', get_string('filter_label_show_mine', 'studentquiz'),
                 true, 'createdby');
         } else {
-            $this->fields[] = new \studentquiz_user_filter_text('firstname', get_string('filter_label_firstname', 'studentquiz'),
-                true, 'firstname');
-            $this->fields[] = new \studentquiz_user_filter_text('lastname', get_string('filter_label_surname', 'studentquiz'),
-                true, 'lastname');
+            $this->fields[] = new \studentquiz_user_filter_text('firstname', get_string('firstname'), true, 'firstname');
+            $this->fields[] = new \studentquiz_user_filter_text('lastname', get_string('lastname'), true, 'lastname');
         }
 
         $this->fields[] = new \studentquiz_user_filter_date('timecreated', get_string('filter_label_createdate', 'studentquiz'),

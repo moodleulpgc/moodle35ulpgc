@@ -432,8 +432,6 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             throw new moodle_exception('nocustomfilter', 'datalynx');
         }
 
-        $customfilter->authorsearch = !isset($formdata->authorsearch) ? 0 : $customfilter->authorsearch;
-
         $customfilterfieldlistfields = array();
         if ($customfilter->fieldlist) {
             $customfilterfieldlistfields = json_decode($customfilter->fieldlist);
@@ -501,12 +499,19 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $menu = array();
             $menu += array(0 => null); // NULL to "not" show in lists.
 
-            // Add all enrolled users to list.
-            global $PAGE;
-            foreach (get_enrolled_users($PAGE->context) as $id => $user) {
-                $menu[$id] = $user->firstname . " " . $user->lastname;
+            // Add users that have written an entry in the current datalynx instance to list.
+            global $DB, $PAGE;
+            $entryauthors = $DB->get_records_menu('datalynx_entries', array('dataid' => $this->_df->id()), null, 'id, userid');
+            $allusers = get_enrolled_users($PAGE->context);
+            foreach ($entryauthors as $userid) {
+                // Skip duplicates.
+                if (isset($menu[$userid])) {
+                    continue;
+                }
+                $menu[$userid] = $allusers[$userid]->firstname . " " . $allusers[$userid]->lastname;
             }
-            $mform->addElement('autocomplete', 'authorsearch', null, $menu);
+
+            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu);
             $mform->setType('authorsearch', PARAM_INT);
         }
 

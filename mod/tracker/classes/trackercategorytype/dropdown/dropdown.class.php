@@ -150,6 +150,8 @@ class dropdownelement extends trackerelement {
 
         $elmname = 'element'.$this->name;
         
+        
+        
         if (!$this->multiple) {
             $value = optional_param($elmname, '', PARAM_TEXT);
             $attribute->elementitemid = $value;

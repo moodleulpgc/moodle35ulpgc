@@ -37,9 +37,7 @@ use html_writer;
 use moodle_url;
 use stdClass;
 
-define ('LOCKSTAT_UNKNOWN', 0);
-define ('LOCKSTAT_ADHOC', 1);
-define ('LOCKSTAT_SCHEDULED', 2);
+require_once($CFG->dirroot . '/admin/tool/lockstats/classes/proxy_lock_factory.php');
 
 /**
  * Proxy lock factory, adhoc task summary table.
@@ -70,6 +68,16 @@ class adhoc_tasks extends html_table {
         ];
 
         $this->attributes['class'] = 'admintable generaltable';
+        $this->colclasses = array(
+            'leftalign',
+            'leftalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+            'rightalign',
+        );
 
         $data = [];
 

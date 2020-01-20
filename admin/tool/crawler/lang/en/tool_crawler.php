@@ -135,6 +135,9 @@ $string['numurls'] = 'Total URLs';
 $string['oversize'] = 'Big / slow links';
 $string['oversize_header'] = '<p>Big files with multiple incoming links to them will be duplicated.</p>';
 $string['outgoingurls'] = 'Outgoing URLs';
+$string['crawl_task'] = 'Parallel crawling task';
+$string['max_workers'] = 'Max workers';
+$string['max_workersdesc'] = 'The max number of adhoc crawl tasks (workers) that should run at any time in parallel.';
 $string['progress'] = 'Progress';
 $string['progresseta'] = '{$a->percent}; ETA is {$a->eta}';
 $string['pluginname'] = 'Link crawler robot';
@@ -147,8 +150,7 @@ $string['queued'] = 'Queued URLs';
 $string['queued_header'] = '<p>The title and course are only known if the URL has been seen on a previous crawl.</p>';
 $string['recent'] = 'Recently crawled URLs';
 $string['recentactivity'] = 'Days of recent activity';
-$string['recentactivitydesc'] = 'A course is crawled only if it has been viewed in the last X days.
-At ' . '{$a->days}' . ' day(s) of recent activity, this will include ' . '{$a->count}' . ' courses total.';
+$string['recentactivitydesc'] = 'A course will only be crawled if it has been viewed in the last number of days set here.';
 $string['recent_header'] = '';
 $string['redirect'] = 'Redirect: {$a->redirectlink}';
 $string['response'] = 'Response';
@@ -182,7 +184,7 @@ Links which have been blacklisted or which are in excluded DOM elements will not
 $string['uselogs'] = 'Use log tables';
 $string['uselogsdesc'] = 'If enabled, only crawl links that are part of courses with recent activity. Uses table mdl_logstore_standard_log.';
 $string['useragent'] = 'Bot user agent string';
-$string['useragentdesc'] = 'The user agent name to use in the HTTP headers, without a version. The version of this plugin is automatically appended.';
+$string['useragentdesc'] = 'The user agent name to use in the HTTP headers, without a version. The version of this plugin is automatically appended. This setting can be left empty and will default to the built in Bot useragent.';
 $string['whenqueued'] = 'When queued';
 /*
  * Privacy provider (GDPR)

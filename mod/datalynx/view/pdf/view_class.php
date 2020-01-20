@@ -26,7 +26,14 @@ defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
-require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/fpdi.php");
+use setasign\Fpdi\TcpdfFpdi;
+
+// Fallback for older Moodle Versions < 3.8.
+if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
+    require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
+} else {
+    require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/fpdi.php");
+}
 
 class datalynxview_pdf extends datalynxview_base {
 
@@ -779,6 +786,8 @@ class datalynxview_pdf extends datalynxview_base {
      * Current code assumes we want to attach all files linked to this context.
      */
     protected function mergepdfs($pdf, $pagecount) {
+        global $CFG;
+
         // Check what fields are file class.
         $filefieldids = array();
         foreach ($this->get_view_fields() as $fieldid => $fieldinview) {
@@ -831,7 +840,26 @@ class datalynxview_pdf extends datalynxview_base {
             if ($file->copy_content_to($filepath)) {
                 $this->_tmpfiles[] = $filepath;
 
-                $importpagecount = $pdf->setSourceFile($filepath);
+                // Try if this pdf files version is <= 1.4 to work with pdftk.
+                try {
+                    $importpagecount = $pdf->setSourceFile($filepath);
+                } catch (\Exception $e) {
+                    // PDF was not valid - try running it through ghostscript to clean it up.
+                    $gsexec = \escapeshellarg($CFG->pathtogs);
+                    $shellfilepath = \escapeshellarg($filepath);
+                    $arguments = " -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dBATCH -dNOPAUSE -q";
+                    putenv("LD_LIBRARY_PATH"); // Set env variable for ghostscript.
+                    shell_exec("$gsexec $arguments -sOutputFile=$shellfilepath.14 $shellfilepath");
+                    shell_exec("mv $filepath.14 $filepath");
+
+                    // Try once more, if not just skip this file.
+                    try {
+                        $importpagecount = $pdf->setSourceFile($filepath);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+
                 for ($pagenumber = 1; $pagenumber <= $importpagecount; $pagenumber++) {
                     $importtemplate = $pdf->ImportPage($pagenumber);
                     $pdf->AddPage();
@@ -845,8 +873,17 @@ class datalynxview_pdf extends datalynxview_base {
     }
 }
 
+// Because different implementations in mdl 3.5 and 3.8 we extend dynamically.
+if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
+    class DynamicParent extends TcpdfFpdi {
+    }
+} else {
+    class DynamicParent extends FPDI {
+    }
+}
+
 // Extend the TCPDF class to create custom Header and Footer.
-class dfpdf extends FPDI {
+class dfpdf extends DynamicParent {
 
     protected $_dfsettings;
 

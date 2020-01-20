@@ -1019,7 +1019,7 @@ class plagiarism_plugin_turnitin extends plagiarism_plugin {
                             // Update assignment in case rubric is not stored in Turnitin yet.
                             $this->sync_tii_assignment($cm, $coursedata->turnitin_cid);
 
-                            $rubricviewlink = html_writer::tag('span','',
+                            $rubricviewlink = html_writer::tag('span', '',
                                 array('class' => 'rubric_view rubric_view_pp_launch tii_tooltip',
                                     'title' => get_string('launchrubricview',
                                         'plagiarism_turnitin'), 'id' => 'rubric_view_launch'
@@ -1291,7 +1291,7 @@ class plagiarism_plugin_turnitin extends plagiarism_plugin {
         $updaterequired = false;
 
         if ($submissiondata = $DB->get_record('plagiarism_turnitin_files', array('id' => $submissionid),
-                                                 'id, cm, userid, identifier, similarityscore, grade, submissiontype, orcapable, student_read, gm_feedback')) {
+                                                 'id, cm, userid, identifier, similarityscore, grade, submissiontype, orcapable, student_read, gm_feedback, errorcode')) {
 
             // Build Plagiarism file object.
             $plagiarismfile = new stdClass();
@@ -1305,6 +1305,11 @@ class plagiarism_plugin_turnitin extends plagiarism_plugin {
             $plagiarismfile->grade = ($tiisubmission->getGrade() == '') ? null : $tiisubmission->getGrade();
             $plagiarismfile->orcapable = ($tiisubmission->getOriginalityReportCapable() == 1) ? 1 : 0;
             $plagiarismfile->gm_feedback = $tiisubmission->getFeedbackExists();
+
+            // If error code is 13, set the status to success otherwise resetting the errorcode will hide the submission.
+            if ($submissiondata->errorcode == 13) {
+                $plagiarismfile->statuscode = 'success';
+            }
 
             // Reset Error Values.
             $plagiarismfile->errorcode = null;
@@ -1388,7 +1393,7 @@ class plagiarism_plugin_turnitin extends plagiarism_plugin {
     /**
      * Update module grade and gradebook.
      */
-    private function update_grade($cm, $submission, $userid, $type = 'submission') {
+    private function update_grade($cm, $submission, $userid) {
         global $DB, $USER, $CFG;
         $return = true;
         $grade = $submission->getGrade();
@@ -2910,7 +2915,7 @@ function plagiarism_turnitin_send_queued_submissions() {
                         plagiarism_turnitin_activitylog('File not found for submission: '.$queueditem->id, 'PP_NO_FILE');
                         mtrace('File not found for submission. Identifier: '.$queueditem->id);
                         $errorcode = 9;
-                        continue;
+                        continue 2;
                     }
 
                     $title = $file->get_filename();
@@ -2923,7 +2928,7 @@ function plagiarism_turnitin_send_queued_submissions() {
                         mtrace($e);
                         mtrace('File content not found on submission. Identifier: '.$queueditem->identifier);
                         $errorcode = 9;
-                        continue;
+                        continue 2;
                     }
                 } else {
                     // Get the actual text content for a submission.

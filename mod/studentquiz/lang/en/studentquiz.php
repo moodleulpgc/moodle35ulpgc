@@ -79,7 +79,7 @@ Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\
 The comment is: \'{$a->commenttext}\'
 
 You can review this question at: {$a->questionurl}.';
-$string['emailcommentaddedsmall'] = 'Your question \'{$a->questionname}\' has been commented by {$a->username}.';
+$string['emailcommentaddedsmall'] = 'Your question \'{$a->questionname}\' has been commented by {$a->actorname}.';
 $string['emailcommentaddedsubject'] = 'Question has been commented: {$a->questionname}';
 
 $string['emailcommentdeletedbody'] = 'Dear {$a->recepientname},
@@ -138,7 +138,6 @@ $string['filter_label_comment'] = 'Comments';
 $string['filter_label_createdate'] = 'Creation';
 $string['filter_label_difficulty_level'] = 'Difficulty';
 $string['filter_label_fast_filters'] = 'Fast filter for questions';
-$string['filter_label_firstname'] = 'Firstname';
 $string['filter_label_myattempts'] = 'My attempts';
 $string['filter_label_mydifficulty'] = 'My difficulty';
 $string['filter_label_mylastattempt'] = 'My latest attempt';
@@ -160,7 +159,6 @@ $string['filter_label_question'] = 'Question title';
 $string['filter_label_questiontext'] = 'Question content';
 $string['filter_label_rates'] = 'Rating';
 $string['filter_label_show_mine'] = 'My questions';
-$string['filter_label_surname'] = 'Lastname';
 $string['filter_label_tags'] = 'Tag';
 $string['finish_button'] = 'Finish';
 $string['lastattempt_right'] = '✓';
@@ -366,8 +364,10 @@ $string['settings_removeqbehavior_label'] = 'Remove question behavior plugin Stu
 $string['settings_section_description_default'] = 'These values define the default values when creating a new studentquiz activity.';
 $string['settings_section_header_question'] = 'Question settings';
 $string['settings_section_header_ranking'] = 'Ranking settings';
-$string['settings_publish_new_questions'] = 'Publish new questions';
-$string['settings_publish_new_questions_help'] = 'Automatically publish new created questions';
+$string['setting_question_publishing'] = 'Question publishing';
+$string['setting_question_publishing_help'] = 'Published questions appear in the question pool for other students to take them. Either allow all questions to be published automatically, or require approval before they can be published.<br>Note that this setting cannot be changed once a question has been created in the StudentQuiz.';
+$string['setting_question_publishing_automatic'] = 'Automatically publish new questions';
+$string['setting_question_publishing_require_approval'] = 'Require approval before publishing';
 $string['show_less'] = 'Show less';
 $string['show_more'] = 'Show more';
 $string['slot_of_slot'] = 'Question {$a->slot} of {$a->slots} in this set';
@@ -409,3 +409,5 @@ $string['studentquizname_help'] = 'The name of this StudentQuiz Activity';
 $string['submissionendbeforestart'] = 'Submissions deadline can not be specified before the open for submissions date';
 $string['tags'] = 'Tags';
 $string['unapprove'] = 'Unapprove';
+$string['filter_label_question_creation_item'] = '{$a->creationtext} {$a->rowtext} {$a->inputtext}';
+$string['filter_label_question_creation_item_inputtext'] = '{$a->inputtext} {$a->inputtype}';

@@ -15,23 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Course renderer.
+ * tool_crawler
  *
- * @package    theme_boost_training
- * @copyright  2017 Eduardo Kraus
+ * @package    tool_crawler
+ * @copyright  2019 Kristian Ringer <kristian.ringer@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace theme_boost_training\output\core;
+namespace tool_crawler\task;
+
 defined('MOODLE_INTERNAL') || die();
 
+require_once("$CFG->dirroot/admin/tool/crawler/lib.php");
+
 /**
- * Course renderer class.
+ * adhoc_crawl_task
+ * Crawl the queue
  *
- * @package    theme_boost_training
- * @copyright  2017 Eduardo Kraus
+ * @package    tool_crawler
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_renderer extends \theme_boost\output\core\course_renderer {
+class adhoc_crawl_task extends \core\task\adhoc_task {
+    /**
+     * Get task name
+     */
+    public function get_name() {
+        return get_string('adhoc_crawl_task', 'tool_crawler');
+    }
 
+    /**
+     * Execute task
+     */
+    public function execute() {
+        if (\tool_crawler\robot\crawler::get_config()->disablebot === '1') {
+            return;
+        }
+        tool_crawler_crawl();
+    }
 }
+
+

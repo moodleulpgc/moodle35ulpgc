@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'assignfeedback_solutionsheet';
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->version  = 2018051200; // Development release.
-$plugin->release  = '3.x dev';
+$plugin->maturity = MATURITY_STABLE;
+$plugin->version  = 2018051200; // Branch MOODLE_35_STABLE
+$plugin->release  = '3.5.0';
 $plugin->requires = 2018050800; // For Moodle 3.5 and later.
 

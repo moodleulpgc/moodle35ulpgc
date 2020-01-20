@@ -404,8 +404,7 @@ class assign_feedback_solutionsheet extends assign_feedback_plugin {
     public function has_user_summary() {
         return false;
     }
-    
-    
+
     /**
      * Has the feedback file been modified?
      *
