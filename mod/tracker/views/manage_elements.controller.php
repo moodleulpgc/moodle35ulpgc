@@ -378,6 +378,13 @@ if ($action == 'addelement') {
         $sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', "trackerid = {$tracker->id} GROUP BY trackerid");
         $used->sortorder = $sortorder + 1;
         $DB->insert_record('tracker_elementused', $used);
+        
+        // ensure autofill is called for newly used elements // ecastro ULPGC
+        $elementobj = \trackerelement::find_instance_by_id($tracker, $elementid);
+        if(isset($elementobj->paramchar1) && $elementobj->paramchar1) {
+            $elementobj->setcontext(\context_module::instance($cm->id));
+            $elementobj->autofill_options();
+        }
     } else {
         //Feedback message that element is already in use
         print_error('errorelementinuse', 'tracker', '', "view.php?id={$cm->id}&amp;what=manageelements");

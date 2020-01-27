@@ -35,7 +35,7 @@ $string['tracker:viewallissues'] = 'See all tickets';
 $string['tracker:viewpriority'] = 'View priority of my owned tickets';
 $string['tracker:viewreports'] = 'View issue work reports';
 $string['tracker:otherscomments'] = 'View comments by others';
-
+$string['tracker:reportpastdue'] = 'Report tickets after duedate';
 
 $string['AND'] = 'AND';
 $string['IN'] = 'IN';
@@ -675,7 +675,15 @@ $string['autowatchestask'] = 'Add watches for selected users in menu';
 $string['mycced'] = 'Issues observed';
 $string['review'] = 'Summary';
 
-
-
-
-
+$string['allowsubmissionsfromdate'] = 'Allow new issues from';
+$string['allowsubmissionsfromdate_help'] = 'A date to allow non-editing users to add new issues';
+$string['duedate'] = 'Due date';
+$string['duedate_help'] = 'After this date, no new issues could be aded by non-editing users';
+$string['statenonrepeat'] = 'Non-repeat states';
+$string['statenonrepeat_help'] = 'If a user has issues in any of the selected stated, the user won\'t be able to create new issues';
+$string['reportnotallowed'] = 'New issues cannot be added until the {$a} existing ones be resolved';
+$string['reportwillopenon'] = 'Issue creation closed. Will open on: {a}';
+$string['reportopenedon'] = 'Issue creation available from: {a}';
+$string['reportwillcloseon'] = 'Issue creation will finish on: {$a}';
+$string['reportclosedon'] = 'Issue creation was finished on: {$a}';
+$string['reportsactive'] = 'You have {$a} active issues in this container';

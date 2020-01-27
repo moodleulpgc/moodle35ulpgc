@@ -35,7 +35,7 @@ class qtype_conceptmap extends question_type {
 
     public function get_question_options($question) {
         global $DB;
-        $question->options = $DB->get_record('qtype_essay_options',
+        $question->options = $DB->get_record('qtype_conceptmap_options',
                 array('questionid' => $question->id), '*', MUST_EXIST);
         parent::get_question_options($question);
     }
@@ -44,17 +44,17 @@ class qtype_conceptmap extends question_type {
         global $DB;
         $context = $formdata->context;
 
-        $options = $DB->get_record('qtype_essay_options', array('questionid' => $formdata->id));
+        $options = $DB->get_record('qtype_conceptmap_options', array('questionid' => $formdata->id));
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $formdata->id;
-            $options->id = $DB->insert_record('qtype_essay_options', $options);
+            $options->id = $DB->insert_record('qtype_conceptmap_options', $options);
         }
 
         $options->graderinfo = $this->import_or_save_files($formdata->graderinfo,
-                $context, 'qtype_essay', 'graderinfo', $formdata->id);
+                $context, 'qtype_conceptmap', 'graderinfo', $formdata->id);
         $options->graderinfoformat = $formdata->graderinfo['format'];
-        $DB->update_record('qtype_essay_options', $options);
+        $DB->update_record('qtype_conceptmap_options', $options);
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
@@ -68,7 +68,7 @@ class qtype_conceptmap extends question_type {
      */
     public function response_formats() {
         return array(
-            'plain' => get_string('formatplain', 'qtype_essay'),
+            'plain' => get_string('formatplain', 'qtype_conceptmap'),
         );
     }
 

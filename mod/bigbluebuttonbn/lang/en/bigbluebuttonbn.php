@@ -97,6 +97,8 @@ $string['completionupdatestate'] = "Completion update state";
 $string['completionvalidatestate'] = "Validate completion";
 $string['completionvalidatestatetriggered'] = "Validate completion has been triggered.";
 
+$string['sendnotification'] = "Send notification";
+
 $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
 

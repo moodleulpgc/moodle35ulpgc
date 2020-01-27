@@ -96,7 +96,37 @@ class mod_tracker_mod_form extends moodleform_mod {
 
 	  	$mform->addElement('checkbox', 'strictworkflow', tracker_getstring('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
+        $mform->setAdvanced('strictworkflow');
 
+        $name = get_string('allowsubmissionsfromdate', 'tracker');
+        $options = array('optional'=>true);
+        $mform->addElement('date_time_selector', 'allowsubmissionsfromdate', $name, $options);
+        $mform->addHelpButton('allowsubmissionsfromdate', 'allowsubmissionsfromdate', 'tracker');
+        $mform->disabledIf('allowsubmissionsfromdate', 'supportmode', 'eq', 'usersupport');
+        $name = get_string('duedate', 'tracker');
+        $mform->addElement('date_time_selector', 'duedate', $name, $options);
+        $mform->addHelpButton('duedate', 'duedate', 'tracker');
+        $mform->disabledIf('duedate', 'supportmode', 'eq', 'usersupport');
+
+        $stateprofileopts = array(
+			OPEN => tracker_getstring('open', 'tracker'),
+			RESOLVING => tracker_getstring('resolving', 'tracker'),
+			WAITING => tracker_getstring('waiting', 'tracker'),
+			RESOLVED => tracker_getstring('resolved', 'tracker'),
+			ABANDONNED => tracker_getstring('abandonned', 'tracker'),
+			TESTING => tracker_getstring('testing', 'tracker'),
+			PUBLISHED => tracker_getstring('published', 'tracker'),
+			VALIDATED => tracker_getstring('validated', 'tracker'),
+            TRANSFERED => tracker_getstring('transfered', 'tracker')
+        );
+      	$select = &$mform->addElement('select', 'statenonrepeat', tracker_getstring('statenonrepeat', 'tracker'), $stateprofileopts);
+        $mform->setType('statenonrepeat', PARAM_INT);
+        $mform->addHelpButton('statenonrepeat', 'statenonrepeat', 'tracker');
+        $mform->disabledIf('statenonrepeat', 'supportmode', 'eq', 'usersupport');
+        $select->setMultiple(true);
+        $mform->setAdvanced('statenonrepeat');
+
+        
         if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname,firstname')) {
             $useropts[0] = get_string('none');
             foreach ($assignableusers as $assignable) {
@@ -153,6 +183,12 @@ class mod_tracker_mod_form extends moodleform_mod {
 
     function set_data($defaults) {
 
+        if (property_exists($defaults, 'statenonrepeat')) {
+            if(isset($defaults->statenonrepeat) && $defaults->statenonrepeat) {
+                $defaults->statenonrepeat = explode(',', $defaults->statenonrepeat);
+            }
+        }
+    
         if (!property_exists($defaults, 'enabledstates')) {
             $defaults->stateprofile = array();
 

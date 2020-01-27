@@ -148,7 +148,8 @@ if ($mform->is_cancelled()) {
         $record->sortorder = 0;
         $sortorder = 0;
         if($max = $DB->get_records('tracker_elementitem', array('elementid'=>$eid), 'sortorder DESC', 'id, sortorder', 0, 1)) {
-            $sortorder = $max[0]->sortorder + 1;
+            $max = reset($max);
+            $sortorder = $max->sortorder + 1; 
         }
         
         foreach($options as $key => $option) {

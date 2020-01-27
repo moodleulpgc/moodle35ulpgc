@@ -24,6 +24,9 @@
         <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="networkable" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" />
+        <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The due date for the assignment. Displayed to students."/>
+        <FIELD NAME="allowsubmissionsfromdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If set, submissions will only be accepted after this date."/>
+        <FIELD NAME="statenonrepeat" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker"/>

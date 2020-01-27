@@ -52,7 +52,6 @@ class field_autofill extends \core\task\scheduled_task {
         $sql = "SELECT e.id, eu.trackerid
                 FROM {tracker_element} e
                 JOIN {tracker_elementused} eu ON eu.elementid = e.id
-        
                 WHERE e.paramchar1 IS NOT NULL AND e.paramchar1 <>''
                 GROUP BY e.id ";
         $autofills = $DB->get_records_sql_menu($sql, null);

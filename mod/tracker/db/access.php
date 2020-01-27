@@ -187,4 +187,13 @@ $capabilities = array(
         )
     ),
 
+    'mod/tracker:reportpastdue' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetype' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+    
 );

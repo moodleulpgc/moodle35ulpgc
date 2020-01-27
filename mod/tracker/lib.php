@@ -69,6 +69,7 @@ function tracker_add_instance($tracker, $mform) {
     } else {
         $tracker->subtrackers = 0;
     }
+    $tracker->statenonrepeat = implode(',', $tracker->statenonrepeat);
 
     $tracker->id = $DB->insert_record('tracker', $tracker);
 
@@ -108,6 +109,7 @@ function tracker_update_instance($tracker, $mform) {
     } else {
         $tracker->subtrackers = '';
     }
+    $tracker->statenonrepeat = implode(',', $tracker->statenonrepeat);
 
     $context = context_module::instance($tracker->coursemodule);
 

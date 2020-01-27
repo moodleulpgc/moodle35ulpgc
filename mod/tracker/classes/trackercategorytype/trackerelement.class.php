@@ -452,10 +452,10 @@ abstract class trackerelement {
         }
         
         if($records) {
-            foreach($records as $idnumber => $name) {
-                $key = array_search($idnumber, $currentmap);
+            foreach($records as $name => $desc) {
+                $key = array_search($name, $currentmap);
                 if($key === false) {
-                    $newoptions[$idnumber] = $name;
+                    $newoptions[$name] = $desc;
                 } else {
                     unset($currentmap[$key]);
                 }
@@ -473,17 +473,15 @@ abstract class trackerelement {
         $params['eid'] = $this->id;
         $usedoptions = $DB->get_records_select_menu('tracker_elementitem', $select, $params, '', 'id,name');
         $delete = array();
-        foreach($deleting as $name => $desc) {
+        foreach($deleting as $eid => $name) {
             $key = array_search($name, $usedoptions);
-            if($key !== false) {
+            if($key === false) {
                 // OK, option is not used in any issue, can be deleted
-                $delete[] = $key;
+                $delete[] = $eid;
             }
         }
         unset($usedoptions);
         unset($deleting);
-        
-        
         if($DB->delete_records_list('tracker_elementitem', 'id', $delete)) {
             $this->options = array_diff_key($this->options, array_flip($delete));
         }
@@ -508,12 +506,13 @@ abstract class trackerelement {
         }
         
         // reorder options
+        $currentmap = array();
         foreach($this->options as $oid => $option) {
             $currentmap[$oid] = $option->description;
         }
         $first = reset($this->options);
         if(isset($first->sortorder)) {
-            $sortorder = $first->sortorder;
+            $sortorder = 1;
             core_collator::asort($currentmap);
             foreach($currentmap as $oid => $name) {
                 $option = $this->options[$oid];

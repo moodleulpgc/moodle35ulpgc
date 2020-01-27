@@ -120,7 +120,40 @@ $view = 'reportanissue';
 include_once($CFG->dirroot.'/mod/tracker/menus.php');
 
 echo $OUTPUT->box(format_text($tracker->intro, $tracker->introformat), 'box generalbox', 'intro'); // ecastro ULPGC
+$now = time();
+$existing = 0;
+$norepeatstates = explode(',', $tracker->statenonrepeat);
+$message = array();
+$isopen = true;
+if($tracker->allowsubmissionsfromdate > 0) {
+    $time = userdate($tracker->allowsubmissionsfromdate);
+    $label = ($tracker->allowsubmissionsfromdate >= $now) ? 'reportwillopenon' : 'reportopenedon';
+    $isopen = $isopen && ($tracker->allowsubmissionsfromdate < $now);
+    $message[] = get_string($label, 'tracker', $time); 
+} 
+if($tracker->duedate > 0){
+    $time = userdate($tracker->duedate);
+    $label = ($tracker->duedate >= $now) ? 'reportwillcloseon' : 'reportclosedon';
+    $isopen = $isopen && ($tracker->duedate >= $now);
+    $message[] = get_string($label, 'tracker', $time); 
+} 
+if(is_array($norepeatstates) && $norepeatstates) {
+    list($insql, $params) = $DB->get_in_or_equal($norepeatstates, SQL_PARAMS_NAMED, 's');
+    $select = " trackerid = :tid AND reportedby = :userid AND status $insql ";
+    $params['tid'] = $tracker->id;
+    $params['userid'] = $USER->id;
+    $existing = $DB->count_records_select('tracker_issue', $select, $params);
+    if($existing){
+        $message[] = get_string('reportsactive', 'tracker', $existing); 
+    }
+}
 
-$form->display();
+echo $OUTPUT->container(implode('<br />', $message) , 'box centerpara'); // ecastro ULPGC
+
+if(($isopen && !$existing) || has_capability('mod/tracker:reportpastdue', $context)) {
+    $form->display();
+} elseif($existing){
+    echo $OUTPUT->box(get_string('reportnotallowed', 'tracker', $existing), 'box centerpara  alert-warning text-danger');
+}
 
 echo $OUTPUT->footer();

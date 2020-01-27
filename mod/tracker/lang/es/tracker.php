@@ -288,6 +288,7 @@ $string['tracker:shareelements'] = 'Compartir elementos en todo el sitio';
 $string['tracker:viewallissues'] = 'Ver todas las incidencias';
 $string['tracker:viewpriority'] = 'Ver prioridad de mis incidencias';
 $string['tracker:viewreports'] = 'Ver informes estadísticos de la gestión';
+$string['tracker:reportpastdue'] = 'Crear entradas después del plazo límite';
 $string['tracker_cascade_description'] = '<p>Si publica este servicio permite que los Trackers de $a encadenen las incidencias en un tracker local.</p>
 <ul><li><i>Depende de</i>: Tiene que subscribir  $a a eset servicio.</li></ul>
 <p>La subscripción a este servicio permite a los trackers locales enviar incidencias a otro Tracker en $a.</p>
@@ -426,3 +427,15 @@ $string['autofilltask'] = 'Agregar opciones en campos de menú auto-rellenado';
 $string['autowatchestask'] = 'Agregar observadores en menús de usuarios';
 $string['mycced'] = 'Entradas que observo';
 $string['review'] = 'Resumen';
+$string['allowsubmissionsfromdate'] = 'Nuevas entradas desde';
+$string['allowsubmissionsfromdate_help'] = 'Una fecha para permitir a los usuarios no editores el añadir nuevas entradas';
+$string['duedate'] = 'Plazo de fin de entregas';
+$string['duedate_help'] = 'Después de esta fecha los usuarios no editores no podrán agregar nuevas entradas';
+$string['statenonrepeat'] = 'Estados de no repetición';
+$string['statenonrepeat_help'] = 'Si un usuario tiene entradas abiertas en uno de estos NO podrá crear nuevas entradas incluso estando en plazo. Deberán resolverse antes las existentes';
+$string['reportnotallowed'] = 'No se pueden crear nuevas entradas hasta que se resuelvan las {$a} pendientes';
+$string['reportwillopenon'] = 'Periodo cerrado se abrirá a partir de: {$a}';
+$string['reportopenedon'] = 'Periodo de entregas abierto desde: {$a} ';
+$string['reportwillcloseon'] = 'Periodo de entregas cerrado a partir de: {$a}';
+$string['reportclosedon'] = 'Periodo cerrado desde: {$a}';
+$string['reportsactive'] = 'Tiene {$a} entradas pendientes de resolución en este gestor';

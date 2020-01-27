@@ -499,7 +499,31 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015111112, 'tracker');
     }
- 
+
+    if ($result && $oldversion < 2015111113) {    
+    
+        // Define field parent to be added to tracker.
+        $table = new xmldb_table('tracker');
+        $field = new xmldb_field('duedate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        // Launch add field parent.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }    
+        
+        $field = new xmldb_field('allowsubmissionsfromdate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        $field = new xmldb_field('statenonrepeat', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015111113, 'tracker');
+    }
  
     return $result;
 }

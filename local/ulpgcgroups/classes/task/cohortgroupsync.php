@@ -102,6 +102,17 @@ class cohortgroupsync extends \core\task\scheduled_task {
                 }
                 $this->mtrace('Added '.count($users)." users to group {$group->id} with idnumber {$cohort->idnumber}");
             }
+            // Update group members actually belonging to cohort
+            $sql = "SELECT gm.id, gm.userid 
+                    FROM {groups_members} gm 
+                    JOIN {cohort_members} chm ON gm.userid = chm.userid AND chm.cohortid = :cohortid
+                    WHERE gm.groupid = :groupid AND (gm.component IS NULL OR gm.component = '') ";
+            if($users = $DB->get_records_sql_menu($sql, $params)) {
+                list($insql, $inparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
+                $select = "groupid = :groupid AND userid $insql";
+                $inparams['groupid'] = $group->id;
+                $DB->set_field_select('groups_members', 'component', 'local_ulpgcgroups', $select, $inparams);
+            }
             
             // remove group members no longer belonging to cohort
             $sql = "SELECT gm.id, gm.userid 
@@ -109,12 +120,11 @@ class cohortgroupsync extends \core\task\scheduled_task {
                     LEFT JOIN {cohort_members} chm ON gm.userid = chm.userid AND chm.cohortid = :cohortid
                     WHERE gm.groupid = :groupid AND gm.component = :component AND chm.id IS NULL  ";
             if($users = $DB->get_records_sql_menu($sql, $params)) {
-                list($insql, $params) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
+                list($insql, $inparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
                 $select = "groupid = :groupid AND component = :component AND userid $insql";
-                $params['groupid'] = $group->id;
-                $params['component'] = 'local_ulpgcgroups';
-                
-                $DB->delete_records_select('groups_members', $select, $params);
+                $inparams['groupid'] = $group->id;
+                $inparams['component'] = 'local_ulpgcgroups';
+                $DB->delete_records_select('groups_members', $select, $inparams);
                 $this->mtrace('Deleted '.count($users)." users from group {$group->id} with idnumber {$cohort->idnumber}");
             }
         } 
