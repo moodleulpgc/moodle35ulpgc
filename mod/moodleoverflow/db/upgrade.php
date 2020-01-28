@@ -158,5 +158,24 @@ function xmldb_moodleoverflow_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019052600, 'moodleoverflow');
     }
 
+    if ($oldversion < 2019112101) {
+    
+        // Define field lockdiscussionafter to be added to forum.
+        $table = new xmldb_table('moodleoverflow');
+        
+        foreach(array('completiondiscussions', 'completionanswers', 'completioncomments', 'completionsuccess') as $name) {
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '9', null, XMLDB_NOTNULL, null, '0');
+
+            // Conditionally launch add field lockdiscussionafter.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Moodleoverflow savepoint reached.
+        upgrade_mod_savepoint(true, 2019112101, 'moodleoverflow');
+    }
+
+    
     return true;
 }

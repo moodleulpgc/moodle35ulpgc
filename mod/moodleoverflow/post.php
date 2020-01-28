@@ -758,9 +758,26 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($moodleoverflow->name), 2);
 
-// Show the description of the instance.
-if (!empty($moodleoverflow->intro)) {
-    echo $OUTPUT->box(format_module_intro('moodleoverflow', $moodleoverflow, $cm->id), 'generalbox', 'intro');
+if(!$reply || ($reply && $parent->parent == 0)) { 
+    // we are writing a new question
+    // Show the description of the instance.
+    if (!empty($moodleoverflow->intro)) {
+        echo $OUTPUT->box(format_module_intro('moodleoverflow', $moodleoverflow, $cm->id), 'generalbox', 'intro');
+    }
+} 
+if($reply) { 
+    // we are replying to a question or post 
+    // Print the starting post.
+    $istracked = \mod_moodleoverflow\readtracking::moodleoverflow_is_tracked($moodleoverflow);
+    // Retrieve all posts of the discussion.
+    $posts = moodleoverflow_get_all_discussion_posts($discussion->id, $istracked);
+    // Start with the parent post.
+    $post = $posts[$parent->id];
+    $ownpost = (isloggedin() AND ($USER->id == $post->userid));
+    
+    $postread = !empty($parent->postread);
+    echo moodleoverflow_print_post($post, $discussion, $moodleoverflow, $cm, $course,
+        false, false, false, '', '', $postread, true, $istracked, true);
 }
 
 // Display the form.

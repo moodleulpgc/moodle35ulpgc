@@ -404,3 +404,9 @@ $string['completionanswers'] = 'Student must post answers:';
 $string['completionanswersdesc'] = 'Student must post at least {$a} answers';
 $string['completionanswersgroup'] = 'Require answers';
 $string['completionanswershelp'] = 'requiring answers to complete';
+$string['completiosuccess'] = 'Student must get right answers:';
+$string['completiosuccessdesc'] = 'Student must post at least {$a} answers labeled as right or useful';
+$string['completiosuccessgroup'] = 'Require right answers';
+$string['completiosuccesshelp'] = 'requiring right answers to complete';
+
+

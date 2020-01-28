@@ -205,6 +205,10 @@ class mod_moodleoverflow_mod_form extends moodleform_mod {
         if (empty($default_values['completioncomments'])) {
             $default_values['completioncomments']=1;
         }
+        if (empty($default_values['completionsuccess'])) {
+            $default_values['completionsuccess']=1;
+        }
+
     }
 
     /**
@@ -236,14 +240,21 @@ class mod_moodleoverflow_mod_form extends moodleform_mod {
         $mform->addGroup($group, 'completioncommentsgroup', get_string('completioncommentsgroup','moodleoverflow'), array(' '), false);
         $mform->disabledIf('completioncomments','completioncommentsenabled','notchecked');
 
+        $group=array();
+        $group[] =& $mform->createElement('checkbox', 'completiosuccessenabled', '', get_string('completiosuccess','moodleoverflow'));
+        $group[] =& $mform->createElement('text', 'completiosuccess', '', array('size'=>3));
+        $mform->setType('completiosuccess',PARAM_INT);
+        $mform->addGroup($group, 'completiosuccessgroup', get_string('completiosuccessgroup','moodleoverflow'), array(' '), false);
+        $mform->disabledIf('completiosuccess','completiosuccessenabled','notchecked');
         
-        return array('completiondiscussionsgroup','completionanswersgroup','completioncommentsgroup');
+        return array('completiondiscussionsgroup','completionanswersgroup','completioncommentsgroup', 'completiosuccessgroup');
     }
 
     function completion_rule_enabled($data) {
         return (!empty($data['completiondiscussionsenabled']) && $data['completiondiscussions']!=0) ||
             (!empty($data['completionanswersenabled']) && $data['completionanswers']!=0) ||
-            (!empty($data['completioncommentsenabled']) && $data['completioncomments']!=0);
+            (!empty($data['completioncommentsenabled']) && $data['completioncomments']!=0) || 
+            (!empty($data['completionsuccessenabled']) && $data['completionsuccess']!=0);
     }
 
     /**
@@ -267,6 +278,9 @@ class mod_moodleoverflow_mod_form extends moodleform_mod {
             }
             if (empty($data->completioncommentsenabled) || !$autocompletion) {
                 $data->completioncomments = 0;
+            }
+            if (empty($data->completioncommentsenabled) || !$autocompletion) {
+                $data->completionsuccess = 0;
             }
         }
     }

@@ -93,8 +93,8 @@ function moodleoverflow_supports($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;
             // ecastro ULPGC implement completion
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_COMPLETION_HAS_RULES:    return false;
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+        case FEATURE_COMPLETION_HAS_RULES:    return true;
 
         case FEATURE_GRADE_HAS_GRADE:
             return true;
@@ -127,7 +127,7 @@ function moodleoverflow_get_completion_state($course,$cm,$userid,$type) {
     $result=$type; // Default return value
 
     $postcountparams=array('userid'=>$userid,'moodleoverflowid'=>$moodleoverflow->id);
-    $postcountsql="SELECT COUNT(1)
+    $postcountsql="SELECT COUNT(fp.id)
                     FROM {moodleoverflow_posts} fp
                     INNER JOIN {moodleoverflow_discussions} fd ON fp.discussion=fd.id
                     WHERE fp.userid=:userid AND fd.moodleoverflow=:moodleoverflowid";
@@ -158,6 +158,16 @@ function moodleoverflow_get_completion_state($course,$cm,$userid,$type) {
             $result = $result || $value;
         }
     }
+    if ($moodleoverflow->completionsuccess) {
+        $value = $moodleoverflow->completionsuccess <= $DB->get_field_sql($postcountsql.' AND (fp.parent <> fd.firstpost AND fp.parent <> 0)', $postcountparams);
+        if ($type == COMPLETION_AND) {
+            $result = $result && $value;
+        } else {
+            $result = $result || $value;
+        }
+    }
+    
+    
 
     return $result;
 }
@@ -1186,7 +1196,7 @@ function moodleoverflow_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, intro, introformat, ratingpreference, coursewidereputation';
+    $fields = 'id, name, intro, introformat, completiondiscussions, completionanswers, completioncomments, completionsuccess';
     if (!$moodleoverflow = $DB->get_record('moodleoverflow', $dbparams, $fields)) {
         return false;
     }
@@ -1201,9 +1211,10 @@ function moodleoverflow_get_coursemodule_info($coursemodule) {
 
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        //$result->customdata['customcompletionrules']['completiondiscussions'] = $moodleoverflow->completiondiscussions;
-        //$result->customdata['customcompletionrules']['completionanswers'] = $moodleoverflow->completionanswers;
-        //$result->customdata['customcompletionrules']['completioncomments'] = $moodleoverflow->completioncomments;
+        $result->customdata['customcompletionrules']['completiondiscussions'] = $moodleoverflow->completiondiscussions;
+        $result->customdata['customcompletionrules']['completionanswers'] = $moodleoverflow->completionanswers;
+        $result->customdata['customcompletionrules']['completioncomments'] = $moodleoverflow->completioncomments;
+        $result->customdata['customcompletionrules']['completionsuccess'] = $moodleoverflow->completionsuccess;
     }
 
     return $result;
@@ -1242,6 +1253,12 @@ function mod_moodleoverflow_get_completion_active_rule_descriptions($cm) {
                     continue;
                 }
                 $descriptions[] = get_string('completioncommentsdesc', 'moodleoverflow', $val);
+                break;
+            case 'completionsuccess':
+                if (empty($val)) {
+                    continue;
+                }
+                $descriptions[] = get_string('completionsuccessdesc', 'moodleoverflow', $val);
                 break;
             default:
                 break;
