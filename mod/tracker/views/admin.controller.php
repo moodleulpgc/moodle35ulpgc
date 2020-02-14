@@ -234,11 +234,10 @@ if ($action == 'deleteelementoption'){
     $DB->execute($sql, array($form->elementid, $deletedoption->sortorder));
     $out = $OUTPUT->heading(tracker_getstring('editoptions', 'tracker'));
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
-    $element->optionlistview($cm);
     $caption = tracker_getstring('addanoption', 'tracker');
     $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
     ob_start();
-
+    echo $element->optionlistview($cm);
     include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
     $out .= ob_get_clean();
     return -1;

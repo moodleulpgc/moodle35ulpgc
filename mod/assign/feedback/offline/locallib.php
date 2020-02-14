@@ -131,6 +131,9 @@ class assign_feedback_offline extends assign_feedback_plugin {
         $adminconfig = $this->assignment->get_admin_config();
         $gradebookplugin = $adminconfig->feedback_plugin_for_gradebook;
 
+        $instance = $this->assignment->get_instance(); // ecastro ULPGC
+        
+        
         $updatecount = 0;
         while ($record = $gradeimporter->next()) {
             $user = $record->user;
@@ -212,6 +215,22 @@ class assign_feedback_offline extends assign_feedback_plugin {
                     }
                 }
             }
+            
+            // ecastro ULPGC
+            if ($instance->markingworkflow && (!$skip || ($ignoremodified || !$stalemodificationdate))) {
+                $flags = $this->assignment->get_user_flags($record->user->id, true);
+                $flags->workflowstate = $record->workflowstate;
+                if($instance->markingallocation && $record->allocatedmarker) {
+                    if($marker = $DB->get_record('user', array('idnumber' => $record->allocatedmarker), '*')) {
+                        $flags->allocatedmarker = $marker->id;
+                    } else {
+                        $flags->allocatedmarker = 0;
+                    }
+                }
+                $this->assignment->update_user_flags($flags);
+            }
+            // ecastro ULPGC               
+            
         }
         $gradeimporter->close(true);
 

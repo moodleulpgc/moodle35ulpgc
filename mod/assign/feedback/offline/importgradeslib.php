@@ -63,6 +63,14 @@ class assignfeedback_offline_grade_importer {
     /** @var string $separator How each bit of information is separated in the file. Defaults to comma separated. */
     private $separator;
 
+    // ecastro ULPGC
+    /** @var int $workflowstateindex the column index containing the state data */
+    private $workflowstateindex = -1;
+
+    /** @var int $allocatedmarkerindex the column index containing the marker idnumber data */
+    private $allocatedmarkerindex = -1;
+    // ecastro ULPGC
+    
     /**
      * Constructor
      *
@@ -114,8 +122,9 @@ class assignfeedback_offline_grade_importer {
                 }
             }
         }
-
+        
         if ($columns) {
+            $instance = $this->assignment->get_instance();
             foreach ($columns as $index => $column) {
                 if (isset($this->feedbackcolumnindexes[$column])) {
                     $this->feedbackcolumnindexes[$column]['index'] = $index;
@@ -129,6 +138,20 @@ class assignfeedback_offline_grade_importer {
                 if ($column == $strmodified) {
                     $this->modifiedindex = $index;
                 }
+                // ecastro ULPGC
+                if($instance->markingworkflow) {
+                    $strstate = get_string('status', 'assign');
+                    if ($column == $strstate) {
+                        $this->workflowstateindex = $index;
+                    }
+                    if($instance->markingallocation) {
+                        $strmarker = get_string('marker', 'assign');
+                        if ($column == $strmarker) {
+                            $this->allocatedmarkerindex = $index;
+                        }                
+                    }                    
+                }
+                // ecastro ULPGC
             }
         }
 
@@ -175,6 +198,11 @@ class assignfeedback_offline_grade_importer {
         global $DB;
         $result = new stdClass();
 
+        // ecastro ULPGC
+        $instance = $this->assignment->get_instance();
+        $validstates = ($instance->markingworkflow) ? $this->assignment->get_marking_workflow_states_for_current_user() : array();
+        $validstates[ASSIGN_MARKING_WORKFLOW_STATE_NOTMARKED] = get_string('markingworkflowstatenotmarked', 'assign');
+
         while ($record = $this->csvreader->next()) {
             $idstr = $record[$this->idindex];
             // Strip the integer from the end of the participant string.
@@ -191,7 +219,14 @@ class assignfeedback_offline_grade_importer {
                             $result->feedback[] = $details;
                         }
                     }
-
+                    // ecastro ULPGC
+                    if($instance->markingworkflow) {
+                        $result->workflowstate = array_search($record[$this->workflowstateindex], $validstates);
+                        if($instance->markingallocation) {
+                            $result->allocatedmarker =  $record[$this->allocatedmarkerindex];
+                        }
+                    }
+                    // ecastro ULPGC
                     return $result;
                 }
             }

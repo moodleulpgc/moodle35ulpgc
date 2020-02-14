@@ -657,6 +657,7 @@ class assign_grading_table extends table_sql implements renderable {
     public function col_allocatedmarker(stdClass $row) {
         static $markers = null;
         static $markerlist = array();
+        
         if ($markers === null) {
             list($sort, $params) = users_order_by_sql('u');
             // Only enrolled users could be assigned as potential markers.

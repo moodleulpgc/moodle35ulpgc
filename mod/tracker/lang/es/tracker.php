@@ -439,3 +439,5 @@ $string['reportopenedon'] = 'Periodo de entregas abierto desde: {$a} ';
 $string['reportwillcloseon'] = 'Periodo de entregas cerrado a partir de: {$a}';
 $string['reportclosedon'] = 'Periodo cerrado desde: {$a}';
 $string['reportsactive'] = 'Tiene {$a} entradas pendientes de resolución en este gestor';
+$string['confirmelementdelete'] = 'Ha solicitado borrar el elemento de nombre "{$a}".  ¿Desea continuar?';
+$string['confirmoptiondelete'] = 'Ha solicitado borrar la opción de nombre "{$a}".  ¿Desea continuar?';

@@ -962,11 +962,11 @@ function tracker_preset_states(&$tracker) {
     } elseif ($tracker->supportmode == 'ticketting') {
         $tracker->enabledstates = ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_VALIDATED;
     } elseif ($tracker->supportmode == 'usersupport') {
-        $tracker->enabledstates = ENABLED_POSTED | ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING ;
+        $tracker->enabledstates = ENABLED_POSTED | ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_TRANSFERED;
     } elseif ($tracker->supportmode == 'boardreview') {
         $tracker->enabledstates = ENABLED_POSTED | ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_TRANSFERED;
     } elseif ($tracker->supportmode == 'tutoring') {
-        $tracker->enabledstates = ENABLED_POSTED | ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_TRANSFERED | ENABLED_PUBLISHED;
+        $tracker->enabledstates = ENABLED_ALL;
     } else {
         if (is_array(@$tracker->stateprofile)) {
             $tracker->enabledstates = array_reduce($tracker->stateprofile, 'tracker_ror', 0);

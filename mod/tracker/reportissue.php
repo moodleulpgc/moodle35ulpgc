@@ -122,7 +122,8 @@ include_once($CFG->dirroot.'/mod/tracker/menus.php');
 echo $OUTPUT->box(format_text($tracker->intro, $tracker->introformat), 'box generalbox', 'intro'); // ecastro ULPGC
 $now = time();
 $existing = 0;
-$norepeatstates = explode(',', $tracker->statenonrepeat);
+// empty if statenonrepeat null or empty
+$norepeatstates =  (isset($tracker->statenonrepeat) && ($tracker->statenonrepeat != ''))  ? explode(',', $tracker->statenonrepeat) : false;
 $message = array();
 $isopen = true;
 if($tracker->allowsubmissionsfromdate > 0) {

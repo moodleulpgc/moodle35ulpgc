@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 global $DB;
 
 // Determina si se intenta aplicar plantilla / restaurar curso (0:no; 1:si)
-$restore = 1;
+$restore = 0;
 
 // Variables que pueden variar al inicio de curso
 // TODO Ofrecer interfaz de configuración
@@ -245,7 +245,17 @@ if ((! isset($cursos)) or (count($cursos) == 0)) {
 					}
 				}
 				$nombre = implode(" ", $palabras);
-				$curso->fullname = $nombre;
+
+        if (strlen($nombre)>252)
+        {
+             print "Nombre Largo: $nombre   ";
+             $nombre=str_replace("euskal Herriko Unibertsitatea","EHU",$nombre);
+             $nombre=substr($nombre,0,252);
+             print "Nombre recortado: $nombre          ";
+        }
+
+
+  			$curso->fullname = $nombre;
 
 				// Asignar id del departamento al curso
 				$departamento = $DB->get_field_select('local_sinculpgc_units', 'id', 'idnumber = ? AND type = ?', array(

@@ -438,7 +438,7 @@ class assignfeedback_copyset_importmarkers_form extends assignfeedback_copyset_f
         
         $fileoptions = array('subdirs'=>0,
                                 'maxbytes'=>$this->assignment->get_course()->maxbytes,
-                                'accepted_types'=>'csv',
+                                'accepted_types'=>'csv,txt',
                                 'maxfiles'=>1,
                                 'return_types'=>FILE_INTERNAL);
 

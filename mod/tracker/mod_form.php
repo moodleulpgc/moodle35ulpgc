@@ -109,6 +109,7 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->disabledIf('duedate', 'supportmode', 'eq', 'usersupport');
 
         $stateprofileopts = array(
+            POSTED => tracker_getstring('posted', 'tracker'),
 			OPEN => tracker_getstring('open', 'tracker'),
 			RESOLVING => tracker_getstring('resolving', 'tracker'),
 			WAITING => tracker_getstring('waiting', 'tracker'),

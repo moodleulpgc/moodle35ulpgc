@@ -687,3 +687,5 @@ $string['reportopenedon'] = 'Issue creation available from: {a}';
 $string['reportwillcloseon'] = 'Issue creation will finish on: {$a}';
 $string['reportclosedon'] = 'Issue creation was finished on: {$a}';
 $string['reportsactive'] = 'You have {$a} active issues in this container';
+$string['confirmelementdelete'] = 'About to permanently delete element with name "{$a}".  Are you sure to proceed?';
+$string['confirmoptiondelete'] = 'About to permanently delete option with name "{$a}".  Are you sure to proceed?';

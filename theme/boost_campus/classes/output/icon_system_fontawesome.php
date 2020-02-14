@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Essential is a clean and customizable theme.
+ * Boost_campus is a clean and customizable theme.
  *
  * @package     theme_boost_campus
  * @copyright   2018 Enrique castro

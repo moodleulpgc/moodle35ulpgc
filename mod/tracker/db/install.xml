@@ -24,9 +24,9 @@
         <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="networkable" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" />
-        <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The due date for the assignment. Displayed to students."/>
-        <FIELD NAME="allowsubmissionsfromdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If set, submissions will only be accepted after this date."/>
-        <FIELD NAME="statenonrepeat" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The due date for the assignment. Displayed to students. ecastro ULPGC"/>
+        <FIELD NAME="allowsubmissionsfromdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If set, submissions will only be accepted after this date.  ecastro ULPGC"/>
+        <FIELD NAME="statenonrepeat" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="ecastro ULPGC"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker"/>
@@ -56,7 +56,7 @@
         <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
-        <FIELD NAME="autoresponse" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="autoresponse" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="ecastro ULPGC"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_elementitem"/>
@@ -71,7 +71,7 @@
         <FIELD NAME="canbemodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
         <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
         <FIELD NAME="mandatory" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
-        <FIELD NAME="private" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="private" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="ecastro ULPGC"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_elementused"/>
@@ -93,9 +93,9 @@
         <FIELD NAME="resolution" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="resolutionformat" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
         <FIELD NAME="resolutionpriority" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
-        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="resolvermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="userlastseen" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ecastro ULPGC"/>
+        <FIELD NAME="resolvermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ecastro ULPGC"/>
+        <FIELD NAME="userlastseen" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ecastro ULPGC"/>
         <FIELD NAME="uplink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  />
         <FIELD NAME="downlink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
       </FIELDS>
@@ -103,8 +103,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issue"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="tracker" UNIQUE="false" FIELDS="trackerid" NEXT="reportedbyuser"/>
-        <INDEX NAME="reportedbyuser" UNIQUE="false" FIELDS="reportedby" PREVIOUS="tracker"/>
+        <INDEX NAME="tracker" UNIQUE="false" FIELDS="trackerid" NEXT="reportedbyuser" COMMENT="ecastro ULPGC"/>
+        <INDEX NAME="reportedbyuser" UNIQUE="false" FIELDS="reportedby" PREVIOUS="tracker" COMMENT="ecastro ULPGC"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="tracker_issueattribute" COMMENT="tracker_issueattribute table retrofitted from MySQL">
@@ -220,7 +220,7 @@
         <INDEX NAME="mdl_tracstatchan_tra_ix" UNIQUE="false" FIELDS="trackerid" />
       </INDEXES>
     </TABLE>
-    <TABLE NAME="tracker_translation" COMMENT="custom words on instance basis" >
+    <TABLE NAME="tracker_translation" COMMENT="custom words on instance basis. ecastro ULPGC " >
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="trackerid"/>
         <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />

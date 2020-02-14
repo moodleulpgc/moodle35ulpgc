@@ -805,7 +805,7 @@ class assign_feedback_copyset extends assign_feedback_plugin {
         global $CFG, $DB, $USER;
         
         $instance = $this->assignment->get_instance();
-        if(!$instance->markingworkflow ||  !$instance->markingallocation) {
+        if(!$instance->markingworkflow || !$instance->markingallocation) {
             return false;
         }
         

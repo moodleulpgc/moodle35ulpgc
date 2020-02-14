@@ -39,7 +39,7 @@ $sqlunidadesulpgc = " SELECT codigo                                AS idnumber ,
     denominacion                              AS name     ,
     tipo,
     PACKUSUARIOS_API.IDAUSUARIO( directorid ) AS director ,
-    PACKUSUARIOS_API.IDAUSUARIO( directorid ) AS secretary,
+    PACKUSUARIOS_API.IDAUSUARIO( secretarioid ) AS secretary,
     estado
    FROM tmounidades u
   WHERE estado='I'";
@@ -47,29 +47,24 @@ $extdb = db_init();
 $unidadesulpgc = get_rows_external_db($extdb, $sqlunidadesulpgc, 'idnumber');
 db_close($extdb);
 
+
+// Eliminamos todos los registros de la tabla, para despues cargarlos de nuevo.
+$DB->delete_records('local_sinculpgc_units');
+
 // Obtención de registros en Campus Virtual
 $sqlunidadescv = "SELECT idnumber
                    FROM {local_sinculpgc_units}";
 $unidadescv = $DB->get_fieldset_sql($sqlunidadescv);
 
-// Registros a tratar (Insertar o Eliminar)
-$unidadeskeys = array_diff(array_keys($unidadesulpgc), $unidadescv);
-$unidades = array_intersect_key($unidadesulpgc, array_flip($unidadeskeys));
-
-// Si no hay unidades a tratar finaliza el script
-if ((! isset($unidades)) or (count($unidades) == 0)) {
-    return;
-} else {
-
     // Tratamiento de cada registro
-    foreach ($unidades as $unidad) {
+    foreach ($unidadesulpgc as $unidad) {
         $unidad->type = $unidad->tipo;
         // Registro a insertar
         if ($unidad->estado == 'I') {
 
             $DB->insert_record('local_sinculpgc_units', $unidad);
         }  // Registro a eliminar
-else
+        else
             if ($unidad->estado == 'D') {
                 $conditions = array(
                     'idnumber' => $unidad->idnumber,
@@ -78,6 +73,5 @@ else
                 $DB->delete_records('local_sinculpgc_units', $conditions);
             }
     }
-}
 
 ?>

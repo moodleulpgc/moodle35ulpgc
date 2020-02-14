@@ -181,7 +181,7 @@ abstract class trackerelement {
 	}
 
 	function optionlistview($cm){
-	    global $CFG, $COURSE, $OUTPUT;
+	    global $CFG, $COURSE, $OUTPUT, $PAGE;
 
         $strname = tracker_getstring('name');
         $strdescription = tracker_getstring('description');
@@ -196,7 +196,7 @@ abstract class trackerelement {
             foreach ($this->options as $option) {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelementoption', 'optionid' => $option->id, 'elementid' => $option->elementid);
                 $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
-                $actions  = '<a href="'.$editoptionurl.'" title="'.tracker_getstring('edit').'">'.$OUTPUT->pix_icon('/t/edit', tracker_getstring('edit')).'</a>&nbsp;';
+                $actions  = '<a href="'.$editoptionurl.'" title="'.tracker_getstring('edit').'">'.$OUTPUT->pix_icon('t/edit', tracker_getstring('edit')).'</a>&nbsp;';
 
                 $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'moveelementoptionup', 'optionid' => $option->id, 'elementid' => $option->elementid);
@@ -211,12 +211,15 @@ abstract class trackerelement {
 
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelementoption', 'optionid' => $option->id, 'elementid' => $option->elementid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '<a href="'.$deleteurl.'" title="'.tracker_getstring('delete').'">'.$OUTPUT->pix_icon('/t/delete', tracker_getstring('delete')).'</a>';
+                $confirmaction = new \confirm_action(get_string('confirmoptiondelete', 'tracker', $option->name));
+                $icon = new pix_icon('t/delete', get_string('delete'), 'core', array());
+                $actions .=  '&nbsp; '.$OUTPUT->action_icon($deleteurl, $icon, $confirmaction);
 
                 $autoresponse = empty($option->autoresponse) ? tracker_getstring('no') : tracker_getstring('yes');
                 $table->data[] = array('<b> '.tracker_getstring('option', 'tracker').' '.$option->sortorder.':</b>',$option->name, format_string($option->description, true, $COURSE->id), $autoresponse, $actions);
             }
         }
+        $PAGE->requires->strings_for_js(array('confirmoptiondelete'), 'tracker');    
         return html_writer::table($table);
     }
 

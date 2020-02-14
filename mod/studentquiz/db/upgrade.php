@@ -583,12 +583,13 @@ function xmldb_studentquiz_upgrade($oldversion) {
     if ($oldversion < 2020011602) {
 
         $table = new xmldb_table('studentquiz');
-        $field = new xmldb_field('reportingemail', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'forcecommenting');
+        $field = new xmldb_field('reportingemail', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'commentdeletionperiod');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         upgrade_mod_savepoint(true, 2020011602, 'studentquiz');
     }
+
     return true;
 }

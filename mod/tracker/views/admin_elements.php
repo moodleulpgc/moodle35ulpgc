@@ -69,7 +69,10 @@ if (!empty($elements)) {
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelement', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('delete').'">'.$OUTPUT->pix_icon('t/delete', '') .'</a>';
+        //$actions .= '&nbsp;<a href="'.$url.'" title="'.tracker_getstring('delete').'">'.$OUTPUT->pix_icon('t/delete', '') .'</a>';
+        $confirmaction = new \confirm_action(get_string('confirmelementdelete', 'tracker', $element->name));
+        $icon = new pix_icon('t/delete', get_string('delete'), 'core', array());
+        $actions .=  '&nbsp; '.$OUTPUT->action_icon($url, $icon, $confirmaction);
 
         $local = '';
         if ($element->course == $COURSE->id) {
@@ -78,6 +81,7 @@ if (!empty($elements)) {
         $type = $OUTPUT->pix_icon("types/{$element->type}", '', 'mod_tracker');
         $table->data[] = array($actions, $name, $local, $type);
     }
+    $PAGE->requires->strings_for_js(array('confirmelementdelete'), 'tracker');    
     echo html_writer::table($table);
 } else {
     echo '<center>';
