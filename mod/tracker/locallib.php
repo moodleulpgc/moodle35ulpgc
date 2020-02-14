@@ -2829,22 +2829,32 @@ function tracker_can_edit($tracker, $context, $issue = null) {
         return true;
     }
 
-    if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview') || ($tracker->supportmode == 'tutoring')) {
+    if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview') || ($tracker->supportmode == 'tutoring')) { // ecastro ULPGC
         if(has_capability('mod/tracker:resolve', $context)) {
             return true;
-        } else {
-            return false;
         }
     }
 
     if ($issue && $issue->reportedby == $USER->id) {
-        return true;
+        if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview'))) { // ecastro ULPGC
+            $now = time();
+            if($tracker->allowsubmissionsfromdate && $tracker->duedate && $tracker->allowsubmissionsfromdate < $now && $tracker->duedate > $now) {
+                return has_capability('mod/tracker:report', $context);
+            }
+        } else {
+            return true;
+        }
     }
 
-    if ($issua && $issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) {
-        return true;
+    if ($issue && $issue->assignedto == $USER->id ) {
+        if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview') || ($tracker->supportmode == 'tutoring')) { // ecastro ULPGC
+            if(has_capability('mod/tracker:comment', $context)) {
+                return true;
+            }
+        } elseif(has_capability('mod/tracker:resolve', $context)) {
+            return true;
+        }
     }
-
     return false;
 }
 
