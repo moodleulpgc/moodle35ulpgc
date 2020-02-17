@@ -41,6 +41,18 @@ $issue = file_prepare_standard_editor($issue, 'resolution', $editoroptions, $con
 
 $fulledit = has_all_capabilities(array('mod/tracker:configurenetwork', 'mod/tracker:shareelements'), $context);          
 $fulledit = false;
+$studentedit = false;
+$owneredit = false;
+if(has_all_capabilities(array('mod/tracker:configurenetwork', 'mod/tracker:shareelements'), $context)) {
+    $fulledit = true;
+} elseif($issue->reportedby == $USER->id) {
+    $now = time();
+    $studentedit = ($tracker->duedate && $tracker->duedate > $now && 
+                            $tracker->allowsubmissionsfromdate && $tracker->allowsubmissionsfromdate < $now);
+} else {
+    $owneredit = has_capability('mod/tracker:develop', $context);
+}
+
 ?>
 <center>
 
@@ -137,7 +149,7 @@ if (tracker_can_edit($tracker, $context, $issue)){
     <tr>
         <td align="right" width="25%" class="tracker-issue-param"><b><?php echo tracker_getstring('summary', 'tracker') ?>:</b></td>
         <td colspan="3" width="75%">
-            <?php if(!$fulledit) {
+            <?php if(!$fulledit && !$studentedit) {
                 echo format_text($issue->summary);
             } else { ?>
             <input type="text" name="summary" size="70" value="<?php echo $issue->summary ?>" />
@@ -149,7 +161,7 @@ if (tracker_can_edit($tracker, $context, $issue)){
         <td align="left" colspan="3" width="75%">
 <?php
             // print_textarea($usehtmleditor, 20, 60, 680, 400, 'description_editor', $issue->description, 0, false, 'id_description');
-            if(!$fulledit) { 
+            if(!$fulledit && !$studentedit) { 
                 echo format_text($issue->description);
             } else {
                 $attributes = array('id' => 'id_description', 'name' => 'description_editor');
@@ -176,7 +188,8 @@ if (is_array($elementsused)){
             echo ":</b><br />";
             echo "</td>";
             echo "<td colspan=\"3\" align=\"left\">";
-                if($fulledit || $elementsused[$key]->private) {
+                if($fulledit || ($studentedit && !$elementsused[$key]->private) || 
+                        ($owneredit && $elementsused[$key]->private)) {
                     echo $elementsused[$key]->edit($issue->id);
                 } else {
                     echo $elementsused[$key]->view($issue->id);
