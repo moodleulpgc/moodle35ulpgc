@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,33 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require('../../config.php');
+/**
+ * Defines message providers (types of messages being sent)
+ *
+ * @package   enrol_waitlist
+ * @author    Enrique Castro @ ULPGC
+ * @copyright Enrique Castro
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-$data['ESB'] = array('AUS', 'AW', 'DEV', 'DV3', 'DV4', 'EMS', 'ESA', 'ESE', 'ESF', 'ESG', 'ESI', 'ESM', 'ESN', 'ESP', 'ESS', 'IBU', 'ILM', 'IM', 'IMP', 'LOG', 'MIM', 'OM', 'PM', 'PRM', 'PRO');
-$data['INF'] = array('HUC', 'MTI', 'MUK', 'SC', 'WI', 'WIN');
-$data['TD'] = array('DES', 'IFR', 'TB', 'TE', 'TID', 'TM', 'TT');
+$messageproviders = array (
+    // Ordinary reminders.
+    'reminder' => array(
+    ),
 
-$param = optional_param('q', 0, PARAM_TEXT);
-$query = strtoupper($param);
-$res = $data[$query];
-
-echo json_encode($res);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+);

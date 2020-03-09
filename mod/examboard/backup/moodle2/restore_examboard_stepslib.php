@@ -134,7 +134,7 @@ class restore_examboard_activity_structure_step extends restore_activity_structu
      *
      * @param array $data Parsed element data.
      */
-    protected function process_member($data) {
+    protected function process_examboard_member($data) {
         global $DB;
 
         $data = (object)$data;

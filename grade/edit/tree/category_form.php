@@ -439,6 +439,11 @@ class edit_category_form extends moodleform {
                 foreach($freezed as $element) {
                     if ($mform->elementExists($element)) {
                         $mform->freeze($element);
+                        //remove roles && required
+                        $mform->_rules[$element] = array();
+                        if($unset = array_search($element, $mform->_required)) {
+                            unset($mform->_required[$unset]);
+                        }
                     }
                 }
             }

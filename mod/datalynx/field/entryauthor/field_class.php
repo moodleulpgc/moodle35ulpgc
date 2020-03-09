@@ -50,6 +50,21 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
 
     const _BADGES = 'badges';
 
+    // ecastro ULPGC 
+    const _USERPHONE1 = 'phone1';
+    
+    const _USERPHONE2 = 'phone2';
+    
+    const _USERADDRESS = 'address';
+    
+    const _USERCITY = 'city';
+    
+    const _USERCOUNTRY = 'country';
+    
+    const _USERAIM = 'aim';
+    // ecastro ULPGC 
+    
+    
     public function supports_group_by() {
         return true;
     }
@@ -115,6 +130,38 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                         'name' => 'Badges', 'description' => '',
                         'visible' => 2, 'internalname' => 'badges');
 
+        // ecastro ULPGC                
+        $fieldobjects[self::_USERPHONE1] = (object) array('id' => self::_USERPHONE1,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('phone1'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'phone1');
+
+        $fieldobjects[self::_USERPHONE2] = (object) array('id' => self::_USERPHONE2,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('phone2'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'phone2');
+
+        $fieldobjects[self::_USERADDRESS] = (object) array('id' => self::_USERADDRESS,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('address'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'address');
+
+        $fieldobjects[self::_USERCITY] = (object) array('id' => self::_USERCITY,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('city'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'city');
+
+        $fieldobjects[self::_USERCOUNTRY] = (object) array('id' => self::_USERCOUNTRY,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('country'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'country');
+                        
+        $fieldobjects[self::_USERAIM] = (object) array('id' => self::_USERAIM,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('aimid'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'aim');
+        // ecastro ULPGC                        
+                        
         return $fieldobjects;
     }
 

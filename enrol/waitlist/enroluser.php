@@ -30,6 +30,13 @@ $enrolid      = required_param('enrolid', PARAM_INT);
 $roleid       = optional_param('roleid', -1, PARAM_INT);
 $extendperiod = optional_param('extendperiod', 0, PARAM_INT);
 $extendbase   = optional_param('extendbase', 3, PARAM_INT);
+// ecastro ULPGC
+$inwaitlist   = optional_param('wait', 0, PARAM_INT); 
+if($inwaitlist) {
+    require_once("$CFG->dirroot/enrol/waitlist/waitlist.php");
+    $waitlist = new waitlist();
+}
+// ecastro ULPGC
 
 $instance = $DB->get_record('enrol', array('id' => $enrolid, 'enrol' => 'waitlist'), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $instance->courseid), '*', MUST_EXIST);
@@ -65,10 +72,10 @@ $PAGE->set_heading($course->fullname);
 navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id' => $course->id)));
 
 // Create the user selector objects.
-$options = array('enrolid' => $enrolid);
+$options = array('enrolid' => $enrolid, 'aswaitlist' => $inwaitlist ) ;
 
-$potentialuserselector = new enrol_apply_potential_participant('addselect', $options);
-$currentuserselector = new enrol_apply_current_participant('removeselect', $options);
+$potentialuserselector = new enrol_apply_potential_participant('addselectw', $options);
+$currentuserselector = new enrol_apply_current_participant('removeselectw', $options);
 
 // Build the list of options for the enrolment period dropdown.
 $unlimitedperiod = get_string('unlimited');
@@ -117,7 +124,12 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
                 $timeend = $timestart + $extendperiod;
             }
             // echo "<pre>";print_r($instance);exit();
-            $enrol_manual->enrol_user($instance, $adduser->id, $roleid, $timestart, $timeend);
+            // ecastro ULPGC
+            if($inwaitlist) {
+                $waitlist->add_wait_list($instance->id, $adduser->id, $instance->roleid, $timestart, $timeend);
+            } else {
+                $enrol_manual->enrol_user($instance, $adduser->id, $roleid, $timestart, $timeend);
+            }
             // add_to_log($course->id, 'course', 'enrol', '../enrol/users.php?id='.$course->id, $course->id); //there should be userid somewhere!
         }
 
@@ -133,8 +145,12 @@ if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstounassign = $currentuserselector->get_selected_users();
     if (!empty($userstounassign)) {
         foreach($userstounassign as $removeuser) {
-            $enrol_manual->unenrol_user($instance, $removeuser->id);
-            add_to_log($course->id, 'course', 'unenrol', '../enrol/users.php?id='.$course->id, $course->id); // there should be userid somewhere!
+            if($inwaitlist) {
+                $DB->delete_records('user_enrol_waitlist', array('userid'=>$removeuser->id, 'instanceid' =>$instance->id));
+            } else { 
+                $enrol_manual->unenrol_user($instance, $removeuser->id);
+            }
+            //add_to_log($course->id, 'course', 'unenrol', '../enrol/users.php?id='.$course->id, $course->id); // there should be userid somewhere!
         }
 
         $potentialuserselector->invalidate_selected_users();
@@ -144,13 +160,20 @@ if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
     }
 }
 
-
 echo $OUTPUT->header();
-echo $OUTPUT->heading($instancename);
+//echo $OUTPUT->heading($instancename);
+// ecastro ULPGC
+$info = new stdClass();
+$info->instancename = $instancename; 
+$info->waitlist = $inwaitlist ? get_string('users_on_waitlist', 'enrol_waitlist') : get_string('enrolusers', 'enrol_waitlist');
+echo $OUTPUT->heading(get_string('enroladdusers', 'enrol_waitlist', $info));
+// ecastro ULPGC
 
 ?>
 <form id="assignform" method="post" action="<?php echo $PAGE->url ?>"><div>
   <input type="hidden" name="sesskey" value="<?php echo sesskey() ?>" />
+  <input type="hidden" name="wait" value="<?php echo $inwaitlist ?>" />
+  <?php echo html_writer::input_hidden_params($PAGE->url) // ecastro ULPGC ?>
 
   <table summary="" class="roleassigntable generaltable generalbox boxaligncenter" cellspacing="0">
     <tr>
@@ -164,15 +187,31 @@ echo $OUTPUT->heading($instancename);
 
               <div class="enroloptions">
 
-              <p><label for="roleid"><?php print_string('assignrole', 'enrol_manual') ?></label><br />
-                <?php echo html_writer::select($roles, 'roleid', $roleid, false); ?></p>
+              <?php if($inwaitlist) { 
+                        echo get_string('waitlisted_users', 'enrol_waitlist');
 
-              <p><label for="extendperiod"><?php print_string('enrolperiod', 'enrol') ?></label><br />
-                <?php echo html_writer::select($periodmenu, 'extendperiod', $defaultperiod, $unlimitedperiod); ?></p>
+                    } else {
+                        echo ' 
+                            <p><label for="roleid">'.get_string('assignrole', 'enrol_manual').'</label><br />'.
+                                html_writer::select($roles, 'roleid', $roleid, true).'</p>
 
-              <p><label for="extendbase"><?php print_string('startingfrom') ?></label><br />
-                <?php echo html_writer::select($basemenu, 'extendbase', $extendbase, false); ?></p>
+                            <p><label for="extendperiod">'.get_string('enrolperiod', 'enrol').'</label><br />'.
+                                html_writer::select($periodmenu, 'extendperiod', $defaultperiod, $unlimitedperiod).'</p>
 
+                            <p><label for="extendbase">'.get_string('startingfrom').'</label><br />'.
+                                html_writer::select($basemenu, 'extendbase', $extendbase, false).'</p>';
+                    }
+              ?>
+              <!--
+              <p><label for="roleid">< ?php print_string('assignrole', 'enrol_manual') ?></label><br />
+                < ?php echo html_writer::select($roles, 'roleid', $roleid, false); ?></p>
+
+              <p><label for="extendperiod">< ?php print_string('enrolperiod', 'enrol') ?></label><br />
+                < ?php echo html_writer::select($periodmenu, 'extendperiod', $defaultperiod, $unlimitedperiod); ?></p>
+
+              <p><label for="extendbase">< ?php print_string('startingfrom') ?></label><br />
+                < ?php echo html_writer::select($basemenu, 'extendbase', $extendbase, false); ?></p>
+            -->
               </div>
           </div>
 

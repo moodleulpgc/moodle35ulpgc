@@ -2,7 +2,8 @@
     padding: 0.3rem;
 }
 
-.path-mod-tracker .issuelist{
+.path-mod-tracker .issuelist, 
+.path-mod-tracker .tracker-issue{
     width: 100%;
 }
 
@@ -242,6 +243,9 @@
     background-color:#D0D0D0;
     border:1px solid #F0F0F0;
     padding:4px 15px 4px 4px;
+    max-width: 25%;
+    min-width: 60px;
+    width: 20%;
 }
 
 .tracker-issue-summary{

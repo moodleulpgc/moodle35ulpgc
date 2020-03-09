@@ -2741,7 +2741,7 @@ function tracker_ror($v, $w) {
  *
  */
 function tracker_resolve_view(&$tracker, &$cm) {
-    global $SESSION;
+    global $DB, $SESSION;
 
     $context = context_module::instance($cm->id);
 
@@ -2753,6 +2753,15 @@ function tracker_resolve_view(&$tracker, &$cm) {
 
     $SESSION->tracker_current_view = $view;
     $SESSION->tracker_current_id = $tracker->id;
+    if(!isset($SESSION->tracker_current_translation[$tracker->id])) {
+        $translation = $DB->get_record('tracker_translation', array('trackerid'=>$tracker->id));
+        if($translation && $translation->statuswords) {
+            $translation->statuswords = explode(',', $translation->statuswords);
+        }
+        $SESSION->tracker_current_translation[$tracker->id] = $translation;
+    }
+    
+    
     return $view;
 }
 
@@ -2836,25 +2845,24 @@ function tracker_can_edit($tracker, $context, $issue = null) {
     }
 
     if ($issue && $issue->reportedby == $USER->id) {
-        if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview'))) { // ecastro ULPGC
+        if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview')) { // ecastro ULPGC
             $now = time();
-            if($tracker->allowsubmissionsfromdate && $tracker->duedate && $tracker->allowsubmissionsfromdate < $now && $tracker->duedate > $now) {
+            if($issue->status == 0 && $tracker->allowsubmissionsfromdate && $tracker->duedate && $tracker->allowsubmissionsfromdate < $now && $tracker->duedate > $now) {
                 return has_capability('mod/tracker:report', $context);
             }
-        } else {
-            return true;
+        } elseif($tracker->supportmode == 'tutoring') {
+            return false;
         }
     }
 
     if ($issue && $issue->assignedto == $USER->id ) {
         if(($tracker->supportmode == 'usersupport') || ($tracker->supportmode == 'boardreview') || ($tracker->supportmode == 'tutoring')) { // ecastro ULPGC
-            if(has_capability('mod/tracker:comment', $context)) {
+            if(has_any_capability(array('mod/tracker:develop', 'mod/tracker:comment'), $context)) {
                 return true;
             }
-        } elseif(has_capability('mod/tracker:resolve', $context)) {
-            return true;
         }
     }
+
     return false;
 }
 
@@ -2877,7 +2885,7 @@ function tracker_can_workon($tracker, $context, $issue = null) {
     }
 
     if ($issue) {
-        if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) {
+        if ($issue->assignedto == $USER->id && has_capability('mod/tracker:develop', $context)) {
             return true;
         }
     } else {

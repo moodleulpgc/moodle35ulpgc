@@ -102,7 +102,7 @@ $string['waitlisted_users'] = 'Waitlisted users';
 $string['faculty'] = 'Faculty';
 
 $string['profilecreatefield'] = 'Create a new waitlist fieled';
-$string['profiledescription2'] = 'Description2 of the field';
+$string['profiledescription2'] = 'Param 2 for the field'; // ecastro ULPGC
 
 $string['manage::define'] = "Define";
 $string['manage::assign'] = "Assign";
@@ -118,3 +118,13 @@ $string['confirmationfullno'] = '<strong>This course is presently fully booked. 
 $string['maxcourses'] = 'Maximun courses autoenroled';
 $string['maxcourses_help'] = 'If different from 0, the maximun number of courses that a user can book through this method in this course category.';
 $string['maxcoursesfull'] = 'This is the autoenrol Waitlist method. <br/>You have already reached the maximun number of courses in thsi category that you can autoenrol with this method.';
+$string['profiledescription1'] = 'Param 1 for the field';
+$string['profiledescription3'] = 'Param 3 for the field';
+$string['profiledescription4'] = 'Param 4 for the field';
+$string['profiledescription5'] = 'Param 5 for the field';
+$string['defaultremindersubject'] = 'Reminder of course enrolment';
+$string['task:enrolment_reminders'] = 'Waitlist enrolment reminders';
+$string['messageprovider:reminder'] = 'Waitlist enrolment reminders';
+$string['enroladdusers'] = '{$a->waitlist} in {$a->instancename}';
+$string['addusers_onwaitlist'] = 'Add users to the waiting list';
+$string['noreplyname'] = 'Automatic reminder message system';

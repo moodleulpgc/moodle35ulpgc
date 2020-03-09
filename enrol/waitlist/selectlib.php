@@ -32,9 +32,13 @@ require_once($CFG->dirroot . '/user/selector/lib.php');
  */
 class enrol_apply_potential_participant extends user_selector_base {
     protected $enrolid;
-
+    protected $aswaitlist = 0; //ecastro ULPGC
+    
     public function __construct($name, $options) {
         $this->enrolid  = $options['enrolid'];
+        if(isset($options['aswaitlist']) && $options['aswaitlist']) {
+            $this->aswaitlist = 1;
+        }
         parent::__construct($name, $options);
     }
 
@@ -45,6 +49,7 @@ class enrol_apply_potential_participant extends user_selector_base {
      */
     public function find_users($search) {
         global $DB;
+       
         // by default wherecondition retrieves all users except the deleted, not confirmed and guest
         list($wherecondition, $params) = $this->search_sql($search, 'u');
         $params['enrolid'] = $this->enrolid;
@@ -52,8 +57,19 @@ class enrol_apply_potential_participant extends user_selector_base {
         $fields      = 'SELECT ' . $this->required_fields_sql('u');
         $countfields = 'SELECT COUNT(1)';
 
+        // ecastro ULPGC
+        $notinwaitlist = '';
+        if($this->aswaitlist) {
+            $notinwaitlist = ' AND (u.id NOT IN (SELECT ew.userid
+                                         FROM {user_enrol_waitlist} ew
+                                         WHERE ew.instanceid = :instanceid)) ';
+            $params['instanceid'] = $this->enrolid;
+        }
+        // ecastro ULPGC
+        
         $sql = " FROM {user} u
                 WHERE $wherecondition
+                      $notinwaitlist  
                       AND u.id NOT IN (SELECT ue.userid
                                          FROM {user_enrolments} ue
                                          JOIN {enrol} e ON (e.id = ue.enrolid AND e.id = :enrolid))";
@@ -72,7 +88,7 @@ class enrol_apply_potential_participant extends user_selector_base {
         if (empty($availableusers)) {
             return array();
         }
-
+        
         if ($search) {
             $groupname = get_string('enrolcandidatesmatching', 'enrol', $search);
         } else {
@@ -86,6 +102,7 @@ class enrol_apply_potential_participant extends user_selector_base {
         $options = parent::get_options();
         $options['enrolid'] = $this->enrolid;
         $options['file']    = 'enrol/waitlist/selectlib.php';
+        $options['aswaitlist'] = $this->aswaitlist; // ecastro uLPGC
         return $options;
     }
 }
@@ -96,9 +113,13 @@ class enrol_apply_potential_participant extends user_selector_base {
 class enrol_apply_current_participant extends user_selector_base {
     protected $courseid;
     protected $enrolid;
+    protected $aswaitlist = 0; //ecastro ULPGC
 
     public function __construct($name, $options) {
         $this->enrolid  = $options['enrolid'];
+        if(isset($options['aswaitlist']) &&  $options['aswaitlist']) {
+            $this->aswaitlist = 1;
+        }
         parent::__construct($name, $options);
     }
 
@@ -116,10 +137,21 @@ class enrol_apply_current_participant extends user_selector_base {
         $fields      = 'SELECT ' . $this->required_fields_sql('u');
         $countfields = 'SELECT COUNT(1)';
 
+/*        
         $sql = " FROM {user} u
                  JOIN {user_enrolments} ue ON (ue.userid = u.id AND ue.enrolid = :enrolid)
                 WHERE $wherecondition";
-
+*/
+        // ecastro ULPGC
+        $userenrolmentjoin = 'JOIN {user_enrolments} ue ON (ue.userid = u.id AND ue.enrolid = :enrolid)';
+        if($this->aswaitlist) {
+            $userenrolmentjoin = 'JOIN {user_enrol_waitlist} ue ON (ue.userid = u.id AND ue.instanceid = :enrolid)';
+        }
+        $sql = " FROM {user} u
+                 $userenrolmentjoin
+                WHERE $wherecondition";
+        // ecastro ULPGC
+                
         $order = ' ORDER BY u.lastname ASC, u.firstname ASC';
 
         if (!$this->is_validating()) {
@@ -148,6 +180,7 @@ class enrol_apply_current_participant extends user_selector_base {
         $options = parent::get_options();
         $options['enrolid'] = $this->enrolid;
         $options['file']    = 'enrol/waitlist/locallib.php';
+        $options['aswaitlist'] = $this->aswaitlist; // ecastro uLPGC
         return $options;
     }
 }

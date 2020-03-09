@@ -38,7 +38,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= format_string($issue->summary);
         $str .= '</td>';
         $str .= '</tr>';
-
+        
         $link = '';
         if ($issue->downlink) {
             $access = true;
@@ -139,22 +139,22 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $str .= '</tr>';
             }
         }
-
+        
         $str .= '<tr valign="top">';
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.tracker_getstring('issuenumber', 'tracker').'</b><br />';
         $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
+        $str .= '<td width="25" class="tracker-issue-value">';
         $str .= $tracker->ticketprefix.$issue->id;
         $str .= '</td>';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
+        $str .= '<td align="right" width="25" class="tracker-issue-param" >';
         $str .= '<b>'.tracker_getstring('status', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%" class="status_'.$STATUSCODES[$issue->status].' tracker-issue-value">';
+        $str .= '<td width="25" class="status_'.$STATUSCODES[$issue->status].' tracker-issue-value">';
         $str .= '<b>'.$STATUSKEYS[$issue->status].'</b>';
         $str .= '</td>';
         $str .= '</tr>';
-
+        
         $str .= '<tr valign="top">';
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.tracker_getstring('reportedby', 'tracker').':</b>';
@@ -223,11 +223,16 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     function issue_attributes($issue, $elementsused) {
+        global $DB, $USER;
+        
         $str = '';
 
         $cm = get_coursemodule_from_instance('tracker', $issue->trackerid);
         $context = context_module::instance($cm->id);
         $canmanage = has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $context); // ecastro ULPGC
+        $canmanage = $canmanage || ($issue->assignedto == $USER->id && has_capability('mod/tracker:comment', $context)) 
+                                || ($USER->id != $issue->reportedby && $DB->record_exists('tracker_issuecc', array('issueid' => $issue->id, 'userid' => $USER->id))); //ecastro ULPGC  
+        
   
         if (!empty($elementsused)) {
             foreach($elementsused as $key => $item) { // ecastro ULPGC avoid infinite loop with for i

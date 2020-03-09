@@ -51,7 +51,15 @@ class waitlist_fields_profile_define_base {
         // $editorOptions = array('trusttext'=>true, 'subdirs'=>true, 'maxfiles'=>5, 'maxbytes'=>1024*1024);
         $editorOptions = array();
         $form->addElement('editor', 'description', get_string('profiledescription', 'admin'), null, $editorOptions);
+        // ecastro ULPGC, additional fields in use, not only param2
+        $form->addElement('text', 'param1', get_string('profiledescription1', 'enrol_waitlist'), array('size'=>'20'));
+        $form->setType('param1', PARAM_TEXT);
         $form->addElement('editor', 'param2', get_string('profiledescription2', 'enrol_waitlist'), null, $editorOptions);
+        $form->addElement('text', 'param3', get_string('profiledescription3', 'enrol_waitlist'), array('size'=>'20'));
+        $form->setType('param3', PARAM_TEXT);
+        $form->addElement('editor', 'param4', get_string('profiledescription4', 'enrol_waitlist'), null, $editorOptions);
+        $form->addElement('text', 'param5', get_string('profiledescription5', 'enrol_waitlist'), array('size'=>'20'));
+        $form->setType('param5', PARAM_TEXT);
 
         $form->addElement('selectyesno', 'required', get_string('profilerequired', 'admin'));
 
@@ -70,7 +78,7 @@ class waitlist_fields_profile_define_base {
         $choices[2] = get_string('profilevisibleall', 'admin');
         // $form->addHelpButton('visible', 'profilevisible', 'admin');
         // $form->setDefault('visible', PROFILE_VISIBLE_ALL);
-        $form->setDefault('visible', 2);
+        // $form->setDefault('visible', 2);
         /*
         $choices = profile_list_categories();
         $form->addElement('select', 'categoryid', get_string('profilecategory', 'admin'), $choices);
@@ -579,6 +587,9 @@ function profile_edit_field($id, $datatype, $redirect) {
 
     $field->param2 = clean_text($field->param2, $field->descriptionformat);
     $field->param2 = array('text' => $field->param2, 'format' => $field->descriptionformat, 'itemid' => 0);
+    // ecastro ULPGC
+    $field->param4 = clean_text($field->param4, $field->descriptionformat);
+    $field->param4 = array('text' => $field->param4, 'format' => $field->descriptionformat, 'itemid' => 0);
 
     require_once('index_field_form.php');
     $fieldform = new field_form(null, $field->datatype);
@@ -609,7 +620,16 @@ function profile_edit_field($id, $datatype, $redirect) {
             $data->descriptionformat = $data->description['format'];
             $data->description = $data->description['text'];
 
-            $data->param2 = $data->param2['text'];
+            $data->param2 = format_text($data->param2['text'], $data->param2['format']); // ecastro ULPGC
+            
+            // ecastro ULPGC
+            $data->param1 = format_string($data->param1);
+            $data->param3 = format_string($data->param3);
+            $data->param4 = format_text($data->param4['text'], $data->param4['format']);
+            $data->param5 = format_string($data->param5);
+            
+            // ecastro ULPGC
+            
 
             // Check whether the default data is an editor, this is (currently) only the
             // textarea field type

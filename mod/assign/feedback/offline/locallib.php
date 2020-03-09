@@ -133,7 +133,6 @@ class assign_feedback_offline extends assign_feedback_plugin {
 
         $instance = $this->assignment->get_instance(); // ecastro ULPGC
         
-        
         $updatecount = 0;
         while ($record = $gradeimporter->next()) {
             $user = $record->user;

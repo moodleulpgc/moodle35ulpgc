@@ -568,9 +568,11 @@ to get the link available even if Moodle is down or not operable properly.
 $string['mode_tutoring'] = 'Students Tutoring monitor';
 $string['mode_usersupport'] = 'User support ULPGC';
 $string['mode_boardreview'] = 'Board issue Review';
+$string['mode_register'] = 'Register';
 $string['message_tutoring'] = 'An entry to support your tutoring plans monitoring and reviewing has been created.';
 $string['message_usersupport'] = 'We have registered your query. It will be handled as soon as possible.';
 $string['message_boardreview'] = 'Your submission has been registered. Please, wait for review.';
+$string['message_register'] = 'Your submission has been registered. Please, wait for review.';
 $string['attachment'] = 'Comment attachment';
 $string['autoresponse'] = 'Automatic answer';
 $string['warninguser'] = 'Administración de Teleformación';
@@ -647,7 +649,15 @@ $string['lastcomment'] = 'Last comment';
 $string['forcedlang'] = 'Forced language';
 $string['allopen'] = 'All open';
 $string['allclosed'] = 'All closed';
+$string['addascced'] = 'Add as watcher';
+$string['addasassigned'] = 'Add as working Assignee';
 $string['adduserwatch'] = 'Add users as observers in issues where selected.';
+$string['adduserwatch_help'] = 'If enabled then the user(s) selected in this menu may be added to the issue attributes either as observer or staff assigned to the issue. <br />
+The two options are:  <br />
+
+ * As watcher: user get in the list of issue watches. May add several users in a multi-select menu.
+ * As Assignee: user gets the role of assigned staff to workon and resolve the issue
+';
 $string['autofilltype'] = 'Auto fill options';
 $string['autofilltype_help'] = 'Sets the field for autofilling the possible options dynamically. 
 The available filling ways are:

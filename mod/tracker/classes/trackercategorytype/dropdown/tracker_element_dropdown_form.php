@@ -48,11 +48,16 @@ class tracker_element_dropdown_form extends tracker_moodle_form {
         $mform->setType('paramchar2', PARAM_ALPHANUMEXT);
         $mform->disabledIf('paramchar2', 'paramchar1', 'eq', '');
         
-        $mform->addElement('advcheckbox', 'paramint2', get_string('adduserwatch', 'tracker'));
-        //$mform->addHelpButton('paramchar2', 'autofillidnumber', 'tracker');
+        $options = array(0 => get_string('no'), 
+                         1 => get_string('addascced', 'tracker'),
+                         2 => get_string('addasassigned', 'tracker'));
+        $mform->addElement('select', 'paramint2', get_string('adduserwatch', 'tracker'), $options);
+        $mform->addHelpButton('paramint2', 'adduserwatch', 'tracker');
+        
         $mform->disabledIf('paramint2', 'paramchar1', 'eq', '');
         $mform->disabledIf('paramint2', 'paramchar1', 'eq', 'courses');
         $mform->disabledIf('paramint2', 'paramchar1', 'eq', 'categories');
+        
         
         
         

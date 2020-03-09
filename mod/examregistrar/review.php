@@ -459,7 +459,6 @@ if($synch) {
         $eventdata['other']['tab'] = $tab;
         $event = \mod_examregistrar\event\manage_action::create($eventdata);
         $event->trigger();
-        
     }
 }
 
@@ -516,10 +515,3 @@ foreach($courses as $examcourse) {
 if(!$courses) {
 echo $output->heading(get_string('noexams', 'examregistrar'), 4, 'error');
 }
-
-
-
-
-
-
-

@@ -116,3 +116,10 @@ $string['maxcourses_help'] = 'Si este parámetro es diferente de 0, entonces est
 El límite es calculado para cada categoría de cursos. Este límite solo s eaoplica a cursos de la misma categoría que éste.';
 $string['maxcoursesfull'] = 'Este es el método de Automatriculación con cupo. <br/>Usted ya está matriculado del máximo de {$a} cursos automatriculables por este método en esta categoría.<br />
 Lo sentimos pero NO puede automatricularse en este curso usando este método.';
+$string['profiledescription1'] = 'Parámetro 1 para el campo';
+$string['profiledescription3'] = 'Parámetro 3 para el campo';
+$string['profiledescription4'] = 'Parámetro 4 para el campo';
+$string['profiledescription5'] = 'Parámetro 5 para el campo';
+$string['defaultremindersubject'] = 'Recordatorio de Inscripción en curso';
+$string['enroladdusers'] = '{$a->waitlist} en {$a->instancename}';
+$string['noreplyname'] = 'Recordatorio automático de matriculación';

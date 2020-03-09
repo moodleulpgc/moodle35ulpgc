@@ -239,14 +239,7 @@ if (is_array($elementsused)) {
 
 
 <?php if (!empty($issue->resolution)) {
-?>
-    <tr valign="top">
-        <td align="right" height="50" class="tracker-issue-param"><b><?php echo tracker_getstring('resolution', 'tracker') ?>:</b></td>
-        <td align="left" colspan="3">
-            <?php echo $renderer->resolution($issue); ?>
-        </td>
-    </tr>
-<?php
+    echo $renderer->resolution($issue);
 
 }
 $showcommentslink = '';

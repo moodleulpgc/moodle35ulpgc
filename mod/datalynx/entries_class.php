@@ -200,7 +200,8 @@ class datalynx_entries {
                 // Entry.
                 ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status, ' .
                 // User.
-                user_picture::fields('u', array('idnumber', 'username', 'institution'
+                user_picture::fields('u', array('idnumber', 'username', 'institution', 
+                                                'phone1', 'phone2', 'address', 'city', 'country', 'aim' // ecastro ULPGC to add new userfields
                 ), 'uid ') . ', ' .
                 // Group (TODO g.description AS groupdesc need to be varchar for MSSQL).
                 'g.name AS groupname, g.hidepicture AS grouphidepic, g.picture AS grouppic ' .
@@ -333,6 +334,7 @@ class datalynx_entries {
                     $entries->entries = $DB->get_records_sql($sqlselect, $allparams);
                 }
             }
+            
             // Now get the contents if required and add it to the entry objects.
             if ($datalynxcontent && $entries->entries) {
                 // Get the node content of the requested entries.
@@ -385,7 +387,6 @@ class datalynx_entries {
                 }
             }
         }
-
         return $entries;
     }
 

@@ -154,4 +154,9 @@ echo $OUTPUT->header();
 echo '<style>.mform{background-color:#f2f2f2;} .mform fieldset div {margin: 0;margin-top: 0;display: inline;clear: none;padding: 1px;}.mform .fitem .felement {border-width: 0;width: 80%;margin-left:0px;}.mform .fitem .fitemtitle {width: 5%;text-align: right;float: left;}</style>';
 echo $OUTPUT->heading(get_string('users_on_waitlist', 'enrol_waitlist'));
 echo $renderer->render_course_enrolment_users_table($table, $filterform);
+
+$url = new moodle_url($CFG->wwwroot.'/enrol/waitlist/enroluser.php', array('enrolid'=>$instance, 'wait'=>1));
+echo $OUTPUT->heading(html_writer::link($url, get_string('addusers_onwaitlist', 'enrol_waitlist')), 5);
+
+http://localhost/moodle35ulpgc/enrol/waitlist/enroluser.php?enrolid=112
 echo $OUTPUT->footer();

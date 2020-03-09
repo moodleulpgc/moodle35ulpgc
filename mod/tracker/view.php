@@ -225,7 +225,8 @@ if ($view == 'view') {
                 }
                 break;
             case 'editanissue' :
-                if (!has_capability('mod/tracker:manage', $context)) {
+                $issue = $issueid ? $DB->get_record('tracker_issue', array('id'=>$issueid)) : null; 
+                if (!tracker_can_edit($tracker, $context, $issue)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
                     include($CFG->dirroot.'/mod/tracker/views/editanissue.html');

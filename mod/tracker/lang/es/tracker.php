@@ -401,7 +401,15 @@ $string['allopen'] = 'Estados abiertos';
 $string['allclosed'] = 'Estados cerrados';
 $string['trackerissuereported'] = '{$a->shortname}: Creada y asignada una entrada en gestor "{$a->name}".';
 $string['trackerissuecommented'] = '{$a->shortname}: Añadido comentario a una entrada en Gestor "{$a->name}".';
+$string['addascced'] = 'como Observador';
+$string['addasassigned'] = 'como Gestor';
 $string['adduserwatch'] = 'Agregar usuarios como observadores en las entradas en las que son seleccionados.';
+$string['adduserwatch_help'] = 'Si se activa, los usuarios seleccionados en este campo se agregarán como observadores o gestores entre los atributos de la propia entrada. <br />
+Las dos opciones son:  <br />
+
+ * Observador: se añade a la lista de observadores de la entrada, pueden ser múltiples.
+ * Gestor: se añade como el único Gestor encargado de resolver el asunto o entrada. 
+';
 $string['autofilltype'] = 'Auto rellenado de opciones';
 $string['autofilltype_help'] = 'Establece un tipo de auto-rellenado dinámico de opciones del campo. Las posibilidades de genera opciones son:
 

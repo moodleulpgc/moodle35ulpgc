@@ -88,13 +88,13 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->setType('thanksmessage', PARAM_TEXT);
         $mform->setAdvanced('thanksmessage');
 
-	  	$mform->addElement('checkbox', 'enablecomments', tracker_getstring('enablecomments', 'tracker'));
+	  	$mform->addElement('advcheckbox', 'enablecomments', tracker_getstring('enablecomments', 'tracker'));
         $mform->addHelpButton('enablecomments', 'enablecomments', 'tracker');
 
-	  	$mform->addElement('checkbox', 'allownotifications', tracker_getstring('notifications', 'tracker'));
+	  	$mform->addElement('advcheckbox', 'allownotifications', tracker_getstring('notifications', 'tracker'));
         $mform->addHelpButton('allownotifications', 'notifications', 'tracker');
 
-	  	$mform->addElement('checkbox', 'strictworkflow', tracker_getstring('strictworkflow', 'tracker'));
+	  	$mform->addElement('advcheckbox', 'strictworkflow', tracker_getstring('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
         $mform->setAdvanced('strictworkflow');
 
@@ -163,7 +163,7 @@ class mod_tracker_mod_form extends moodleform_mod {
         }
 
         if ($CFG->mnet_dispatcher_mode == 'strict') {
-            $mform->addElement('checkbox', 'networkable', get_string('networkable', 'tracker'), get_string('yes'), 0);
+            $mform->addElement('advcheckbox', 'networkable', get_string('networkable', 'tracker'), get_string('yes'), 0);
             $mform->addHelpButton('networkable', 'networkable', 'tracker');
             $mform->setAdvanced('networkable');
         }

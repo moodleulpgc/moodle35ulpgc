@@ -101,6 +101,12 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $entry->email = $USER->email;
             $entry->userid = $USER->id;
             $entry->institution = $USER->institution;
+            //ecastro ULPGC 
+            foreach(array('phone1', 'phone2', 'address', 'city', 'country', 'aim') as $field) {
+                $entry->{$field} = $USER->{$field};
+            }
+            // ecastro ULPGC
+            
         }
         $field = $this->_field;
         $fieldid = $field->id();
@@ -119,7 +125,14 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 $user->lastname = $entry->lastname;
                 $user->email = $entry->email;
                 $user->institution = $entry->institution;
+                //ecastro ULPGC 
+                foreach(array('phone1', 'phone2', 'address', 'city', 'country', 'aim') as $field) {
+                    $user->{$field} = $entry->{$field};
+                }
+                // ecastro ULPGC
+                
                 $users[$entry->userid] = $user;
+
             }
         }
         $usermenu = array();
@@ -318,6 +331,112 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
     }
 
+    // ecastro ULPGC
+    
+    /**
+     * Display the phone1 of user profile.
+     *
+     * @param $entry
+     * @author Enrique Castro ULPGC
+     * @return mixed
+     */
+    public function display_phone1($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->phone1;
+        } else {
+            return $entry->phone1;
+        }
+    }    
+    
+    /**
+     * Display the phone2 of user profile.
+     *
+     * @param $entry
+     * @author Enrique Castro ULPGC
+     * @return mixed
+     */
+    public function display_phone2($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->phone2;
+        } else {
+            return $entry->phone2;
+        }
+    }    
+    
+    /**
+     * Display the address of user profile.
+     *
+     * @param $entry
+     * @author Enrique Castro ULPGC
+     * @return mixed
+     */
+    public function display_address($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->address;
+        } else {
+            return $entry->address;
+        }
+    }    
+    
+    /**
+     * Display the city of user profile.
+     *
+     * @param $entry
+     * @author Enrique Castro ULPGC
+     * @return mixed
+     */
+    public function display_city($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->city;
+        } else {
+            return $entry->city;
+        }
+    }    
+    
+     /**
+     * Display the country of user profile.
+     *
+     * @param $entry
+     * @author Enrique Castro ULPGC
+     * @return mixed
+     */
+    public function display_country($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->country;
+        } else {
+            return $entry->country;
+        }
+    }     
+
+     /**
+     * Display the country of user profile.
+     *
+     * @param $entry
+     * @author Enrique Castro ULPGC
+     * @return mixed
+     */
+    public function display_aim($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->aim;
+        } else {
+            return $entry->aim;
+        }
+    }    
+    
+    // ecastro ULPGC
+    
     /**
      * Array of patterns this field supports.
      *

@@ -43,16 +43,18 @@ $fulledit = has_all_capabilities(array('mod/tracker:configurenetwork', 'mod/trac
 $fulledit = false;
 $studentedit = false;
 $owneredit = false;
+$workedit = false;
 if(has_all_capabilities(array('mod/tracker:configurenetwork', 'mod/tracker:shareelements'), $context)) {
     $fulledit = true;
-} elseif($issue->reportedby == $USER->id) {
+}
+if($issue->reportedby == $USER->id) {
     $now = time();
     $studentedit = ($tracker->duedate && $tracker->duedate > $now && 
                             $tracker->allowsubmissionsfromdate && $tracker->allowsubmissionsfromdate < $now);
 } else {
-    $owneredit = has_capability('mod/tracker:develop', $context);
+    $owneredit = has_any_capability(array('mod/tracker:develop', 'mod/tracker:comment'), $context);
+    $workedit = tracker_can_workon($tracker, $context, $issue);
 }
-
 ?>
 <center>
 
@@ -101,6 +103,7 @@ if (tracker_can_edit($tracker, $context, $issue)){
         <td width="28%">
             <?php 
             $dependancies = tracker_getpotentialdependancies($tracker->id, $issueid);
+            if($fulledit || $workedit) {
             ?>
             <select name="dependancies[]" multiple="multiple" size="5">
             <?php
@@ -110,6 +113,15 @@ if (tracker_can_edit($tracker, $context, $issue)){
             }
             ?>
             </select>
+            <?php
+            } else {
+                $selected = '';
+                foreach($dependancies as $dependancy){    
+                    $selected .=  ($dependancy->isparent) ? "{$tracker->ticketprefix}{$dependancy->id} <br />" : '';
+                }
+                echo $selected;
+            } 
+            ?>
         </td>
     </tr>
     <tr>
@@ -129,21 +141,34 @@ if (tracker_can_edit($tracker, $context, $issue)){
         <td align="right" width="25%" class="tracker-issue-param"><b><?php echo tracker_getstring('assignedto', 'tracker') ?>:</b><br /></td>
         <td width="25%">
             <?php 
-            $resolvers = tracker_getdevelopers($context) + tracker_getresolvers($context); // ecastro ULPGC
-            if ($resolvers){
-                foreach ($resolvers as $resolver) {
-                    $resolversmenu[$resolver->id] = fullname($resolver);
+            if($fulledit || $workedit) {
+                $resolvers = tracker_getdevelopers($context) + tracker_getresolvers($context); // ecastro ULPGC
+                if ($resolvers){
+                    foreach ($resolvers as $resolver) {
+                        $resolversmenu[$resolver->id] = fullname($resolver);
+                    }
+                    echo html_writer::select($resolversmenu, 'assignedto', @$issue->assignedto);
+                } else {
+                    echo tracker_getstring('noresolvers', 'tracker');
+                    echo '<input type="hidden" name="assignedto" value="0" />';
                 }
-                echo html_writer::select($resolversmenu, 'assignedto', @$issue->assignedto);
             } else {
-                echo tracker_getstring('noresolvers', 'tracker');
-                echo '<input type="hidden" name="assignedto" value="0" />';
+                $issue->owner = $DB->get_record('user', array('id' => $issue->assignedto));
+                echo $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+                echo '&nbsp;'.fullname($issue->owner);
             }
             ?>
         </td>
         <td align="right" width="22%" class="tracker-issue-param"><b><?php echo tracker_getstring('status', 'tracker') ?>:</b></td>
         <td width="28%" class="<?php echo 'status_'.$STATUSCODES[$issue->status] ?>">
-            <?php echo html_writer::select(tracker_get_statuskeys($tracker), 'status', $issue->status); ?>
+            <?php 
+                if($fulledit || $workedit) {
+                    echo html_writer::select(tracker_get_statuskeys($tracker), 'status', $issue->status);   
+                } else {
+                    $STATUSKEYS = tracker_get_statuskeys($tracker);
+                    echo $STATUSKEYS[$issue->status];
+                }
+            ?>
         </td>
     </tr>
     <tr>
@@ -181,36 +206,42 @@ if (is_array($elementsused)){
         for ($i=0; $i < count($keys); $i++){
             // Print first category in one column
             $key = $keys[$i];
-            echo "<tr valign=\"top\">";
-            echo "<td align=\"right\">";
-            echo "<b>";
-                echo format_string($elementsused[$key]->description);
-            echo ":</b><br />";
-            echo "</td>";
-            echo "<td colspan=\"3\" align=\"left\">";
-                if($fulledit || ($studentedit && !$elementsused[$key]->private) || 
-                        ($owneredit && $elementsused[$key]->private)) {
-                    echo $elementsused[$key]->edit($issue->id);
-                } else {
-                    echo $elementsused[$key]->view($issue->id);
-                    
-                    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$elementsused[$key]->name, 
-                                                    'value' => format_string($elementsused[$key]->getvalue($issue->id))));
-                }
-            echo "</td>";
-            echo "</tr>";
+
+            if(!($elementsused[$key]->private && $studentedit)) {
+                echo "<tr valign=\"top\">";
+                echo "<td align=\"right\">";
+                echo "<b>";
+                    echo format_string($elementsused[$key]->description);
+                echo ":</b><br />";
+                echo "</td>";
+                echo "<td colspan=\"3\" align=\"left\">";
+                    if($fulledit || ($studentedit && !$elementsused[$key]->private) || 
+                            ($owneredit && $elementsused[$key]->private)) {
+                        echo $elementsused[$key]->edit($issue->id);
+                    } else {
+                        echo $elementsused[$key]->view($issue->id);
+                        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$elementsused[$key]->name, 
+                                                        'value' => format_string($elementsused[$key]->getvalue($issue->id))));
+                    }
+                echo "</td>";
+                echo "</tr>";
+            }
         }
     }
 }
 ?>
+<?php   if($fulledit || $workedit) { ?>
     <tr valign="top">
         <td align="right" height="25%" class="tracker-issue-param"><b><?php echo tracker_getstring('resolution', 'tracker') ?>:</b></td>
         <td align="left" colspan="3" width="75%">
-<?php
+<?php 
             $attributes = array('id' => 'id_resolution', 'name' => 'resolution_editor');
             $values = array('text' => $issue->resolution_editor['text'], 'format' => $issue->resolution_editor['format'], 'itemid' => $issue->resolution_editor['itemid']);
             $options = array('maxfiles' => 0, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
             echo tracker_print_direct_editor($attributes, $values, $options);
+        } else {
+            echo $renderer->resolution($issue);
+        }
 ?>
         </td>
     </tr>

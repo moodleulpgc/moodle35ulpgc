@@ -178,7 +178,7 @@ class dropdownelement extends trackerelement {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
         
-        $this->add_autowatches(); // ecastro ULPGC
+        $this->add_autowatches($attribute->issueid); // ecastro ULPGC
         
     }
 

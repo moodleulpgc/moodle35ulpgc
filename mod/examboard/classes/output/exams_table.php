@@ -24,8 +24,9 @@
 
 namespace mod_examboard\output;
 
-use renderable;                                                                                                                     
- 
+use renderable;       
+use flexible_table;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -35,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2017 Enrique Castro @ ULPGC
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class exams_table extends \flexible_table implements renderable {
+ class exams_table extends flexible_table implements renderable {
     /** @var int the cmid of this instance. */
     public $cmid;
     

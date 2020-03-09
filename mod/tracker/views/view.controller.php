@@ -51,25 +51,39 @@ elseif ($action == 'updateanissue') {
 
     $issue->id = required_param('issueid', PARAM_INT);
     $issue->issueid = $issue->id;
-    $issue->status = required_param('status', PARAM_INT);
-    $issue->assignedto = required_param('assignedto', PARAM_INT);
+    $issue->status = optional_param('status', -1, PARAM_INT);
+    $issue->assignedto = optional_param('assignedto', -1, PARAM_INT);
     //$issue->summary = required_param('summary', PARAM_TEXT);
     $issue->summary = optional_param('summary', '', PARAM_TEXT); // ecastro ULPGC non-updateable if not fulledit
     if(!$issue->summary) {
         unset($issue->summary);
+    } 
+    if($issue->status == -1) {
+        unset($issue->status);
+    }
+    if($issue->assignedto == -1) {
+        unset($issue->assignedto);
     }
     
     //$issue->description_editor = required_param_array('description_editor', PARAM_CLEANHTML);
     $editoroptions = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
     $issue->description_editor = optional_param_array('description_editor', '', PARAM_CLEANHTML); // ecastro ULPGC non-updateable if not fulledit
     if($issue->description_editor) {
+        if(!isset($issue->description_editor['itemid'])) {
+            $issue->description_editor['itemid'] = 0;
+        }
         $issue->descriptionformat = $issue->description_editor['format'];
         $issue->description = file_save_draft_area_files($issue->description_editor['itemid'], $context->id, 'mod_tracker', 'issuedescription', $issue->id, $editoroptions, $issue->description_editor['text']);
     }
     
-    $issue->resolution_editor = required_param_array('resolution_editor', PARAM_CLEANHTML);
-    $issue->resolutionformat = $issue->resolution_editor['format'];
-    $issue->resolution = $issue->resolution_editor['text'] ? file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker', 'issueresolution', $issue->id, $editoroptions, $issue->resolution_editor['text']) : '';
+    $issue->resolution_editor = optional_param_array('resolution_editor', '', PARAM_CLEANHTML);
+        if($issue->resolution_editor) {
+        $issue->resolutionformat = $issue->resolution_editor['format'];
+        if(!isset($issue->resolution_editor['itemid'])) {
+            $issue->resolution_editor['itemid'] = 0;
+        }
+        $issue->resolution = $issue->resolution_editor['text'] ? file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker', 'issueresolution', $issue->id, $editoroptions, $issue->resolution_editor['text']) : '';
+    }
 
     $issue->datereported = required_param('datereported', PARAM_INT);
 
@@ -78,7 +92,7 @@ elseif ($action == 'updateanissue') {
     
     // if ownership has changed, prepare logging
     $oldrecord = $DB->get_record('tracker_issue', array('id' => $issue->id));
-    if ($oldrecord->assignedto != $issue->assignedto) {
+    if (isset($issue->assignedto) && $oldrecord->assignedto != $issue->assignedto) {
         $ownership = new StdClass;
         $ownership->trackerid = $tracker->id;
         $ownership->issueid = $oldrecord->id;
@@ -89,19 +103,26 @@ elseif ($action == 'updateanissue') {
             print_error('errorcannotlogoldownership', 'tracker');
         }
         tracker_notifyccs_changeownership($issue->id, $tracker);
+        $issue->bywhomid = $USER->id;
+        $issue->timeassigned = time();
+        //remove the former assignee  // ecastro ULPGC
+        if($tracker->supportmode == 'boardreview') {
+            $DB->delete_records('tracker_issuecc', array('issueid'=>$oldrecord->id, 'userid'=>$oldrecord->assignedto, 'trackerid'=>$tracker->id));
+            $DB->delete_records('tracker_issueownership', array('issueid'=>$oldrecord->id, 'userid'=>$oldrecord->assignedto, 'trackerid'=>$tracker->id));    
+        }
     }
-    $issue->bywhomid = $USER->id;
-    $issue->timeassigned = time();
 
     if (!$DB->update_record('tracker_issue', $issue)) {
         print_error('errorcannotupdateissue', 'tracker');
     }
 
     // if not CCed, the assignee should be
-    tracker_register_cc($tracker, $issue, $issue->assignedto);
+    if(isset($issue->assignedto)) {
+        tracker_register_cc($tracker, $issue, $issue->assignedto);
+    }
 
     // send state change notification
-    if ($oldrecord->status != $issue->status) {
+    if (isset($issue->status) && $oldrecord->status != $issue->status) {
         tracker_notifyccs_changestate($issue->id, $tracker);
 
         // log state change
@@ -230,22 +251,24 @@ elseif ($action == 'updatelist') {
             $issue = new StdClass;
             $issue->id = $issueid;
             $issue->status = required_param($akey, PARAM_INT);
-            $oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $issue->id));
-            $DB->update_record('tracker_issue', $issue);
-            // check status changing and send notifications
-            if ($oldstatus != $issue->status) {
-                if ($tracker->allownotifications) {
-                    tracker_notifyccs_changestate($issue->id, $tracker);
+            if($issue->status >= 0) {
+                $oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $issue->id));
+                $DB->update_record('tracker_issue', $issue);
+                // check status changing and send notifications
+                if ($oldstatus != $issue->status) {
+                    if ($tracker->allownotifications) {
+                        tracker_notifyccs_changestate($issue->id, $tracker);
+                    }
+                    // log state change
+                    $stc = new StdClass;
+                    $stc->userid = $USER->id;
+                    $stc->issueid = $issue->id;
+                    $stc->trackerid = $tracker->id;
+                    $stc->timechange = $now; //time();
+                    $stc->statusfrom = $oldstatus;
+                    $stc->statusto = $issue->status;
+                    $DB->insert_record('tracker_state_change', $stc);
                 }
-                // log state change
-                $stc = new StdClass;
-                $stc->userid = $USER->id;
-                $stc->issueid = $issue->id;
-                $stc->trackerid = $tracker->id;
-                $stc->timechange = $now; //time();
-                $stc->statusfrom = $oldstatus;
-                $stc->statusto = $issue->status;
-                $DB->insert_record('tracker_state_change', $stc);
             }
         }
     }

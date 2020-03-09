@@ -536,38 +536,63 @@ abstract class trackerelement {
     * ULPGC ecastro to use autofill fields
     *
     */
-    function add_autowatches() {
+    function add_autowatches($issueid = false) {
         global $CFG, $DB;
-
+        
         // check is applicable
         if(!$this->paramint2 || (substr($this->paramchar1, 0, 5) != 'users'))  {
             return;
         }
 
-        $sql = "SELECT i.*, ia.elementitemid
+        $sql = "SELECT i.*, ia.elementitemid, ia.timemodified AS itemmodified
                 FROM {tracker_issue} i 
                 JOIN {tracker_issueattribute} ia ON ia.trackerid = i.trackerid AND i.id = ia.issueid
                 WHERE i.trackerid = :tid AND ia.elementid = :eid ";
         $params = array('tid'=>$this->tracker->id, 'eid'=>$this->id);
+        if($issueid) {
+            $sql .= ' AND i.id = :iid ';
+            $params['iid'] = $issueid;
+        }
         
         if($issues = $DB->get_records_sql($sql, $params)) {
             $this->setoptionsfromdb();
+            $record = new stdClass();
+            $record->timeassigned = time();
             foreach($issues as $issue) {
-                $options = explode(',', $issue->elementitemid);
-                list($insql, $params) = $DB->get_in_or_equal($options, SQL_PARAMS_NAMED, 'op');
-                $sql = "SELECT u.id
-                        FROM {tracker_elementitem} ei 
-                        JOIN {user} u ON ei.name = u.idnumber
-                        WHERE ei.id $insql AND ei.elementid = :eid AND NOT EXISTS (SELECT 1 FROM {tracker_issuecc} ic 
-                                                                                    WHERE ic.trackerid = :tid AND 
-                                                                                            ic.issueid = :iid AND  ic.userid = u.id ) ";
-                $params['eid'] = $this->id;
-                $params['iid'] = $issue->id;
-                $params['tid'] = $this->tracker->id;
-                
-                if($users = $DB->get_records_sql($sql, $params)) {
-                    foreach($users as $user) {
-                        tracker_register_cc($this->tracker, $issue, $user->id);
+                if($this->paramint2 == 1) {
+                    // this is user as cced
+                    $options = explode(',', $issue->elementitemid);
+                    list($insql, $params) = $DB->get_in_or_equal($options, SQL_PARAMS_NAMED, 'op');
+                    $sql = "SELECT u.id
+                            FROM {tracker_elementitem} ei 
+                            JOIN {user} u ON ei.name = u.idnumber
+                            WHERE ei.id $insql AND ei.elementid = :eid AND NOT EXISTS (SELECT 1 FROM {tracker_issuecc} ic 
+                                                                                        WHERE ic.trackerid = :tid AND 
+                                                                                                ic.issueid = :iid AND  ic.userid = u.id ) ";
+                    $params['eid'] = $this->id;
+                    $params['iid'] = $issue->id;
+                    $params['tid'] = $this->tracker->id;
+                    
+                    if($users = $DB->get_records_sql($sql, $params)) {
+                        foreach($users as $user) {
+                            tracker_register_cc($this->tracker, $issue, $user->id);
+                        }
+                    }
+                }
+                if($this->paramint2 == 2 && (!$issue->assignedto || ($issue->timeassigned <= $issue->itemmodified))) {
+                    //this is user as assignedto 
+                    $sql = "SELECT u.id, u.idnumber
+                                FROM {tracker_elementitem} ei 
+                                JOIN {user} u ON ei.name = u.idnumber
+                                WHERE ei.id = :eiid AND ei.elementid = :eid AND u.id <> :uid ";
+                    $params = array('eid' => $this->id, 'eiid' => $issue->elementitemid, 'uid' => $issue->assignedto);
+                    if($users = $DB->get_records_sql($sql, $params)) {
+                        $user = reset($users);
+                        if($user->id) {
+                            $record->id = $issue->id;
+                            $record->assignedto = $user->id;
+                            $DB->update_record('tracker_issue', $record);
+                        }
                     }
                 }
             }

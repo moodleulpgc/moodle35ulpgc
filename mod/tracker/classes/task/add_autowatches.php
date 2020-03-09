@@ -53,14 +53,13 @@ class add_autowatches extends \core\task\scheduled_task {
                 FROM {tracker_element} e
                 JOIN {tracker_elementused} eu ON eu.elementid = e.id
         
-                WHERE e.paramchar1 LIKE 'user\_%' AND e.paramint2 = 1
+                WHERE e.paramchar1 LIKE 'users\_%' AND e.paramint2 > 0
                 GROUP BY e.id ";
         $autowatches = $DB->get_records_sql_menu($sql, null);
         
         if($autowatches) {
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
         }
-        
         
         mtrace("... Running tracker autowatches ");
         foreach($autowatches as $eid => $tid) {
@@ -69,7 +68,8 @@ class add_autowatches extends \core\task\scheduled_task {
                 list ($course, $cm) = get_course_and_cm_from_instance($tid, 'tracker'); 
                 $elementobj = \trackerelement::find_instance_by_id($tracker, $eid);
                 mtrace("    autowatch {$elementobj->name}");
-                $elementobj->setcontext(\context_module::instance($cm->id));
+                $context = \context_module::instance($cm->id);
+                $elementobj->setcontext($context);
                 $elementobj->add_autowatches();
             } catch (\Exception $e) {
                 mtrace("    autowatch FAILED " . $e->getMessage());

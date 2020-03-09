@@ -31,7 +31,7 @@ require_once($CFG->libdir.'/tablelib.php');
 
 $FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
 $STATUSKEYS = tracker_get_statuskeys($tracker, $cm);
-$STATUSKEYS[0] = tracker_getstring('nochange', 'tracker');
+$STATUSKEYS[''] = tracker_getstring('nochange', 'tracker');
 
 // get search engine related information
 // fields can come from a stored query,or from the current query in the user's client environement cookie
@@ -298,9 +298,7 @@ if (!empty($issues)) {
         $reportedby = fullname($user);
         $assignedto = '';
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
-        
-        
-        $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
+        $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", -1, array(-1 => tracker_getstring('nochange', 'tracker')), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
         $developersmenu = array();
         $managersmenu = array();
         $assignedto = '';
