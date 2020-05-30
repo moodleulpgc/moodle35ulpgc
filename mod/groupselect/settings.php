@@ -96,6 +96,14 @@ if ($ADMIN->fulltree) {
         get_string('hidefullgroups', 'mod_groupselect'),
         get_string('hidefullgroups_help', 'mod_groupselect'), 0));
 
+    $settings->add(new admin_setting_configcheckbox('groupselect/hidesuspendedstudents',
+        get_string('hidesuspendedstudents', 'mod_groupselect'),
+        get_string('hidesuspendedstudents_help', 'mod_groupselect'), 0));
+
+    $settings->add(new admin_setting_configcheckbox('groupselect/hidegroupmembers',
+        get_string('hidegroupmembers', 'mod_groupselect'),
+        get_string('hidegroupmembers_help', 'mod_groupselect'), 0));
+
     $settings->add(new admin_setting_configcheckbox('groupselect/notifyexpiredselection',
         get_string('notifyexpiredselection', 'mod_groupselect'),
         get_string('notifyexpiredselection_help', 'mod_groupselect'), 1));

@@ -89,14 +89,10 @@ class provider implements
                 'parentid' => 'privacy:metadata:studentquiz_comment:parentid',
                 'deleted' => 'privacy:metadata:studentquiz_comment:deleted',
                 'deleteuserid' => 'privacy:metadata:studentquiz_comment:deleteuserid',
+                'edited' => 'privacy:metadata:studentquiz_comment:edited',
+                'edituserid' => 'privacy:metadata:studentquiz_comment:edituserid'
 
         ], 'privacy:metadata:studentquiz_comment');
-
-        $collection->add_database_table('studentquiz_practice', [
-                'quizcoursemodule' => 'privacy:metadata:studentquiz_practice:quizcoursemodule',
-                'studentquizcoursemodule' => 'privacy:metadata:studentquiz_practice:studentquizcoursemodule',
-                'userid' => 'privacy:metadata:studentquiz_practice:userid'
-        ], 'privacy:metadata:studentquiz_practice');
 
         $collection->add_database_table('studentquiz_attempt', [
                 'studentquizid' => 'privacy:metadata:studentquiz_attempt:studentquizid',
@@ -120,7 +116,7 @@ class provider implements
         $contextlist = new contextlist();
 
         // Get activity context if user created/modified the question or their data exist in these table
-        // base on user ID field: rate, comment, progress, practice, attempt.
+        // base on user ID field: rate, comment, progress, attempt.
         $sql = "SELECT DISTINCT ctx.id
                   FROM {context} ctx
                   JOIN {studentquiz} sq ON sq.coursemodule = ctx.instanceid
@@ -132,7 +128,6 @@ class provider implements
              LEFT JOIN {studentquiz_comment} comment ON comment.questionid = q.id
              LEFT JOIN {studentquiz_progress} progress ON progress.questionid = q.id
                        AND progress.studentquizid = sq.id
-             LEFT JOIN {studentquiz_practice} practice ON practice.studentquizcoursemodule = sq.coursemodule
              LEFT JOIN {studentquiz_attempt} attempt ON attempt.categoryid = ca.id
                        AND attempt.studentquizid = sq.id
                  WHERE (
@@ -140,7 +135,6 @@ class provider implements
                          OR rate.id IS NOT NULL
                          OR comment.id IS NOT NULL
                          OR progress.questionid IS NOT NULL
-                         OR practice.id IS NOT NULL
                          OR attempt.id IS NOT NULL
                        )
                        AND (
@@ -149,7 +143,6 @@ class provider implements
                              OR rate.userid = :rateuser
                              OR comment.userid = :commentuser
                              OR progress.userid = :progressuser
-                             OR practice.userid = :practiceuser
                              OR attempt.userid = :attemptuser
                            )";
 
@@ -160,7 +153,6 @@ class provider implements
                 'rateuser' => $userid,
                 'commentuser' => $userid,
                 'progressuser' => $userid,
-                'practiceuser' => $userid,
                 'attemptuser' => $userid
         ];
 
@@ -195,11 +187,10 @@ class provider implements
                        comment.id AS commentid, comment.comment AS commentcomment, comment.questionid AS commentquestionid,
                        comment.userid AS commentuserid, comment.created AS commentcreate,
                        comment.parentid AS commentparentid, comment.deleted AS commentdelete, comment.deleteuserid AS commentdeleteuserid,
+                       comment.edited AS commentedit, comment.edituserid AS commentedituserid,
                        progress.questionid AS progressquestionid, progress.userid AS progressuserid,
                        progress.studentquizid AS progressstudentquizid, progress.lastanswercorrect AS progresslastanswercorrect,
                        progress.attempts AS progressattempts, progress.correctattempts AS progresscorrectattempts,
-                       practice.id AS practiceid, practice.quizcoursemodule AS practicequizcoursemodule,
-                       practice.studentquizcoursemodule AS practicestudentquizcoursemodule, practice.userid AS practiceuserid,
                        attempt.id AS attemptid, attempt.studentquizid AS attempstudentquizid,attempt.userid AS attemptuserid,
                        attempt.questionusageid AS attemptquestionusageid, attempt.categoryid AS attemptcategoryid
                   FROM {context} ctx
@@ -212,7 +203,6 @@ class provider implements
              LEFT JOIN {studentquiz_comment} comment ON comment.questionid = q.id
              LEFT JOIN {studentquiz_progress} progress ON progress.questionid = q.id
                        AND progress.studentquizid = sq.id
-             LEFT JOIN {studentquiz_practice} practice ON practice.studentquizcoursemodule = sq.coursemodule
              LEFT JOIN {studentquiz_attempt} attempt ON attempt.categoryid = ca.id
                        AND attempt.studentquizid = sq.id
                  WHERE (
@@ -220,7 +210,6 @@ class provider implements
                          OR rate.id IS NOT NULL
                          OR comment.id IS NOT NULL
                          OR progress.questionid IS NOT NULL
-                         OR practice.id IS NOT NULL
                          OR attempt.id IS NOT NULL
                        )
                        AND (
@@ -229,7 +218,6 @@ class provider implements
                              OR rate.userid = :rateuser
                              OR comment.userid = :commentuser
                              OR progress.userid = :progressuser
-                             OR practice.userid = :practiceuser
                              OR attempt.userid = :attemptuser
                            )
                        AND ctx.id {$contextsql}
@@ -242,7 +230,6 @@ class provider implements
                 'rateuser' => $userid,
                 'commentuser' => $userid,
                 'progressuser' => $userid,
-                'practiceuser' => $userid,
                 'attemptuser' => $userid
         ];
         $params += $contextparam;
@@ -266,7 +253,6 @@ class provider implements
                     $contextdata->rates = [];
                     $contextdata->comments = [];
                     $contextdata->progresses = [];
-                    $contextdata->practices = [];
                     $contextdata->attempts = [];
                 }
             }
@@ -300,6 +286,9 @@ class provider implements
                         'parentid' => $record->commentparentid,
                         'deleted' => $record->commentdelete > 0 ? transform::datetime($record->commentdelete) : 0,
                         'deleteuserid' => !is_null($record->commentdeleteuserid) ? transform::user($record->commentdeleteuserid) :
+                                null,
+                        'edited' => $record->commentedit > 0 ? transform::datetime($record->commentedit) : 0,
+                        'edituserid' => !is_null($record->commentedituserid) ? transform::user($record->commentedituserid) :
                                 null
                 ];
             }
@@ -312,15 +301,6 @@ class provider implements
                         'lastanswercorrect' => transform::yesno($record->progresslastanswercorrect),
                         'attempts' => $record->progressattempts,
                         'correctattempts' => $record->progresscorrectattempts
-                ];
-            }
-
-            // Export practices.
-            if (!empty($record->practiceid) && $userid == $record->practiceuserid) {
-                $contextdata->practices[$record->practiceid] = (object) [
-                        'quizcoursemodule' => $record->practicequizcoursemodule,
-                        'studentquizcoursemodule' => $record->practicestudentquizcoursemodule,
-                        'userid' => transform::user($record->practiceuserid),
                 ];
             }
 
@@ -410,11 +390,6 @@ class provider implements
         $DB->execute("DELETE FROM {studentquiz_progress}
                        WHERE questionid {$questionsql}", $questionparams);
 
-        // Delete practices belong to this context.
-        $DB->execute("DELETE FROM {studentquiz_practice}
-                       WHERE studentquizcoursemodule = :studentquizcoursemodule",
-                ['studentquizcoursemodule' => $context->instanceid]);
-
         // Delete attempts belong to this context.
         $DB->execute("DELETE FROM {studentquiz_attempt}
                        WHERE studentquizid IN (
@@ -501,11 +476,6 @@ class provider implements
                        WHERE questionid {$questionsql}
                              AND userid = :userid", ['userid' => $userid] + $questionparams);
 
-        // Delete practices belong to user within approved context.
-        $DB->execute("DELETE FROM {studentquiz_practice}
-                       WHERE studentquizcoursemodule {$studentquizsql}
-                             AND userid = :userid", ['userid' => $userid] + $sudentquizparams);
-
         // Delete attempts belong to user within approved context.
         $DB->execute("DELETE FROM {studentquiz_attempt}
                        WHERE userid = :userid
@@ -585,15 +555,6 @@ class provider implements
                  WHERE cm.id = :instanceid";
         $userlist->add_from_sql('userid', $sql, $params);
 
-        // User practices.
-        $sql = "SELECT practice.userid
-                  FROM {course_modules} cm
-                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
-                  JOIN {studentquiz} sq ON sq.coursemodule = cm.id
-                  JOIN {studentquiz_practice} practice ON practice.studentquizcoursemodule = sq.coursemodule
-                 WHERE cm.id = :instanceid";
-        $userlist->add_from_sql('userid', $sql, $params);
-
         // User attempt.
         $sql = "SELECT attempt.userid
                   FROM {course_modules} cm
@@ -663,11 +624,6 @@ class provider implements
                        WHERE questionid {$questionsql}
                              AND userid {$userinsql}", $questionparams + $userinparams);
 
-        // Delete practice belong to users.
-        $DB->execute("DELETE FROM {studentquiz_practice}
-                       WHERE studentquizcoursemodule = :coursemodule
-                             AND userid {$userinsql}", ['coursemodule' => $context->instanceid] + $userinparams);
-
         // Delete attempts belong to users.
         $DB->execute("DELETE FROM {studentquiz_attempt}
                        WHERE userid {$userinsql}
@@ -692,7 +648,9 @@ class provider implements
                               SET userid = :guestuserid,
                                   deleted = :deleted,
                                   deleteuserid = :deleteuserid,
-                                  comment = :comment
+                                  comment = :comment,
+                                  edited = :edited,
+                                  edituserid = :edituserid
                             WHERE questionid {$questionsql}
                                   AND userid {$userinsql}
                                   AND parentid = :parentid", $params + $blankcomment);
@@ -717,7 +675,9 @@ class provider implements
                               SET userid = :guestuserid,
                                   deleted = :deleted,
                                   deleteuserid = :deleteuserid,
-                                  comment = :comment
+                                  comment = :comment,
+                                  edited = :edited,
+                                  edituserid = :edituserid
                             WHERE questionid {$questionsql}
                                   AND userid = :userid
                                   AND parentid = :parentid", $params + $blankcomment);

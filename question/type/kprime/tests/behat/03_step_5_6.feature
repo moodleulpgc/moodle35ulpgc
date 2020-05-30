@@ -19,17 +19,14 @@ Feature: Step 5 and Step 6
       | Default for c1       | kprime         | KPrime-Question-001 | question_one        |
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
+    And I navigate to "Question bank" in current page administration
 
   @javascript
   Scenario: TESTCASE 5.
   # Change options within a KPrime question.
   # Option can be changed.
 
-    And I output "[Kprime - TESTCASE 5 - begin]"
-    When I click on "Edit" "link" in the "KPrime-Question-001" "table_row"
+    When I choose "Edit question" action for "KPrime-Question-001" in the question bank
     And I set the following fields to these values:
       | id_option_1          | New Questiontext 1 |
       | id_option_2          | New Questiontext 2 |
@@ -45,7 +42,7 @@ Feature: Step 5 and Step 6
       | id_weightbutton_4_1  | checked            |
     And I press "id_submitbutton"
     Then I should see "KPrime-Question-001"
-    When I click on "Edit" "link" in the "KPrime-Question-001" "table_row"
+    When I choose "Edit question" action for "KPrime-Question-001" in the question bank
     Then I should see "New Questiontext 1"
     And I should see "New Questiontext 2"
     And I should see "questiontext 3"
@@ -55,15 +52,12 @@ Feature: Step 5 and Step 6
     And I should see "feedback 3"
     And I should see "feedback 4"
 
-    And I output "[Kprime - TESTCASE 5 - end]"
-
   @javascript
   Scenario: TESTCASE 6.
   # Save with empty options
   # All 4 options must be filled
-    
-    And I output "[Kprime - TESTCASE 6- begin]"
-    When I click on "Edit" "link" in the "KPrime-Question-001" "table_row"
+
+    When I choose "Edit question" action for "KPrime-Question-001" in the question bank
     And I set the following fields to these values:
       | id_option_1 | |
     And I press "id_submitbutton"
@@ -71,15 +65,3 @@ Feature: Step 5 and Step 6
       | id_option_1 | New Optiontext 1 |
     And I press "id_submitbutton"
     Then I should see "KPrime-Question-001"
-    And I output "[Kprime - TESTCASE 6 - end]"
-
- 
-
-
-    
-
-
-    
-
-
-

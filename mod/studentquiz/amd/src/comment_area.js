@@ -37,7 +37,9 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
             ACTION_GET_ALL: 'mod_studentquiz_get_comments',
             ACTION_EXPAND: 'mod_studentquiz_expand_comment',
             ACTION_DELETE: 'mod_studentquiz_delete_comment',
+            ACTION_EDIT: 'mod_studentquiz_edit_comment',
             ACTION_LOAD_FRAGMENT_FORM: 'mod_studentquiz_load_fragment_form',
+            ACTION_LOAD_FRAGMENT_EDIT_FORM: 'mod_studentquiz_load_fragment_edit_form',
             ACTION_EXPAND_ALL: 'action_expand_all',
             ACTION_COLLAPSE_ALL: 'action_collapse_all',
             ACTION_RENDER_COMMENT: 'action_render_comment',
@@ -48,7 +50,12 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
             ACTION_CLEAR_FORM: 'action_clear_form',
             ACTION_SHOW_ERROR: 'action_show_error',
             FRAGMENT_FORM_CALLBACK: 'commentform',
+            FRAGMENT_EDIT_FORM_CALLBACK: 'commenteditform',
             HAS_COMMENT_CLASS: 'has-comment',
+            ATTO_CONTENT_TYPE: {
+                HAS_CONTENT: 'has-content',
+                NO_CONTENT: 'no-content'
+            },
             SELECTOR: {
                 CONTAINER: '.studentquiz-comment-container',
                 EXPAND_ALL: '.studentquiz-comment-expand',
@@ -90,7 +97,9 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                 BTN_REPORT: '.studentquiz-comment-btnreport',
                 COMMENT_FILTER_ITEM: '.studentquiz-comment-filter-item',
                 COMMENT_FILTER_NAME: '.studentquiz-comment-filter-name',
-                COMMENT_FILTER_TYPE: '.studentquiz-comment-filter-type'
+                COMMENT_FILTER_TYPE: '.studentquiz-comment-filter-type',
+                BTN_EDIT: '.studentquiz-comment-btnedit',
+                BTN_EDIT_REPLY: '.studentquiz-comment-btneditreply'
             },
             get: function() {
                 return {
@@ -144,11 +153,11 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         self.loadingIcon = el.find(t.SELECTOR.LOADING_ICON);
                         self.formSelector = el.find(t.SELECTOR.FORM_SELECTOR);
 
-                        self.questionId = parseInt(params.questionid);
-                        self.contextId = parseInt(params.contextid);
-                        self.userId = parseInt(params.userid);
-                        self.numberToShow = parseInt(params.numbertoshow);
-                        self.cmId = parseInt(params.cmid);
+                        self.questionId = parseInt(el.data('questionid'));
+                        self.contextId = parseInt(el.data('contextid'));
+                        self.userId = parseInt(el.data('userid'));
+                        self.numberToShow = parseInt(el.data('numbertoshow'));
+                        self.cmId = parseInt(el.data('cmid'));
 
                         self.countServerData = {
                             count: params.count,
@@ -156,12 +165,12 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         };
 
                         self.expand = params.expand || false;
-                        self.referer = params.referer;
+                        self.referer = el.data('referer');
                         self.sortFeature = params.sortfeature;
-                        self.sortable = params.sortable;
+                        self.sortable = el.data('sortable');
 
-                        // Get all language string.
-                        self.string = params.strings;
+                        // Get all language strings.
+                        self.string = el.data('strings');
                         self.forceCommenting = params.forcecommenting;
                         self.canViewDeleted = params.canviewdeleted;
                         self.isNoComment = params.isnocomment;
@@ -348,6 +357,7 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                                     formSelector.trigger('reset');
                                     // Clear atto editor data.
                                     formSelector.find('#id_editor_question_' + unique + 'editable').empty();
+                                    formSelector.find(t.SELECTOR.TEXTAREA).trigger('change');
                                     M.util.js_complete(t.ACTION_CLEAR_FORM);
                                 });
                                 var data = self.convertForTemplate(response, true);
@@ -643,6 +653,10 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                             e.preventDefault();
                             window.location = $(this).data('href');
                         });
+                        el.find(t.SELECTOR.BTN_EDIT).click(function(e) {
+                            e.preventDefault();
+                            self.getFragmentEditFormEvent(data);
+                        });
                     },
 
                     /**
@@ -661,6 +675,10 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         replySelector.find(t.SELECTOR.BTN_REPORT).click(function(e) {
                             e.preventDefault();
                             window.location = $(this).data('href');
+                        });
+                        replySelector.find(t.SELECTOR.BTN_EDIT_REPLY).click(function(e) {
+                            e.preventDefault();
+                            self.getFragmentEditFormEvent(reply);
                         });
                     },
 
@@ -685,6 +703,8 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         self.elementSelector.find(t.SELECTOR.BTN_REPORT).prop('disabled', boolean);
                         self.elementSelector.find(t.SELECTOR.EXPAND_LINK).css('visibility', visibility);
                         self.elementSelector.find(t.SELECTOR.COLLAPSE_LINK).css('visibility', visibility);
+                        self.elementSelector.find(t.SELECTOR.BTN_EDIT).prop('disabled', boolean);
+                        self.elementSelector.find(t.SELECTOR.BTN_EDIT_REPLY).prop('disabled', boolean);
                         if (self.deleteDialog) {
                             self.deleteDialog.getFooter().find('button[data-action="yes"]').prop('disabled', boolean);
                         }
@@ -1033,7 +1053,7 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                             self.createReplyComment(fragmentForm, item, formFragmentSelector, data);
                             return true;
                         });
-                        self.fragmentFormCancelEvent(formFragmentSelector);
+                        self.fragmentFormCancelEvent(formFragmentSelector, false);
                         self.bindEditorEvent(fragmentForm);
                     },
 
@@ -1101,16 +1121,22 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         self.changeWorkingState(true);
                     },
 
-                    /*
-                    * Bind fragment form cancel button event.
-                    * */
-                    fragmentFormCancelEvent: function(formSelector) {
+                    /**
+                     * Bind fragment form cancel button event.
+                     *
+                     * @param {jQuery} formSelector
+                     * @param {Boolean} isEdit
+                     */
+                    fragmentFormCancelEvent: function(formSelector, isEdit) {
                         var self = this;
-                        var cancelBtn = formSelector.find('#id_cancel');
-                        cancelBtn.click(function(e) {
+                        formSelector.find('#id_cancel').click(function(e) {
                             e.preventDefault();
                             var commentSelector = formSelector.closest(t.SELECTOR.COMMENT_ITEM);
-                            self.lastFocusElement = commentSelector.find(t.SELECTOR.BTN_REPLY);
+                            if (isEdit) {
+                                self.lastFocusElement = commentSelector.find(t.SELECTOR.BTN_EDIT);
+                            } else {
+                                self.lastFocusElement = commentSelector.find(t.SELECTOR.BTN_REPLY);
+                            }
                             self.changeWorkingState(false);
                             formSelector.parent().empty();
                         });
@@ -1421,6 +1447,8 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         submitBtn.removeClass('disabled');
                         submitBtn.prop('disabled', false);
                         editorContentWrap.attr('data-placeholder', '');
+                        editorContentWrap.addClass(t.ATTO_CONTENT_TYPE.HAS_CONTENT);
+                        editorContentWrap.removeClass(t.ATTO_CONTENT_TYPE.NO_CONTENT);
                     },
 
                     /**
@@ -1435,6 +1463,8 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         submitBtn.addClass('disabled');
                         submitBtn.prop('disabled', true);
                         editorContentWrap.attr('data-placeholder', placeholder);
+                        editorContentWrap.addClass(t.ATTO_CONTENT_TYPE.NO_CONTENT);
+                        editorContentWrap.removeClass(t.ATTO_CONTENT_TYPE.HAS_CONTENT);
                     },
 
                     /**
@@ -1447,11 +1477,143 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         if ($.inArray(string, self.sortable) !== -1) {
                             self.sortFeature = string;
                         }
+                    },
+
+                    /**
+                     * Begin to load the fragment form for editing.
+                     *
+                     * @param {Object} item
+                     */
+                    getFragmentEditFormEvent: function(item) {
+                        var self = this;
+                        var el = self.elementSelector.find(t.SELECTOR.COMMENT_ID + item.id);
+                        var fragmentForm = el.find(t.SELECTOR.FRAGMENT_FORM).first();
+                        var clone = self.loadingIcon.clone().show();
+                        fragmentForm.append(clone);
+                        self.loadFragmentEditForm(fragmentForm, item);
+                        self.changeWorkingState(true);
+                    },
+
+                    /**
+                     * Call web services to get the fragment edit form, append to the DOM then bind event.
+                     *
+                     * @param {jQuery} fragmentForm
+                     * @param {Object} item
+                     */
+                    loadFragmentEditForm: function(fragmentForm, item) {
+                        var self = this;
+                        M.util.js_pending(t.ACTION_LOAD_FRAGMENT_EDIT_FORM);
+                        var params = self.getParamsBeforeCallApi({
+                            cancelbutton: true,
+                            forcecommenting: self.forceCommenting,
+                            commentid: item.id
+                        });
+                        // Clear error message on the main form to prevent Atto editor from focusing to old message.
+                        var attoWrap = self.formSelector.find(t.SELECTOR.ATTO_EDITOR_WRAP);
+                        if (attoWrap.length !== 0 && attoWrap.hasClass('error')) {
+                            attoWrap.removeClass('error');
+                            attoWrap.find('#id_error_message_5btext_5d').remove();
+                        }
+                        fragment.loadFragment(
+                            'mod_studentquiz',
+                            t.FRAGMENT_EDIT_FORM_CALLBACK,
+                            self.contextId,
+                            params
+                        ).done(function(html, js) {
+                            Templates.replaceNodeContents(fragmentForm, html, js);
+                            // Focus form.
+                            var textFragmentFormId = '#id_editor_question_' + self.questionId + '_' + item.id + 'editable';
+                            fragmentForm.find(textFragmentFormId).focus();
+                            self.bindFragmentEditFormEvent(fragmentForm, item);
+                            M.util.js_complete(t.ACTION_LOAD_FRAGMENT_EDIT_FORM);
+                        });
+                    },
+
+                    /**
+                     * Bind fragment edit form action button event.
+                     *
+                     * @param {jQuery} fragmentForm
+                     * @param {Object} item
+                     */
+                    bindFragmentEditFormEvent: function(fragmentForm, item) {
+                        var self = this;
+                        var formFragmentSelector = fragmentForm.find(t.SELECTOR.COMMENT_AREA_FORM);
+                        fragmentForm.find(t.SELECTOR.SUBMIT_BUTTON).click(function(e) {
+                            e.preventDefault();
+                            self.changeWorkingState(true);
+                            var data = self.convertFormToJson(formFragmentSelector);
+                            // Check message field.
+                            if (data['message[text]'].length === 0) {
+                                return true; // Return true to trigger form validation and show error messages.
+                            }
+                            var clone = self.loadingIcon.clone().show();
+                            clone.appendTo(fragmentForm);
+                            formFragmentSelector.hide();
+                            self.editCommentEvent(fragmentForm, item, formFragmentSelector, data);
+                            return true;
+                        });
+                        self.fragmentFormCancelEvent(formFragmentSelector, true);
+                        self.bindEditorEvent(fragmentForm);
+                    },
+
+                    /**
+                     * Edit comment event.
+                     *
+                     * @param {jQuery} container
+                     * @param {Object} item
+                     * @param {jQuery} formSelector
+                     * @param {Object} formData
+                     */
+                    editCommentEvent: function(container, item, formSelector, formData) {
+                        var self = this;
+                        M.util.js_pending(t.ACTION_EDIT);
+                        var params = {
+                            commentid: item.id,
+                            message: {
+                                text: formData['message[text]'],
+                                format: formData['message[format]'],
+                            }
+                        };
+                        self.editComment(params).then(function(response) {
+                            // Hide error if exists.
+                            $(t.SELECTOR.COMMENT_ERROR).addClass('hide');
+                            var el = self.elementSelector.find(t.SELECTOR.COMMENT_ID + item.id);
+                            self.lastFocusElement = el.find(t.SELECTOR.BTN_EDIT);
+                            if (self.lastFocusElement.length === 0) {
+                                self.lastFocusElement = el.find(t.SELECTOR.BTN_EDIT_REPLY);
+                            }
+                            // Assign new content.
+                            item.shortcontent = response.shortcontent;
+                            el.find(t.SELECTOR.COMMENT_TEXT).first().html(response.content);
+                            container.empty();
+                            self.changeWorkingState(false);
+                            M.util.js_complete(t.ACTION_EDIT);
+                            return true;
+                        }).fail(function(e) {
+                            self.handleFailWhenCreateComment(e, params);
+                            M.util.js_complete(t.ACTION_EDIT);
+                        });
+                    },
+
+                    /**
+                     * Call web services to edit comment.
+                     *
+                     * @param {Object} data
+                     * @returns {Promise}
+                     */
+                    editComment: function(data) {
+                        var self = this;
+                        data = self.getParamsBeforeCallApi(data);
+                        var promise = ajax.call([{
+                            methodname: t.ACTION_EDIT,
+                            args: data
+                        }]);
+                        return promise[0];
                     }
                 };
             },
             generate: function(params) {
-                t.get().init(JSON.parse(params));
+                t.get().init(params);
             }
         };
         return t;

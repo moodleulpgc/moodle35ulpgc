@@ -26,6 +26,7 @@
 
 
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
+require_once($CFG->dirroot . '/question/type/regexp/renderer.php');  // ecastro ULPGC rezeau
 
 
 /**
@@ -81,7 +82,7 @@ class qtype_multianswer_renderer extends qtype_renderer {
             question_display_options $options, $index, question_graded_automatically $subq) {
 
         $subtype = $subq->qtype->name();
-        if ($subtype == 'numerical' || $subtype == 'shortanswer') {
+        if ($subtype == 'numerical' || $subtype == 'shortanswer' || $subtype == 'regexp') {  // ecastro ULPGC rezeau
             $subrenderer = 'textfield';
         } else if ($subtype == 'multichoice') {
             if ($subq instanceof qtype_multichoice_multi_question) {
@@ -191,7 +192,7 @@ class qtype_multianswer_textfield_renderer extends qtype_multianswer_subq_render
         $fieldname = $fieldprefix . 'answer';
 
         $response = $qa->get_last_qt_var($fieldname);
-        if ($subq->qtype->name() == 'shortanswer') {
+        if ($subq->qtype->name() == 'shortanswer' || $subq->qtype->name() == 'regexp') { // ecastro ULPGC rezeau
             $matchinganswer = $subq->get_matching_answer(array('answer' => $response));
         } else if ($subq->qtype->name() == 'numerical') {
             list($value, $unit, $multiplier) = $subq->ap->apply_units($response, '');

@@ -266,7 +266,7 @@ body#page-question-type-kprime div[id^=fgroup_id_weightsarray] {
 .que.kprime table .c1,
 .que.kprime table .c2 {
     width: 1%;
-    min-width: 65px;
+    min-width: 70px;
 }
 
 #page-mod-quiz-review .que.kprime table .c0,
@@ -291,4 +291,8 @@ body#page-question-type-kprime .optionbox,
 .kprimespecificfeedback {
     word-break: break-word;
     overflow-wrap: anywhere;
+}
+
+#page-mod-quiz-attempt .que.kprime .kprimeresponsebutton label {
+    padding: 10px;
 }

@@ -116,7 +116,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
 
     if ($agenda) { // agenda already created
         //get actual count of topics of topics
-        $topic_count = $DB->count_records('chairman_agenda_topics', array('chairman_agenda' => $agenda_id), '*', $ignoremultiple = false);
+        $topic_count = $DB->count_records('chairman_agenda_topics', array('chairman_agenda' => $agenda_id), '*');
         $topic_count++; //Introducing one empty set of fields to add new topic
         //If no topics exist, then the database returns null, and we replace with zero topic count
         if (!$topic_count) {
@@ -226,7 +226,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
                     $topic_object->filename = $count;
 
 
-                    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+                    $context = context_module::instance($cm->id);
                     //prepare file area for topic
                     file_save_draft_area_files($topic_files[$key], $context->id, 'mod_chairman', 'attachment', $count, array('subdirs' => 0, 'maxfiles' => 50));
 
@@ -310,7 +310,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
                     //print_object($cm);
                     //print_object($fromform);
 
-                    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+                    $context = context_module::instance($cm->id);
                     //Save state of files draft area
                     file_save_draft_area_files($fromform->attachments[$key], $context->id, 'mod_chairman', 'attachment', $count, array('subdirs' => 0, 'maxfiles' => 50));
 
@@ -353,7 +353,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
 
                     //Updating record, and file draft area state
                     $DB->insert_record('chairman_agenda_topics', $topic_object, $returnid = true, $bulk = false);
-                    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+                    $context = context_module::instance($cm->id);
                     file_save_draft_area_files($fromform->attachments[$key], $context->id, 'mod_chairman', 'attachment', $count, array('subdirs' => 0, 'maxfiles' => 50));
                 }
             } // end topic updating
@@ -407,7 +407,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
         $toform->edit_url = $url;
 
         //get record for event agenda is attached to
-        $event_record = $DB->get_record('chairman_events', array('id' => $event_id), '*', $ignoremultiple = false);
+        $event_record = $DB->get_record('chairman_events', array('id' => $event_id), '*');
 
         //Add zero to minutes ex: 4 -> 04
         $month = toMonth($event_record->month);
@@ -436,7 +436,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
 //----Description ------------------------------------------------------
         //Committee has already been called in view.php, and is still a valid object but we re-queried for code claridy
         $chairman = $DB->get_record("chairman", array("id" => $cm->instance)); // get chairman record for our instance
-        $chairman_event = $DB->get_record('chairman_events', array('id' => $event_id), '*', $ignoremultiple = false);
+        $chairman_event = $DB->get_record('chairman_events', array('id' => $event_id), '*');
 
         $toform->committee = $chairman->name;
         $toform->summary = $chairman_event->summary;
@@ -489,7 +489,7 @@ function agenda_editable($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
 
                 $draftitemid = file_get_submitted_draft_itemid('attachments[' . $index . "]");
 
-                $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+                $context = context_module::instance($cm->id); // ecastro ULPGC
                 file_prepare_draft_area($draftitemid, $context->id, 'mod_chairman', 'attachment', $entry, array('subdirs' => 0, 'maxfiles' => 50));
                 $toform->attachments[$index] = $draftitemid;
 
@@ -548,7 +548,7 @@ function agenda_viewonly($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
     }
 
     $topic_count = 0;
-    $topic_count = $DB->count_records('chairman_agenda_topics', array('chairman_agenda' => $agenda_id), '*', $ignoremultiple = false);
+    $topic_count = $DB->count_records('chairman_agenda_topics', array('chairman_agenda' => $agenda_id), '*');
 
     if (!$topic_count) { //if no database items(null return) make count zero
         $topic_count = 0;
@@ -569,7 +569,7 @@ function agenda_viewonly($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
     }
 
 
-    $event_record = $DB->get_record('chairman_events', array('id' => $event_id), '*', $ignoremultiple = false);
+    $event_record = $DB->get_record('chairman_events', array('id' => $event_id), '*');
 
     //Add zero to minutes ex: 4 -> 04
     $month = toMonth($event_record->month);
@@ -583,7 +583,7 @@ function agenda_viewonly($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
     //----Description ------
     //Committee has already been called in view.php, and is still a valid object but we re-queried for code claridy
     $chairman = $DB->get_record("chairman", array("id" => $cm->instance)); // get chairman record for our instance
-    $chairman_event = $DB->get_record('chairman_events', array('id' => $event_id), '*', $ignoremultiple = false);
+    $chairman_event = $DB->get_record('chairman_events', array('id' => $event_id), '*');
 
     $toform->committee = $chairman->name;
     $toform->summary = $chairman_event->summary;
@@ -626,7 +626,7 @@ function agenda_viewonly($agenda, $chairman_id, $event_id, $cm, $selected_tab, $
             //print $entry;
 //print_object($mform->attributes);
             $draftitemid = file_get_submitted_draft_itemid('attachments[' . $index . "]");
-            $context = get_context_instance(CONTEXT_MODULE, $chairman_id);
+            $context = context_module::instance($chairman_id);
             file_prepare_draft_area($draftitemid, $context->id, 'mod_chairman', 'attachment', $entry, array('subdirs' => 1, 'maxfiles' => 50));
             $toform->attachments[$index] = $draftitemid;
 
@@ -674,7 +674,7 @@ function create_agenda($chairman_id, $event_id, $location = "") {
 //------------------------------------------------------------------------------
 //We create a snapshot of committee members for agenda, from the current state
 //of the chairman_members table entries for the committee
-        $commityRecords = $DB->get_records('chairman_members', array('chairman_id' => $chairman_id), '', '*', $ignoremultiple = false);
+        $commityRecords = $DB->get_records('chairman_members', array('chairman_id' => $chairman_id), '', '*');
 
         if ($commityRecords) {//If any committee members present
             foreach ($commityRecords as $member) {

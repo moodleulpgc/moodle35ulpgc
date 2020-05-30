@@ -39,6 +39,7 @@ $userorder = optional_param('uorder', 1, PARAM_INT);
 $examid = optional_param('exam', 0, PARAM_INT);
 $boardid = optional_param('board', 0, PARAM_INT);
 
+
 if ($id) {
     list ($course, $cm) = get_course_and_cm_from_cmid($id, 'examboard');
     $examboard = $DB->get_record('examboard', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -222,7 +223,6 @@ if($action == 'synchusers') {
     redirect($returnurl);
 }
 
-
 $straction = get_string($action, 'examboard');
 
 $mform = new stdClass();       
@@ -248,7 +248,11 @@ if(is_subclass_of($mform, 'moodleform')) {
             
         } elseif($action == 'updateuser') {
             $message = examboard_process_updateuser($examboard, $fromform);
-
+        } elseif($action == 'moveusers') {
+            $message = examboard_process_change_user_session($examboard, $fromform);
+            if($message && $fromform->targetexam  && $fromform->movetoreturn) {
+                $returnurl->param('item', $fromform->targetexam);
+            }
         } elseif($action == 'notify') {
             // store input files on temdir
             $tempdir = make_request_directory();
@@ -268,7 +272,6 @@ if(is_subclass_of($mform, 'moodleform')) {
             $message = examboard_process_notifications($examboard, $course, $cm, $context, $fromform);
             //remove_dir($CFG->tempdir . '/' . $tempdir ); 
             
-            
         } elseif(($action == 'deleteexam') && ($fromform->confirmed == 'deleteexam')) {
             // OK, delete it
             $message = examboard_remove_exam($fromform->exam, $fromform->withboard);
@@ -283,8 +286,8 @@ if(is_subclass_of($mform, 'moodleform')) {
                 $message = get_string('cannotsavedata', 'error');   
             }
 
-            $eventparams['objectid'] = $examid;
-            $eventparams['relateduserid'] = $userid;
+            $eventparams['objectid'] = $fromform->exam;
+            $eventparams['relateduserid'] = $fromform->user;
             $event = \mod_examboard\event\exam_updated_users::create($eventparams);
             $event->trigger();
             
@@ -296,8 +299,7 @@ if(is_subclass_of($mform, 'moodleform')) {
                     $deleted++;
                 }
             }
-            $eventparams['objectid'] = $examid;
-            $eventparams['relateduserid'] = $userid;
+            $eventparams['objectid'] = $fromform->exam;
             $event = \mod_examboard\event\exam_updated_users::create($eventparams);
             $event->trigger();
             $message = get_string('deletedexaminees', 'examboard', $deleted);

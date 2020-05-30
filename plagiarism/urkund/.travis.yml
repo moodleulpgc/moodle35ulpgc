@@ -1,16 +1,14 @@
 language: php
 
-sudo: true
-
-services:
-  - mysql
+dist: trusty
 
 addons:
-  firefox: "47.0.1"
+  chrome: stable
   postgresql: "9.4"
   apt:
     packages:
       - openjdk-8-jre-headless
+      - chromium-chromedriver
 
 cache:
   directories:
@@ -27,9 +25,14 @@ matrix:
     - php: 7.2
       env: DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
     - php: 7.2
-      env: DB=pgsql  MOODLE_BRANCH=master
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
 
 before_install:
+  - export MOODLE_VERSION=$(echo "$MOODLE_BRANCH" | cut -d'_' -f 2)
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ] && [ $DB == "pgsql" ] && [[ "$MOODLE_VERSION" -gt 38 || "$MOODLE_VERSION" == "master" ]] ; then
+    sudo /etc/init.d/postgresql stop;
+    sudo /etc/init.d/postgresql start 9.5;
+    fi
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
@@ -51,4 +54,4 @@ script:
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  - moodle-plugin-ci behat --profile chrome

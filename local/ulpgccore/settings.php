@@ -36,6 +36,8 @@ if ($hassiteconfig) {
     
     $temp->add(new \admin_setting_configtext('local_ulpgccore/croncheck', get_string('croncheck','local_ulpgccore'), get_string('explaincroncheck','local_ulpgccore'), '0'));
     $temp->add(new \admin_setting_configtext('local_ulpgccore/croncheckemail', get_string('croncheckemail','local_ulpgccore'), get_string('explaincroncheckemail','local_ulpgccore'), ''));
+    
+    $temp->add(new \admin_setting_configtextarea('local_ulpgccore/allowedcoursecats', get_string('allowedcoursecats','local_ulpgccore'), get_string('explainallowedcoursecats','local_ulpgccore'), ''));
 
     $ADMIN->add('local_ulpgccore_settings', $temp);    
     

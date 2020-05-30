@@ -33,6 +33,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class restore_groupselect_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define structure
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -48,6 +51,9 @@ class restore_groupselect_activity_structure_step extends restore_activity_struc
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process definition for restoring table groupselect
+     */
     protected function process_groupselect($data) {
         global $DB;
 
@@ -73,6 +79,9 @@ class restore_groupselect_activity_structure_step extends restore_activity_struc
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Process definition for restoring table groupselect_groups_teachers
+     */
     protected function process_groupselect_groups_teachers($data) {
         global $DB;
 
@@ -90,6 +99,9 @@ class restore_groupselect_activity_structure_step extends restore_activity_struc
         }
     }
 
+    /**
+     * Process definition for restoring table groupselect_passwords
+     */
     protected function process_groupselect_passwords($data) {
         global $DB;
 
@@ -107,6 +119,9 @@ class restore_groupselect_activity_structure_step extends restore_activity_struc
 
     }
 
+    /**
+     * Final step after execution
+     */
     protected function after_execute() {
         // Add groupselect related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_groupselect', 'intro', null);

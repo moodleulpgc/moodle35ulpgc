@@ -184,14 +184,14 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         $mform->disabledIf('allowedqtypes', "allowedqtypes[ALL]", 'checked');
         $mform->addHelpButton('allowedqtypes', 'settings_allowedqtypes', 'studentquiz');
 
+        // Comment and rating sections.
+        $mform->addElement('header', 'sectioncomment', get_string('settings_section_header_comment_rating', 'studentquiz'));
+
         // Field force rating.
         $mform->addElement('checkbox', 'forcerating', get_string('settings_forcerating', 'studentquiz'));
         $mform->setType('forcerating', PARAM_INT);
         $mform->addHelpButton('forcerating', 'settings_forcerating', 'studentquiz');
         $mform->setDefault('forcerating', get_config('studentquiz', 'forcerating'));
-
-        // Comment sections.
-        $mform->addElement('header', 'sectioncomment', get_string('settings_section_header_comment', 'studentquiz'));
 
         // Field force commenting
         $mform->addElement('checkbox', 'forcecommenting', get_string('settings_forcecommenting', 'studentquiz'));
@@ -206,7 +206,7 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         );
         $mform->setType('commentdeletionperiod', PARAM_INT);
         $mform->addHelpButton('commentdeletionperiod', 'settings_commentdeletionperiod', 'studentquiz');
-        $mform->setDefault('commentdeletionperiod', get_config('studentquiz', 'commentdeletionperiod'));
+        $mform->setDefault('commentdeletionperiod', get_config('studentquiz', 'commentediting_deletionperiod'));
 
         // Email address for reporting unacceptable comment for this studentquiz, default is blank.
         $mform->addElement('text', 'reportingemail', get_string('settings_reportingemail', 'studentquiz'), ['size' => 64]);
@@ -307,4 +307,5 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         }
         return $data;
     }
+
 }

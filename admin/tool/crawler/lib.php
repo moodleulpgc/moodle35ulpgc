@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_crawler\local\url;
+use tool_crawler\robot\crawler;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/constants.php');
@@ -39,14 +42,11 @@ function tool_crawler_crawl($verbose = false) {
 
     global $CFG, $DB;
 
-    $robot = new \tool_crawler\robot\crawler();
+    $robot = new crawler();
+    $url = new url();
     $config = $robot::get_config();
     $crawlstart = $config->crawlstart;
     $crawlend   = $config->crawlend;
-
-    if ($config->uselogs == 1) {
-        $recentcourses = $robot->get_recentcourses();
-    }
 
     // If we need to start a new crawl, add new items to the queue.
     if (!$crawlstart || $crawlstart <= $crawlend) {
@@ -55,6 +55,7 @@ function tool_crawler_crawl($verbose = false) {
         set_config('crawlstart', $start, 'tool_crawler');
 
         if ($config->uselogs == 1) {
+            $recentcourses = $robot->get_recentcourses();
             foreach ($recentcourses as $courseid) {
                 $robot->mark_for_crawl($CFG->wwwroot . '/', 'course/view.php?id=' . $courseid, $courseid);
             }
@@ -74,25 +75,6 @@ function tool_crawler_crawl($verbose = false) {
         $history = $DB->get_record('tool_crawler_history', array('startcrawl' => $crawlstart));
     }
 
-    // Before beginning to process queue, add any new courses to the queue.
-    if ($config->uselogs == 1) {
-
-        $coursesinurltableobject = $DB->get_records_list('tool_crawler_url', 'courseid', $recentcourses, '', 'DISTINCT courseid');
-
-        $coursesinurltable = [];
-        foreach ($coursesinurltableobject as $course) {
-            array_push($coursesinurltable, $course->courseid);
-        }
-
-        foreach ($recentcourses as $courseid) {
-
-            // If a course from recent activity is not in the queue, add it.
-            if (!in_array($courseid, $coursesinurltable)) {
-                $robot->mark_for_crawl($CFG->wwwroot . '/', 'course/view.php?id=' . $courseid, $courseid);
-            }
-        }
-    }
-
     $cronstart = time();
     $cronstop = $cronstart + $config->maxcrontime;
 
@@ -105,7 +87,7 @@ function tool_crawler_crawl($verbose = false) {
         $history->endcrawl = time();
         set_config('crawlend', time(), 'tool_crawler');
     }
-    $history->urls = $robot->get_processed();
+    $history->urls = $url->get_processed();
     $history->links = $robot->get_num_links();
     $history->broken = $robot->get_num_broken_urls();
     $history->oversize = $robot->get_num_oversize();

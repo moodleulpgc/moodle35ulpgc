@@ -81,10 +81,16 @@ if($administrator = $DB->get_record('chairman_members', array('chairman_id'=>$id
 $memberssql = 'SELECT mdl_user.id, mdl_user.email, mdl_user.lastname, mdl_user.firstname, mdl_chairman_members.chairman_id, mdl_chairman_members.id
             FROM mdl_chairman_members INNER JOIN mdl_user ON mdl_chairman_members.user_id = mdl_user.id
             WHERE mdl_chairman_members.chairman_id ='.$id.' AND mdl_chairman_members.role_id =3 ORDER BY mdl_user.lastname';
-
+// ecastro ULPGC
+$memberssql = "SELECT u.id, m.id AS mid, u.idnumber, u.email, u.lastname, u.firstname, m.chairman_id
+                FROM {chairman_members} m
+                JOIN {user} u ON u.id = m.user_id
+                WHERE m.chairman_id = :chairmanid AND m.role_id = 3 
+                ORDER BY u.lastname, u.firstname";
+$params = array('chairmanid' => $id);             
 //echo $memberssql;
 //   if($member_check = get_record('chairman_members', 'chairman_id', $id, 'role_id', 3)){
-if ($members = $DB->get_records_sql($memberssql)) {
+if ($members = $DB->get_records_sql($memberssql, $params)) {
     
     echo '<div><div class="title">'.get_string('members', 'chairman').'</div>';
 

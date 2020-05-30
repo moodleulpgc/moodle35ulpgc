@@ -67,7 +67,8 @@ class utils {
                 'plural' => new external_value(PARAM_TEXT, 'text reply or replies.'),
                 'hascomment' => new external_value(PARAM_BOOL, 'Check if in current user has comment'),
                 'canreport' => new external_value(PARAM_BOOL, 'Can report this comment or not.'),
-                'reportlink' => new external_value(PARAM_TEXT, 'Report link for this comment.')
+                'reportlink' => new external_value(PARAM_TEXT, 'Report link for this comment.'),
+                'canedit' => new external_value(PARAM_BOOL, 'Can delete this comment or not.')
         ];
     }
 
@@ -168,10 +169,11 @@ class utils {
 
         $numconditions = $options['numconditions'];
         $conditions = $options['conditions'];
+        $previewurl = $customdata['previewurl'];
 
         $content = \html_writer::div(get_string('report_comment_emailpreface', 'studentquiz', $customdata));
 
-        $link = \html_writer::link($customdata['previewurl'], get_string('report_comment_link_text', 'studentquiz'));
+        $link = \html_writer::link($previewurl, get_string('report_comment_link_text', 'studentquiz'));
 
         $content .= \html_writer::div($link);
 
@@ -215,7 +217,7 @@ class utils {
             ];
             // Send email.
             if (!email_to_user($fakeuser, $from, $subject, null, $mailcontent)) {
-                print_error('error_sendalert', 'studentquiz', $customdata->url, $fakeuser->email);
+                print_error('error_sendalert', 'studentquiz', $previewurl, $fakeuser->email);
             }
         }
     }
@@ -231,7 +233,9 @@ class utils {
                 'guestuserid' => $guestuserid,
                 'deleted' => time(),
                 'deleteuserid' => $guestuserid,
-                'comment' => ''
+                'comment' => '',
+                'edited' => time(),
+                'edituserid' => $guestuserid
         ];
     }
 }

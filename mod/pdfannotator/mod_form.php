@@ -114,12 +114,47 @@ class mod_pdfannotator_mod_form extends moodleform_mod {
 
     // Loads the old file in the filemanager.
     public function data_preprocessing(&$defaultvalues) {
+        global $DB; 
+
         if ($this->current->instance) {
             $contextid = $this->context->id;
             $draftitemid = file_get_submitted_draft_itemid('files');
-            file_prepare_draft_area($draftitemid, $contextid, 'mod_pdfannotator', 'content', 0, array('subdirs' => true));
+            file_prepare_draft_area($draftitemid, $contextid, 'mod_pdfannotator', 'content', 0, array('subdirs' => false));
             $defaultvalues['files'] = $draftitemid;
-            $this->_form->disabledIf('files', 'update', 'notchecked', 2);
+
+            //$this->_form->disabledIf('files', 'update', 'notchecked', 2); // ecastro ULPGC
+        }
+    }
+
+    
+    // ecasto ULPGC
+    public function definition_after_data() {
+        global $DB; 
+            
+        $hasannotations = $DB->record_exists('pdfannotator_annotations', array('pdfannotatorid'=>$this->current->instance));
+        if($hasannotations) {
+            $mform =& $this->_form;
+            $name = '';
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($this->context->id, 'mod_pdfannotator', 'content', 0, 'sortorder DESC, id ASC', false, 0, 0, 1);
+            if (count($files) >= 1) {
+                $mainfile = reset($files);
+                $name = $mainfile->get_filename();
+            }
+
+            $update = $mform->createElement('checkbox', 'allowupdate', get_string('allowupdate', 'pdfannotator'), $name);
+            $mform->insertElementBefore($update, 'files'); 
+            $mform->setType('allowupdate', PARAM_INT);
+            $mform->setDefault('allowupdate', 0);
+            $mform->addHelpButton('allowupdate', 'allowupdate', 'pdfannotator');
+            $mform->disabledIf('files', 'allowupdate', 'notchecked');
+            /*
+            $remove = $mform->createElement('checkbox', 'removeannotations', get_string('removeannotations', 'pdfannotator'));
+            $mform->insertElementBefore($remove, 'files'); 
+            $mform->setType('removeannotations', PARAM_INT);
+            $mform->setDefault('removeannotations', 0);
+            $mform->addHelpButton('removeannotations', 'removeannotations', 'pdfannotator');
+            */
         }
     }
 

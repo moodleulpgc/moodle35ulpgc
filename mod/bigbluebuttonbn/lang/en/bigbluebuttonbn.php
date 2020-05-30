@@ -148,6 +148,8 @@ $string['config_recordings_preview_editable'] = 'Preview feature can be edited';
 $string['config_recordings_preview_editable_description'] = 'Preview feature can be edited when the instance is added or updated.';
 $string['config_recordings_sortorder'] = 'Order the recordings in ascending order.';
 $string['config_recordings_sortorder_description'] = 'By default recordings are displayed in descending order. When checked they will be sorted in ascending order.';
+$string['config_recordings_validate_url'] = 'Validate URL';
+$string['config_recordings_validate_url_description'] = 'If checked the playback URL will be validated before the user access it.';
 
 $string['config_importrecordings'] = 'Configuration for "Import recordings" feature';
 $string['config_importrecordings_description'] = 'These settings are feature specific';
@@ -352,11 +354,12 @@ $string['view_recording_list_duration'] = 'Duration';
 $string['view_recording_list_recording'] = 'Recording';
 $string['view_recording_button_import'] = 'Import recording links';
 $string['view_recording_button_return'] = 'Go back';
-$string['view_recording_format_podcast'] = 'podcast';
-$string['view_recording_format_presentation'] = 'presentation';
-$string['view_recording_format_screenshare'] = 'screenshare';
-$string['view_recording_format_statistics'] = 'statistics';
-$string['view_recording_format_video'] = 'video';
+$string['view_recording_format_notes'] = 'Notes';
+$string['view_recording_format_podcast'] = 'Podcast';
+$string['view_recording_format_presentation'] = 'Presentation';
+$string['view_recording_format_screenshare'] = 'Screenshare';
+$string['view_recording_format_statistics'] = 'Statistics';
+$string['view_recording_format_video'] = 'Video';
 $string['view_recording_format_errror_unreachable'] = 'The URL for this recording format is unreachable.';
 $string['view_section_title_presentation'] = 'Presentation file';
 $string['view_section_title_recordings'] = 'Recordings';
@@ -498,3 +501,8 @@ $string['index_error_bbtn'] = 'BigBlueButton ID {$a} is incorrect';
 
 $string['view_mobile_message_reload_page_creation_time_meeting'] = 'You exceeded the 45 seconds in this page, please reload the page to join correctly to the meeting.';
 $string['view_mobile_message_groups_not_supported'] = 'This instance is enable to work with groups but the mobile app has not support for this. Please open in desktop if you want to use the group support.';
+
+// ecastro ULPGC
+$string['config_numnodes'] = 'Number of server nodes';
+$string['config_numnodes_description'] = 'If set to > 1 then the server data settinhs above are treated as a comma separated list, and converted to array.
+Then each course BigBlueButton instances uses the server with index = courseid mod numnodes';

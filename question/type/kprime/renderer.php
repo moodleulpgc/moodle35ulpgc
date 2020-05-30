@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      qtype_kprime
-* @author       Amr Hourani (amr.hourani@id.ethz.ch)
- *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
-* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
-* @author       Andreas Hruska (andreas.hruska@edaktik.at)
-* @copyright    2016 ETHZ {@link http://ethz.ch/}
-* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
-* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     qtype_kprime
+ * @author      Amr Hourani (amr.hourani@id.ethz.ch)
+ * @author      Martin Hanusch (martin.hanusch@let.ethz.ch)
+ * @author      Jürgen Zimmer (juergen.zimmer@edaktik.at)
+ * @author      Andreas Hruska (andreas.hruska@edaktik.at)
+ * @copyright   2016 ETHZ {@link http://ethz.ch/}
+ * @copyright   2014 eDaktik GmbH {@link http://www.edaktik.at}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -200,6 +200,12 @@ class qtype_kprime_renderer extends qtype_renderer {
 
         $result .= html_writer::table($table, true);
 
+        if ($qa->get_state() == question_state::$invalid) {
+            $result .= html_writer::nonempty_tag('div',
+                    $question->get_validation_error($qa->get_last_qt_data()),
+                    array('class' => 'validationerror'));
+        }
+
         if (!empty(get_config('qtype_kprime')->showscoringmethod)) {
             $result .= $this->showscoringmethod($question);
         }
@@ -210,7 +216,7 @@ class qtype_kprime_renderer extends qtype_renderer {
     /**
      * Returns a string containing the rendererd question's scoring method.
      * Appends an info icon containing information about the scoring method.
-     * @param qtype_sc_question $question
+     * @param qtype_kprime_question $question
      * @return string
      */
     private function showscoringmethod($question) {
@@ -225,10 +231,11 @@ class qtype_kprime_renderer extends qtype_renderer {
         }
 
         if (get_string_manager()->string_exists('scoring' . $question->scoringmethod . '_help', 'qtype_kprime')) {
+            $label = get_string('scoringmethod', 'qtype_kprime'). ': <b>' . ucfirst($outputscoringmethod) . '</b>';
             $result .= html_writer::tag('div',
-                '<br>'. get_string('scoringmethod', 'qtype_kprime'). ': <b>' . ucfirst($outputscoringmethod) . '</b>' .
-                $OUTPUT->help_icon('scoring' . $question->scoringmethod, 'qtype_kprime'),
-                array('id' => 'scoringmethodinfo_q' . $question->id));
+                '<br>'. $label . $OUTPUT->help_icon('scoring' . $question->scoringmethod, 'qtype_kprime'),
+                array('id' => 'scoringmethodinfo_q' . $question->id,
+                    'label' => $label));
         }
         return $result;
     }
@@ -247,8 +254,8 @@ class qtype_kprime_renderer extends qtype_renderer {
         $readonly = $readonly ? 'readonly="readonly" disabled="disabled"' : '';
         $checked = $checked ? 'checked="checked"' : '';
 
-        return '<input type="radio" name="' . $name . '" value="' . $value . '" ' . $checked . ' ' .
-                 $readonly . '/>';
+        return '<label><input type="radio" name="' . $name . '" value="' . $value . '" ' . $checked . ' ' .
+                 $readonly . '/></label>';
     }
 
     /**
@@ -282,7 +289,7 @@ class qtype_kprime_renderer extends qtype_renderer {
             } else {
                 $correctcolumn = new stdClass();
                 $correctcolumn->responsetextformat = 1;
-                $correctcolumn->responsetext = get_string('false', 'qtype_mtf');
+                $correctcolumn->responsetext = get_string('false', 'qtype_kprime');
                 $correctcolumn->id = $rowid;
             }
 

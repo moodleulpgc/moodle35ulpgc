@@ -35,19 +35,19 @@ $string['exempted_help'] = 'Marcar si este usuario ha sido eximido de sus debere
 $string['exclude'] = 'Excluir al estudiante de la evaluación';
 $string['include'] = 'Incluir al estudiante en la evaluación';
 $string['examhide'] = 'Ocultar un Examen impide a los usuarios sin capacidades extra el acceder al mismo (Miembros del Tribunal o estudiantes)';
-$string['examshow'] = 'Mostrar un Examen ocultopermite el acceso y trabajo por parte de Miembros del Tribunal y estudiantes';
+$string['examshow'] = 'Mostrar un Examen oculto permite el acceso y trabajo por parte de Miembros del Tribunal y estudiantes';
 $string['userhide'] = 'Excluir a un estudiante de la evaluación impide que los Profesores puedan emitir calificaciones, 
 pero permite el acceso a los ítems entregados por el estudiante, si existen';
 $string['usershow'] = 'Incluir a un usuario en la evaluación permite a los Profesores evaluar y calificar al estudiante';
 $string['excluded'] = 'Excluido';
-$string['excluded_help'] = 'El estudiante excluído es mostrado pero no puede ser calificado';
+$string['excluded_help'] = 'El estudiante excluido es mostrado pero no puede ser calificado';
 $string['approved'] = 'Conformidad';
 $string['filtersheader'] = 'Filtros de selección';
 $string['examboard:addinstance'] = 'Añadir una instancia de Tribunal';
 $string['examboard:view'] = 'Ver actividades Tribunal';
 $string['examboard:viewall'] = 'Ver todos los Tribunales y sesiones';
-$string['examboard:viewothers'] = 'Ver otros participantes en sesión de Truibunal';
-$string['examboard:submit'] = 'Entregar items evaluables a un Tribunal';
+$string['examboard:viewothers'] = 'Ver otros participantes en sesión de Tribunal';
+$string['examboard:submit'] = 'Entregar ítems evaluables a un Tribunal';
 $string['examboard:grade'] = 'Calificar como Tribunal';
 $string['examboard:viewgrades'] = 'Ver calificaciones';
 $string['examboard:releasegrades'] = 'Publicar calificaciones para participantes';
@@ -92,7 +92,7 @@ $string['examgroups'] = 'Grupos por Examen';
 $string['examgroups_help'] = 'Si se habilita se creará automáticamente un grupo separado para cada Examen definido en el módulo. 
 El grupo tendrá por miembros a los estudiantes, tutores y examinadores asignados al examen.
 
-Los grupos se actualizarán automáticamente cada vez que se asigna o desasigna a una persona como estudiante, tutor o examinador en un examen.';
+Los grupos se actualizarán automáticamente cada vez que se asigna o des-asigna a una persona como estudiante, tutor o examinador en un examen.';
 $string['examvenue'] = 'Local';
 $string['examvenue_help'] = 'El aula, sala o auditorio donde tendrá lugar el examen.';
 $string['examdate'] = 'Fecha del examen';
@@ -116,13 +116,13 @@ La inclusión de datos de tutores es opcional, dependiendo de la configuración 
 
 Los datos obligatorios son: 
 
-   * ID de usuario: una ID única para cada estudiante, intrepretada según el campo definido más abajo. Normalmente será el DNI.
+   * ID de usuario: una ID única para cada estudiante, interpretada según el campo definido más abajo. Normalmente será el DNI.
    * ID del Tribunal: el código identificador único de cada Tribunal definido previamente. Este código ya debe existir, no se crea en el momento. 
 
 La primera línea DEBE contener los nombres de cada campo, como se indica.     
-Dentro de cada línea cada dato puede ser separado de sus vecinos por un caracter de "|", ",", ";". No por espacios.
+Dentro de cada línea cada dato puede ser separado de sus vecinos por un carácter de "|", ",", ";". No por espacios.
 Si hay varios Tutores como "Otros", se lista cada ID (DNI) separada por ESPACIO de los otros tutores, 
-y la lista entera se separa de los otros datos por uno de lso caracteres de arriba.. 
+y la lista entera se separa de los otros datos por uno de los caracteres de arriba.. 
 
 Por ejemplo:
 
@@ -132,7 +132,7 @@ DNIestudiante| CódigoTribunal, DNItutor, DNIotrotutor1 DNIotrotutor2 DNIotrotut
 $string['tutorcheck'] = 'Comprobar conflictos';
 $string['tutorcheck_help'] = 'Si se habilita, se comprobará si la lista de tutores incluye alguno de los miembros del Tribunal.
 
-Si existe alguan coincidencia entre Tutores y miembros del Tribunal, entonces esa línea NO se procesa y NO se asignará al estudiante al Tribunal. 
+Si existe alguna coincidencia entre Tutores y miembros del Tribunal, entonces esa línea NO se procesa y NO se asignará al estudiante al Tribunal. 
 ';
 /*
 $string['useridfield'] = 'User ID code';
@@ -147,7 +147,7 @@ $string['addexam'] = 'Añadir examen';
 $string['addexam_help'] = 'Aquí puede añadir los datos básicos de una sesión de examen por Tribunal. 
 Tanto los datos de la sesión (nombre, aula, fecha) como los datos identificadores del Tribunal.
 
-Un nuevo Examen por Tribunal debe consitir en un Tribunal (un grupo de examinadores) y los datos específicos de la sesión de examen (aula, fecha).
+Un nuevo Examen por Tribunal debe consistir en un Tribunal (un grupo de examinadores) y los datos específicos de la sesión de examen (aula, fecha).
 
 Puede usar un Tribunal ya existente (y así asignar un nuevo examen a esos profesores) o puede crear un nuevo Tribunal para este examen.
 Cada Tribunal es definido por un <strong>código identificador</strong> esencial. Puede además especificar un título y nombre si es conveniente para mayor definición.';
@@ -185,7 +185,7 @@ Por ejemplo, su código de intervención o el código de colocación del póster
 $string['maintutor'] = 'Primer tutor';
 $string['othertutors'] = 'Otros tutores';
 $string['updateuser'] = 'Actualizar estudiante';
-$string['updateuser_help'] = 'Aquí puede agregar un estudianet a un examen, o actualizar sus datos. 
+$string['updateuser_help'] = 'Aquí puede agregar un estudiante a un examen, o actualizar sus datos. 
 
 Se pueden asignar o eliminar tutores, según la configuración del módulo en cuanto a los Tutores (requeridos, permitidos o no empleados).
 
@@ -217,6 +217,7 @@ $string['orderkeepchosen'] = 'Mantener orden actual';
 $string['orderrandomize'] = 'Reordenar al azar';
 $string['orderalphabetic'] = 'Orden alfabético';
 $string['orderalphatutor'] = 'Alfabético por tutor';
+$string['orderalphalabel'] = 'Alfabético por etiqueta';
 $string['codename'] = 'Código';
 $string['session'] = 'Sesión';
 $string['examinees'] = 'Estudiantes';
@@ -233,15 +234,15 @@ $string['notifyfieldset'] = 'Notificaciones y confirmaciones';
 $string['publishfieldset'] = 'Fechas de publicación';
 $string['maxboardsize'] = 'Máximo nº de miembros';
 $string['maxboardsize_help'] = 'El mayor número de miembros que pueden ser adscritos a un Tribunal.  
-Pueden manejarse Tribubales con menos miembros, pero no con más de eset valor.';
+Pueden manejarse Tribunales con menos miembros, pero no con más de este valor.';
 $string['usetutors'] = 'Participación de Tutores';
 $string['usetutors_help'] = 'Si los tutores de los estudiantes juegan algún papel en la operativa de estos Tribunales. 
-En genral, si existen tutores de estudiantes éstos no pueden participar como miembros del tribunal que evalúa a los estudiantes tutorizados.
+En general, si existen tutores de estudiantes éstos no pueden participar como miembros del tribunal que evalúa a los estudiantes tutorizados.
 Las opciones pueden ser: 
 
- * No: No se consideran Tutores. No se gestiona la asignación de Tutores a los estudiantes, ni restriciones en los examinadores.
- * Si: Estos Tribunales tienen en cuenta lso Tutores asignados a cada estudiante. Se gestiona su asignación y la restrición de ser examinador y tutor del mismo estudiante.
- * Required: Los estudiantes deben tener obligatoriamente un Tutor. No se puede asignar un estudiante a un Tribunal de examen careciendo de Tutor.
+ * No: No se consideran Tutores. No se gestiona la asignación de Tutores a los estudiantes, ni restricciones en los examinadores.
+ * Si: Estos Tribunales tienen en cuenta los Tutores asignados a cada estudiante. Se gestiona su asignación y la restrición de ser examinador y tutor del mismo estudiante.
+ * Requerido: Los estudiantes deben tener obligatoriamente un Tutor. No se puede asignar un estudiante a un Tribunal de examen careciendo de Tutor.
 
 ';
 $string['tutoruseno'] = 'No';
@@ -255,8 +256,8 @@ Este parámetro controla la estrategia de distribución
  * Distribuir examinadores una vez los estudiantes (y sus tutores) han sido asignados a un tribunal. 
     El algoritmo de distribución tien en cuenta no asignar un examinador a un tribunal en el que son evaluados los estudiantes que tutoriza..
 
- * Distribuir estudiantes una vez han siso asignados los miembrso de cada tribunal de examen.. 
-    El algoritmo de distribución evita asiganr un estudianet a un Tribunal en el uno de sus tutores actúa como examinador.
+ * Distribuir estudiantes una vez han siso asignados los miembros de cada tribunal de examen.. 
+    El algoritmo de distribución evita asignar un estudiante a un Tribunal en el uno de sus tutores actúa como examinador.
 
 ';
 $string['allocmodenone'] = 'Sin distribución automática';
@@ -264,7 +265,7 @@ $string['allocmodemember'] = 'Distribuir examinadores dados estudiantes';
 $string['allocmodeuser'] = 'Distribuir estudiantes dados examinadores';
 $string['allocmodetutor'] = 'Distribuir estudiantes dados examinadores';
 $string['allocnumusers'] = 'Ubicados {$a} estudiantes';
-$string['allocnumexams'] = 'Asignados miembros en {$a} exámenes';
+$string['allocnumexams'] = 'Asignados miembros en {$a->boards} Tribunales para {$a->exams} exámenes';
 $string['allocemptied'] = 'No quedan usuarios que ubicar';
 $string['allocprevious'] = 'Borrar existentes';
 $string['allocprevious_help'] = 'Si se activa, se eliminarán todas las asignaciones previas 
@@ -280,8 +281,27 @@ Se pueden indicar los mismos grupos repetidos en varias posiciones, si se desea.
 $string['allocateusers'] = 'Ubicar estudiantes';
 $string['allocateusers_help'] = 'Los usuarios de los grupos seleccionados serán asignados como estudiantes en los exámenes indicados.';
 $string['allocationsettings'] = 'Opciones de distribución';
+$string['allocatedboards'] = 'Tribunales diana';
+$string['allocatedboards_help'] = 'Los usuarios disponibles se asignarán al azar entre los Tribunales seleccionados.';
 $string['allocatedexams'] = 'Exámenes diana';
 $string['allocatedexams_help'] = 'Los usuarios disponibles se asignarán al azar entre los exámenes seleccionados.';
+$string['allocexcludeexisting'] = 'Exclusión de Miembros ya asignados';
+$string['allocexcludeexisting_help'] = 'Define si los profesores ya designados como Miembros de Tribunal en otros tribunales (que no vayan a ser borrados debajo) 
+se incluirán en esta distribución o no, esto es, si s e les asignarán nuevos exámenes adicionales alos que ya tienen. 
+Las opciones son
+
+Defines if existing board members (not to be deleted, below) 
+will be included in this allocation or excluded from allocation, that is, they will not we assigned additional new exams here. 
+The options are: 
+
+ * Ninguno: No hay exclusiones, todos entran al reparto, incluso los Profesores que ya son Miembros de un tribunal con examen asigando serán considerados para nuevas asignaciones en este reparto.
+ * Cualquiera : Se excluye a un Profesor si ya es Miembro del algún tribunal en alguna Convocatoria, da lo mismo cual. 
+ * Exams: Se excluye a los profesores que ya son Miembros de uno de los tribunales cuyos miembros se van a repartir ahora. 
+ * Convovatorias: Se excluye a los profesores que ya son Miembros de algún Tribunal con examen en esa Convocatoria.
+ 
+';
+$string['allocvacant'] = 'Profesores insuficientes. Puestos vacantes en: <br />
+{$a}';
 $string['examsallocated'] = 'Exámenes ubicados';
 $string['choosegroup'] = 'Grupos para posición {$a}';
 $string['allocatewarningboard'] = 'Los estudiantes pueden tener asignados tutores.
@@ -300,22 +320,22 @@ $string['requireconfirm'] = 'Requiere confirmación';
 $string['requireconfirm_help'] = 'Controla si los miembros del Tribunal deben confirmar su participación como examinadores. 
 Si se habilita, entonces se realizan comprobaciones y avisos adicionales para el Tribunal y los gestores.';
 $string['confirmtime'] = 'Plazo para confirmación';
-$string['confirmtime_help'] = 'Antelación mínima, tiempo antes de la sesión de examen en el que se puede cambiar el estado de confirmaciónm. 
+$string['confirmtime_help'] = 'Antelación mínima, tiempo antes de la sesión de examen en el que se puede cambiar el estado de confirmación. 
 Pasado este plazo ya no se puede cambiar la confirmación.';
 $string['notifyconfirm'] = 'Notificar confirmaciones';
-$string['notifyconfirm_help'] = 'Si los gestores del módulo Tribunal recibiran o no una notificación por e-mail 
-cuando los miembros del Triibunal confirmen o declinen su participación. ';
+$string['notifyconfirm_help'] = 'Si los gestores del módulo Tribunal recibirán o no una notificación por e-mail 
+cuando los miembros del Tribunal confirmen o declinen su participación. ';
 $string['confirmdefault'] = 'Estado de confirmación predefinido';
 $string['confirmdefault_help'] = 'Si están habilitadas las confirmaciones, define el estado inicial para los examinadores.
 
-Si el estado inciial es "Si" entonces para todo los miembros del Tribunal el estado predefinido en "Confirmado", 
+Si el estado inicial es "Si" entonces para todo los miembros del Tribunal el estado predefinido en "Confirmado", 
 y en su caso podrán <strong>revocar</strong> la confirmación para indicar que NO pueden participar.
 
-Si el estado incial es "No" entonces se espera que cada miembro del tribunal confirme independientemente su participación (o no) en el Tribunal.
+Si el estado inicial es "No" entonces se espera que cada miembro del tribunal confirme independientemente su participación (o no) en el Tribunal.
 ';
 $string['usewarnings'] = 'Envío de recordatorios';
 $string['usewarnings_help'] = 'Si el módulo ha de enviar recordatorios automáticos sobre un examen próximo y a quién se remiten. 
-Cuando se acerca la fecha de un examen por Tribubal el módulo puede emitir mensajes a los usuarios como recordatorio de la sesión de examen que se avecina. 
+Cuando se acerca la fecha de un examen por Tribunal el módulo puede emitir mensajes a los usuarios como recordatorio de la sesión de examen que se avecina. 
 Los mensajes se pueden emitir para:
 
  * Nadie, no se emplean recordatorios.
@@ -337,8 +357,8 @@ $string['warntime_help'] = 'Cuánto tiempo antes del examen por Tribunal se emit
 $string['inactive'] = 'Ocultar';
 $string['active'] = 'Mostrar';
 $string['assignedexams'] = 'Exámenes adscritos';
-$string['assignedexams_help'] = 'Puede especificar aquí a qué sesiones de examen esatrá adcrito eset Tribunal, 
-esto es, en cuáles sesiones de examen estos miembrso serán los examinadores responsables.';
+$string['assignedexams_help'] = 'Puede especificar aquí a qué sesiones de examen estará adscrito este Tribunal, 
+esto es, en cuáles sesiones de examen estos miembros serán los examinadores responsables.';
 $string['publishboard'] = 'Publicación del Tribunal';
 $string['publishboard_help'] = 'Determina si o cuándo la composición del Tribunal, sus miembros, será visible por los estudiantes u otros usuarios.';
 $string['publishondate'] = 'A partir de';
@@ -401,15 +421,15 @@ Puede ser el mismo ítem que la Actividad evaluada o la Solicitud de Defensa.
 
 
 $string['grademode'] = 'Cómputo de calificación';
-$string['grademode_help'] = 'Cómo se calcula la calificación final de un estudianet a partir de las puntuaciones individuales de cada miembro del Tribunal. 
-Los métodos disponbles son:
+$string['grademode_help'] = 'Cómo se calcula la calificación final de un estudiante a partir de las puntuaciones individuales de cada miembro del Tribunal. 
+Los métodos disponibles son:
 
  * Promedio: la calificación final es la media aritmética de la puntuaciones otorgadas por cada examinador por separado.
  * Mayor: la calificación final es la puntuación más alta de las otorgadas por cada examinador por separado.
  * Menor: la calificación final es la puntuación más baja de las otorgadas por cada examinador por separado.
 
-Adicionalmente, se pued establecer un número mínimo de puntuaciones para calcular la calificación final. 
-Si un estudianet no ha sido evaluado por al menos es nº mínimo de examinadores, cada uno con su puntuación, 
+Adicionalmente, se puede establecer un número mínimo de puntuaciones para calcular la calificación final. 
+Si un estudiante no ha sido evaluado por al menos es nº mínimo de examinadores, cada uno con su puntuación, 
 entonces la calificación final no es calculada y el estudiante queda no calificado.
 
 ';
@@ -431,7 +451,7 @@ Las opciones disponibles son:
  * Estudiantes: sólo los estudiantes a examinar recibirán la notificación sobre el Tribunal.
  * Examinadores: los miembros del Tribunal evaluador recibirán la notificación sobre el Tribunal.
  * Tutores: los tutores de los estudiantes serán notificados..
- * Docentes: todo slso profesores, ya sean miembros evaluadores del Tribunal o tutores de los estudiantes examinados, serán notificados.
+ * Docentes: todos los profesores, ya sean miembros evaluadores del Tribunal o tutores de los estudiantes examinados, serán notificados.
  * Todos: todos los participantes, ya sean estudiantes, tutores o evaluadores recibirán la notificación sobre el Tribunal.
 
 ';
@@ -449,7 +469,7 @@ $string['attachment'] = 'Notificación de Tribunal';
 $string['messagesubject'] = 'Asunto';
 $string['messagesubject_help'] = 'La línea de "Asunto:" que aparecerá en el mensaje de correo. 
 
-El texto llevará como prefijo el código de la asignatura en la que se encuentar esta actividad Tribunal.
+El texto llevará como prefijo el código de la asignatura en la que se encuentra esta actividad Tribunal.
 
 ';
 $string['messagebody'] = 'Texto del mensaje';
@@ -457,7 +477,7 @@ $string['messagebody_explain'] = '<p>El mensaje incluirá automáticamente un en
 Tribunal que gestiona estos exámenes y notificaciones. </p>
 <p>Puede personalizar el mensaje con una serie de elementos %%CLAVE%% que serán sustituidos 
 por el valor correspondiente al procesar el envío de la notificación a cada usuario y cada examen. 
-Puede ver las claves en el botónde  ayuda.';
+Puede ver las claves en el botón de ayuda.';
 $string['messagebody_help'] = "
 El cuerpo principal del mensaje de notificación.  
 El mensaje incluirá automáticamente un enlace a la actividad Tribunal que gestiona estos exámenes y notificaciones. 
@@ -474,10 +494,11 @@ al procesar el envío de la notificación a cada usuario y cada examen. Las may�
  * <strong>%%SESIÓN%%</strong>: La sesión de este examen.  
  * <strong>%%FECHA%%</strong>: La fecha en la que se realizará el examen por Tribunal.
  * <strong>%%HORA%%</strong>: La hora del día (HH::MM) a la que se realizará el examen por Tribunal.
- * <strong>%%DÍAHORA%%</strong>: La fecha, dia y hora, en la que se realizará el examen por Tribunal.
+ * <strong>%%DÍAHORA%%</strong>: La fecha, día y hora, en la que se realizará el examen por Tribunal.
  
  * <strong>%%DURACIÓN%%</strong>: La duración declarada de la sesión de examen.
  * <strong>%%AULA%%</strong>: El aula, sala o local en el que se realizará el examen.
+ * <strong>%%URL%%</strong>: El enlace web, sitio o sala de videoconferencia que se realizará el examen telemático.
  * <strong>%%HOY%%</strong>: La fecha de hoy.
  
  * <strong>%%ESTUDIANTES%%</strong>: La lista de estudiantes a ser examinados por el Tribunal. 
@@ -494,12 +515,13 @@ $string['replace_examdate'] = 'FECHA';
 $string['replace_examtime'] = 'HORA';
 $string['replace_examdatetime'] = 'DÍAHORA';
 $string['replace_venue'] = 'AULA';
+$string['replace_accessurl'] = 'URL';
 $string['replace_duration'] = 'DURACIÓN';
 $string['replace_students'] = 'ESTUDIANTES';
 $string['replace_committee'] = 'TRIBUNAL';
 $string['replace_date'] = 'HOY';
 $string['logofile'] = 'Archivo de Logo';
-$string['logofile_help'] = 'Un archivo gráfico con un logotipo o sello que s eincluirá en la esquina superior izquierda del documento.
+$string['logofile_help'] = 'Un archivo gráfico con un logotipo o sello que se incluirá en la esquina superior izquierda del documento.
 
 Debe ser una archivo de imagen (png, jpg etc.).
 
@@ -530,7 +552,7 @@ al procesar el envío de la notificación a cada usuario y cada examen. <br />La
 <br /> 
  <li><strong>%%ROL%%</strong>: El rol o tipo de participación del usuario, bien como examinador, examinando o tutor. </li>
  <li><strong>%%CÓDIGO%%</strong>: La etiqueta o código identificador del Tribunal . </li>
- <li><strong>%%SESIÓN%%</strong>: La sesión de eset examen.  </li>
+ <li><strong>%%SESIÓN%%</strong>: La sesión de este examen.  </li>
  <li><strong>%%FECHA%%</strong>: La fecha en la que se realizará el examen por Tribunal.</li>
  <li><strong>%%DURACIÓN%%</strong>: La duración declarada de la sesión de examen.</li>
  <li><strong>%%AULA%%</strong>: El aula, sala o local en el que se realizará el examen.</li>
@@ -564,11 +586,11 @@ $string['examhasgrades'] = 'El examen incluye estudiantes que ya han sido califi
 $string['examplacedate'] = 'Lugar y Fecha';
 $string['updateboard'] = 'Actualizar Tribunal';
 $string['boardtitle'] = 'Título';
-$string['boardtitle_help'] = 'El título del Tribunal es la palabra usada para refererise al conjunto de miembros del mismo. 
+$string['boardtitle_help'] = 'El título del Tribunal es la palabra usada para refererirse al conjunto de miembros del mismo. 
 
 Si no se desea otra cosa, usar la palabra "Tribunal".';
 $string['accessgroup'] = 'Grupo';
-$string['accessgroup_help'] = 'Si se estableec un grupo concreto entonces solo usuarios pertenecientes a ese grupo, 
+$string['accessgroup_help'] = 'Si se establece un grupo concreto entonces solo usuarios pertenecientes a ese grupo, 
 tanto estudiante, examinadores o tutores, podrán acceder al mismo. 
 
 Solo se podrá asignar como miembros del tribunal o como estudiantes examinandos (o sus tutores) a personas que pertenezcan a ese grupo. ';
@@ -587,7 +609,7 @@ $string['examsession'] = 'Sesión';
 $string['examsession_help'] = 'El nombre de la sesión o convocatoria de examen. 
 
 Cada Tribunal puede reunirse varias veces en diferentes sesiones para examinar a los mismos o diferentes estudiantes. 
-Cada reunión separada, cada sesión del Tribunal debe tener un nombre distintitivo.';
+Cada reunión separada, cada sesión del Tribunal debe tener un nombre distintivo.';
 $string['import'] = 'Importar';
 $string['import_help'] = 'Permite importar datos de Tribunales de Examen desde un archivo de texto CSV.
 Los datos a importar pueden incluir los nombres es identificación del examen y el tribunal, 
@@ -599,17 +621,18 @@ Los nombres de las columnas deben coincidir con los indicados en esta página m�
 Las fechas y tiempos deben introducirse en un formato estándar ISO 8601 o RFC entendible por "strtotime". 
 Por ejemplo 01-02-2018 10:00 
 
-Las duraciones deben indicarse en horas, opcionalmenet con minutos y segundos, por ejemplo 2:30:05.
+Las duraciones deben indicarse en horas, opcionalmente con minutos y segundos, por ejemplo 2:30:05.
 
 ';
 $string['importedrecords'] = 'Procesados {$a} registros para importación o actualización.';
+$string['cannotreadtmpfile'] = 'Archivo inválido o no leído con las columnas CSV correctas.';
 $string['export'] = 'Exportar';
-$string['export_help'] = 'Permite exportar todos o algunso delos datos sobre Exámenes por Tribunal almacenados en este módulo. 
+$string['export_help'] = 'Permite exportar todos o algunos de los datos sobre Exámenes por Tribunal almacenados en este módulo. 
 
-Puede seleccionar qué columnas de datos exportar, así como el formato de archivao generado. 
+Puede seleccionar qué columnas de datos exportar, así como el formato de archivo generado. 
 ';
 $string['fixedfields'] = 'Campos obligatorios';
-$string['fixedfields_help'] = 'Estos campos serán exportados incondicionalmnte en cada entrada. 
+$string['fixedfields_help'] = 'Estos campos serán exportados incondicionalmente en cada entrada. 
 
 Puede considerar incluir el DNI del usuario además de su nombre completo para aquellos campos que hacen referencia a usuarios.
 ';
@@ -648,8 +671,8 @@ $string['exportlistby'] = 'Modo de listado';
 $string['exportlistby_help'] = 'Cómo se organizará el listado de líneas exportadas. 
 Hay varias posibilidades:
 
- * Por Tribunal y sesión: cada seión de examen por Tribunal ocupara una fila. Varios de los elementos (miembroas, examinados) pueden ser datos multilínea anidados.
- * Por Estudiante examinado: habrá una fila separada para cada estudiabnte en cada Tribunal de examen.
+ * Por Tribunal y sesión: cada sesión de examen por Tribunal ocupara una fila. Varios de los elementos (miembros, examinados) pueden ser datos multilínea anidados.
+ * Por Estudiante examinado: habrá una fila separada para cada estudiante en cada Tribunal de examen.
  * Por Miembro del tribunal: en cada sesión de examen, habrá una línea separada para cada miembro del tribunal. 
 
 ';
@@ -675,11 +698,11 @@ $string['allusers'] = 'Todos los participantes';
 $string['downloadfile'] = 'Descargar archivo {$a}';
 $string['gradeusers'] = 'Calificar a los estudiantes';
 $string['discharge'] = 'Motivo de la indisponibilidad';
-$string['discharge_help'] = 'Los miembros del tibunal deben indicar una justificación para validar su no participación en un Tribunal.';
+$string['discharge_help'] = 'Los miembros del tribunal deben indicar una justificación para validar su no participación en un Tribunal.';
 $string['dischargeexplain'] = 'Justificación';
-$string['dischargeexplain_help'] = 'Explicaciones adiconales que pueden ser necesarias para justificar la no disponibilidad para ser mimbro del Tribunal.';
+$string['dischargeexplain_help'] = 'Explicaciones adicionales que pueden ser necesarias para justificar la no disponibilidad para ser mimbro del Tribunal.';
 $string['confirmavailable'] = 'Disponible en otras sesiones';
-$string['confirmavailable_help'] = 'Indica si el usuario, qu eno está disponible la sesión indicada, 
+$string['confirmavailable_help'] = 'Indica si el usuario, que no está disponible la sesión indicada, 
 podría asistir como miembro del tribunal en otras de las sesiones programadas, o bien su no-disponibilidad se extiende a todo el periodo.';
 $string['discharges'] = 'Motivos de no confirmación';
 $string['discharges_help'] = 'Los motivos válidos para NO confirmar la participación como miembro de un Tribunal de Examen.';
@@ -727,8 +750,40 @@ $string['submitbulkaddexam'] = 'Agregar lote';
 $string['submissionstatus'] = 'Ítem evaluable y datos complementarios';
 $string['viewgraded'] = 'Detalles de calificación';
 $string['viewgrading'] = 'Calificar estudiante';
-$string['visibility_explain'] = 'Los ítems ocultos estan inactivos, visibles sólo para los gestores.';
+$string['gradeoutof'] = 'Calificación sobre {$a}';
+$string['gradesaved'] = 'Calificacón guardada';
+$string['visibility_explain'] = 'Los ítems ocultos están inactivos, visibles sólo para los gestores.';
 $string['viewgradingdetails'] = 'Clic para ver detalles de la calificación por criterio.';
-$string['usergrades'] = 'User grades';
+$string['usergrades'] = 'Calificaciones de usuarios';
 $string['synchusers'] = 'Actualizar grupos y accesos';
 $string['foruser'] = 'Participante';
+$string['editchangetext'] = 'Cambiar este dato';
+$string['editchangenewvalue'] = 'Nuevo valor para {$a}';
+$string['moveusers'] = 'Cambiar estudiantes de sesión de examen';
+$string['moveusers_help'] = 'Esta página permite cambiar la sesión de examen asignada a varios estudiantes de este exaem. 
+En la práctica eso significa transferirlos a otra sesión diferente del Tribunal. 
+
+Si este módulo emplea Tutores, la transferencia solo tendrá lugar efectivamente si no hay conflictos 
+entre los Miembros existentes del Tribunal y los tutores del estudiante (si los hay). 
+Esto está garantizado para movimientos entre sesiones del mismo Tribunal. 
+';
+$string['moveto'] = 'Mover estudiantes';
+$string['movetoexam'] = 'Sesión de destino';
+$string['movetoexam_help'] = 'Debe seleccionar una Sesión de Examen, según código de tribunal, convocatoria y sesión. 
+
+Los estudiante serán transferidos a esta sesión';
+$string['movetoreturn'] = 'Volver a';
+$string['movetoreturn_help'] = 'La página de Examen que mostrar tras hacer la transferencia de los estudiantes a la The Exam page to view after the Students are transfererd to a the new Exam session';
+$string['movetokeep'] = 'Página de la sesión original';
+$string['movetonew'] = 'Página de la sesión de destino';
+$string['movetoconflicts'] = 'Algunos estudianet no han sido transferidos debido a conflictos: <br /> ';
+$string['movetoerror'] = 'Datos para la transferencia de estduiantes inválidos o ausentes. No se ha ejecutado.';
+$string['movetomoved'] = 'Transferidos {$a} estudiantes a otra session de examen';
+
+$string['newexamsession'] = 'Nueva sesión para el Tribunal';
+$string['url'] = 'URL';
+$string['accessurl'] = 'Url para acceso web';
+$string['accessurl_help'] = 'Escriba aquí la URL completa, con la parte http(s)://, y válida,  
+del sitio o canal web en el que tendrá lugar em Examen vía web o videoconferencia.  . ';
+$string['accessurltext'] = 'Acceso Web';
+$string['accessurllabel'] = 'Para acceso telemático: {$a}';

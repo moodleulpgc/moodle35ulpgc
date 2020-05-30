@@ -23,19 +23,16 @@ Feature: Step 27
   # Backup and restore works (Images etc. are also backuped and restored)
 
   # Upload images
-    And I output "[MTF - TESTCASE 27 - begin]"
     Given I log in as "admin"
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
-    And I click on "Edit" "link" in the "MTF-Question-001" "table_row"
+    And I navigate to "Question bank" in current page administration
+    And I choose "Edit question" action for "MTF-Question-001" in the question bank
 
   # Add image to question stem
     And I click on "Insert or edit image" "button" in the "#id_generalheader" "css_element"
     And I press "Browse repositories..."
     And I click on "URL downloader" "link" in the ".fp-repo-area" "css_element"
-    And I set the field "fileurl" to "http://127.0.0.1/question/type/mtf/tests/media/testimage1.png"
+    And I set the field "fileurl" to "http://localhost/moodle-3-8-1+/question/type/mtf/tests/fixtures/testimage1.png"
     And I press "Download"
     And I click on "testimage1.png" "link"
     And I press "Select this file"
@@ -47,7 +44,7 @@ Feature: Step 27
     And I click on "Insert or edit image" "button" in the ".optiontext" "css_element"
     And I press "Browse repositories..."
     And I click on "URL downloader" "link" in the ".fp-repo-area" "css_element"
-    And I set the field "fileurl" to "http://127.0.0.1/question/type/mtf/tests/media/testimage2.png"
+    And I set the field "fileurl" to "http://localhost/moodle-3-8-1+/question/type/mtf/tests/fixtures/testimage2.png"
     And I press "Download"
     And I click on "testimage2.png" "link"
     And I press "Select this file"
@@ -57,8 +54,7 @@ Feature: Step 27
 
   # Backup MTF Question
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "Backup" "link"
+    And I navigate to "Backup" in current page administration
     And I press "Next"
     And I press "Next"
     And I set the field "Filename" to "test_backup.mbz"
@@ -70,10 +66,8 @@ Feature: Step 27
     When I click on "Restore" "link"
     And I restore "test_backup.mbz" backup into a new course using this options:
       | Schema | Course name | Course 2 |
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
-    And I click on "Edit" "link" in the "MTF-Question-001" "table_row"
+    And I navigate to "Question bank" in current page administration
+    And I choose "Edit question" action for "MTF-Question-001" in the question bank
 
   # Check
     Then the following fields match these values:
@@ -82,13 +76,12 @@ Feature: Step 27
       | id_option_1          | option text 2               |
       | id_feedback_0        | feedback to option 1        |
       | id_feedback_1        | feedback to option 2        |
-    And element with css "#id_weightbutton_0_1[checked]" should exist
-    And element with css "#id_weightbutton_1_2[checked]" should exist
+    And "#id_weightbutton_0_1[checked]" "css_element" should exist
+    And "#id_weightbutton_1_2[checked]" "css_element" should exist
     And I should see "Questiontext for Question 1"
     And I should see "This feedback is general"
     And I should see "option text 1"
-    And element with xpath "[alt='testimage1AltDescription']" should exist
+    And "[alt='testimage1AltDescription']" "css_element" should exist
     And I should not see "testimage1AltDescription"
-    And element with xpath "[alt='testimage2AltDescription']" should exist
+    And "[alt='testimage2AltDescription']" "css_element" should exist
     And I should not see "testimage2AltDescription"
-    And I output "[MTF - TESTCASE 27 - end]"

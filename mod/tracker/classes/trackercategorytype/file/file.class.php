@@ -37,6 +37,7 @@ class fileelement extends trackerelement {
         parent::__construct($tracker, $id, $used);
         $this->filemanageroptions = array('subdirs' => 0,
                                           'maxfiles' => 1,
+                                          'context' => $this->context,
                                           'maxbytes' => $COURSE->maxbytes,
                                           'accepted_types' => array('*'));
     }
@@ -110,7 +111,7 @@ class fileelement extends trackerelement {
             } elseif($config->reportmaxfiles && has_capability('mod/tracker:report',  $this->context)) {
                 $maxfiles = $config->reportmaxfiles;
             }
-            $this->filemanageroptions = array('subdirs' => 0, 'maxfiles' => $maxfiles, 'maxbytes' => $COURSE->maxbytes, 'accepted_types' => array('*'));
+            $this->filemanageroptions = array('subdirs' => 0, 'context' => $this->context, 'maxfiles' => $maxfiles, 'maxbytes' => $COURSE->maxbytes, 'accepted_types' => array('*'));
         }
     }
 
@@ -124,12 +125,19 @@ class fileelement extends trackerelement {
         }
 
         $draftitemid = 0; // Drafitemid will be filled when preparing new area.
+        /*
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute',
+                                $itemid, $this->filemanageroptions);*/
+        // On purpose, intended empty, avoid fill with old items when updating
+        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'xx',
                                 $itemid, $this->filemanageroptions);
 
+                                
+                                
         $options = new StdClass();
         $options->accepted_types = $this->filemanageroptions['accepted_types'];
         $options->itemid = $draftitemid;
+        $options->context =  $this->context;
         $options->maxbytes = $this->filemanageroptions['maxbytes'];
         $options->maxfiles = $this->filemanageroptions['maxfiles'];
         $options->elementname = 'element'.$this->name;
@@ -154,7 +162,7 @@ class fileelement extends trackerelement {
             'itemid' => $draftitemid,
             'subdirs' => 0,
             'maxbytes' => $this->filemanageroptions['maxbytes'],
-            'maxfiles' => 1,
+            'maxfiles' => $this->filemanageroptions['maxfiles'],
             'ctx_id' => $this->context->id,
             'course' => $PAGE->course->id,
             'sesskey' => sesskey(),
@@ -218,10 +226,20 @@ class fileelement extends trackerelement {
 
         $elmname = 'element'.$this->name;
         $data->$elmname = optional_param($elmname, 0, PARAM_INT);
-
+        
         if ($data->$elmname) {
-            file_save_draft_area_files($data->$elmname, $this->context->id, 'mod_tracker', 'issueattribute',
-                                       0 + $attribute->id, $this->filemanageroptions);
+            $fs = get_file_storage();
+            $draftfiles = file_get_all_files_in_draftarea($data->$elmname);
+            if($draftfiles) {
+                $files = $fs->get_area_files($this->context->id, 'mod_tracker', 'issueattribute', 0 + $attribute->id);
+                if(count($files) > 1) {
+                    $fs->delete_area_files($this->context->id, 'mod_tracker', 'issueattribute', 0 + $attribute->id);
+                    //print_object("deleted files for area attribute {$data->$elmname}");
+                }
+            
+                file_save_draft_area_files($data->$elmname, $this->context->id, 'mod_tracker', 'issueattribute',
+                                        0 + $attribute->id, $this->filemanageroptions);
+            }
         }
     }
 }

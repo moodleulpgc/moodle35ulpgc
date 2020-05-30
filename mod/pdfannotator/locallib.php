@@ -82,6 +82,10 @@ function pdfannotator_display_embed($pdfannotator, $cm, $course, $file, $page = 
     $capabilities->usedrawing = has_capability('mod/pdfannotator:usedrawing', $context);
     $capabilities->useprint = has_capability('mod/pdfannotator:printdocument', $context);
     $capabilities->useprintcomments = has_capability('mod/pdfannotator:printcomments', $context);
+    // ecastro ULPGC 
+    $capabilities->createannotations = has_capability('mod/pdfannotator:create', $context);
+    $capabilities->usequestions = has_capability('mod/pdfannotator:viewquestions', $context);
+    // ecastro ULPGC
 
     $params = [$cm, $documentobject, $USER->id, $capabilities, $toolbarsettings, $page, $annoid, $commid];
     $PAGE->requires->js_init_call('adjustPdfannotatorNavbar', null, true);
@@ -106,6 +110,11 @@ function pdfannotator_get_instance_name($id) {
 
     global $DB;
     return $DB->get_field('pdfannotator', 'name', array('id' => $id), $strictness = MUST_EXIST);
+}
+
+function pdfannotator_get_course_name_by_id($courseid) {
+    global $DB;
+    return $DB->get_field('course', 'fullname', array('id' => $courseid), $strictness = MUST_EXIST);
 }
 
 /**
@@ -1708,6 +1717,7 @@ function pdfannotator_reportstable_add_row($thiscourse, $table, $report, $cmid, 
     // Add a new row to the reports table.
     $table->add_data(array($report->report, $reportedby . '<br>' . $reporttime, $reportedcommmentlink, $writtenby . '<br>' . $commenttime, $dropdown), $classname);
 }
+
 
 /**
  * Function takes a moodle timestamp, calculates how much time has since elapsed

@@ -44,6 +44,8 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
      */
     public function definition() {
         global $CFG, $DB, $OUTPUT, $PAGE;
+        $mform = &$this->_form;
+
         // Validates if the BigBlueButton server is running.
         $serverversion = bigbluebuttonbn_get_server_version();
         if (is_null($serverversion)) {
@@ -53,7 +55,10 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         }
         // Context.
         $bigbluebuttonbn = null;
-        $course = null;
+        $course = get_course($this->current->course);
+        if ($this->current->id) {
+            $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', array('id' => $this->current->id), '*', MUST_EXIST);
+        }
         $courseid = optional_param('course', 0, PARAM_INT);
         if ($courseid) {
             $course = get_course($courseid);
@@ -81,7 +86,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         $context = $this->context; // ecastro ULPGC better check capabilities at module (update) or course (create) level
         // UI configuration options.
         $cfg = \mod_bigbluebuttonbn\locallib\config::get_options();
-        $mform = &$this->_form;
+
         $jsvars = array();
         // Get only those that are allowed.
         $createroom = has_capability('mod/bigbluebuttonbn:meeting', $context);
@@ -129,7 +134,7 @@ class mod_bigbluebuttonbn_mod_form extends moodleform_mod {
         // JavaScript for locales.
         if(!$modconfig) { // ecastro ULPGC allow modconfig managejobplugin
             $PAGE->requires->strings_for_js(array_keys(bigbluebuttonbn_get_strings_for_js()), 'bigbluebuttonbn');
-            $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context);
+            $jsvars['participantData'] = bigbluebuttonbn_get_participant_data($context, $bigbluebuttonbn);
             $jsvars['participantList'] = $participantlist;
             $jsvars['iconsEnabled'] = (boolean)$cfg['recording_icons_enabled'];
             $jsvars['pixIconDelete'] = (string)$OUTPUT->pix_icon('t/delete', get_string('delete'), 'moodle');

@@ -1,5 +1,6 @@
 Group self-selection module for Moodle
 
+* Copyright (C) 2020 Roger Barras
 * Copyright (C) 2017 HTWChur
 * Copyright (C) 2014 Tampere University of Technology, Pirkka Pyykkönen (pirkka.pyykkonen ÄT tut.fi)
 * Copyright (C) 2008-2011 Petr Skoda (http://skodak.org/)
@@ -29,6 +30,7 @@ contributors, on whose earlier work this plugin is based on.
 
 Project page:
 
-* https://github.com/BLC-HTWChur/moodle-mod_groupselect (version >=3.06) by HTWChur
+* https://github.com/rogerbaba/moodle-mod_groupselect (version >= 3.15) by Roger Barras
+* https://github.com/BLC-HTWChur/moodle-mod_groupselect (version >= 3.06) by HTWChur
 * https://github.com/birrel/moodle-mod_groupselect (version <= 3.05 beta) by Pirkka Pyykkönen
 * https://github.com/skodak/moodle-mod_groupselect (original <= 2.1 versions) by Petr Skoda

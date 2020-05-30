@@ -4,6 +4,10 @@ moodle-availability_cohort
 Changes
 -------
 
+### v3.8-r1
+
+* 2020-02-12 - Prepare compatibility for Moodle 3.8.
+
 ### v3.7-r2
 
 * 2019-06-26 - Fixed bug that only 25 cohorts will be displayed.

@@ -4,8 +4,15 @@ moodle-local_navbarplus
 Changes
 -------
 
-### Unreleased 
+### Release v3.8-r1
 
+* 2020-02-18 - Prepare compatibility for Moodle 3.8.
+
+### Release v3.7-r2
+
+* 2020-02-13 - Adapt the placement of the icons in the navbar due to Moodle core upstream changes in MDL-67577.
+               PLEASE NOTE: From now on, local_navbarplus icons will be placed on the _right_ side of the Moodle
+               core icons and not on the _left_ side anymore.
 * 2019-06-26 - Removed the optional aspect from the behat tests scenarios.
 
 ### Release v3.7-r1

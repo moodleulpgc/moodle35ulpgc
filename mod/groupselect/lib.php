@@ -45,7 +45,7 @@ function groupselect_supports($feature) {
         case FEATURE_MOD_INTRO:
             return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS:
-            return false;
+            return true;
         case FEATURE_GRADE_HAS_GRADE:
             return false;
         case FEATURE_GRADE_OUTCOMES:
@@ -244,7 +244,7 @@ function groupselect_get_view_actions() {
 
 
 /**
- * groupselect_get_post_actions
+ * Serves intro attachment files.
  *
  * @return array
  */
@@ -252,12 +252,16 @@ function groupselect_get_post_actions() {
     return array('select', 'unselect', 'create', 'assign');
 }
 
-
 /**
  * Used to create exportable csv-file in view.php
  *
- * @param $data the data submitted from the reset course.
- * @return array status array
+ * @param mixed $course course or id of the course
+ * @param mixed $cm course module or id of the course module
+ * @param context $context context object
+ * @param string $filearea the name of the file area.
+ * @param array $args the remaining bits of the file path.
+ * @param bool $forcedownload whether the user must be forced to download the file.
+ * @param array $options additional options affecting the file serving
  */
 function groupselect_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
@@ -316,9 +320,27 @@ function groupselect_core_calendar_event_action_shows_item_count(calendar_event 
     return $itemcount > 1;
 }
 
-function groupselect_core_calendar_provide_event_action(calendar_event $event,
-                                                        \core_calendar\action_factory $factory) {
-    $cm = get_fast_modinfo($event->courseid)->instances['groupselect'][$event->instance];
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_groupselect_core_calendar_provide_event_action(calendar_event $event,
+                                                            \core_calendar\action_factory $factory,
+                                                            $userid = 0) {
+    global $USER;
+
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+
+    $cm = get_fast_modinfo($event->courseid, $userid)->instances['groupselect'][$event->instance];
     $context = context_module::instance($cm->id);
     $itmecount = 1;
     $actionable = true;
@@ -330,7 +352,7 @@ function groupselect_core_calendar_provide_event_action(calendar_event $event,
         return null;
     }
 
-    if (!has_capability('mod/groupselect:select', $context)) {
+    if (!has_capability('mod/groupselect:select', $context, $userid)) {
         $actionable = false;
     }
 
@@ -444,4 +466,32 @@ function groupselect_reset_userdata($data) {
     }
 
     return $status;
+}
+
+/**
+ * Mark the activity completed (if required) and trigger the course_module_viewed event.
+ *
+ * @param  stdClass $groupselect   groupselect object
+ * @param  stdClass $course  course object
+ * @param  stdClass $cm      course module object
+ * @param  stdClass $context context object
+ * @since Moodle 3.5
+ */
+function groupselect_view($groupselect, $course, $cm, $context) {
+
+    // Completion.
+    $completion = new completion_info($course);
+    $completion->set_module_viewed($cm);
+
+    // Trigger course_module_viewed event.
+    $params = array(
+        'context' => $context,
+        'objectid' => $groupselect->id
+    );
+
+    $event = \mod_groupselect\event\course_module_viewed::create($params);
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('groupselect', $groupselect);
+    $event->trigger();
 }

@@ -38,6 +38,9 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
  */
 class mod_groupselect_mod_form extends moodleform_mod {
 
+    /**
+     * Definition of the form
+     */
     public function definition() {
         global $CFG, $COURSE, $DB; // TODO: get rid of the sloppy $COURSE.
 
@@ -153,6 +156,16 @@ class mod_groupselect_mod_form extends moodleform_mod {
                 array('optional' => true, 'group' => null), array(0, 1));
         $mform->addHelpButton('hidefullgroups', 'hidefullgroups', 'mod_groupselect');
         $mform->setDefault('hidefullgroups', $config->hidefullgroups);
+        // Hide suspended students.
+        $mform->addElement('advcheckbox', 'hidesuspendedstudents', get_string('hidesuspendedstudents', 'mod_groupselect'), '',
+                array('optional' => true, 'group' => null), array(0, 1));
+        $mform->addHelpButton('hidesuspendedstudents', 'hidesuspendedstudents', 'mod_groupselect');
+        $mform->setDefault('hidesuspendedstudents', $config->hidesuspendedstudents);
+        // Hide group members.
+        $mform->addElement('advcheckbox', 'hidegroupmembers', get_string('hidegroupmembers', 'mod_groupselect'), '',
+                array('optional' => true, 'group' => null), array(0, 1));
+        $mform->addHelpButton('hidegroupmembers', 'hidegroupmembers', 'mod_groupselect');
+        $mform->setDefault('hidegroupmembers', $config->hidegroupmembers);
         // Notify expired group selection.
         $mform->addElement('advcheckbox', 'notifyexpiredselection', get_string('notifyexpiredselection', 'mod_groupselect'), '',
                 array('optional' => true, 'group' => null), array(0, 1));
@@ -173,6 +186,13 @@ class mod_groupselect_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Validation of the form
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

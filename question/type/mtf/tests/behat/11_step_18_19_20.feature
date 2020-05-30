@@ -30,15 +30,13 @@ Feature: Step 18 and 19 and 20
   # In the second Run feedback will be disabled. Check if fb and results are hidden
 
   # See if the Review is shown if enabled
-    And I output "[MTF - TESTCASE 18 - begin]"
     Given I log in as "teacher1"
     And quiz "Quiz 1" contains the following questions:
       | question       | page |
       | MTF-Question-3 | 1    |
     When I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Edit settings" "link"
+    And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_attemptimmediately | 1 |
       | id_correctnessimmediately | 1 |
@@ -48,21 +46,21 @@ Feature: Step 18 and 19 and 20
       | id_rightanswerimmediately | 1 |
       | id_overallfeedbackimmediately | 1 |
     And I press "Save and return to course"
-    And I click on css ".usermenu"
+    And I click on ".usermenu" "css_element"
     And I click on "Log out" "link"
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     Then I should see "Quiz 1"
     When I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
@@ -77,39 +75,36 @@ Feature: Step 18 and 19 and 20
     And I should see "feedback to option 6"
     And I should see "feedback to option 7"
     And I should see "feedback to option 8"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # See if the Review is shown if disabled
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Edit settings" "link"
+    And I navigate to "Edit settings" in current page administration
     And I click on "Review options" "link"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_correctnessimmediately']"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_marksimmediately']"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_specificfeedbackimmediately']"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_generalfeedbackimmediately']"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_rightanswerimmediately']"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_overallfeedbackimmediately']"
-    And I click on css "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_attemptimmediately']"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_correctnessimmediately']" "css_element"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_marksimmediately']" "css_element"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_specificfeedbackimmediately']" "css_element"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_generalfeedbackimmediately']" "css_element"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_rightanswerimmediately']" "css_element"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_overallfeedbackimmediately']" "css_element"
+    And I click on "#id_reviewoptionshdr div:contains('Immediately after the attempt') input[id='id_attemptimmediately']" "css_element"
     And I press "Save and return to course"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     Then I should see "Quiz 1"
     And I press "Re-attempt quiz"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
@@ -124,9 +119,7 @@ Feature: Step 18 and 19 and 20
     And I should not see "feedback to option 6"
     And I should not see "feedback to option 7"
     And I should not see "feedback to option 8"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
-    And I output "[MTF - TESTCASE 18 - end]"
+    And I log out
 
   @javascript
   Scenario: TESTCASE 19 - Part 1.
@@ -136,7 +129,6 @@ Feature: Step 18 and 19 and 20
   # Scenario: Shuffling disabled
     
   # Create a response as student
-    And I output "[MTF - TESTCASE 19 - Part 1 - begin]"
     Given I log in as "student2"
     And quiz "Quiz 1" contains the following questions:
       | question       | page |
@@ -145,20 +137,19 @@ Feature: Step 18 and 19 and 20
     And I follow "Quiz 1"
     Then I should see "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "Finished" 
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Login as a teacher and see if everything works
     When I log in as "teacher1"
@@ -166,23 +157,21 @@ Feature: Step 18 and 19 and 20
     And I follow "Quiz 1"
 
   # Check Responses Page
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    Then element with xpath "[id='mod-quiz-report-responses-report_r0']" should exist
+    And I navigate to "Responses" in current page administration
+    Then "#mod-quiz-report-responses-report_r0" "css_element" should exist
     And I should see "student2@moodle.com"
     And I should see "100.00"
 
-
   # Check Review Attempt Page
     And I click on "Review attempt" "link"
-    Then element with css "tr:contains('option text 1') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 2') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 3') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 4') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 5') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 6') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 7') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 8') input[value='2'][checked='checked']" should exist
+    Then "tr:contains('option text 1') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 2') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 3') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 4') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 5') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 6') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 7') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 8') input[value='2'][checked='checked']" "css_element" should exist
 
     And I should see "option text 1: True"
     And I should see "option text 2: True"
@@ -192,7 +181,6 @@ Feature: Step 18 and 19 and 20
     And I should see "option text 6: False"
     And I should see "option text 7: False"
     And I should see "option text 8: False"
-    And I output "[MTF - TESTCASE 19 - Part 1 - end]"
 
   @javascript
   Scenario: TESTCASE 19 - Part 2.
@@ -202,7 +190,6 @@ Feature: Step 18 and 19 and 20
   # Scenario: Shuffling enabled
     
   # Create a response as student
-    And I output "[MTF - TESTCASE 19 - Part 2 - begin]"
     Given I log in as "student2"
     And quiz "Quiz 1" contains the following questions:
       | question       | page |
@@ -212,36 +199,34 @@ Feature: Step 18 and 19 and 20
     And I follow "Quiz 1"
     Then I should see "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    Then I should see "Finished" 
-    And I click on css ".usermenu"
-    And I click on "Log out" "link" 
+    Then I should see "Finished"
+    And I log out
 
   # Login as a teacher and see if everything works
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
+    And I navigate to "Responses" in current page administration
     And I click on "Review attempt" "link"
-    Then element with css "tr:contains('option text 1') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 2') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 3') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 4') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 5') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 6') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 7') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 8') input[value='2'][checked='checked']" should exist
+    Then "tr:contains('option text 1') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 2') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 3') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 4') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 5') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 6') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 7') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 8') input[value='2'][checked='checked']" "css_element" should exist
     And I should see "option text 1: True"
     And I should see "option text 2: True"
     And I should see "option text 3: True"
@@ -250,7 +235,6 @@ Feature: Step 18 and 19 and 20
     And I should see "option text 6: False"
     And I should see "option text 7: False"
     And I should see "option text 8: False"
-    And I output "[MTF - TESTCASE 19 - Part 2 - end]"
 
   @javascript
   Scenario: TESTCASE 20.
@@ -258,7 +242,6 @@ Feature: Step 18 and 19 and 20
   # Check "review attempt, "responses", "statistics"
     
   # Create a response as student
-    And I output "[MTF - TESTCASE 20 - begin]"
     Given I log in as "student2"
     And quiz "Quiz 1" contains the following questions:
       | question       | page |
@@ -267,20 +250,19 @@ Feature: Step 18 and 19 and 20
     And I follow "Quiz 1"
     Then I should see "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    Then I should see "Finished" 
-    And I click on css ".usermenu"
-    And I click on "Log out" "link" 
+    Then I should see "Finished"
+    And I log out
 
   # Login as a teacher and see if everything works
     When I log in as "teacher1"
@@ -288,9 +270,8 @@ Feature: Step 18 and 19 and 20
     And I follow "Quiz 1"
 
   # Check Responses Page
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    Then element with xpath "[id='mod-quiz-report-responses-report_r0']" should exist
+    And I navigate to "Responses" in current page administration
+    Then "#mod-quiz-report-responses-report_r0" "css_element" should exist
     And I should see "student2@moodle.com"
     And I should see "100.00"
 
@@ -298,14 +279,14 @@ Feature: Step 18 and 19 and 20
     When I click on "Review attempt" "link"
     Then I should see "100.00 out of 100.00"
     Then I should see "Mark 1.00 out of 1.00"
-    And element with css "tr:contains('option text 1') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 2') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 3') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 4') input[value='1'][checked='checked']" should exist
-    And element with css "tr:contains('option text 5') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 6') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 7') input[value='2'][checked='checked']" should exist
-    And element with css "tr:contains('option text 8') input[value='2'][checked='checked']" should exist
+    Then "tr:contains('option text 1') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 2') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 3') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 4') input[value='1'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 5') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 6') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 7') input[value='2'][checked='checked']" "css_element" should exist
+    And "tr:contains('option text 8') input[value='2'][checked='checked']" "css_element" should exist
     And I should see "option text 1: True"
     And I should see "option text 2: True"
     And I should see "option text 3: True"
@@ -316,22 +297,8 @@ Feature: Step 18 and 19 and 20
     And I should see "option text 8: False"
 
   # Check Responses Page - Delete Entry
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    And I click on "Select all" "link"
+    And I navigate to "Responses" in current page administration
+    And I click on "#mod-quiz-report-responses-report-selectall-attempts" "css_element"
     And I press "Delete selected attempts"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
     Then I should not see "student2@moodle.com"
-    And I output "[MTF - TESTCASE 20 - end]"
-
-
-
-
-
-
-
-
-
-
-
-

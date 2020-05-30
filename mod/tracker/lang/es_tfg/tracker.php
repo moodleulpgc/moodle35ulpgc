@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['assignedto'] = 'Tutor encargado';
+$string['assignedto'] = 'Gestor encargado';
 $string['assignee'] = 'Tutorizado';
 $string['assigndeveloper'] = 'por Tutor';
 $string['assignissue'] = 'por TFT';

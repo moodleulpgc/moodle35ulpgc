@@ -13,9 +13,7 @@ Feature: Step 13
       | teacher1 | c1     | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
+    And I navigate to "Question bank" in current page administration
 
  @javascript
   Scenario: TESTCASE 13
@@ -23,12 +21,8 @@ Feature: Step 13
   # Change all options to false. Save. Reenter. 
   # All options should now be set to false.
 
-    And I output "[Kprime - TESTCASE 13 - begin]"
-    When I press "Create a new question ..."
-    And I click on "item_qtype_kprime" "radio"
-    And I press "Add"
+    And I add a "Kprime (ETH)" question filling the form with:
   # Set all to true
-    And I set the following fields to these values:
       | id_name              | KPrime-Question-002      |
       | id_defaultmark       | 1                        |
       | id_questiontext      | The Questiontext         |
@@ -45,15 +39,14 @@ Feature: Step 13
       | id_weightbutton_2_1  | checked                  |
       | id_weightbutton_3_1  | checked                  |
       | id_weightbutton_4_1  | checked                  |
-    And I press "id_submitbutton"
     Then I should see "KPrime-Question-002"
 
   # Check
-    When I click on "Edit" "link" in the "KPrime-Question-002" "table_row"
-    Then element with css "#id_weightbutton_1_1[checked]" should exist
-    And element with css "#id_weightbutton_2_1[checked]" should exist
-    And element with css "#id_weightbutton_3_1[checked]" should exist
-    And element with css "#id_weightbutton_4_1[checked]" should exist
+    When I choose "Edit question" action for "KPrime-Question-002" in the question bank
+    Then "#id_weightbutton_1_1[checked]" "css_element" should exist
+    And "#id_weightbutton_2_1[checked]" "css_element" should exist
+    And "#id_weightbutton_3_1[checked]" "css_element" should exist
+    And "#id_weightbutton_4_1[checked]" "css_element" should exist
   # Set all to false
     When I set the following fields to these values:
       | id_weightbutton_1_2  | checked                  |
@@ -62,9 +55,7 @@ Feature: Step 13
       | id_weightbutton_4_2  | checked                  |
     And I press "id_updatebutton"
   # Check
-    Then element with css "#id_weightbutton_1_2[checked]" should exist
-    And element with css "#id_weightbutton_2_2[checked]" should exist
-    And element with css "#id_weightbutton_3_2[checked]" should exist
-    And element with css "#id_weightbutton_4_2[checked]" should exist
-    And I output "[Kprime - TESTCASE 13 - end]"
-    
+    Then "#id_weightbutton_1_2[checked]" "css_element" should exist
+    And "#id_weightbutton_2_2[checked]" "css_element" should exist
+    And "#id_weightbutton_3_2[checked]" "css_element" should exist
+    And "#id_weightbutton_4_2[checked]" "css_element" should exist

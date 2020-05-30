@@ -507,13 +507,13 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render the content of practice column.
+     * Render the content of attempts column.
      *
      * @param $question
      * @param $rowclasses
      * @return string
      */
-    public function render_practice_column($question, $rowclasses) {
+    public function render_attempts_column($question, $rowclasses) {
         $output = '';
         $attrs = ['tabindex' => 0];
 
@@ -525,9 +525,9 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
 
         $output .= '&nbsp;|&nbsp;';
 
-        if (!empty($question->mylastattempt)) {
+        if ($question->mylastanswercorrect !== null) {
             // TODO: Refactor magic constant.
-            if ($question->mylastattempt == 'gradedright') {
+            if ($question->mylastanswercorrect == '1') {
                 $output .= get_string('lastattempt_right', 'studentquiz');
                 $attrs['aria-label'] = get_string('lastattempt_right_label', 'studentquiz');
             } else {
@@ -634,8 +634,8 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
     public function render_tag_column($question, $rowclasses) {
         $output = '';
 
-        if (!empty($question->tags) && !empty($question->tagarray)) {
-            foreach ($question->tagarray as $tag) {
+        if (!empty($question->tagarray)) {
+            foreach (explode(',', $question->tagarray) as $tag) {
                 $tag = $this->render_tag($tag);
                 $output .= $tag;
             }
@@ -653,7 +653,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_tag($tag) {
-        $output = html_writer::tag('span', (strlen($tag->rawname) > 10 ? (substr($tag->rawname, 0, 8) . '...') : $tag->rawname), [
+        $output = html_writer::tag('span', (strlen($tag) > 10 ? (substr($tag, 0, 8) . '...') : $tag), [
                 'role' => 'listitem',
                 'data-value' => 'HELLO',
                 'aria-selected' => 'true',
@@ -776,7 +776,7 @@ class mod_studentquiz_renderer extends plugin_renderer_base {
                 . 'mod_studentquiz\\bank\\sq_hidden_column,'
                 . 'mod_studentquiz\\bank\\anonym_creator_name_column,'
                 . 'mod_studentquiz\\bank\\tag_column,'
-                . 'mod_studentquiz\\bank\\practice_column,'
+                . 'mod_studentquiz\\bank\\attempts_column,'
                 . 'mod_studentquiz\\bank\\difficulty_level_column,'
                 . 'mod_studentquiz\\bank\\rate_column,'
                 . 'mod_studentquiz\\bank\\comment_column';
@@ -1511,9 +1511,9 @@ class mod_studentquiz_attempt_renderer extends mod_studentquiz_renderer {
                     studentquiz_helper::STATE_DELETE => get_string('delete')
             ];
             $output .= html_writer::start_span('change-question-state');
-            $output .= html_writer::tag('label', get_string('state_toggle', 'studentquiz'), ['for' => 'statetype']);
+            $output .= html_writer::tag('label', get_string('state_column_name', 'studentquiz'), ['for' => 'statetype']);
             $output .= html_writer::select($states, 'statetype');
-            $output .= html_writer::tag('button', 'Submit',
+            $output .= html_writer::tag('button', get_string('state_toggle', 'studentquiz'),
                     ['type' => 'button', 'class' => 'btn btn-secondary', 'id' => 'change_state', 'data-questionid' => $questionid,
                             'data-courseid' => $courseid, 'data-cmid' => $cmid, 'disabled' => 'disabled']);
             $output .= html_writer::end_span();
@@ -1889,7 +1889,7 @@ class mod_studentquiz_comment_renderer extends mod_studentquiz_renderer {
      * @return string HTML fragment
      */
     public function render_comment_area($questionid, $userid, $cmid, $highlight = 0) {
-        global $COURSE, $PAGE;
+        global $PAGE;
 
         $id = 'question_comment_area_' . $questionid;
 
@@ -1959,38 +1959,32 @@ class mod_studentquiz_comment_renderer extends mod_studentquiz_renderer {
         }
 
         $forcecommenting = $commentarea->get_studentquiz()->forcecommenting;
+        // Get current sort.
         $sortfeature = $commentarea->get_sort_feature();
+        // Get a list of sortable features.
         $sortable = $commentarea->get_sortable();
 
         $jsdata = [
                 'id' => $id,
-                'courseid' => $COURSE->id,
-                'questionid' => $questionid,
-                'contextid' => $context->id,
-                'userid' => $userid,
-                'numbertoshow' => container::NUMBER_COMMENT_TO_SHOW_BY_DEFAULT,
-                'cmid' => $cmid,
                 'forcecommenting' => $forcecommenting,
                 'canviewdeleted' => $canviewdeleted,
-                'referer' => $referer,
                 'highlight' => $highlight,
                 'expand' => $isexpand,
                 'sortfeature' => $sortfeature,
-                'sortable' => $sortable,
                 'isnocomment' => empty($res)
         ];
-        $mform = new \mod_studentquiz\commentarea\form\comment_form([
-                'index' => $id,
-                'replyto' => VALUE_DEFAULT,
-                'questionid' => $questionid,
-                'cmid' => $cmid,
-                'cancelbutton' => false,
-                'forcecommenting' => $forcecommenting
-        ]);
 
         $count = utils::count_comments_and_replies($res);
         $current = $count['total'];
         $total = $commentarea->get_num_comments();
+
+        // Need to pass this to js to calculate current of total comments.
+        $jsdata = array_merge($jsdata, [
+                'count' => $count,
+                'total' => $total
+        ]);
+
+        $this->page->requires->js_call_amd(self::MODNAME . '/comment_area', 'generate', [$jsdata]);
 
         // Get strings.
         $strings = [
@@ -2008,12 +2002,22 @@ class mod_studentquiz_comment_renderer extends mod_studentquiz_renderer {
                 ]
         ];
 
-        // Need to pass this to js to calculate current of total comments.
-        $jsdata = array_merge($jsdata, compact('count', 'total', 'strings'));
+        // Create form add comment.
+        $mform = new \mod_studentquiz\commentarea\form\comment_form([
+                'index' => $id,
+                'replyto' => VALUE_DEFAULT,
+                'questionid' => $questionid,
+                'cmid' => $cmid,
+                'cancelbutton' => false,
+                'forcecommenting' => $forcecommenting
+        ]);
 
-        $commentcountstring = get_string('current_of_total', 'mod_studentquiz', compact('current', 'total'));
+        // Get current of total string. Example: 5 of 7.
+        $commentcountstring = get_string('current_of_total', 'mod_studentquiz', [
+                'current' => $current,
+                'total' => $total
+        ]);
 
-        $this->page->requires->js_call_amd(self::MODNAME . '/comment_area', 'generate', [json_encode($jsdata)]);
         return $this->output->render_from_template(self::MODNAME . '/comment_area', [
                 'id' => $id,
                 'postform' => $mform->get_html(),
@@ -2022,7 +2026,15 @@ class mod_studentquiz_comment_renderer extends mod_studentquiz_renderer {
                 'hascomment' => $commentarea->check_has_comment(),
                 'sortfeature' => $sortfeature,
                 'sortable' => $sortable,
-                'sortselect' => $commentarea->get_sort_select()
+                'sortselect' => $commentarea->get_sort_select(),
+                'strings' => json_encode($strings),
+                'sortablestrings' => json_encode($sortable),
+                'referer' => $referer,
+                'questionid' => $questionid,
+                'contextid' => $context->id,
+                'userid' => $userid,
+                'numbertoshow' => container::NUMBER_COMMENT_TO_SHOW_BY_DEFAULT,
+                'cmid' => $cmid
         ]);
     }
 }

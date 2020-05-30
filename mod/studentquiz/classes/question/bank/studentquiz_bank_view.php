@@ -35,7 +35,7 @@ require_once(__DIR__ . '/question_text_row.php');
 require_once(__DIR__ . '/rate_column.php');
 require_once(__DIR__ . '/difficulty_level_column.php');
 require_once(__DIR__ . '/tag_column.php');
-require_once(__DIR__ . '/practice_column.php');
+require_once(__DIR__ . '/attempts_column.php');
 require_once(__DIR__ . '/comments_column.php');
 require_once(__DIR__ . '/state_column.php');
 require_once(__DIR__ . '/anonym_creator_name_column.php');
@@ -131,11 +131,11 @@ class studentquiz_bank_view extends \core_question\bank\view {
         $this->set_filter_form_fields($this->is_anonymized());
         $this->initialize_filter_form($pageurl);
         // Init search conditions with filterform state.
-        $cateorycondition = new \core_question\bank\search\category_condition(
+        $categorycondition = new \core_question\bank\search\category_condition(
                 $pagevars['cat'], $pagevars['recurse'], $contexts, $pageurl, $course);
         $studentquizcondition = new \mod_studentquiz\condition\studentquiz_condition($cm, $this->filterform, $this->report, $studentquiz);
         $this->isfilteractive = $studentquizcondition->is_filter_active();
-        $this->searchconditions = array ($cateorycondition, $studentquizcondition);
+        $this->searchconditions = array ($categorycondition, $studentquizcondition);
         $this->renderer = $PAGE->get_renderer('mod_studentquiz', 'overview');
     }
 
@@ -170,38 +170,20 @@ class studentquiz_bank_view extends \core_question\bank\view {
 
         // Get result set.
         $questions = $this->load_questions($page, $perpage);
-
-        $tags = mod_studentquiz_get_tags_by_question_ids($this->displayedquestionsids);
-
-        // Annotate questions with tags.
-        foreach ($questions as $key => $question) {
-            if (array_key_exists($question->id, $tags)) {
-                $question->tagarray = $tags[$question->id];
-            } else {
-                $question->tagarray = null;
-            }
-            if (isset($question->sq_hidden) && $question->sq_hidden) {
-                // Hide the question if needed.
-                $context = \context::instance_by_id($question->contextid);
-                if ($question->createdby != $USER->id && !has_capability('mod/studentquiz:previewothers', $context)) {
-                    unset($questions[$key]);
-                }
-            }
-        }
-
         $this->questions = $questions;
+        $this->countsql = count($this->questions);
 
         if ($this->process_actions_needing_ui()) {
             return;
         }
 
-        if (count($this->questions) || $this->isfilteractive) {
+        if ($this->countsql || $this->isfilteractive) {
             // We're unable to force the filter form to submit with get method. We have 2 forms on the page
             // which need to interact with each other, so forcing method as get here
             $output .= str_replace('method="post"', 'method="get"', $this->renderer->render_filter_form($this->filterform));
         }
 
-        if (count($this->questions) > 0) {
+        if ($this->countsql > 0) {
             $questionslist = $this->display_question_list(
                     $this->contexts->having_one_edit_tab_cap($tabname),
                     $this->baseurl, $cat, $this->cm,
@@ -263,7 +245,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
                     }
                     $this->baseurl->remove_params('approveselected');
                     $this->baseurl->remove_params('confirm');
-                    $this->baseurl->remove_params('sesskey');
                     foreach ($rawquestionids as $id) {
                         $this->baseurl->remove_params('q' . $id);
                     }
@@ -297,7 +278,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
                 }
                 question_move_questions_to_category($rawquestionids, $tocategory->id);
                 $this->baseurl->remove_params('move');
-                $this->baseurl->remove_params('sesskey');
                 foreach ($rawquestionids as $id) {
                     $this->baseurl->remove_params('q' . $id);
                 }
@@ -322,7 +302,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
                     }
                     $this->baseurl->remove_params('deleteselected');
                     $this->baseurl->remove_params('confirm');
-                    $this->baseurl->remove_params('sesskey');
                     foreach ($rawquestionids as $id) {
                         $this->baseurl->remove_params('q' . $id);
                     }
@@ -343,7 +322,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
             \question_bank::notify_question_edited($unhide);
             // Fix infinite redirect.
             $this->baseurl->remove_params('unhide');
-            $this->baseurl->remove_params('sesskey');
             foreach ($rawquestionids as $id) {
                 $this->baseurl->remove_params('q' . $id);
             }
@@ -359,29 +337,10 @@ class studentquiz_bank_view extends \core_question\bank\view {
             \question_bank::notify_question_edited($hide);
             // Fix infinite redirect.
             $this->baseurl->remove_params('hide');
-            $this->baseurl->remove_params('sesskey');
             foreach ($rawquestionids as $id) {
                 $this->baseurl->remove_params('q' . $id);
             }
             redirect($this->baseurl);
-        }
-
-        if (optional_param('hiddenselected', false, PARAM_BOOL)) {
-            // If teacher has already confirmed the action.
-            if (($confirm = optional_param('confirm', '', PARAM_ALPHANUM)) and confirm_sesskey()) {
-                $hiddenselected = required_param('hiddenselected', PARAM_RAW);
-                if ($confirm == md5($hiddenselected)) {
-                    if ($questionlist = explode(',', $hiddenselected)) {
-                        // For each question either hide it if it is in use or delete it.
-                        foreach ($questionlist as $questionid) {
-                            $questionid = (int)$questionid;
-                            question_require_capability_on($questionid, 'edit');
-                            mod_studentquiz_state_notify($questionid, $this->course, $this->cm, 'hidden');
-                            $DB->set_field('studentquiz_question', 'hidden', 1, ['id' => $questionid]);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -483,18 +442,12 @@ class studentquiz_bank_view extends \core_question\bank\view {
         $fields = array('q.hidden', 'q.category', 'q.timecreated', 'q.createdby');
         $tests = array('q.parent = 0', 'q.hidden = 0');
         foreach ($this->requiredcolumns as $column) {
-            if (method_exists($column, 'set_searchconditions')) {
-                $column->set_searchconditions($this->searchconditions);
-            }
             $extrajoins = $column->get_extra_joins();
             foreach ($extrajoins as $prefix => $join) {
                 if (isset($joins[$prefix]) && $joins[$prefix] != $join) {
                     throw new \coding_exception('Join ' . $join . ' conflicts with previous join ' . $joins[$prefix]);
                 }
                 $joins[$prefix] = $join;
-            }
-            if (method_exists($column, 'get_sqlparams')) {
-                $params = array_merge($params, $column->get_sqlparams());
             }
             $fields = array_merge($fields, $column->get_required_fields());
         }
@@ -526,7 +479,6 @@ class studentquiz_bank_view extends \core_question\bank\view {
         $sql = ' FROM {question} q ' . implode(' ', $joins);
         $sql .= ' WHERE ' . implode(' AND ', $tests);
         $this->sqlparams = $params;
-        $this->countsql = 'SELECT count(1)' . $sql;
         $this->loadsql = 'SELECT ' . implode(', ', $fields) . $sql . ' ORDER BY ' . implode(', ', $sorts);
     }
 
@@ -678,16 +630,16 @@ class studentquiz_bank_view extends \core_question\bank\view {
             get_string('filter_label_onlynew_help', 'studentquiz'));
 
         $this->fields[] = new \toggle_filter_checkbox('only_new_state',
-                get_string('state_new', 'studentquiz'), false, 'ap.state',
+                get_string('state_new', 'studentquiz'), false, 'sqs.state',
                 ['approved'], 2, studentquiz_helper::STATE_NEW);
         $this->fields[] = new \toggle_filter_checkbox('only_approved_state',
-                get_string('state_approved', 'studentquiz'), false, 'ap.state',
+                get_string('state_approved', 'studentquiz'), false, 'sqs.state',
                 ['approved'], 2, studentquiz_helper::STATE_APPROVED);
         $this->fields[] = new \toggle_filter_checkbox('only_disapproved_state',
-                get_string('state_disapproved', 'studentquiz'), false, 'ap.state',
+                get_string('state_disapproved', 'studentquiz'), false, 'sqs.state',
                 ['approved'], 2, studentquiz_helper::STATE_DISAPPROVED);
         $this->fields[] = new \toggle_filter_checkbox('only_changed_state',
-                get_string('state_changed', 'studentquiz'), false, 'ap.state',
+                get_string('state_changed', 'studentquiz'), false, 'sqs.state',
                 ['approved'], 2, studentquiz_helper::STATE_CHANGED);
 
         $this->fields[] = new \toggle_filter_checkbox('onlygood',
@@ -710,24 +662,25 @@ class studentquiz_bank_view extends \core_question\bank\view {
             false, 'dl.difficultylevel', array('difficultylevel', 'difficultylevel_op'), 1, 0.60,
             get_string('filter_label_onlydifficult_help', 'studentquiz', '60'));
 
-        // Standard filters.
-        $this->fields[] = new \user_filter_tag('tagname', get_string('filter_label_tags', 'studentquiz'),
-            true, 'tagname');
-
-        $this->fields[] = new \user_filter_simpleselect('approved', get_string('filter_label_approved', 'studentquiz'),
-            true, 'approved', array(
-                true => get_string('approved', 'studentquiz'),
-                false => get_string('not_approved', 'studentquiz')
-            ));
-
         // Advanced filters.
+        $this->fields[] = new \studentquiz_user_filter_text('tagarray', get_string('filter_label_tags', 'studentquiz'),
+            true, 'tagarray');
+
+        $states = array();
+        foreach (studentquiz_helper::$statename as $num => $name) {
+            if ($num == studentquiz_helper::STATE_DELETE || $num == studentquiz_helper::STATE_HIDE) {
+                continue;
+            }
+            $states[$num] = get_string('state_'.$name, 'studentquiz');
+        }
+        $this->fields[] = new \user_filter_simpleselect('state', get_string('state_column_name', 'studentquiz'),
+            true, 'state', $states);
+
         $this->fields[] = new \user_filter_number('rate', get_string('filter_label_rates', 'studentquiz'),
             true, 'rate');
         $this->fields[] = new \user_filter_percent('difficultylevel', get_string('filter_label_difficulty_level', 'studentquiz'),
             true, 'difficultylevel');
 
-        $this->fields[] = new \user_filter_number('practice', get_string('filter_label_practice', 'studentquiz'),
-            true, 'practice');
         $this->fields[] = new \user_filter_number('comment', get_string('filter_label_comment', 'studentquiz'),
             true, 'comment');
         $this->fields[] = new \studentquiz_user_filter_text('name', get_string('filter_label_question', 'studentquiz'),
@@ -746,10 +699,10 @@ class studentquiz_bank_view extends \core_question\bank\view {
         $this->fields[] = new \studentquiz_user_filter_date('timecreated', get_string('filter_label_createdate', 'studentquiz'),
             true, 'timecreated');
 
-        $this->fields[] = new \user_filter_simpleselect('mylastattempt', get_string('filter_label_mylastattempt', 'studentquiz'),
-            true, 'mylastattempt', array(
-                'gradedright' => get_string('lastattempt_right', 'studentquiz'),
-                'gradedwrong' => get_string('lastattempt_wrong', 'studentquiz')
+        $this->fields[] = new \user_filter_simpleselect('lastanswercorrect', get_string('filter_label_mylastattempt', 'studentquiz'),
+            true, 'lastanswercorrect', array(
+                '1' => get_string('lastattempt_right', 'studentquiz'),
+                '0' => get_string('lastattempt_wrong', 'studentquiz')
             ));
 
         $this->fields[] = new \user_filter_number('myattempts', get_string('filter_label_myattempts', 'studentquiz'),

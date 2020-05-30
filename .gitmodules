@@ -1,0 +1,510 @@
+[submodule "local/csp"]
+	path = local/csp
+	url = https://github.com/catalyst/moodle-local_csp.git
+[submodule "local/globalmessage"]
+	path = local/globalmessage
+	url = https://github.com/satrun77/Global-Message-Moodle-Plugin.git
+[submodule "local/metadata"]
+	path = local/metadata
+	url = https://github.com/PoetOS/moodle-local_metadata.git
+[submodule "local/navbarplus"]
+	path = local/navbarplus
+	url = https://github.com/moodleuulm/moodle-local_navbarplus.git
+[submodule "local/sandbox"]
+	path = local/sandbox
+	url = https://github.com/moodleuulm/moodle-local_sandbox.git
+[submodule "local/searchquestions"]
+	path = local/searchquestions
+	url = https://github.com/MorrisR2/moodle_local_searchquestions.git
+[submodule "local/unusedquestions"]
+	path = local/unusedquestions
+	url = https://github.com/MorrisR2/moodle_local_unusedquestions.git
+[submodule "local/o365"]
+	path = local/o365
+	url = https://github.com/Microsoft/moodle-local_o365.git
+[submodule "local/onenote"]
+	path = local/onenote
+	url = https://github.com/Microsoft/moodle-local_onenote.git
+[submodule "auth/oidc"]
+	path = auth/oidc
+	url = https://github.com/Microsoft/moodle-auth_oidc.git
+[submodule "blocks/microsoft"]
+	path = blocks/microsoft
+	url = https://github.com/Microsoft/moodle-block_microsoft.git
+[submodule "filter/oembed"]
+	path = filter/oembed
+	url = https://github.com/PoetOS/moodle-filter_oembed.git
+[submodule "repository/office365"]
+	path = repository/office365
+	url = https://github.com/Microsoft/moodle-repository_office365.git
+[submodule "mod/assign/submission/onenote"]
+	path = mod/assign/submission/onenote
+	url = https://github.com/Microsoft/moodle-assignsubmission_onenote.git
+[submodule "mod/assign/feedback/onenote"]
+	path = mod/assign/feedback/onenote
+	url = https://github.com/Microsoft/moodle-assignfeedback_onenote.git
+[submodule "mod/activequiz"]
+	path = mod/activequiz
+	url = https://github.com/jhoopes/moodle-mod_activequiz.git
+[submodule "mod/advmindmap"]
+	path = mod/advmindmap
+	url = https://github.com/ctchanandy/moodle-mod_advmindmap.git
+[submodule "mod/attendance"]
+	path = mod/attendance
+	url = https://github.com/danmarsden/moodle-mod_attendance.git
+[submodule "mod/bigbluebuttonbn"]
+	path = mod/bigbluebuttonbn
+	url = https://github.com/blindsidenetworks/moodle-mod_bigbluebuttonbn.git
+[submodule "mod/bootstrapelements"]
+	path = mod/bootstrapelements
+	url = https://bitbucket.org/covuni/moodle-mod_bootstrapelements.git
+[submodule "mod/chairman"]
+	path = mod/chairman
+	url = https://github.com/oohoo/moodle-mod_chairman.git
+[submodule "mod/checklist"]
+	path = mod/checklist
+	url = https://github.com/davosmith/moodle-checklist.git
+[submodule "mod/customcert"]
+	path = mod/customcert
+	url = https://github.com/markn86/moodle-mod_customcert.git
+[submodule "mod/datalynx"]
+	path = mod/datalynx
+	url = https://github.com/dasistwas/moodle-mod_datalynx.git
+[submodule "mod/dialogue"]
+	path = mod/dialogue
+	url = https://github.com/troywilliams/moodle-mod_dialogue.git
+[submodule "mod/game"]
+	path = mod/game
+	url = https://github.com/bdaloukas/moodle-mod_game.git
+[submodule "mod/geogebra"]
+	path = mod/geogebra
+	url = https://github.com/projectestac/moodle-mod_geogebra.git
+[submodule "mod/hvp"]
+	path = mod/hvp
+	url = https://github.com/h5p/h5p-moodle-plugin.git
+[submodule "mod/hotpot"]
+	path = mod/hotpot
+	url = https://github.com/gbateson/moodle-mod_hotpot.git
+[submodule "mod/lightboxgallery"]
+	path = mod/lightboxgallery
+	url = https://github.com/netspotau/moodle-mod_lightboxgallery.git
+[submodule "mod/masks"]
+	path = mod/masks
+	url = https://github.com/Edunao/moodle-mod_masks.git
+[submodule "mod/moodleoverflow"]
+	path = mod/moodleoverflow
+	url = https://github.com/learnweb/moodle-mod_moodleoverflow.git
+[submodule "mod/offlinequiz"]
+	path = mod/offlinequiz
+	url = https://github.com/academic-moodle-cooperation/moodle-mod_offlinequiz.git
+[submodule "mod/qcreate"]
+	path = mod/qcreate
+	url = https://github.com/jmvedrine/moodle-mod_qcreate.git
+[submodule "mod/ratingallocate"]
+	path = mod/ratingallocate
+	url = https://github.com/learnweb/moodle-mod_ratingallocate.git
+[submodule "mod/scheduler"]
+	path = mod/scheduler
+	url = https://github.com/bostelm/moodle-mod_scheduler.git
+[submodule "mod/simplecertificate"]
+	path = mod/simplecertificate
+	url = https://github.com/bozoh/moodle-mod_simplecertificate.git
+[submodule "mod/studentquiz"]
+	path = mod/studentquiz
+	url = https://github.com/frankkoch/moodle-mod_studentquiz.git
+[submodule "mod/subcourse"]
+	path = mod/subcourse
+	url = https://github.com/mudrd8mz/moodle-mod_subcourse.git
+[submodule "mod/tab"]
+	path = mod/tab
+	url = https://github.com/oohoo/moodle-mod_tab.git
+[submodule "mod/tracker"]
+	path = mod/tracker
+	url = https://github.com/vfremaux/moodle-mod_tracker.git
+[submodule "mod/turnitintooltwo"]
+	path = mod/turnitintooltwo
+	url = https://github.com/turnitin/moodle-mod_turnitintooltwo.git
+[submodule "mod/unedtrivial"]
+	path = mod/unedtrivial
+	url = https://github.com/jcastello46/moodle-mod_unedtrivial.git
+[submodule "mod/vpl"]
+	path = mod/vpl
+	url = https://github.com/jcrodriguez-dis/moodle-mod_vpl.git
+[submodule "mod/assign/feedback/solutionsheet"]
+	path = mod/assign/feedback/solutionsheet
+	url = https://github.com/bostelm/moodle-assignfeedback_solutionsheet.git
+[submodule "mod/assign/submission/geogebra"]
+	path = mod/assign/submission/geogebra
+	url = https://github.com/geogebra/moodle-assignsubmission_geogebra.git
+[submodule "mod/assign/submission/gradereviews"]
+	path = mod/assign/submission/gradereviews
+	url = https://github.com/mouneyrac/moodle-assignsubmission_gradereviews.git
+[submodule "mod/assign/submission/mahara"]
+	path = mod/assign/submission/mahara
+	url = https://github.com/MaharaProject/moodle-assignsubmission_mahara.git
+[submodule "mod/book/tool/wordimport"]
+	path = mod/book/tool/wordimport
+	url = https://github.com/ecampbell/moodle-booktool_wordimport.git
+[submodule "mod/quiz/report/downloadsubmissions"]
+	path = mod/quiz/report/downloadsubmissions
+	url = https://github.com/IITBombayWeb/moodle-quiz_downloadsubmissions.git
+[submodule "mod/quiz/report/gradingstudents"]
+	path = mod/quiz/report/gradingstudents
+	url = https://github.com/moodleou/moodle-quiz_gradingstudents.git
+[submodule "mod/quiz/accessrule/honestycheck"]
+	path = mod/quiz/accessrule/honestycheck
+	url = https://github.com/moodleou/moodle-quizaccess_honestycheck.git
+[submodule "mod/quiz/accessrule/offlinemode"]
+	path = mod/quiz/accessrule/offlinemode
+	url = https://github.com/timhunt/moodle-quizaccess_offlinemode
+[submodule "mod/quiz/accessrule/passgrade"]
+	path = mod/quiz/accessrule/passgrade
+	url = https://github.com/catalyst/moodle-quizaccess_passgrade
+[submodule "mod/quiz/accessrule/safeexambrowser"]
+	path = mod/quiz/accessrule/safeexambrowser
+	url = https://github.com/moodleou/moodle-quizaccess_safeexambrowser.git
+[submodule "mod/quiz/report/mcq"]
+	path = mod/quiz/report/mcq
+	url = https://github.com/daveyboond/moodle-quiz_mcq.git
+[submodule "mod/quiz/report/randomsummary"]
+	path = mod/quiz/report/randomsummary
+	url = https://github.com/danmarsden/moodle-quiz_randomsummary.git
+[submodule "mod/quiz/report/stack"]
+	path = mod/quiz/report/stack
+	url = https://github.com/maths/quiz_stack.git
+[submodule "lib/editor/atto/plugins/chemistry"]
+	path = lib/editor/atto/plugins/chemistry
+	url = https://github.com/geoffrowland/moodle-editor_atto-chemistry.git
+[submodule "lib/editor/atto/plugins/chemrender"]
+	path = lib/editor/atto/plugins/chemrender
+	url = https://github.com/ucla/moodle-atto_chemrender.git
+[submodule "lib/editor/atto/plugins/cloze"]
+	path = lib/editor/atto/plugins/cloze
+	url = https://github.com/dthies/moodle-atto_cloze.git
+[submodule "lib/editor/atto/plugins/count"]
+	path = lib/editor/atto/plugins/count
+	url = https://github.com/damyon/moodle-atto_count.git
+[submodule "lib/editor/atto/plugins/fontsize"]
+	path = lib/editor/atto/plugins/fontsize
+	url = https://github.com/andrewnicols/moodle-atto_fontsize
+[submodule "lib/editor/atto/plugins/fullscreen"]
+	path = lib/editor/atto/plugins/fullscreen
+	url = https://github.com/dthies/moodle-atto_fullscreen
+[submodule "lib/editor/atto/plugins/generico"]
+	path = lib/editor/atto/plugins/generico
+	url = https://github.com/justinhunt/moodle-atto_generico.git
+[submodule "lib/editor/atto/plugins/hr"]
+	path = lib/editor/atto/plugins/hr
+	url = https://github.com/damyon/moodle-atto_hr.git
+[submodule "lib/editor/atto/plugins/morebackcolors"]
+	path = lib/editor/atto/plugins/morebackcolors
+	url = https://github.com/ndunand/moodle-atto_morebackcolors.git
+[submodule "lib/editor/atto/plugins/morefontcolors"]
+	path = lib/editor/atto/plugins/morefontcolors
+	url = https://github.com/ndunand/moodle-atto_morefontcolors.git
+[submodule "lib/editor/atto/plugins/pastespecial"]
+	path = lib/editor/atto/plugins/pastespecial
+	url = https://github.com/cdsmith-umn/pastespecial.git
+[submodule "lib/editor/atto/plugins/preview"]
+	path = lib/editor/atto/plugins/preview
+	url = https://github.com/dthies/moodle-atto_preview.git
+[submodule "lib/editor/atto/plugins/sketch"]
+	path = lib/editor/atto/plugins/sketch
+	url = https://github.com/Syxton/atto_sketch.git
+[submodule "lib/editor/atto/plugins/styles"]
+	path = lib/editor/atto/plugins/styles
+	url = https://github.com/moodleuulm/moodle-atto_styles.git
+[submodule "lib/editor/atto/plugins/wordimport"]
+	path = lib/editor/atto/plugins/wordimport
+	url = https://github.com/ecampbell/moodle-atto_wordimport.git
+[submodule "admin/tool/adhoc"]
+	path = admin/tool/adhoc
+	url = https://github.com/unikent/moodle-tool_adhoc.git
+[submodule "admin/tool/advuserbulk"]
+	path = admin/tool/advuserbulk
+	url = https://github.com/andreev-artem/moodle_admin_tool_advuserbulk.git
+[submodule "admin/tool/capexplorer"]
+	path = admin/tool/capexplorer
+	url = https://github.com/simoncoggins/moodle-tool_capexplorer.git
+[submodule "admin/tool/crawler"]
+	path = admin/tool/crawler
+	url = https://github.com/central-queensland-uni/moodle-tool_crawler.git
+[submodule "admin/tool/editrolesbycap"]
+	path = admin/tool/editrolesbycap
+	url = https://github.com/moodleou/moodle-tool_editrolesbycap.git
+[submodule "admin/tool/lockstats"]
+	path = admin/tool/lockstats
+	url = https://github.com/catalyst/moodle-tool_lockstats.git
+[submodule "admin/tool/mergeusers"]
+	path = admin/tool/mergeusers
+	url = https://github.com/ndunand/moodle-tool_mergeusers.git
+[submodule "admin/tool/pluginskel"]
+	path = admin/tool/pluginskel
+	url = https://github.com/mudrd8mz/moodle-tool_pluginskel.git
+[submodule "admin/tool/rebuildcoursecache"]
+	path = admin/tool/rebuildcoursecache
+	url = https://github.com/agrowe/moodle-tool_rebuildcoursecache.git
+[submodule "admin/tool/uploadcoursecategory"]
+	path = admin/tool/uploadcoursecategory
+	url = https://github.com/piersharding/moodle-tool_uploadcoursecategory.git
+[submodule "auth/basic"]
+	path = auth/basic
+	url = https://github.com/catalyst/moodle-auth_basic.git
+[submodule "availability/condition/badge"]
+	path = availability/condition/badge
+	url = https://github.com/tlock/moodle-availability_badge.git
+[submodule "availability/condition/cohort"]
+	path = availability/condition/cohort
+	url = https://github.com/moodleuulm/moodle-availability_cohort.git
+[submodule "availability/condition/coursecompleted"]
+	path = availability/condition/coursecompleted
+	url = https://github.com/ewallah/moodle-availability_coursecompleted.git
+[submodule "availability/condition/language"]
+	path = availability/condition/language
+	url = https://github.com/ewallah/moodle-availability_language.git
+[submodule "blocks/configurable_reports"]
+	path = blocks/configurable_reports
+	url = https://github.com/jleyva/moodle-block_configurablereports.git
+[submodule "blocks/admin_presets"]
+	path = blocks/admin_presets
+	url = https://github.com/DigiDago/moodle-block_admin_presets.git
+[submodule "blocks/cohortspecifichtml"]
+	path = blocks/cohortspecifichtml
+	url = https://github.com/moodleuulm/moodle-block_cohortspecifichtml.git
+[submodule "blocks/news_slider"]
+	path = blocks/news_slider
+	url = https://bitbucket.org/covuni/moodle-block_news_slider.git
+[submodule "blocks/simple_clock"]
+	path = blocks/simple_clock
+	url = https://github.com/deraadt/moodle-block_simple_clock.git
+[submodule "blocks/todo"]
+	path = blocks/todo
+	url = https://github.com/mudrd8mz/moodle-block_todo.git
+[submodule "course/format/board"]
+	path = course/format/board
+	url = https://github.com/brandaorodrigo/moodle-format_board.git
+[submodule "course/format/buttons"]
+	path = course/format/buttons
+	url = https://github.com/brandaorodrigo/moodle-format_buttons.git
+[submodule "course/format/flexsections"]
+	path = course/format/flexsections
+	url = https://github.com/marinaglancy/moodle-format_flexsections.git
+[submodule "course/format/menutopic"]
+	path = course/format/menutopic
+	url = https://github.com/davidherney/moodle-format_menutopic.git
+[submodule "course/format/onetopic"]
+	path = course/format/onetopic
+	url = https://github.com/davidherney/moodle-format_onetopic.git
+[submodule "course/format/topcoll"]
+	path = course/format/topcoll
+	url = https://github.com/gjb2048/moodle-format_topcoll.git
+[submodule "enrol/apply"]
+	path = enrol/apply
+	url = https://github.com/emeneo/moodle-enrol_apply.git
+[submodule "enrol/attributes"]
+	path = enrol/attributes
+	url = https://github.com/ndunand/moodle-enrol_attributes.git
+[submodule "enrol/autoenrol"]
+	path = enrol/autoenrol
+	url = https://github.com/bobopinna/moodle-enrol_autoenrol.git
+[submodule "enrol/groupsync"]
+	path = enrol/groupsync
+	url = https://github.com/moodlehq/moodle-enrol_groupsync.git
+[submodule "enrol/waitlist"]
+	path = enrol/waitlist
+	url = https://github.com/emeneo/moodle-enrol_waitlist.git
+[submodule "filter/collapsible"]
+	path = filter/collapsible
+	url = https://github.com/eberhardt/moodle-filter_collapsible.git
+[submodule "filter/imageopt"]
+	path = filter/imageopt
+	url = https://github.com/gthomas2/moodle-filter_imageopt.git
+[submodule "filter/jmol"]
+	path = filter/jmol
+	url = https://github.com/geoffrowland/moodle-filter_jmol.git
+[submodule "filter/multiembed"]
+	path = filter/multiembed
+	url = https://github.com/frederic-nevers/moodle-filter_multiembed.git
+[submodule "filter/generico"]
+	path = filter/generico
+	url = https://github.com/justinhunt/moodle-filter_generico.git
+[submodule "grade/grading/form/btec"]
+	path = grade/grading/form/btec
+	url = https://github.com/marcusgreen/moodle-gradingform_btec.git
+[submodule "grade/grading/form/checklist"]
+	path = grade/grading/form/checklist
+	url = https://github.com/moodlerooms/moodle-gradingform_checklist.git
+[submodule "grade/grading/form/erubric"]
+	path = grade/grading/form/erubric
+	url = https://github.com/johndimopoulos/moodle-gradingform_erubric.git
+[submodule "grade/export/checklist"]
+	path = grade/export/checklist
+	url = https://github.com/davosmith/moodle-grade_checklist.git
+[submodule "grade/report/quizanalytics"]
+	path = grade/report/quizanalytics
+	url = https://github.com/dualcube/moodle-gradereport_quizanalytics.git
+[submodule "plagiarism/turnitin"]
+	path = plagiarism/turnitin
+	url = https://github.com/turnitin/moodle-plagiarism_turnitin.git
+[submodule "plagiarism/unicheck"]
+	path = plagiarism/unicheck
+	url = https://github.com/unicheck/moodle-plagiarism_unicheckcorp.git
+[submodule "plagiarism/urkund"]
+	path = plagiarism/urkund
+	url = https://github.com/danmarsden/moodle-plagiarism_urkund.git
+[submodule "question/behaviour/adaptive_adapted_for_coderunner"]
+	path = question/behaviour/adaptive_adapted_for_coderunner
+	url = https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner.git
+[submodule "question/behaviour/adaptivemultipart"]
+	path = question/behaviour/adaptivemultipart
+	url = https://github.com/maths/moodle-qbehaviour_adaptivemultipart.git
+[submodule "question/behaviour/deferredfeedbackexplain"]
+	path = question/behaviour/deferredfeedbackexplain
+	url = https://github.com/timhunt/moodle-qbehaviour_deferredfeedbackexplain.git
+[submodule "question/behaviour/dfcbmexplicitvaildate"]
+	path = question/behaviour/dfcbmexplicitvaildate
+	url = https://github.com/maths/moodle-qbehaviour_dfcbmexplicitvaildate.git
+[submodule "question/behaviour/dfexplicitvaildate"]
+	path = question/behaviour/dfexplicitvaildate
+	url = https://github.com/maths/moodle-qbehaviour_dfexplicitvaildate.git
+[submodule "question/format/giftmedia"]
+	path = question/format/giftmedia
+	url = https://github.com/jmvedrine/moodle-qformat_giftmedia.git
+[submodule "question/format/glossary"]
+	path = question/format/glossary
+	url = https://github.com/dthies/moodle-qformat_glossary.git
+[submodule "question/format/hotpot"]
+	path = question/format/hotpot
+	url = https://github.com/gbateson/moodle-qformat_hotpot.git
+[submodule "question/format/stack"]
+	path = question/format/stack
+	url = https://github.com/maths/moodle-qformat_stack.git
+[submodule "question/type/algebra"]
+	path = question/type/algebra
+	url = https://github.com/jmvedrine/moodle-qtype_algebra.git
+[submodule "question/type/coderunner"]
+	path = question/type/coderunner
+	url = https://github.com/trampgeek/moodle-qtype_coderunner.git
+[submodule "question/type/combined"]
+	path = question/type/combined
+	url = https://github.com/moodleou/moodle-qtype_combined.git
+[submodule "question/type/conceptmap"]
+	path = question/type/conceptmap
+	url = https://github.com/villalon/qtype_conceptmap.git
+[submodule "question/type/easyofischer"]
+	path = question/type/easyofischer
+	url = https://github.com/cleblond/moodle-qtype_easyofischer
+[submodule "question/type/easyonewman"]
+	path = question/type/easyonewman
+	url = https://github.com/cleblond/moodle-qtype_easyonewman.git
+[submodule "question/type/essayautograde"]
+	path = question/type/essayautograde
+	url = https://github.com/gbateson/moodle-qtype_essayautograde.git
+[submodule "question/type/formulas"]
+	path = question/type/formulas
+	url = https://github.com/jmvedrine/moodle-qtype_formulas.git
+[submodule "question/type/gapfill"]
+	path = question/type/gapfill
+	url = https://github.com/marcusgreen/moodle-qtype_gapfill.git
+[submodule "question/type/geogebra"]
+	path = question/type/geogebra
+	url = https://github.com/geogebra/moodle-qtype_geogebra.git
+[submodule "question/type/kprime"]
+	path = question/type/kprime
+	url = https://github.com/ethz-let/moodle-qtype_kprime
+[submodule "question/type/pmatch"]
+	path = question/type/pmatch
+	url = https://github.com/moodleou/moodle-qtype_pmatch.git
+[submodule "question/type/pmatchreverse"]
+	path = question/type/pmatchreverse
+	url = https://github.com/timhunt/moodle-qtype_pmatchreverse
+[submodule "question/type/mtf"]
+	path = question/type/mtf
+	url = https://github.com/ethz-let/qtype_mtf.git
+[submodule "question/type/ordering"]
+	path = question/type/ordering
+	url = https://github.com/gbateson/moodle-qtype_ordering.git
+[submodule "question/type/stack"]
+	path = question/type/stack
+	url = https://github.com/maths/moodle-qtype_stack.git
+[submodule "question/type/type_calc_sheet"]
+	path = question/type/type_calc_sheet
+	url = https://github.com/lechunche/type_calc_sheet.git
+[submodule "report/assign"]
+	path = report/assign
+	url = https://github.com/thepurpleblob/moodle-report_assign.git
+[submodule "report/benchmark"]
+	path = report/benchmark
+	url = https://github.com/mikasmart/benchmark.git
+[submodule "report/componentgrades"]
+	path = report/componentgrades
+	url = https://github.com/pauln/moodle-report_componentgrades.git
+[submodule "report/customsql"]
+	path = report/customsql
+	url = https://github.com/moodleou/moodle-report_customsql.git
+[submodule "report/extendedlog"]
+	path = report/extendedlog
+	url = https://github.com/vadimonus/moodle-report_extendedlog.git
+[submodule "report/forumgraph"]
+	path = report/forumgraph
+	url = https://github.com/ctchanandy/moodle-report_forumgraph.git
+[submodule "repository/geogebratube"]
+	path = repository/geogebratube
+	url = https://github.com/geogebra/moodle-repository_geogebratube.git
+[submodule "repository/searchable"]
+	path = repository/searchable
+	url = https://github.com/jpahullo/moodle-repository_searchable.git
+[submodule "theme/adaptable"]
+	path = theme/adaptable
+	url = https://bitbucket.org/covuni/moodle-theme_adaptable.git
+[submodule "theme/boost_training"]
+	path = theme/boost_training
+	url = https://github.com/EduardoKrausME/moodle-theme_boost_training.git
+[submodule "theme/bootstrap"]
+	path = theme/bootstrap
+	url = https://github.com/bmbrands/theme_bootstrap.git
+[submodule "theme/essential"]
+	path = theme/essential
+	url = https://github.com/gjb2048/moodle-theme_essential.git
+[submodule "theme/moove"]
+	path = theme/moove
+	url = https://github.com/willianmano/moodle-theme_moove.git
+[submodule "user/profile/field/oidc"]
+	path = user/profile/field/oidc
+	url = https://github.com/microsoft/moodle-profilefield_oidc.git
+[submodule "course/format/multitopic"]
+	path = course/format/multitopic
+	url = https://github.com/james-cnz/moodle-format_multitopic.git
+[submodule "lib/editor/atto/plugins/teamsmeeting"]
+	path = lib/editor/atto/plugins/teamsmeeting
+	url = https://github.com/enovation/moodle-atto_teamsmeeting.git
+[submodule "question/type/varnumeric"]
+	path = question/type/varnumeric
+	url = https://github.com/moodleou/moodle-qtype_varnumeric.git
+[submodule "question/type/varnumericset"]
+	path = question/type/varnumericset
+	url = https://github.com/moodleou/moodle-qtype_varnumericset.git
+[submodule "question/type/varnumunit"]
+	path = question/type/varnumunit
+	url = https://github.com/moodleou/moodle-qtype_varnumunit.git
+[submodule "question/type/regexp"]
+	path = question/type/regexp
+	url = https://github.com/rezeau/moodle-qtype_regexp.git
+[submodule "question/behaviour/regexpadaptivewithhelp"]
+	path = question/behaviour/regexpadaptivewithhelp
+	url = https://github.com/rezeau/moodle-qbehaviour_regexpadaptivewithhelp.git
+[submodule "question/behaviour/regexpadaptivewithhelpnopenalty"]
+	path = question/behaviour/regexpadaptivewithhelpnopenalty
+	url = https://github.com/rezeau/moodle-qbehaviour_regexpadaptivewithhelpnopenalty.git
+[submodule "question/type/oumultiresponse"]
+	path = question/type/oumultiresponse
+	url = https://github.com/moodleou/moodle-qtype_oumultiresponse.git
+[submodule "question/type/recordrtc"]
+	path = question/type/recordrtc
+	url = https://github.com/moodleou/moodle-qtype_recordrtc.git
+[submodule "mod/pdfannotator"]
+	path = mod/pdfannotator
+	url = https://github.com/rwthmoodle/moodle-mod_pdfannotator.git
+[submodule "mod/groupselect"]
+	path = mod/groupselect
+	url = https://github.com/rogerbaba/moodle-mod_groupselect.git

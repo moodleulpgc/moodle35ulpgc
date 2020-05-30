@@ -49,7 +49,7 @@ git submodule add https://github.com/dasistwas/moodle-mod_datalynx.git          
 git submodule add https://github.com/troywilliams/moodle-mod_dialogue.git               mod/dialogue
 git submodule add https://github.com/bdaloukas/moodle-mod_game.git                      mod/game
 git submodule add https://github.com/projectestac/moodle-mod_geogebra.git               mod/geogebra
-git submodule add https://github.com/BLC-HTWChur/moodle-mod_groupselect.git             mod/groupselect
+git submodule add https://github.com/rogerbaba/moodle-mod_groupselect.git               mod/groupselect
 git submodule add https://github.com/h5p/h5p-moodle-plugin.git                          mod/hvp
 git submodule add https://github.com/gbateson/moodle-mod_hotpot.git                     mod/hotpot
 #git submodule add https://github.com/drachels/moodle-mod_hotquestion.git                mod/hotquestion
@@ -107,11 +107,6 @@ cd mod/quiz/report/mcq && git checkout master && cd ../../../../
 git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
 git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
 
-git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
-git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
-git submodule add https://github.com/danmarsden/moodle-quiz_randomsummary.git           mod/quiz/report/randomsummary
-git submodule add https://github.com/maths/quiz_stack.git                               mod/quiz/report/stack  
-
 #Atto editor plugins
 git submodule add https://github.com/geoffrowland/moodle-editor_atto-chemistry.git  lib/editor/atto/plugins/chemistry
 git submodule add https://github.com/ucla/moodle-atto_chemrender.git                lib/editor/atto/plugins/chemrender
@@ -132,6 +127,7 @@ git submodule add https://github.com/Syxton/atto_sketch.git                     
 git submodule add https://github.com/moodleuulm/moodle-atto_styles.git              lib/editor/atto/plugins/styles
 git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git           lib/editor/atto/plugins/wordimport
 git submodule add https://github.com/moodleuulm/moodle-atto_styles.git              lib/editor/atto/plugins/styles
+git submodule add https://github.com/enovation/moodle-atto_teamsmeeting.git         lib/editor/atto/plugins/teamsmeeting
 git submodule add https://github.com/ecampbell/moodle-atto_wordimport.git           lib/editor/atto/plugins/wordimport
 
 #Admin tools
@@ -163,10 +159,10 @@ git submodule add https://github.com/ewallah/moodle-availability_coursecompleted
 git submodule add https://github.com/ewallah/moodle-availability_language.git           availability/condition/language
 
 #Blocks
+git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git        blocks/admin_presets
 git submodule add https://github.com/jleyva/moodle-block_configurablereports.git    blocks/configurable_reports
 #Branch MOODLE_36_STABLE
 cd blocks/configurable_reports && git checkout MOODLE_36_STABLE && cd ../../
-git submodule add https://github.com/DigiDago/moodle-block_admin_presets.git        blocks/admin_presets
 git submodule add https://github.com/moodleuulm/moodle-block_cohortspecifichtml.git blocks/cohortspecifichtml
 git submodule add  https://bitbucket.org/covuni/moodle-block_news_slider.git        blocks/news_slider
 git submodule add https://github.com/deraadt/moodle-block_simple_clock.git          blocks/simple_clock
@@ -177,6 +173,7 @@ git submodule add https://github.com/brandaorodrigo/moodle-format_board.git     
 git submodule add https://github.com/brandaorodrigo/moodle-format_buttons.git       course/format/buttons
 git submodule add https://github.com/marinaglancy/moodle-format_flexsections.git    course/format/flexsections  
 git submodule add https://github.com/davidherney/moodle-format_menutopic.git        course/format/menutopic
+git submodule add https://github.com/james-cnz/moodle-format_multitopic.git         course/format/multitopic  
 git submodule add https://github.com/davidherney/moodle-format_onetopic.git         course/format/onetopic  
 git submodule add https://github.com/gjb2048/moodle-format_topcoll.git              course/format/topcoll
 cd course/format/topcoll && git checkout MOODLE_35 && cd ../../../
@@ -223,6 +220,8 @@ git submodule add https://github.com/maths/moodle-qbehaviour_adaptivemultipart.g
 git submodule add https://github.com/timhunt/moodle-qbehaviour_deferredfeedbackexplain.git  question/behaviour/deferredfeedbackexplain
 git submodule add https://github.com/maths/moodle-qbehaviour_dfcbmexplicitvaildate.git      question/behaviour/dfcbmexplicitvaildate
 git submodule add https://github.com/maths/moodle-qbehaviour_dfexplicitvaildate.git         question/behaviour/dfexplicitvaildate
+git submodule add https://github.com/rezeau/moodle-qbehaviour_regexpadaptivewithhelp.git            question/behaviour/regexpadaptivewithhelp
+git submodule add https://github.com/rezeau/moodle-qbehaviour_regexpadaptivewithhelpnopenalty.git   question/behaviour/regexpadaptivewithhelpnopenalty
 
 #Question formats
 git submodule add https://github.com/jmvedrine/moodle-qformat_giftmedia.git question/format/giftmedia
@@ -248,9 +247,15 @@ git submodule add https://github.com/timhunt/moodle-qtype_pmatchreverse     ques
 git submodule add https://github.com/ethz-let/qtype_mtf.git                 question/type/mtf
 git submodule add https://github.com/gbateson/moodle-qtype_ordering.git     question/type/ordering
 #Fix install.xml 
+git submodule add https://github.com/moodleou/moodle-qtype_oumultiresponse.git  question/type/oumultiresponse
+git submodule add https://github.com/rezeau/moodle-qtype_regexp.git         question/type/regexp
+git submodule add https://github.com/moodleou/moodle-qtype_recordrtc.git     question/type/recordrtc
 git submodule add https://github.com/maths/moodle-qtype_stack.git           question/type/stack
 git submodule add https://github.com/lechunche/type_calc_sheet.git          question/type/type_calc_sheet
 #need to be upgraded v 2013061200 + backup ULPGC 
+git submodule add https://github.com/moodleou/moodle-qtype_varnumeric.git       question/type/varnumeric
+git submodule add https://github.com/moodleou/moodle-qtype_varnumericset.git    question/type/varnumericset
+git submodule add https://github.com/moodleou/moodle-qtype_varnumunit.git       question/type/varnumunit
 
 #Reports
 git submodule add https://github.com/thepurpleblob/moodle-report_assign.git             report/assign

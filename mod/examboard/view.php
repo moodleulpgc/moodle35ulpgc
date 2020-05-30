@@ -163,6 +163,7 @@ if($view == 'board' && ($cangrade || $canmanage)) {
         $examinees_table = new \mod_examboard\output\examinees_table($url, $examination, $examboard);
         $examinees_table->editurl = $editurl;
         $examinees_table->canmanage = $canmanage;
+        $examinees_table->canedit = $examination->is_active_member($USER->id);
         echo $renderer->render($examinees_table);   
         
 

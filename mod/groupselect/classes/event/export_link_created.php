@@ -32,20 +32,33 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 class export_link_created extends \core\event\base {
+
+    /**
+     * Initialisation
+     */
     protected function init() {
         $this->data['crud'] = 'c'; // c(reate), r(ead), u(pdate), d(elete)
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
+    /**
+     * Gets the name
+     */
     public static function get_name() {
         return get_string('eventexportlinkcreated', 'mod_groupselect');
     }
 
+    /**
+     * Gets the description
+     */
     public function get_description() {
         return "The user with id '$this->userid' created a download link " .
                 "for the groupselect with the course module id '$this->contextinstanceid'";
     }
 
+    /**
+     * Gets the URL
+     */
     public function get_url() {
         return new \moodle_url('/mod/groupselect/view.php', array('id' => $this->contextinstanceid));
     }

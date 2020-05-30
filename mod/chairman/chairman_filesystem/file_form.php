@@ -34,7 +34,7 @@ chairman_check($id);
 chairman_header($id, 'filesview', 'chairman_filesystem/file_form.php?id=' . $id);
 
 $COURSE_MODULE = get_coursemodule_from_id('chairman', $id);
-$CONTEXT = get_context_instance(CONTEXT_MODULE, $COURSE_MODULE->id);
+$CONTEXT = context_module::instance($COURSE_MODULE->id);
 $PRIVATE = 0;
 $ADMIN = 0;
 

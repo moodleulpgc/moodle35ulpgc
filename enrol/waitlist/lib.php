@@ -26,6 +26,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// ecastro ULPGC
+/**
+ * waitlist_CREATEGROUP constant for automatically creating a group for a waitlist enrol from cohort.
+ */
+define('WAITLIST_CREATE_GROUP', -1);
+define('WAITLIST_MULTIPLE_GROUP', -2);
+define('WAITLIST_KEEP_GROUP', -3);
+define('WAITLIST_ENROLGROUPS', 0);
+define('WAITLIST_ONLYGROUPS', 1);
+define('WAITLIST_ROLEGROUPS', 2);
+// ecastro ULPGC
+
+
 class enrol_waitlist_plugin extends enrol_plugin {
 
     /**
@@ -44,6 +57,9 @@ class enrol_waitlist_plugin extends enrol_plugin {
         $key = false;
         $nokey = false;
         foreach ($instances as $instance) {
+            if(!$this->show_enrolme_link($instance)) {
+                continue 1;
+            }
             if ($instance->password or $instance->customint1) {
                 $key = true;
             } else {
@@ -99,7 +115,71 @@ class enrol_waitlist_plugin extends enrol_plugin {
     }
 
     public function show_enrolme_link(stdClass $instance) {
-        return ($instance->status == ENROL_INSTANCE_ENABLED);
+        //return ($instance->status == ENROL_INSTANCE_ENABLED);
+        global $DB, $USER;
+        
+        if(!($instance->status == ENROL_INSTANCE_ENABLED)) {
+            return false;
+        }
+        
+        if(empty($instance->customchar1) && empty($instance->customchar2) && empty($instance->customchar3)) {
+            return ($instance->status == ENROL_INSTANCE_ENABLED);
+        }
+        
+        $sql = '';
+        $params = array();
+        $params['userid'] = $USER->id;
+
+        // add mandatory AND cohort, if existing
+        $cohortand = '';
+        if($instance->customchar1) {
+            $cohortand = " AND EXISTS (SELECT 1 FROM {cohort_members} cha 
+                                                JOIN {cohort} ca ON ca.id = cha.cohortid AND ca.idnumber = :chand
+                                                WHERE cha.userid = chm.userid ) ";
+            $params['chand'] = $instance->customchar1;
+        }
+
+        // add restricting NOT cohort, if existing
+        $cohortnot = '';
+        if($instance->customchar2) {
+            $cohortnot = " AND NOT EXISTS (SELECT 1 FROM {cohort_members} chn 
+                                                JOIN {cohort} cn ON cn.id = chn.cohortid AND cn.idnumber = :chnot
+                                                WHERE chn.userid = chm.userid ) ";
+            $params['chnot'] = $instance->customchar2;
+        }
+        
+        if($instance->customchar3) {
+            $groupcohorts = explode(',', $instance->customchar3);
+            list($insql, $chparams) = $DB->get_in_or_equal($groupcohorts);
+            $groupcohorts = $DB->get_records_select_menu('cohort', "idnumber $insql", $chparams, 'id, idnumber');
+            list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groupcohorts), SQL_PARAMS_NAMED, 'ch');
+            $params = array_merge($params, $inparams);
+            
+            $sql = "SELECT 1
+                    FROM {cohort_members} chm 
+                    WHERE chm.userid = :userid AND chm.cohortid $insql  
+                    $cohortand $cohortnot ";
+                    
+        } elseif($instance->customchar1) {
+            $sql = "SELECT 1
+                    FROM {cohort_members} chm 
+                    JOIN {cohort} c ON c.id = chm.cohortid AND c.idnumber = :chand
+                    WHERE chm.userid = :userid $cohortnot ";
+            $params['chand'] = $instance->customchar1;
+        
+        } elseif($instance->customchar2) { 
+            $sql = "SELECT 1 FROM {cohort_members} chm 
+                            JOIN {cohort} c ON c.id = chm.cohortid AND c.idnumber = :chnot
+                            WHERE chm.userid = :userid ";
+            $params['chnot'] = $instance->customchar2;
+            return !$DB->record_exists_sql($sql, $params);
+        }
+        
+        if($sql) { 
+            return (bool)$DB->record_exists_sql($sql, $params);
+        }
+        
+        return false;
     }
 
     /**
@@ -237,6 +317,14 @@ class enrol_waitlist_plugin extends enrol_plugin {
             // TODO: inform that we can not enrol yet
             return null;
         }
+        
+        //ecastro ULPGC
+        if(!$this->show_enrolme_link($instance)) {
+            // TODO: inform that we can not enrol yet
+            return null;
+        }
+        //ecastro ULPGC        
+        
         /*
         if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
             //TODO: inform that enrolment is not possible any more
@@ -291,7 +379,7 @@ class enrol_waitlist_plugin extends enrol_plugin {
                         }
                     }
                 }
-
+                
                 if($canEnrol){
                              $this->enrol_user($instance, $USER->id, $instance->roleid, $timestart, $timeend);
                     if ($instance->customint4) {
@@ -323,7 +411,7 @@ class enrol_waitlist_plugin extends enrol_plugin {
                 redirect("$CFG->wwwroot/course/view.php?id=$instance->courseid");
             }
         }
-
+        
         ob_start();
         $form->display();
         $output = ob_get_clean();
@@ -352,6 +440,8 @@ class enrol_waitlist_plugin extends enrol_plugin {
         return $this->add_instance($course, $fields);
     }
 
+
+    
     /**
      * Send welcome email to specified user
      *
@@ -538,6 +628,48 @@ class enrol_waitlist_plugin extends enrol_plugin {
             }
         }
     }
+    
+    
+    /**
+    * Enrol user into course via waitlist instance, add groups 
+    *
+    * @param stdClass $instance
+    * @param int $userid
+    * @param int $roleid optional role id
+    * @param int $timestart 0 means unknown
+    * @param int $timeend 0 means forever
+    * @param int $status default to ENROL_USER_ACTIVE for new enrolments, no change by default in updates
+    * @param bool $recovergrades restore grade history
+    * @return void
+    */
+    public function enrol_user(stdClass $instance, $userid, $roleid = null, $timestart = 0, $timeend = 0, $status = null, $recovergrades = null) {
+        global $DB, $USER, $CFG; // CFG necessary!!!
+
+        parent::enrol_user($instance, $userid, $roleid, $timestart, $timeend, $status, $recovergrades);
+        
+        if($instance->customint7) {
+            require_once("$CFG->dirroot/group/lib.php");        
+            // group assigning asked 
+            if($instance->customint8 > 0) {
+                $coursegroups = groups_get_all_groups($instance->courseid, 0, 0, 'g.id, g.idnumber');
+                // customint8 if a groupid
+                if(isset($coursegroups[$instance->customint8])) {
+                    groups_add_member($instance->customint8, $userid);
+                }
+            } else if($instance->customint8 == WAITLIST_MULTIPLE_GROUP && !empty($instance->customchar3)) {
+                require_once($CFG->dirroot . '/cohort/lib.php');
+                list($insql, $params) = $DB->get_in_or_equal(explode(',', $instance->customchar3));
+                $cohorts = $DB->get_records_select_menu('cohort', "idnumber $insql", $params, 'id, idnumber');
+                foreach($cohorts as $cohortid => $idnumber) {
+                    if($groupid = groups_get_group_by_idnumber($instance->courseid, $idnumber) 
+                                    && cohort_is_member($cohortid, $userid)){
+                        groups_add_member($groupid, $userid);
+                    } 
+                }
+            }
+        }
+    }
+    
 }
 
 /**

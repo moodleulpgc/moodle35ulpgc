@@ -168,11 +168,11 @@
 
 .path-mod-studentquiz #categoryquestions .rates,
 .path-mod-studentquiz #categoryquestions .difficultylevel,
-.path-mod-studentquiz #categoryquestions .practice {
+.path-mod-studentquiz #categoryquestions .attempts {
     width: 115px;
 }
 
-.path-mod-studentquiz #categoryquestions th.practice .sorters,
+.path-mod-studentquiz #categoryquestions th.attempts .sorters,
 .path-mod-studentquiz #categoryquestions th.difficultylevel .sorters,
 .path-mod-studentquiz #categoryquestions th.rates .sorters {
     font-size: .8em;
@@ -239,8 +239,8 @@
     text-decoration: none;
 }
 
-.path-mod-studentquiz .studentquiz_behaviour .comment_list div p:last-child {
-    margin: 0;
+.path-mod-studentquiz .studentquiz_behaviour .comment_list .editor_atto_content_wrap.no-content .editor_atto_content p {
+    margin: 0; /** When in no content state, p has no margin. */
 }
 
 .path-mod-studentquiz .studentquiz_behaviour .rate .rating {
@@ -560,7 +560,11 @@
     text-align: right;
     display: inline-block;
     width: 100%;
-    padding: 12px 0 12px 30px;
+    padding: 12px 0 2px 30px;
+}
+
+.path-mod-studentquiz .studentquiz-comment-container .studentquiz-comment-postfooter .studentquiz-comment-commands-box > div {
+    margin-bottom: 10px;
 }
 
 .path-mod-studentquiz .studentquiz-comment-container .studentquiz-comment-commands-buttons {
@@ -577,10 +581,9 @@
 
 .path-mod-studentquiz .studentquiz-comment-container .studentquiz-comment-totalreply {
     display: inline-block;
-    float: right;
-    margin-top: 3px;
     font-size: 1em;
     color: #000;
+    line-height: 28px;
 }
 
 .path-mod-studentquiz .studentquiz-comment-container .studentquiz-comment-replies {
@@ -763,3 +766,10 @@
     content: url([[pix:mod_studentquiz|switch_plus]]);
 }
 
+.path-mod-studentquiz .studentquiz-comment-container .studentquiz-comment-commands-buttons .studentquiz-comment-btneditreply img,
+.path-mod-studentquiz .studentquiz-comment-container .studentquiz-comment-commands-buttons .studentquiz-comment-btnedit img {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin: 0 9px 0 0;
+}

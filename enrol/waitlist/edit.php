@@ -15,154 +15,107 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-
  * *************************************************************************
-
  * *                  Waitlist Enrol                                      **
-
  * *************************************************************************
-
  * @copyright   emeneo.com                                                **
-
  * @link        emeneo.com                                                **
-
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later  **
-
  * *************************************************************************
-
  * ************************************************************************
-
  */
 
 require('../../config.php');
-
 require_once('edit_form.php');
 
-
-
 $courseid   = required_param('courseid', PARAM_INT);
-
 $instanceid = optional_param('id', 0, PARAM_INT); // instanceid
-
-
-
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-
 // $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
-
 $context = context_course::instance($course->id);
-
-
 
 require_login($course);
 
 require_capability('enrol/waitlist:config', $context);
 
-
-
 $PAGE->set_url('/enrol/waitlist/edit.php', array('courseid' => $course->id, 'id' => $instanceid));
-
 $PAGE->set_pagelayout('admin');
-
-
-
 $return = new moodle_url('/enrol/instances.php', array('id' => $course->id));
 
 if (!enrol_is_enabled('waitlist')) {
-
     redirect($return);
-
 }
-
-
 
 $plugin = enrol_get_plugin('waitlist');
 
-
-
 if ($instanceid) {
-
     $instance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'waitlist', 'id' => $instanceid), '*', MUST_EXIST);
-
 } else {
-
     require_capability('moodle/course:enrolconfig', $context);
-
     // no instance yet, we have to add new instance
-
     navigation_node::override_active_url(new moodle_url('/enrol/instances.php', array('id' => $course->id)));
-
     $instance = new stdClass();
-
     $instance->id       = null;
-
     $instance->courseid = $course->id;
-
 }
-
-
 
 $mform = new enrol_waitlist_edit_form(null, array($instance, $plugin, $context));
 
-
-
 if ($mform->is_cancelled()) {
-
     redirect($return);
-
-
-
 } else if ($data = $mform->get_data()) {
-
+    $data->customchar3 = !empty($data->customchar3) ? implode(',', $data->customchar3) : '';
     if ($instance->id) {
-
         $instance->status         = $data->status;
-
         $instance->name           = $data->name;
-
         $instance->password       = $data->password;
-
         $instance->customint1     = $data->customint1;
-
         $instance->customint2     = $data->customint2;
-
         $instance->customint3     = $data->customint3;
-
         $instance->customint4     = $data->customint4;
-
         $instance->customint5     = $data->customint5; // ecastro ULPGC
         $instance->customint6     = $data->customint6; // ecastro ULPGC
-        
-        $instance->customchar1     = $data->customchar1;
-
-        $instance->customchar2     = $data->customchar2;
-
+        $instance->customint7     = $data->customint7; // ecastro ULPGC
+        $instance->customint8     = $data->customint8; // ecastro ULPGC
+        $instance->customchar1    = $data->customchar1;
+        $instance->customchar2    = $data->customchar2;
+        $instance->customchar3    = $data->customchar3; // ecastro ULPGC
         $instance->customtext1    = $data->customtext1;
-
         $instance->roleid         = $data->roleid;
-
         $instance->enrolperiod    = $data->enrolperiod;
-
         $instance->enrolstartdate = $data->enrolstartdate;
-
         $instance->enrolenddate   = $data->enrolenddate;
-
         $instance->timemodified   = time();
 
         $DB->update_record('enrol', $instance);
-
     } else {
-
         $fields = array('status' => $data->status, 'name' => $data->name, 'password' => $data->password, 'customint1' => $data->customint1, 'customint2' => $data->customint2,
-
-                        'customint3' => $data->customint3, 'customint4' => $data->customint4, 'customtext1' => $data->customtext1,
-
-                        'roleid' => $data->roleid, 'enrolperiod' => $data->enrolperiod, 'enrolstartdate' => $data->enrolstartdate, 'enrolenddate' => $data->enrolenddate,'customchar1' => $data->customchar1,'customchar2' => $data->customchar2);
-
+                        'customint3' => $data->customint3, 'customint4' => $data->customint4, 'customint5' => $data->customint5, 
+                        'customint6' => $data->customint6, 'customint7' => $data->customint7, 'customint8' => $data->customint8, 
+                        'customtext1' => $data->customtext1,
+                        'roleid' => $data->roleid, 'enrolperiod' => $data->enrolperiod, 'enrolstartdate' => $data->enrolstartdate, 'enrolenddate' => $data->enrolenddate,
+                        'customchar1' => $data->customchar1,'customchar2' => $data->customchar2, 'customchar3' => $data->customchar3);
         $plugin->add_instance($course, $fields);
-
     }
 
+    // process groups // ensure groups created
+    if($data->customint7  && $data->customint8 < 0) {
+        require_once("$CFG->dirroot/group/lib.php");        
+    
+        if($data->customchar3 && $data->customint8 == WAITLIST_MULTIPLE_GROUP) {
+            $group = new stdClass();
+            $group->courseid = $course->id;
+            $group->description = '';
+            foreach(explode(',', $data->customchar3) as $idnumber) {
+                if(!groups_get_group_by_idnumber($course->id, $idnumber)) {
+                    $group->name = $DB->get_field('cohort', 'name', array('idnumber'=>$idnumber));
+                    $group->idnumber = $idnumber;
+                    groups_create_group($group);
+                }
+            }
+        }
+    }    
+    
     // cumstom fields process
     $data = data_submitted();
     $data = (array)$data;
@@ -189,27 +142,15 @@ if ($mform->is_cancelled()) {
             $fieldData->data = $v;
             $DB->insert_record('waitlist_info_data', $fieldData);
         }
-    }else{
+    } else {
         $DB->delete_records('waitlist_info_data', array('course_id' => $courseid));
     }
-
     redirect($return);
-
 }
 
-
-
 $PAGE->set_heading($course->fullname);
-
 $PAGE->set_title(get_string('pluginname', 'enrol_waitlist'));
-
-
-
 echo $OUTPUT->header();
-
 echo $OUTPUT->heading(get_string('pluginname', 'enrol_waitlist'));
-
 $mform->display();
-
 echo $OUTPUT->footer();
-

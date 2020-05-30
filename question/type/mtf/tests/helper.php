@@ -15,22 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Test helpers for the mtf question type.
- *
- * @package    qtype
- * @subpackage mtf
- * @copyright  2018 ETHZ
+ * @package     qtype_mtf
+ * @author      Amr Hourani (amr.hourani@id.ethz.ch)
+ * @author      Martin Hanusch (martin.hanusch@let.ethz.ch)
+ * @copyright   2016 ETHZ {@link http://ethz.ch/}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 
-/**
- * Test helper class for the mtf question type.
- *
- * @copyright  2018 ETHZ
- */
 class qtype_mtf_test_helper extends question_test_helper {
 
     public function get_test_questions() {

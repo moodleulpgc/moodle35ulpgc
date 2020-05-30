@@ -15,21 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @package qtype_mtf
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+ * @package     qtype_mtf
+ * @author      Amr Hourani (amr.hourani@id.ethz.ch)
+ * @author      Martin Hanusch (martin.hanusch@let.ethz.ch)
+ * @copyright   2016 ETHZ {@link http://ethz.ch/}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/outputcomponents.php');
-
 
 /**
  * Subclass for generating the bits of output specific to mtf questions.
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 class qtype_mtf_renderer extends qtype_renderer {
 
     /**
@@ -170,7 +172,7 @@ class qtype_mtf_renderer extends qtype_renderer {
                             'qtype_mtf', 'optiontext', $row->id));
             $rowcount++;
             $cell = new html_table_cell(
-                    '<span class="optiontext"><label for="' . $buttonid . '">' . $rowtext .
+                    '<span class="optiontext"><label>' . $rowtext .
                              '</label></span>');
             $cell->attributes['class'] = 'optiontext';
             $rowdata[] = $cell;
@@ -204,6 +206,12 @@ class qtype_mtf_renderer extends qtype_renderer {
 
         $result .= html_writer::table($table, true);
 
+        if ($qa->get_state() == question_state::$invalid) {
+            $result .= html_writer::nonempty_tag('div',
+                    $question->get_validation_error($qa->get_last_qt_data()),
+                    array('class' => 'validationerror'));
+        }
+
         if (!empty(get_config('qtype_mtf')->showscoringmethod)) {
             $result .= $this->showscoringmethod($question);
         }
@@ -214,7 +222,7 @@ class qtype_mtf_renderer extends qtype_renderer {
     /**
      * Returns a string containing the rendererd question's scoring method.
      * Appends an info icon containing information about the scoring method.
-     * @param qtype_sc_question $question
+     * @param qtype_mtf_question $question
      * @return string
      */
     private function showscoringmethod($question) {
@@ -229,10 +237,11 @@ class qtype_mtf_renderer extends qtype_renderer {
         }
 
         if (get_string_manager()->string_exists('scoring' . $question->scoringmethod . '_help', 'qtype_mtf')) {
+            $label = get_string('scoringmethod', 'qtype_mtf') . ': <b>' . ucfirst($outputscoringmethod) . '</b>';
             $result .= html_writer::tag('div',
-                '<br>'. get_string('scoringmethod', 'qtype_mtf'). ': <b>' . ucfirst($outputscoringmethod) . '</b>' .
-                $OUTPUT->help_icon('scoring' . $question->scoringmethod, 'qtype_mtf'),
-                array('id' => 'scoringmethodinfo_q' . $question->id));
+                '<br>'. $label . $OUTPUT->help_icon('scoring' . $question->scoringmethod, 'qtype_mtf'),
+                array('id' => 'scoringmethodinfo_q' . $question->id,
+                    'label' => $label));
         }
         return $result;
     }
@@ -256,8 +265,8 @@ class qtype_mtf_renderer extends qtype_renderer {
         if ($id == '') {
             $id = $name;
         }
-        $result .= '<input type="radio" id="' . $id . '" name="' . $name . '" value="' . $value .
-                 '" ' . $checked . ' ' . $readonly . ' ' . $datacol . ' ' . $datamulti . '/>';
+        $result .= '<label><input type="radio" id="' . $id . '" name="' . $name . '" value="' . $value .
+                 '" ' . $checked . ' ' . $readonly . ' ' . $datacol . ' ' . $datamulti . '/></label>';
         return $result;
     }
 

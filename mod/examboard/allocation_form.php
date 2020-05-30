@@ -45,22 +45,33 @@ class examboard_allocation_form extends moodleform {
         $groupid = $this->_customdata['groupid'];
         $groups = $this->_customdata['groups'];
         $allocationmode = $this->_customdata['allocationmode'];
-        
 
         $mform->addElement('header', 'examsfieldset', get_string('examsallocated', 'examboard'));
         
         $exams = examboard_get_user_exams($examboard, true, 0, $groupid, 'idnumber ASC');
         $boards = array();
         foreach($exams as $key => $exam) {
-            if(array_key_exists($exam->boardid, $boards)) {
-                //this insures that a board team with multiple exam sessions is allocated only once
-                unset($exams[$key]);
-                continue;
+            if($allocationmode == 'allocateboard') {
+                if(array_key_exists($exam->boardid, $boards)) {
+                    //this insures that a board team with multiple exam sessions is allocated only once
+                    //unset($exams[$key]);
+                    //continue;
+                }
             }
-            $exams[$key] = $exam->idnumber.' - '.$exam->name ;
+            $name = $exam->idnumber;
+            if($exam->name) {
+                $name .= ' - '.$exam->name;
+            }
+            //if(($allocationmode != 'allocateboard') && $exam->sessionname) {
+                $name .= ' ('.$exam->examperiod.' - '.$exam->sessionname.')';
+            //}
+            
+            $exams[$key] = $name ;
             $boards[$exam->boardid] = $exam->boardid;    
         }
-        $select = $mform->addElement('select', 'allocatedexams', get_string('allocatedexams', 'examboard'), $exams, array('size'=>8));
+        
+        $targetname = ($allocationmode == 'allocateboard') ?  get_string('allocatedboards', 'examboard') : get_string('allocatedexams', 'examboard');
+        $select = $mform->addElement('select', 'allocatedexams', $targetname, $exams, array('size'=>12));
         $mform->addHelpButton('allocatedexams', 'allocatedexams', 'examboard');
         $select->setMultiple(true);
         $mform->addRule('allocatedexams', null, 'required', '', 'client');
@@ -92,8 +103,22 @@ class examboard_allocation_form extends moodleform {
         
         if($allocationmode == 'allocateboard') {
             $mform->addElement('advcheckbox', 'repeatable', get_string('allocrepeatable', 'examboard'), get_string('allocrepeatable_help', 'examboard'));
-            $mform->addElement('advcheckbox', 'deputy', get_string('allocdeputy', 'examboard'), get_string('allocdeputy_help', 'examboard'));
+            
+            $options = array('' => get_string('none'), 
+                            'any' => get_string('any'), 
+                            'exams' => get_string('allocatedexams', 'examboard'));
+            $convos = explode("\n", get_config('examboard', 'examperiods'));
+            foreach($convos as $convo) {
+                $parts = explode(':', trim($convo)); 
+                if(isset($parts[1]) && trim($parts[1])) {
+                    $options[trim($parts[0])] = trim($parts[1]);
+                }
+            }
+            $mform->addElement('select', 'excludeexisting', get_string('allocexcludeexisting', 'examboard'), $options);
+            $mform->addHelpButton('excludeexisting', 'allocexcludeexisting', 'examboard');
+            
             $mform->addElement('advcheckbox', 'delexisting', get_string('allocprevious', 'examboard'), get_string('allocprevious_help', 'examboard'));
+            $mform->addElement('advcheckbox', 'deputy', get_string('allocdeputy', 'examboard'), get_string('allocdeputy_help', 'examboard'));
         } else {
             $options = array(0 => get_string('nolimit', 'examboard'));
             foreach(range(1,25) as $i) {
@@ -103,13 +128,20 @@ class examboard_allocation_form extends moodleform {
             $mform->addHelpButton('usersperexam', 'usersperexam', 'examboard');
         }
         
-        
-        $options = array(EXAMBOARD_ORDER_KEEP => get_string('orderkeepchosen', 'examboard'),
-                         EXAMBOARD_ORDER_RANDOM => get_string('orderrandomize', 'examboard'),
-                         EXAMBOARD_ORDER_ALPHA => get_string('orderalphabetic', 'examboard'),);
-        $mform->addElement('select', 'userorder', get_string('allocmemberorder', 'examboard'), $options);
-        $mform->setDefault('userorder', 0);
-        $mform->addHelpButton('userorder', 'allocmemberorder', 'examboard');
+        if($allocationmode == 'allocateboard') {
+            $mform->addElement('hidden', 'userorder', EXAMBOARD_ORDER_KEEP);
+            $mform->setType('userorder', PARAM_INT);
+        } else {
+            $options = array(EXAMBOARD_ORDER_KEEP => get_string('orderkeepchosen', 'examboard'),
+                            EXAMBOARD_ORDER_RANDOM => get_string('orderrandomize', 'examboard'),
+                            EXAMBOARD_ORDER_ALPHA => get_string('orderalphabetic', 'examboard'),
+                            EXAMBOARD_ORDER_TUTOR => get_string('orderalphatutor', 'examboard'),
+                            EXAMBOARD_ORDER_LABEL => get_string('orderalphalabel', 'examboard'),
+                            );
+            $mform->addElement('select', 'userorder', get_string('allocmemberorder', 'examboard'), $options);
+            $mform->setDefault('userorder', 0);
+            $mform->addHelpButton('userorder', 'allocmemberorder', 'examboard');
+        }
         
         $mform->addElement('hidden', 'id', $cmid);
         $mform->setType('id', PARAM_INT);

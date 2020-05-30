@@ -486,6 +486,8 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         }
 
         $mform = &$this->_form;
+        $mform->addElement('header', 'collapseCustomfilter', get_string('search'));
+        $mform->setExpanded('collapseCustomfilter', false);
 
         if ($customfilter->fulltextsearch) {
             $mform->addElement('text', 'search', get_string('search'));
@@ -495,14 +497,12 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         // Search for author.
         if ($customfilter->authorsearch) {
 
-            // We need this to sidetrack autocomplete.
-            $menu = array();
-            $menu += array(0 => null); // NULL to "not" show in lists.
-
             // Add users that have written an entry in the current datalynx instance to list.
             global $DB, $PAGE;
             $entryauthors = $DB->get_records_menu('datalynx_entries', array('dataid' => $this->_df->id()), null, 'id, userid');
             $allusers = get_enrolled_users($PAGE->context);
+
+            $menu = array();
             foreach ($entryauthors as $userid) {
                 // Skip duplicates.
                 if (isset($menu[$userid])) {
@@ -510,8 +510,8 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
                 }
                 $menu[$userid] = $allusers[$userid]->firstname . " " . $allusers[$userid]->lastname;
             }
-
-            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu);
+            $options = array('multiple' => true);
+            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu, $options);
             $mform->setType('authorsearch', PARAM_INT);
         }
 
@@ -531,6 +531,17 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $grp[] = $mform->createElement('select', 'customfiltersortdirection', '', $directions);
             $mform->addGroup($grp, "customfiltersort_grp", get_string('sortby'), ' ', false);
         }
-        $this->add_action_buttons(false, get_string('search'));
+
+        // Show buttons in line with each other.
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'customsearch', get_string("search"));
+
+        // Add a button that resets all custom filter values at once.
+        $clearcustomsearch = '<a  class="btn btn-secondary" href="';
+        $clearcustomsearch .= new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->cm->id, 'filter' => 0));
+        $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
+        $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '',  $clearcustomsearch);
+
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 }

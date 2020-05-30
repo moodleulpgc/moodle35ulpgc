@@ -58,6 +58,10 @@ $string['groupselect:select'] = 'Allow becoming of group member';
 $string['groupselect:unselect'] = 'Allow leaving of group';
 $string['hidefullgroups'] = 'Hide full groups from the main view';
 $string['hidefullgroups_help'] = 'If set, hides all groups, which have reached max member count, from the main list view (excluding user\'s own group). May be useful if the activity has lots of groups.';
+$string['hidegroupmembers'] = 'Hide group members for students';
+$string['hidegroupmembers_help'] = 'If set, all group members will be hidden for students. If the students have the capabilities to manage groups (moodle/course:managegroups) or if the can access all groups (moodle/site:accessallgroups), the members will be always shown.';
+$string['hidesuspendedstudents'] = 'Hide suspended students';
+$string['hidesuspendedstudents_help'] = 'If checked, suspended students will be removed from user count and group lists.';
 $string['incorrectpassword'] = 'Incorrect password';
 $string['managegroups'] = 'Manage groups';
 $string['maxcharlenreached'] = 'Maximum character number reached';
@@ -83,7 +87,14 @@ $string['minmembers_icon'] = 'Group has less members than required';
 $string['minmembers_notification'] = 'Your group has less members than required! Minimum is {$a}.';
 $string['miscellaneoussettings'] = 'Miscellaneous settings';
 $string['modulename'] = 'Group self-selection';
-$string['modulename_help'] = '<p>Lets participants create and select groups. Features: </p><ul><li>Participant can create groups, give them a description and set them password protected, if wanted</li><li>Participants can select and join groups</li><li>Supervisors may be assigned to groups</li><li>Teacher can export course group list as a csv-file</li><li>Full compatibility with basic Moodle groups: groups may be created by other means if needed, supports group assignment submissions etc.</li></ul>';
+$string['modulename_help'] = 'Lets participants create and select groups. Features:
+
+* Participant can create groups, give them a description and set them password protected, if wanted
+* Participants can select and join groups
+* Supervisors may be assigned to groups
+* Teacher can export course group list as a csv-file
+* Full compatibility with basic Moodle groups: groups may be created by other means if needed, supports group assignment submissions etc.';
+$string['modulename_link'] = 'mod/groupselect/view';
 $string['modulenameplural'] = 'Group self-selections';
 $string['nogroups'] = 'No groups available to select from, sorry.';
 $string['notavailableanymore'] = 'Group selection is not available anymore, sorry (since {$a}).';

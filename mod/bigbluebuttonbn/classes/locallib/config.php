@@ -84,6 +84,7 @@ class config {
             'recordings_imported_editable' => false,
             'recordings_preview_default' => true,
             'recordings_preview_editable' => false,
+            'recordings_validate_url' => true,
             'recording_default' => true,
             'recording_editable' => true,
             'recording_icons_enabled' => true,
@@ -127,6 +128,24 @@ class config {
      */
     public static function get($setting) {
         global $CFG;
+
+        // ecastro ULPGC
+        global $COURSE; 
+        $numnodes =  isset($CFG->bigbluebuttonbn_numnodes) ? (int)$CFG->bigbluebuttonbn_numnodes : 1; 
+        if($numnodes > 1 && ($setting == 'server_url' || $setting == 'shared_secret')) {
+            $node = $COURSE->id % $numnodes;
+            if (isset($CFG->bigbluebuttonbn[$setting])) {
+                $value = (string)$CFG->bigbluebuttonbn[$setting];
+            } elseif (isset($CFG->{'bigbluebuttonbn_'.$setting})) {
+                $value = (string)$CFG->{'bigbluebuttonbn_'.$setting};
+            } else {
+                $value = self::defaultvalue($setting);
+            }
+            $values = explode(',', $value);
+            $value = trim($values[$node]);
+            return $value;
+        } 
+
         if (isset($CFG->bigbluebuttonbn[$setting])) {
             return (string)$CFG->bigbluebuttonbn[$setting];
         }
@@ -190,6 +209,7 @@ class config {
                'recordings_imported_editable' => self::get('recordings_imported_editable'),
                'recordings_preview_default' => self::get('recordings_preview_default'),
                'recordings_preview_editable' => self::get('recordings_preview_editable'),
+               'recordings_validate_url' => self::get('recordings_validate_url'),
                'recording_default' => self::get('recording_default'),
                'recording_editable' => self::get('recording_editable'),
                'recording_icons_enabled' => self::get('recording_icons_enabled'),

@@ -15,15 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      qtype_kprime
-* @author       Amr Hourani (amr.hourani@id.ethz.ch)
- *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
-* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
-* @author       Andreas Hruska (andreas.hruska@edaktik.at)
-* @copyright    2016 ETHZ {@link http://ethz.ch/}
-* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
-* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     qtype_kprime
+ * @author      Amr Hourani (amr.hourani@id.ethz.ch)
+ * @author      Martin Hanusch (martin.hanusch@let.ethz.ch)
+ * @author      Jürgen Zimmer (juergen.zimmer@edaktik.at)
+ * @author      Andreas Hruska (andreas.hruska@edaktik.at)
+ * @copyright   2016 ETHZ {@link http://ethz.ch/}
+ * @copyright   2014 eDaktik GmbH {@link http://www.edaktik.at}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['configintro'] = 'Default values for kprime questions.';
 $string['configscoringmethod'] = 'Default scoring method for kprime questions.';
 $string['configshuffleanswers'] = 'Default setting for option shuffling in kprime questions.';
@@ -39,6 +40,7 @@ $string['generalfeedback_help'] = 'The same general feedback is displayed regard
 $string['maxpoints'] = 'Max. points';
 $string['mustsupplyresponses'] = 'You must supply values for all responses.';
 $string['mustsupplyvalue'] = 'You must supply a value here.';
+$string['oneanswerperrow'] = 'Please answer all parts of the question.';
 $string['optionno'] = 'Option {$a}';
 $string['pluginname'] = 'Kprime (ETH)';
 $string['pluginname_help'] = 'Kprime questions consist of an item stem and four corresponding options. For each option students have to decide whether it is "true" or "false".';

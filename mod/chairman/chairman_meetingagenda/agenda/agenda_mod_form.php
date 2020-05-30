@@ -41,7 +41,7 @@ global $DB;
 $agenda_id = $this->agenda_id;
 $agenda = $DB->get_record('chairman_agenda', array('id' => $agenda_id), '*', $ignoremultiple = false);
 		
-$commity_members = $DB->get_records('chairman_agenda_members', array('chairman_id' => $agenda->chairman_id, 'agenda_id' => $agenda_id), '', '*', $ignoremultiple = false);		
+$commity_members = $DB->get_records('chairman_agenda_members', array('chairman_id' => $agenda->chairman_id, 'agenda_id' => $agenda_id), '', '*');		// ecastro ULPGC
 $chairmanmembers = convert_members_to_select_options($commity_members);
 
 //---------GENERAL AGENDA INFORMATION-------------------------------------------

@@ -124,7 +124,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                         'name' => get_string('institution'), 'description' => '',
                         'visible' => 2, 'internalname' => 'institution');
 
-        // TODO: Multilang
+        // TODO: Multilang.
         $fieldobjects[self::_BADGES] = (object) array('id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => 'Badges', 'description' => '',
@@ -191,21 +191,16 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     /**
      */
     public function get_search_sql($search) {
-        global $USER;
-        $internalname = $this->field->internalname;
+        global $USER, $DB;
+        list($not, $operator, $value) = $search;
 
-        if ($internalname == 'id' || $internalname == 'name') {
-            if ($search[1] == 'ME') {
-                $search[1] = '=';
-                $search[2] = $USER->id;
-            } else {
-                if ($search[1] == 'OTHER_USER') {
-                    $search[1] = '=';
-                }
-            }
+        if ($operator == 'ME') {
+            $value = $USER->id;
         }
 
-        return parent::get_search_sql($search);
+        list($sql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED);
+        $sql = " $not ( e.userid $sql ) ";
+        return array($sql, $params, false);
     }
 
     public function parse_search($formdata, $i) {
@@ -233,7 +228,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
      * returns an array of distinct content of the field
      */
     public function get_distinct_content($sortdir = 0) {
-        global $CFG, $DB;
+        global $DB;
 
         $sortdir = $sortdir ? 'DESC' : 'ASC';
         $contentfull = $this->get_sort_sql();

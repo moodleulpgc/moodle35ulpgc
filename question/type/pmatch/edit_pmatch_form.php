@@ -69,7 +69,7 @@ class qtype_pmatch_edit_form extends question_edit_form {
         \qtype_pmatch\form_utils::add_synonyms($this, $mform, $this->question, true, 'synonymsdata', 3, 2);
 
         $this->add_per_answer_fields($mform, get_string('answerno', 'qtype_pmatch', '{no}'),
-                question_bank::fraction_options());
+                question_bank::fraction_options_full()); // question_bank::fraction_options()); // ecastro ULPGC
 
         $this->add_interactive_settings();
     }

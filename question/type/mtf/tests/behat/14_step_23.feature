@@ -43,165 +43,145 @@ Feature: Step 23
   # The correct number of points is awarded, as specified
 
   # Set Scoring Method to subpoints
-    And I output "[MTF - TESTCASE 23 - begin]"
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Edit quiz" "link"
+    And I navigate to "Edit quiz" in current page administration
     And I click on "Edit question MTF-Question-2" "link" in the "MTF-Question-2" "list_item"
     And I click on "Scoring method" "link"
     And I click on "id_scoringmethod_subpoints" "radio"
     And I press "id_updatebutton"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Solving quiz as student1: 100% correct options (SUBPOINTS are activated)
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Solving quiz as student2: 50% correct options (SUBPOINTS are activated)
     When I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=1]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=1]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Solving quiz as student3: 0% correct options (SUBPOINTS are activated)
     When I log in as "student3"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=1]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=1]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Check results for Subpoints
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    And I click on css "tr:contains('student1@moodle.com') a:contains('Review attempt')"
-    Then element with css ".state:contains('Correct')" should exist
-    And element with css ".grade:contains('Mark 1.00 out of 1.00')" should exist
+    And I navigate to "Responses" in current page administration
+    And I click on "tr:contains('student1@moodle.com') a:contains('Review attempt')" "css_element"
+    Then ".state:contains('Correct')" "css_element" should exist
+    And ".grade:contains('Mark 1.00 out of 1.00')" "css_element" should exist
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    And I click on css "tr:contains('student2@moodle.com') a:contains('Review attempt')"
-    Then element with css ".state:contains('Partially correct')" should exist
-    And element with css ".grade:contains('Mark 0.50 out of 1.00')" should exist
+    And I navigate to "Responses" in current page administration
+    And I click on "tr:contains('student2@moodle.com') a:contains('Review attempt')" "css_element"
+    Then ".state:contains('Partially correct')" "css_element" should exist
+    And ".grade:contains('Mark 0.50 out of 1.00')" "css_element" should exist
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    And I click on css "tr:contains('student3@moodle.com') a:contains('Review attempt')"
-    Then element with css ".state:contains('Incorrect')" should exist
-    And element with css ".grade:contains('Mark 0.00 out of 1.00')" should exist
+    And I navigate to "Responses" in current page administration
+    And I click on "tr:contains('student3@moodle.com') a:contains('Review attempt')" "css_element"
+    Then ".state:contains('Incorrect')" "css_element" should exist
+    And ".grade:contains('Mark 0.00 out of 1.00')" "css_element" should exist
 
   # Set Scoring Method to MTF 1/0
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Edit quiz" "link"
+    And I navigate to "Edit quiz" in current page administration
     And I click on "Edit question MTF-Question-2" "link" in the "MTF-Question-2" "list_item"
     And I click on "Scoring method" "link"
     And I click on "id_scoringmethod_mtfonezero" "radio"
     And I press "id_submitbutton"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
-  
+    And I log out
+
   # Solving quiz as student4: 100% correct options (MTF1/0 is activated)
     When I log in as "student4"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=2]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=2]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=2]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=2]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Solving quiz as student5: 000% correct options (MTF1/0 is activated)
     When I log in as "student5"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
     And I press "Attempt quiz now"
-    And I click on css ".qtype_mtf_row:contains('option text 1') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 2') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 3') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 4') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 5') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 6') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 7') input[value=1]"
-    And I click on css ".qtype_mtf_row:contains('option text 8') input[value=1]"
+    And I click on ".qtype_mtf_row:contains('option text 1') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 2') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 3') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 4') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 5') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 6') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 7') input[value=1]" "css_element"
+    And I click on ".qtype_mtf_row:contains('option text 8') input[value=1]" "css_element"
     And I press "Finish attempt ..."
     And I press "Submit all and finish"
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Check results for MC1/0
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    And I click on css "tr:contains('student4@moodle.com') a:contains('Review attempt')"
-    Then element with css ".state:contains('Correct')" should exist
-    And element with css ".grade:contains('Mark 1.00 out of 1.00')" should exist
+    And I navigate to "Responses" in current page administration
+    And I click on "tr:contains('student4@moodle.com') a:contains('Review attempt')" "css_element"
+    Then ".state:contains('Correct')" "css_element" should exist
+    And ".grade:contains('Mark 1.00 out of 1.00')" "css_element" should exist
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Responses" "link"
-    And I click on css "tr:contains('student5@moodle.com') a:contains('Review attempt')"
-    Then element with css ".state:contains('Incorrect')" should exist
-    And element with css ".grade:contains('Mark 0.00 out of 1.00')" should exist
-    And I output "[MTF - TESTCASE 23 - end]"
-
-
-
-
+    And I navigate to "Responses" in current page administration
+    And I click on "tr:contains('student5@moodle.com') a:contains('Review attempt')" "css_element"
+    Then ".state:contains('Incorrect')" "css_element" should exist
+    And ".grade:contains('Mark 0.00 out of 1.00')" "css_element" should exist

@@ -66,7 +66,6 @@
         <INDEX NAME="board-idnumber-group" UNIQUE="true" FIELDS="examboardid, idnumber, groupid"/>
       </INDEXES>
     </TABLE>
-    
     <TABLE NAME="examboard_exam" COMMENT="stores examination session data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -75,6 +74,7 @@
         <FIELD NAME="examperiod" TYPE="char" LENGTH="30" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="sessionname" TYPE="char" LENGTH="255" NOTNULL="true"  SEQUENCE="false"/>
         <FIELD NAME="venue" TYPE="char" LENGTH="255" NOTNULL="true"  SEQUENCE="false"/>
+        <FIELD NAME="accessurl" TYPE="char" LENGTH="500" NOTNULL="false"  SEQUENCE="false"/>
         <FIELD NAME="examdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>	
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>	
         <FIELD NAME="active" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>

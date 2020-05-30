@@ -31,7 +31,7 @@ require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 
-$add    = optional_param('add', '', PARAM_ALPHA);     // module name
+$add    = optional_param('add', '', PARAM_ALPHANUM);     // Module name.
 $update = optional_param('update', 0, PARAM_INT);
 $return = optional_param('return', 0, PARAM_BOOL);    //return to course/view.php if false or mod/modname/view.php if true
 $type   = optional_param('type', '', PARAM_ALPHANUM); //TODO: hopefully will be removed in 2.0
@@ -149,15 +149,15 @@ if ($mform->is_cancelled()) {
     }
 } else if ($fromform = $mform->get_data()) {
     if (!empty($fromform->update)) {
-        list($cm, $fromform) = update_moduleinfo($cm, $fromform, $course, $mform);
+        list($cm, $moduleinfo) = update_moduleinfo($cm, $fromform, $course, $mform); // ecastro ULPGC
     } else if (!empty($fromform->add)) {
         $fromform = add_moduleinfo($fromform, $course, $mform);
     } else {
         print_error('invaliddata');
     }
-
+    
     if (isset($fromform->submitbutton)) {
-        $url = new moodle_url("/mod/$module->name/view.php", array('id' => $fromform->coursemodule, 'forceview' => 1));
+        $url = new moodle_url("/mod/{$module->name}/view.php", array('id' => $fromform->coursemodule, 'forceview' => 1)); // ecastro ULPGC
         if (empty($fromform->showgradingmanagement)) {
             redirect($url);
         } else {

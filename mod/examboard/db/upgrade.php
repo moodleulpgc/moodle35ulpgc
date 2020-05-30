@@ -201,6 +201,18 @@ function xmldb_examboard_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019073002, 'examboard');   
     }    
     
+    if ($oldversion < 2020052100) {
+        // Define table examboard to be modified
+        $table = new xmldb_table('examboard_exam');
+        $field = new xmldb_field('accessurl', XMLDB_TYPE_CHAR, '500', null, XMLDB_NOTNULL, null, null, 'venue');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020052100, 'examboard');   
+    }
+    
+    
     
     return true;
 }

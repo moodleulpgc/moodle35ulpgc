@@ -165,6 +165,7 @@ git submodule add https://github.com/brandaorodrigo/moodle-format_board.git     
 git submodule add https://github.com/brandaorodrigo/moodle-format_buttons.git       course/format/buttons
 git submodule add https://github.com/marinaglancy/moodle-format_flexsections.git    course/format/flexsections  
 git submodule add https://github.com/davidherney/moodle-format_menutopic.git        course/format/menutopic
+git submodule add https://github.com/james-cnz/moodle-format_multitopic.git         course/format/multitopic  
 git submodule add https://github.com/davidherney/moodle-format_onetopic.git         course/format/onetopic  
 git submodule add https://github.com/gjb2048/moodle-format_topcoll.git              course/format/topcoll
 

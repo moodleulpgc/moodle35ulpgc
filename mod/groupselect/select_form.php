@@ -38,7 +38,9 @@ require_once($CFG->dirroot . '/lib/formslib.php');
 class select_form extends moodleform {
     private $groupselect;
 
-    // Define the form.
+    /**
+     * Definition of the form
+     */
     public function definition() {
         global $OUTPUT;
         $mform = $this->_form;
@@ -64,6 +66,13 @@ class select_form extends moodleform {
         $this->set_data( $data );
     }
 
+    /**
+     * Validation of the form
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
     public function validation($data, $files) {
         global $OUTPUT;
 

@@ -57,7 +57,7 @@ class user_graded extends base {
     public static function create_from_grade($event, $grade) {
         $data = array(
             'objectid' => $grade->id,
-            'relateduserid' = $grade->userid;
+            'relateduserid' => $grade->userid
         );
 
         $event['other']['exam'] = $grade->examid;

@@ -860,3 +860,23 @@ header, section, footer, aside, nav, main, article, figure {
 .path-mod-pdfannotator .pdfannotator-statistic #chart-container {
     min-height: 500px;
 }
+
+/* ecastro ULPGC */
+.path-mod-pdfannotator .pdfViewer.disabledpdfcontent {
+    pointer-events: none !important;
+    -youbkit-touch-callout: none; /* iOS Safari */
+    -youbkit-user-select: none;   /* Chrome 6.0+, Safari 3.1+, Edge & Opera 15+ */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge*/
+    -o-user-select: none;
+    user-select: none;          /* Non-prefixed version, currently 
+                                  not supported by any browser */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}

@@ -81,7 +81,7 @@ class block_course_termlist extends block_base {
             $control_departments = supervision_get_reviewed_itemnames($USER->id, 'department');
         }
 
-        $courses = enrol_get_users_courses($USER->id, false, 'id, visible');
+        $courses = enrol_get_users_courses($USER->id, $config->onlyactiveenrol, 'id, visible');
         $courses = local_ulpgccore_load_courses_details(array_keys($courses), 
                                                             'c.id, c.shortname, c.idnumber, c.fullname, c.category, c.visible, uc.term, uc.credits, uc.ctype, uc.department',
                                                             'c.category ASC, uc.term ASC, c.visible DESC, c.fullname ASC');            
@@ -103,9 +103,25 @@ class block_course_termlist extends block_base {
             }
         }
 
+        $allowedcats = array();
+        if($config->useallowedcats) {
+            if($cats = trim(get_config('local_ulpgccore', 'allowedcoursecats'))) {
+                $cats = str_replace(array("\r\n", "\r", ',', ';'), "\n", $cats);
+                $allowedcats = explode("\n", $cats);
+                foreach($allowedcats as $key=>$name) {
+                    $allowedcats[$key] = trim($name);
+                }
+            }
+        }
+        
         foreach ($courses as $course) {
             if(in_array($course->shortname, $excluded)) {
                 continue;
+            }
+            if($config->useallowedcats && !empty($allowedcats)) {
+                if(!in_array($categorylist[$course->category]->idnumber, $allowedcats)) {
+                    continue;
+                }
             }
             $order = array_search($course->category, $catorder);
             if(!isset($categories[$order])) {
@@ -116,6 +132,7 @@ class block_course_termlist extends block_base {
                 $categories[$order] = $cat;
                 unset($cat);
             }
+            
             if(!isset($categories[$order]->term[$course->term])) {
                 $term = new stdClass();
                 $num = sprintf('%02d', $course->term);

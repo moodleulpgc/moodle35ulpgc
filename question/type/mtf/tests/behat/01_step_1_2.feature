@@ -13,20 +13,13 @@ Feature: Step 1 and 2
       | teacher1 | c1     | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
+    And I navigate to "Question bank" in current page administration
 
- @javascript
   Scenario: TESTCASE 1 and TESTCASE 2.
-    And I output "[MTF - TESTCASE 1 - begin]"
-    When I press "Create a new question ..."
-    And I click on "item_qtype_mtf" "radio"
-    And I press "Add"
-    And I set the following fields to these values:
+    And I add a "Multiple True False (ETH)" question filling the form with:
       | id_name              | MTF-Question-001                                    |
       | id_defaultmark       | 1                                                   |
-      | id_questiontext      | question_one			          	   |
+      | id_questiontext      | question_one                                        |
       | id_generalfeedback   | This feedback is general                            |
       | id_option_0          | q1                                                  |
       | id_option_1          | q2                                                  |
@@ -40,7 +33,9 @@ Feature: Step 1 and 2
       | id_weightbutton_1_1  | checked                                             |
       | id_weightbutton_2_1  | checked                                             |
       | id_weightbutton_3_1  | checked                                             |
-    And I output "[MTF - TESTCASE 2 - begin]"
+    Then I should see "MTF-Question-001"
+
+    And I choose "Edit question" action for "MTF-Question-001" in the question bank
     And I press "Blanks for 3 more choices"
     And I set the following fields to these values:
       | id_option_4          | q5                                                  |
@@ -87,6 +82,3 @@ Feature: Step 1 and 2
       | id_weightbutton_15_2 | checked                                             |
     And I press "id_submitbutton"
   Then I should see "MTF-Question-001"
-  And I output "[MTF - TESTCASE 1 - end]"
-  And I output "[MTF - TESTCASE 2 - end]"
-    

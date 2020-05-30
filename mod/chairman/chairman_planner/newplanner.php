@@ -96,7 +96,7 @@ echo '<tr>';
 echo '<td valign="top">'.get_string('timezone_used','mod_chairman').'</td>';
 //Timezone
 require_once($CFG->dirroot.'/calendar/lib.php');
-$timezones = get_list_of_timezones();
+$timezones = core_date::get_list_of_timezones();
 //get user timezone
 
 

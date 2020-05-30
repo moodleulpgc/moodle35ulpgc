@@ -1077,7 +1077,8 @@ class mod_vpl {
         $ret = $ret && $this->has_capability( VPL_SUBMIT_CAPABILITY );
         $ret = $ret && $this->is_submission_period();
         $ret = $ret && $modinfo->get_cm( $cm->id )->uservisible;
-        // Manager can always submit.
+        // Manager or grader can always submit.
+        $ret = $ret || $this->has_capability( VPL_GRADE_CAPABILITY );
         $ret = $ret || $this->has_capability( VPL_MANAGE_CAPABILITY );
         return $ret;
     }
@@ -1373,7 +1374,10 @@ class mod_vpl {
     }
 
     /**
-     * prepare_page initialy
+     * Prepare page calling $PAGE set_cm, set_context and set_url.
+     *
+     * @param string $url
+     * @param $parms @deprecated
      */
     public function prepare_page($url = false, $parms = array()) {
         global $PAGE;
@@ -1381,7 +1385,7 @@ class mod_vpl {
         $PAGE->set_cm( $this->get_course_module(), $this->get_course(), $this->get_instance() );
         $PAGE->set_context( $this->get_context() );
         if ($url) {
-            $PAGE->set_url( '/mod/vpl/' . $url, $parms );
+            $PAGE->set_url( '/mod/vpl/' . $url, $_GET );
         }
     }
 

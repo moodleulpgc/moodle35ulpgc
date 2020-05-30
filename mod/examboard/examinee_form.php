@@ -45,6 +45,7 @@ class examboard_examinee_form extends moodleform {
         $users = $this->_customdata['users'];
         $tutors = $this->_customdata['tutors'];
         $examid = $this->_customdata['examid'];
+        $canallocate = $this->_customdata['canallocate'];
         
         $userid = '';
         $tutorid = '';
@@ -93,6 +94,11 @@ class examboard_examinee_form extends moodleform {
             $options['noselectionstring'] = get_string('nothingselected', 'examboard');
             $options['multiple'] = true;
             $mform->addElement('autocomplete', 'others', get_string('othertutors', 'examboard'), $tutors, $options);
+            
+            if(!$canallocate) {
+                $mform->freeze('tutor');
+                $mform->freeze('others');
+            }
         }
         
         $mform->addElement('text', 'userlabel', get_string('userlabel', 'examboard'), array('size'=>30));
@@ -103,6 +109,8 @@ class examboard_examinee_form extends moodleform {
         $options = array(EXAMBOARD_ORDER_KEEP => get_string('orderkeepchosen', 'examboard'),
                          EXAMBOARD_ORDER_RANDOM => get_string('orderrandomize', 'examboard'),
                          EXAMBOARD_ORDER_ALPHA => get_string('orderalphabetic', 'examboard'),
+                         EXAMBOARD_ORDER_TUTOR => get_string('orderalphatutor', 'examboard'),
+                         EXAMBOARD_ORDER_LABEL => get_string('orderalphalabel', 'examboard'),
                          );
         $mform->addElement('select', 'userorder', get_string('allocmemberorder', 'examboard'), $options);
         $mform->setDefault('userorder', EXAMBOARD_ORDER_KEEP);
@@ -111,7 +119,10 @@ class examboard_examinee_form extends moodleform {
         $mform->addElement('advcheckbox', 'excluded', get_string('excluded', 'examboard'));
         $mform->setDefault('excluded', 0);
         $mform->addHelpButton('excluded', 'excluded', 'examboard');
-
+        if(!$canallocate) {
+            $mform->freeze('excluded');
+        }
+        
         $mform->addElement('hidden', 'id', $cmid);
         $mform->setType('id', PARAM_INT);
         

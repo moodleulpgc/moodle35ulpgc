@@ -75,7 +75,9 @@ foreach ($records as $record) {
     $adhocid = $current::get_adhoc_id_by_task($record->resourcekey);
     if ($adhocid != null) {
         $adhocrecord = $current->get_adhoc_record($adhocid);
-        $name = $adhocrecord->classname;
+        if (!empty($adhocrecord)) {
+            $name = $adhocrecord->classname;
+        }
     } else {
         $name = '';
     }
@@ -97,6 +99,10 @@ foreach ($records as $record) {
         case LOCKSTAT_MAXSCHEDULED:
             $type = 'maxcron';
             $name = 'One of ' . $maxcronlimit . ' $CFG->task_scheduled_concurrency_limit';
+            break;
+        case LOCKSTAT_CORE_CRON:
+            $type = 'core';
+            $name = 'Global queue lock';
             break;
         default:
             $type = 'unknown';

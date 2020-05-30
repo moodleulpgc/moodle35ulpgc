@@ -42,6 +42,9 @@
     margin: 6px 1.0rem;
 }
 
+.path-mod-examboard #mod_examboard_view_exams_table th.header.c1 {
+    min-width: 18%;
+}
 
 .path-mod-examboard div.usersummary div.usersummarysection img.userpicture {
     width: 100px;
@@ -86,7 +89,8 @@
 }
 
 .tutor {
-    display: table-row;
+    /*display: inline-table-row;*/
+    display: inline-table;
 }
 
 .tutorname, .tutortitle {
@@ -94,7 +98,7 @@
 }
 
 .tutortitle {
-    width: 20%;
+    width: 5%;
 }
 
 #mod_examboard_view_board_table .btn {
@@ -120,4 +124,12 @@
 .path-mod-examboard .dimmed, .path-mod-examboard .dimmed a 
 {
     color: #868e96 !important; 
+}
+
+.path-mod-examboard .inplaceeditable.inplaceeditingon input {
+    width: 12.0rem;
+}
+
+.path-mod-examboard #mod_examboard_view_exams_table .sessionurl {
+    font-weight: bold;
 }

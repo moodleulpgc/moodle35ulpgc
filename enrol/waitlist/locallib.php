@@ -61,6 +61,8 @@ class enrol_waitlist_enrol_form extends moodleform {
         }
 
         global $USER;
+        // ecastro ULPGC
+        /*
         if($instance->customchar1){
             if($USER->phone2 != strtoupper($instance->customchar1)){
                  $isDisabled = true;
@@ -75,6 +77,7 @@ class enrol_waitlist_enrol_form extends moodleform {
                 }
             }
         }
+        */
 
 		if($isDisabled){
 			$mform->addElement('html', get_string('disable', 'enrol_waitlist'));

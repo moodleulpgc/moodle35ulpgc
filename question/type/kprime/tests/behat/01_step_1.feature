@@ -13,14 +13,10 @@ Feature: Add a Kprime question
       | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
+    And I navigate to "Question bank" in current page administration
 
-  @javascript
   Scenario: Add a Kprime question
 
-    And I output "[Kprime - TESTCASE: Add - begin]"
     When I add a "Kprime" question filling the form with:
       | id_name                  | Added-Kprime-Question-1   |
       | id_questiontext          | This is a questiontext.   |
@@ -38,5 +34,3 @@ Feature: Add a Kprime question
       | id_weightbutton_3_2      | checked                   |
       | id_weightbutton_4_2      | checked                   |
     Then I should see "Added-Kprime-Question-1"
-    And I output "[Kprime - TESTCASE: Add - end]"
-

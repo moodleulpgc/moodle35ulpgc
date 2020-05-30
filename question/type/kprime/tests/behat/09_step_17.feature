@@ -43,19 +43,16 @@ Feature: Step 17
 
 
   # See if the Review is shown if enabled
-    And I output "[KPrime - TESTCASE 17 - begin]"
     Given I log in as "teacher1"
-    
+
   # Login as admin and set Question behavior to "Deferred feedback"
     When I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Edit settings" "link"
+    And I navigate to "Edit settings" in current page administration
     And I click on "Question behaviour" "link"
     And I set the field "How questions behave" to "Deferred feedback"
     And I press "Save and return to course"
-    And I click on css ".usermenu"
-    And I click on "Log out" "link"
+    And I log out
 
   # Login as student and see if everything works
     And I log in as "student2"
@@ -66,23 +63,18 @@ Feature: Step 17
   
   # No option selected
     When I click on "quiznavbutton2" "link"
-    Then element with css "#quiznavbutton1[title='Not yet answered']" should exist
+    Then "#quiznavbutton1[title='Not yet answered']" "css_element" should exist
 
   # Not all options selected
-    When I click on css "tr:contains('option text 1') input[value=1]"
-    And I click on css "tr:contains('option text 2') input[value=1]"
+    When I click on "tr:contains('option text 1') input[value=1]" "css_element"
+    And I click on "tr:contains('option text 2') input[value=1]" "css_element"
     And I click on "quiznavbutton3" "link"
-    Then element with css "#quiznavbutton2[title='Incomplete answer']" should exist
+    Then "#quiznavbutton2[title='Incomplete answer']" "css_element" should exist
 
   #All options selected
-    When I click on css "tr:contains('option text 1') input[value=1]"
-    And I click on css "tr:contains('option text 2') input[value=1]"
-    And I click on css "tr:contains('option text 3') input[value=2]"
-    And I click on css "tr:contains('option text 4') input[value=2]"
+    When I click on "tr:contains('option text 1') input[value=1]" "css_element"
+    And I click on "tr:contains('option text 2') input[value=1]" "css_element"
+    And I click on "tr:contains('option text 3') input[value=2]" "css_element"
+    And I click on "tr:contains('option text 4') input[value=2]" "css_element"
     And I click on "quiznavbutton1" "link"
-    Then element with css "#quiznavbutton3[title='Answer saved']" should exist
-    And I output "[KPrime - TESTCASE 17 - end]"
-
-
-
-
+    Then "#quiznavbutton3[title='Answer saved']" "css_element" should exist

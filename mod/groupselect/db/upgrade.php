@@ -26,6 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/**
+ * Upgrade function
+ */
 function xmldb_groupselect_upgrade($oldversion) {
     global $DB;
 
@@ -309,5 +312,56 @@ function xmldb_groupselect_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018031606, 'groupselect');
     }
 
+    if ($oldversion < 2018051901) {
+
+        // Changing nullability of field intro on table groupselect to null.
+        $table = new xmldb_table('groupselect');
+        $field = new xmldb_field('intro', XMLDB_TYPE_TEXT, null, null, null, null, null, 'name');
+
+        // Launch change of nullability for field intro.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing the default of field supervisionrole on table groupselect to 1.
+        $table = new xmldb_table('groupselect');
+        $field = new xmldb_field('supervisionrole', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'notifyexpiredselection');
+
+        // Launch change of default for field supervisionrole.
+        $dbman->change_field_default($table, $field);
+
+        // Define field signuptype to be dropped from groupselect.
+        $table = new xmldb_table('groupselect');
+        $field = new xmldb_field('signuptype');
+
+        // Conditionally launch drop field signuptype.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Groupselect savepoint reached.
+        upgrade_mod_savepoint(true, 2018051901, 'groupselect');
+    }
+    if ($oldversion < 2020020500) {
+
+        // Change the length of minmembers from 1 to 10
+        $table = new xmldb_table('groupselect');
+        $field = new xmldb_field('minmembers', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'studentcancreate');
+
+        // Launch change of nullability for field intro.
+        $dbman->change_field_precision($table, $field);
+
+        // Update module settings table.
+        $fields = array();
+        $fields[] = new xmldb_field('hidesuspendedstudents', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'hidefullgroups');
+        $fields[] = new xmldb_field('hidegroupmembers', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'hidesuspendedstudents');
+
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Groupselect savepoint reached.
+        upgrade_mod_savepoint(true, 2020020500, 'groupselect');
+    }
     return true;
 }

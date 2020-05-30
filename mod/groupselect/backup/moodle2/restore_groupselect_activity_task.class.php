@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class definition for the restore activity
+ *
  * @package   mod_groupselect
  * @copyright 2018 HTW Chur Roger Barras
  * @copyright  2011 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}

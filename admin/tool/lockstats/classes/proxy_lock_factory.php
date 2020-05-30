@@ -41,7 +41,7 @@ define ('LOCKSTAT_ADHOC', 1);
 define ('LOCKSTAT_SCHEDULED', 2);
 define ('LOCKSTAT_MAXSCHEDULED', 3);
 define ('LOCKSTAT_MAXADHOC', 4);
-
+define ('LOCKSTAT_CORE_CRON', 5);
 /**
  * Proxy lock factory.
  *
@@ -236,7 +236,7 @@ class proxy_lock_factory implements lock_factory {
 
         preg_match(" /^adhoc_(\d+)$/", $resourcekey, $adhoc);
         if (count($adhoc) > 0) {
-            $timequeued = $DB->get_record('task_adhoc', array('id' => $adhoc[1]), 'nextruntime');
+            $adhoc = $DB->get_record('task_adhoc', array('id' => $adhoc[1]), 'nextruntime');
         }
 
         if (empty($record)) {
@@ -246,8 +246,9 @@ class proxy_lock_factory implements lock_factory {
             $record->host = gethostname();
             $record->pid = posix_getpid();
             $record = $this->fill_more_for_tasks($record, $resourcekey);
-            if (isset($timequeued) && $timequeued->nextruntime > 0) {
-                $record->latency = $record->gained - $timequeued->nextruntime;
+
+            if (!empty($adhoc) && $adhoc->nextruntime > 0) {
+                $record->latency = $record->gained - $adhoc->nextruntime;
             } else {
                 $record->latency = 0;
             }
@@ -258,8 +259,8 @@ class proxy_lock_factory implements lock_factory {
             $record->released = null;
             $record->host = gethostname();
             $record->pid = posix_getpid();
-            if (isset($timequeued) && $timequeued->nextruntime > 0) {
-                $record->latency = $record->gained - $timequeued->nextruntime;
+            if (!empty($adhoc) && $adhoc->nextruntime > 0) {
+                $record->latency = $record->gained - $adhoc->nextruntime;
             }
 
             $this->update_lock_type($record);
@@ -433,6 +434,7 @@ class proxy_lock_factory implements lock_factory {
 
     /**
      * Fill in more data for adhoc and scheduled tasks
+     *
      * @param stdClass $record
      * @param stdClass $record
      * @return stdClass $records to insert for adhoc and scheduled tasks
@@ -445,8 +447,10 @@ class proxy_lock_factory implements lock_factory {
             $adhocparams = ['id' => $adhocid];
             $adhocselect = $DB->sql_compare_text('id') . ' = ' . $DB->sql_compare_text(':id');
             $adhocrecord = $DB->get_record_select('task_adhoc', $adhocselect, $adhocparams);
-            $record->classname = $adhocrecord->classname;
-            $record->customdata = $adhocrecord->customdata;
+            if (!empty($adhocrecord)) {
+                $record->classname = $adhocrecord->classname;
+                $record->customdata = $adhocrecord->customdata;
+            }
         } else {
             $scheduledparams = ['classname' => $resourcekey];
             $scheduledselect = $DB->sql_compare_text('classname') . ' = ' . $DB->sql_compare_text(':classname');
@@ -466,6 +470,11 @@ class proxy_lock_factory implements lock_factory {
      */
     private function update_lock_type($record) {
         $record->type = LOCKSTAT_UNKNOWN;
+
+        if ($record->resourcekey == 'core_cron') {
+            $record->type = LOCKSTAT_CORE_CRON;
+            return;
+        }
 
         preg_match(" /^scheduled_task_runner_(\d+)$/", $record->resourcekey, $adhoc);
         if (count($adhoc) > 0) {

@@ -44,7 +44,8 @@ define('EXAMBOARD_PUBLISH_DATE',2);
 define('EXAMBOARD_ORDER_KEEP',  0);
 define('EXAMBOARD_ORDER_RANDOM',1);
 define('EXAMBOARD_ORDER_ALPHA', 2);
-define('EXAMBOARD_ORDER_TUTOR', 2);
+define('EXAMBOARD_ORDER_TUTOR', 3);
+define('EXAMBOARD_ORDER_LABEL', 4);
 
 
 /**
@@ -422,12 +423,15 @@ function examboard_scale_used_anywhere($scaleid) {
  * @return grade_item The grade_item record
 */
 function examboard_get_grade_item($examboardid, $courseid) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+    
     $params = array('itemtype' => 'mod',
                     'itemmodule' => 'examboard',
                     'iteminstance' => $examboardid,
                     'courseid' => $courseid,
                     'itemnumber' => 0);
-    $gradeitem = grade_item::fetch($params);
+    $gradeitem = \grade_item::fetch($params);
     if (!$gradeitem) {
         throw new coding_exception('Improper use of the examboard module. ' .
                                     'Cannot load the grade item.');
@@ -551,6 +555,7 @@ function examboard_get_gradeable_cm($courseorid, $idnumber) {
             return $cm;
         }
     }
+    return false;
 }
 
 
@@ -1055,4 +1060,72 @@ function examboard_cron() {
     global $CFG;
     
     return true;
+}
+
+/**
+ * Handles editing the 'name' of the element in a list.
+ *
+ * @param string $itemtype
+ * @param int $itemid
+ * @param string $newvalue
+ * @return \core\output\inplace_editable
+ */
+function mod_examboard_inplace_editable($itemtype, $itemid, $newvalue) {
+    global $DB, $PAGE;
+/*
+    if ($itemtype === 'mytestname') {
+        global $DB;
+        $record = $DB->get_record('tool_mytest_mytable', array('id' => $itemid), '*', MUST_EXIST);
+        // Must call validate_context for either system, or course or course module context. 
+        // This will both check access and set current context.
+        \external_api::validate_context(context_system::instance());
+        // Check permission of the user to update this item. 
+        require_capability('tool/mytest:update', context_system::instance());
+        // Clean input and update the record.
+        $newvalue = clean_param($newvalue, PARAM_NOTAGS);
+        $DB->update_record('tool_mytest_mytable', array('id' => $itemid, 'name' => $newvalue));
+        // Prepare the element for the output:
+        $record->name = $newvalue;
+        return new \core\output\inplace_editable('tool_mytest', 'mytestname', $record->id, true,
+            format_string($record->name), $record->name, 'Edit mytest name',  'New value for ' . format_string($record->name));
+    }
+*/    
+    $update = new stdClass();
+    $update->id = 0;
+    $table = '';
+    $examboardid = 0;
+    if ($itemtype === 'userlabel') {
+        $table = 'examboard_examinee';
+        $record = $DB->get_record('examboard_examinee', array('id' => $itemid), 'id, examid, userlabel', MUST_EXIST);
+        $exam = $DB->get_record('examboard_exam', array('id' => $record->examid), 'id, examboardid, boardid', MUST_EXIST);
+        $examboardid = $exam->examboardid; 
+        
+        $update->id = $record->id;
+        $update->newfieldvalue = clean_param($newvalue, PARAM_TEXT);
+        $update->userlabel = $update->newfieldvalue;
+    }
+    
+    $fields = array('sessionname', 'venue', 'duration');
+    if (in_array($itemtype, $fields)) {
+        $table = 'examboard_exam';
+        $exam = $DB->get_record('examboard_exam', array('id' => $itemid), 'id, examboardid, '.$itemtype, MUST_EXIST);
+        $examboardid = $exam->examboardid; 
+
+        $update->id = $exam->id;
+        $update->newfieldvalue = clean_param($newvalue, PARAM_TEXT);
+        $update->{$itemtype} = $update->newfieldvalue;
+    }
+        
+    if($update->id && $table && $examboardid) {
+        list ($course, $cm) = get_course_and_cm_from_instance($examboardid, 'examboard'); 
+        $context = context_module::instance($cm->id);
+        $PAGE->set_context($context);
+        require_login($course, false, $cm);
+    
+        $DB->update_record($table, $update);
+ 
+         return new \core\output\inplace_editable('mod_examboard', $itemtype, $update->id, true,
+            format_string($update->newfieldvalue), $update->newfieldvalue); 
+    }
+    
 }

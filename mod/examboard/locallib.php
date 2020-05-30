@@ -29,6 +29,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir.'/tablelib.php');
+
 /**
  * Finds the boards belonging in this module and  accesible to this user
  * either the user is participating or can view all
@@ -45,6 +48,10 @@ defined('MOODLE_INTERNAL') || die();
 function examboard_get_boards($cm, $examboard, $viewallgroups, $viewallboards, $userid = 0, $menu = false) {
     global $DB, $USER; 
     
+    if(!$userid) {
+        $userid = $USER->id;
+    }
+    
     $params = array('examboardid' => $examboard->id);
     
     if(!$viewallgroups && $groupid = groups_get_activity_group($cm)) {
@@ -57,13 +64,13 @@ function examboard_get_boards($cm, $examboard, $viewallgroups, $viewallboards, $
         $tutorwhere = '';
         if($examboard->usetutors) {
             $tutorwhere = ' OR  EXISTS(SELECT 1 FROM {examboard_tutor} t WHERE t.examid = e.id AND t.tutorid = :tutor)   ';
-            $params['tutor'] = $USER->id;
+            $params['tutor'] = $userid;
         }
 
-        $params['member'] = $USER->id;
-        $params['user'] = $USER->id;
+        $params['member'] = $userid;
+        $params['user'] = $userid;
         
-        $sql = "SELECT b.*, e.sessioname
+        $sql = "SELECT b.*, e.sessionname
                 FROM {examboard_board} b
                 LEFT JOIN {examboard_exam} e ON e.examboardid = b.examboardid AND e.boardid = b.id
                 
@@ -95,21 +102,25 @@ function examboard_get_boards($cm, $examboard, $viewallgroups, $viewallboards, $
 
 
 
-function examboard_get_exam_board_conflicts($examid, $boardids = array()) {
+function examboard_get_exam_board_conflicts($examid, $boardids = array(), $userid = false) {
     global $DB;
 
     $params = array();
-    $insql = '';
+    $additionalwhere = '';
     if($boardids) {
         list($insql, $params) = $DB->get_in_or_equal($boardids, SQL_PARAMS_NAMED);
-        $insql = " AND m.boardid $insql ";
+        $additionalwhere .= " AND m.boardid $insql ";
+    }
+    if($userid) {
+        $additionalwhere .=' AND t.userid = :userid ';
+        $params['userid'] = $userid;
     }
     $params['examid'] = $examid; 
     
-    $sql = "SELECT m.boardid, t.examid 
+    $sql = "SELECT t.id, m.boardid, t.examid, t.userid 
             FROM {examboard_tutor} t 
             JOIN {examboard_member} m ON m.userid = t.tutorid
-            WHERE t.examid = :examid $insql
+            WHERE t.examid = :examid $additionalwhere
             GROUP BY m.boardid ";
             
     return $DB->get_records_sql_menu($sql, $params);
@@ -153,7 +164,7 @@ function examboard_get_potential_board_graders($cm, $context, $boardorid, $usetu
     }
     
     if($usetutors) {
-        $sql = "SELECT t.tutorid, t.examid 
+        $sql = "SELECT DISTINCT t.tutorid, t.examid 
                     FROM {examboard_exam} e 
                     JOIN {examboard_tutor} t ON e.id = t.examid
                     WHERE e.boardid = :boardid  AND e.examboardid = :examboardid 
@@ -212,9 +223,10 @@ function examboard_get_potential_board_graders($cm, $context, $boardorid, $usetu
  * @param int $boardid the ID of the board committee
  * @param int $examboardid ID of the module instance
  * @param bool $usetutors if tutors used in this examboard
+ * @param int $examperiod optional, if non-zero only exmas in the same examperiod
  * @return array the list of users 
 */
-function examboard_get_board_exams($boardid, $examboardid, $usetutors) {
+function examboard_get_board_exams($boardid, $examboardid, $usetutors, $examperiod = 0) {
     global $DB;
 
     // assigned = in members table
@@ -223,7 +235,7 @@ function examboard_get_board_exams($boardid, $examboardid, $usetutors) {
                 FROM {examboard_exam} e
                 JOIN {examboard_board} b ON e.boardid = b.id AND e.examboardid = b.examboardid
             WHERE e.examboardid = :examboardid AND e.boardid = :boardid
-            ORDER BY b.idnumber ASC, e.sessionname ASC";
+            ORDER BY b.idnumber ASC, e.examperiod DESC, e.sessionname ASC";
     $assignedexams = $DB->get_records_sql($sql, $params);
     
     // other rest excluding those been tutors, if used
@@ -240,7 +252,7 @@ function examboard_get_board_exams($boardid, $examboardid, $usetutors) {
                                         JOIN {examboard_tutor} t ON t.examid = ee.id AND m.userid = t.tutorid
                                         WHERE m.boardid = ee.boardid AND t.examid = ee.id) ";
     }
-    $sql .= "ORDER BY b.idnumber ASC, e.sessionname ASC";
+    $sql .= "ORDER BY b.idnumber ASC, e.examperiod DESC, e.sessionname ASC";
     $otherexams = $DB->get_records_sql($sql, $params);
 
     return array($assignedexams, $otherexams);
@@ -378,6 +390,31 @@ function examboard_get_potential_exam_users($cm, $context, $examorid) {
 }
 
 
+/**
+ * Finds the boards belonging in this module and  accesible to this user
+ * either the user is participating or can view all
+ *
+ * @param object $cm Course Module cm_info
+ * @param object $context the context fro this module
+ * @throw required_capability_exception
+ * @return array of bools  $cangrade, $canallocate
+*/
+function examboard_action_access_helper($context, $requiremanage = false ) {
+    $cangrade = has_capability('mod/examboard:grade', $context);
+    $canallocate = has_capability('mod/examboard:allocate', $context);
+    $canmanage = has_capability('mod/examboard:manage', $context); 
+    if($requiremanage) {
+        $cangrade = false;
+        $canallocate = false;
+    }
+    if (!($cangrade || $canallocate || $canmanage)) {
+        $capabilty = $canallocate ? 'mod/examboard:grade' : 'mod/examboard:allocate';   
+        $capabilty = $requiremanage ? 'mod/examboard:manage' : $capabilty; 
+        throw new required_capability_exception($context, $capability, 'nopermissions', '');
+    }
+    return array($cangrade, $canallocate, $canmanage);
+}
+
 
 /**
  * Finds the boards belonging in this module and  accesible to this user
@@ -392,20 +429,24 @@ function examboard_get_potential_exam_users($cm, $context, $examorid) {
  * @return void  the action is in setting mform
 */
 function examboard_set_action_form($cm, $context, $examboard, $action, &$mform) {
-    global $CFG, $DB, $USER;
+    global $CFG, $DB, $PAGE, $USER;
 
     switch($action) {
         case 'addexam' :
         case 'updateexam' :
-                require_capability('mod/examboard:manage', $context);
+                //require_capability('mod/examboard:manage', $context);
+                list($cangrade, $canallocate, $canmanage) = examboard_action_access_helper($context); 
+                $manage = optional_param('manage', '-1', PARAM_INT);
+                
                 require_once($CFG->dirroot.'/mod/examboard/exam_form.php');
                 
                 $exam = 0;
                 $examid = optional_param('exam', 0, PARAM_INT);
+                $itemid = $examid ? $examid : optional_param('item', 0, PARAM_INT);
                 
                 $viewallgroups = has_capability('moodle/site:accessallgroups', $context);
                 $viewallboards = has_capability('mod/examboard:viewall', $context);
-                $boards = examboard_get_boards($cm, $examboard, $viewallgroups, $viewallboards, 0, true);
+                $boards = examboard_get_boards($cm, $examboard, $viewallgroups, $viewallboards, $USER->id, true);
                 
                 //eliminate all boards that have members in conflict with this users, their tutors
                 if($examboard->usetutors) {
@@ -416,14 +457,27 @@ function examboard_set_action_form($cm, $context, $examboard, $action, &$mform) 
                     }
                 }
                 
-                $mform = new examboard_addexam_form(null, array('cm'=>$cm, 'boards' => $boards, 'examid'=>$examid));
+                $newexam = ($action === 'addexam') ? 0 : $examid;
+                
+                $mform = new examboard_addexam_form(null, array('cm'=>$cm, 'boards' => $boards, 'itemid' => $itemid, 'examid'=>$newexam, 'manage' => $canmanage));
 
-                if($examid) {
+                if($itemid) {
                     // if there is an examid we are updating
-                    $exam = examboard_get_exam_with_board($examid);
+                    $exam = examboard_get_exam_with_board($itemid);
                     $exam->updateboardid = $exam->boardid; // needed for form processing 
                     $exam->exam = $examid;
+                    $exam->name = array('text'=>$exam->name, 'format'=>1);
                     $exam->id = $cm->id;
+                    if($action === 'addexam') {
+                        unset($exam->exam);
+                        unset($exam->sessionname);
+                        unset($exam->accessurl);
+                        unset($exam->venue);
+                        unset($exam->examdate);
+                        unset($exam->duration);
+                    } else {
+                        $exam->venue = array('text'=>$exam->venue, 'format'=>1);
+                    }
                     $mform->set_data($exam);
                 }
                 break;
@@ -527,7 +581,13 @@ function examboard_set_action_form($cm, $context, $examboard, $action, &$mform) 
                 break;
                 
         case 'updateuser' :      
-                require_capability('mod/examboard:allocate', $context);
+                $cangrade = has_capability('mod/examboard:grade', $context);
+                $canallocate = has_capability('mod/examboard:allocate', $context); 
+                if (!($cangrade || $canallocate)) {
+                    $capabilty = $canallocate ? 'mod/examboard:grade' : 'mod/examboard:allocate';       
+                    throw new required_capability_exception($context, $capability, 'nopermissions', '');
+                }
+                    
                 require_once($CFG->dirroot.'/mod/examboard/examinee_form.php');
 
                 $examid = required_param('exam', PARAM_INT);
@@ -549,7 +609,7 @@ function examboard_set_action_form($cm, $context, $examboard, $action, &$mform) 
                     $tutors = examboard_get_potential_tutors($cm, $context, $exam);
                 }
                 
-                $mform = new examboard_examinee_form(null, array('cmid'=>$cm->id, 'examboard'=>$examboard, 'examid' => $examid,
+                $mform = new examboard_examinee_form(null, array('cmid'=>$cm->id, 'examboard'=>$examboard, 'examid' => $examid, 'canallocate' => $canallocate, 
                                                                     'existing' => $existingtutors, 'users'=>$users, 'tutors'=>$tutors));
                 //set data if updating
                 if($userid) {
@@ -569,6 +629,44 @@ function examboard_set_action_form($cm, $context, $examboard, $action, &$mform) 
                 }
                 break;
                 
+        case 'moveusers' :      
+                $cangrade = has_capability('mod/examboard:grade', $context);
+                $canallocate = has_capability('mod/examboard:allocate', $context); 
+                if (!($cangrade || $canallocate)) {
+                    $capabilty = $canallocate ? 'mod/examboard:grade' : 'mod/examboard:allocate';       
+                    throw new required_capability_exception($context, $capability, 'nopermissions', '');
+                }
+                    
+                require_once($CFG->dirroot.'/mod/examboard/user_session_form.php');
+
+                $examid = required_param('exam', PARAM_INT);
+                $exam = $DB->get_record('examboard_exam', array('id'=>$examid), '*', MUST_EXIST);
+                $examination = \mod_examboard\examination::get_from_id($examid);
+                
+                $users = $examination->load_examinees();
+                foreach($users as $uid => $user) {
+                    $users[$uid] = fullname($user);
+                }
+                
+                $examperiod = $canallocate ? 0 : $exam->examperiod;
+                list($asignedexams, $otherexams) = examboard_get_board_exams($exam->boardid, $examboard->id, $examboard->usetutors, $examperiod);
+                if($canallocate) {
+                    $asignedexams = $asignedexams + $otherexams;
+                }
+                
+                $renderer = $PAGE->get_renderer('mod_examboard');
+                foreach($asignedexams as $eid => $aexam) {
+                     $asignedexams[$eid] =  $renderer->format_exam_name($aexam);
+                }
+                $asignedexams = array('' => get_string('choose')) + $asignedexams;                
+                
+                
+                $mform = new examboard_change_user_session_form(null, array('cmid'=>$cm->id, 
+                                                                            'exam' => $exam,
+                                                                            'targets' => $asignedexams,
+                                                                            'users' => $users));
+                break; 
+        
         case 'deleteexam' :      
                 require_capability('mod/examboard:manage', $context);
                 require_once($CFG->dirroot.'/mod/examboard/delete_form.php');    
@@ -746,10 +844,13 @@ function examboard_process_add_update_exam($examboard, $fromform) {
     }
     
     $now = time();
-    
     // sanitization
-    foreach(array('title', 'idnumber', 'name', 'venue', 'sessionname') as $field) {
+    foreach(array('title', 'idnumber', 'sessionname') as $field) {
         $fromform->{$field} = format_string(trim($fromform->{$field}));
+    }
+    foreach(array('name', 'venue') as $field) {
+        $value = $fromform->{$field};
+        $fromform->{$field} = format_text(trim($value['text']), $value['format']);
     }
     
     $context = context_module::instance($examboard->cmid);
@@ -771,11 +872,11 @@ function examboard_process_add_update_exam($examboard, $fromform) {
         $exam->examperiod = $fromform->examperiod;
         $exam->sessionname = $fromform->sessionname;
         $exam->venue  = $fromform->venue;
+        $exam->accessurl  = $fromform->accessurl;
         $exam->examdate  = $fromform->examdate;
         $exam->duration  = $fromform->duration;
         $exam->active = $fromform->examactive;
         $exam->timemodified  = $now;
-    
     
     $start = 0;
     $end = 1;
@@ -788,7 +889,7 @@ function examboard_process_add_update_exam($examboard, $fromform) {
         $format = "%'.0{$n}d";
         $idnumber = $fromform->idnumber;
     }
-    
+   
     for($i = $start; $i < $end; $i++) {
         if($idnumber) {
             //$board->idnumber = $idnumber.sprintf("%'.0{$n}d", $i);
@@ -859,6 +960,7 @@ function examboard_save_update_member($newuser, $member, $params) {
         // update / insert member in this position
         if($oldrec = $DB->get_record('examboard_member', $params, 'id, boardid, userid, sortorder')) {
             $oldrec->userid = $newuser;
+            $oldrec->role = $member->role;
             $oldrec->timemodified = $member->timemodified;
             $success = $success && $DB->update_record('examboard_member', $oldrec);
         } else {
@@ -1141,6 +1243,7 @@ function examboard_reorder_examinees($examid, $userorder) {
     
     //ordering  of users fromform
     if($users = examboard_get_exam_examinees($examid)) {
+    
         switch($userorder) {
             case EXAMBOARD_ORDER_RANDOM : // order randomize
                     shuffle($users);
@@ -1159,6 +1262,32 @@ function examboard_reorder_examinees($examid, $userorder) {
                     // now reindex base zero
                     $users = array_values(array_filter($users)); 
                     break;
+            case EXAMBOARD_ORDER_LABEL  : // order alphabetic by label     
+                    $params = array('examid' => $examid);
+            
+                    $sql = "SELECT e.id, e.examid, e.userid, e.sortorder
+                            FROM {examboard_examinee} e 
+                            JOIN {user} u ON u.id = e.userid 
+                            WHERE e.examid = :examid 
+                            ORDER BY e.userlabel, u.lastname, u.firstname, u.idnumber
+                            ";
+                    $users = $DB->get_records_sql($sql, $params);
+            
+/*                    
+                    $names = array();
+                    foreach($users as $user) {
+                        $names[$user->userid] = $user;
+                    }              
+                    $users = $DB->get_records_menu('examboard_examinee', $params, 'userlabel ASC', 'userid, sortorder');
+                    
+                    foreach($users as $id => $idnumber) {
+                        $users[$id] = $names[$id];
+                    }
+                
+  */                  
+                    // now reindex base zero
+                    $users = array_values(array_filter($users));
+                    break;
             case EXAMBOARD_ORDER_TUTOR  : // order alphabetic by tutor
                     //names are not in the array, use DB to sort
                     $names = array();
@@ -1174,7 +1303,7 @@ function examboard_reorder_examinees($examid, $userorder) {
                             WHERE e.examid = :examid AND e.userid $insql
                             ORDER BY u.lastname ASC, u.firstname ASC, u.idnumber ASC ";
                     $params['examid'] = $examid;
-                    $users = $DB->get_records_sql_menu($nsql, $params); 
+                    $users = $DB->get_records_sql_menu($sql, $params); 
                     foreach($users as $id => $idnumber) {
                         $users[$id] = $names[$id];
                     }
@@ -1186,6 +1315,7 @@ function examboard_reorder_examinees($examid, $userorder) {
         }
         
         // array must have keys indexed from 0 (done by shuffle or array_values() )
+        
         foreach($users as $order => $user) {
             $user->sortorder = $order;
             $success = $success && $DB->update_record('examboard_examinee', $user);
@@ -1195,7 +1325,83 @@ function examboard_reorder_examinees($examid, $userorder) {
     return $success;
 }
 
-
+/**
+ * Move students and tutors in a given exam to a difefrente exam (session)
+ * from a manually input form
+ *
+ * @param stdClass $examboard instance record
+ * @param stdClass $fromform user input from mform
+ * @return string success/error notification message 
+*/
+function examboard_process_change_user_session($examboard, $fromform) {
+    global $DB;
+    
+    $success = true;
+    $message = '';
+    
+    if(!$fromform->users || !$fromform->targetexam) {
+        \core\notification::add(get_string('movetoerror', 'examboard'), \core\output\notification::NOTIFY_ERROR);
+        return;
+    }
+    
+    $params = array('id' => $fromform->targetexam, 'examboardid' => $examboard->id);
+    $targetexam = $DB->get_record('examboard_exam', $params);
+    $now = time();
+    unset($params['examboardid']);
+    $last = $DB->count_records('examboard_examinee', $params);
+    
+    
+    $context = context_module::instance($examboard->cmid);
+    // event params.
+    $eventparams = array(
+        'context' => $context,
+        'objectid' => $targetexam->id,
+        'other' => array('examboardid'=>$examboard->id)
+    );    
+    
+    $moved = 0;
+    $conflicts = array();
+    
+    foreach($fromform->users as $userid) {
+        // checkconflicts 
+        $params = array('examid'=>$fromform->exam , 'userid' => $userid);
+        $examinee = $DB->get_record('examboard_examinee', $params);
+        
+        if(!$c = examboard_get_exam_board_conflicts($fromform->exam, array($targetexam->boardid), $userid)) {
+            $examinee->examid = $targetexam->id;
+            $examinee->sortorder = $last + $moved;
+            $examinee->timemodified = $now;
+            if($DB->update_record('examboard_examinee', $examinee)) {
+                $moved++;
+                $DB->set_field('examboard_tutor', 'examid', $targetexam->id, $params);
+                $eventparams['relateduserid'] = $userid;
+                $event = \mod_examboard\event\examinee_updated::create($eventparams);
+                $event->trigger();
+            }
+        } else {
+            $conflicts[] = $userid;
+        }
+    }
+    // now event in original exam
+    $eventparams['objectid'] = $fromform->exam;
+    $eventparams['relateduserid'] = 0;
+    $event = \mod_examboard\event\exam_updated_users::create($eventparams);
+    $event->trigger();
+    
+    if($conflicts) {
+        $examination = \mod_examboard\examination::get_from_id($fromform->exam);
+        $users = $examination->load_examinees();
+        foreach($users as $uid => $user) {
+            $users[$uid] = fullname($user);
+        }
+        \core\notification::add(get_string('movetoconflicts', 'examboard', html_writer::alist($users)), \core\output\notification::NOTIFY_ERROR);
+    }
+    if($moved) {
+        $message = get_string('movetomoved', 'examboard', $moved);
+    }
+    
+    return $message;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1503,7 +1709,14 @@ function examboard_process_userassign($examboard, $fromform) {
                 
                 if(!$skip) { 
                     //assign this user to all exams using this boardid             
-                    $exams = $DB->get_records_menu('examboard_exam', array('examboardid' => $examboard->id, 'boardid' => $boardid), 'id', 'id, boardid');
+                    $params = array('examboardid' => $examboard->id, 'boardid' => $boardid);
+                    foreach(array('examperiod', 'sessionanme') as $extra) {
+                        if(isset($fields[$extra])) {
+                            $params[$extra] = $fields[$extra];
+                        }
+                    }
+                    
+                    $exams = $DB->get_records_menu('examboard_exam', $params, 'id', 'id, boardid');
                     foreach($exams as $examid => $boardid) {
                         $params = array('userid' => $userid, 'examid' =>$examid);
                         if(!$DB->record_exists('examboard_examinee', $params)) {
@@ -1756,8 +1969,8 @@ function  examboard_process_reminders($examboard) {
     
     // send control email to manager user
     $info->count = count($sent);
-    $subject = get_string('controlemailsubject', 'examboard', $info);
-    $messagehtml = get_string('controlemailbody', 'examboard',  $info);
+    $subject = get_string('remindercontrolsubject', 'examboard', $info);
+    $messagehtml = get_string('remindercontrolbody', 'examboard',  $info);
     $messagehtml .= '<br />'.html_writer::link($url, format_string($examboard->name)); 
     $messagehtml .= "<br />\n".implode("<br />\n", $sent);
     $messagetext = html_to_text($messagehtml);
@@ -1775,22 +1988,16 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
     global $CFG, $DB, $USER;
     
     $replaceable = array_fill_keys(array('firstname', 'lastname', 'fullname', 'role', 'idnumber', 
-                                        'sessionname', 'examdate', 'examdatetime', 'examtime', 'venue', 'duration', 'date',
+                                        'sessionname', 'accessurl', 'examdate', 'examdatetime', 'examtime', 'venue', 'duration', 'date',
                                         'students', 'committee'),
                                         '');
     foreach($replaceable as $key => $value) {
         $replaceable[$key] = '%%'.get_string('replace_'.$key, 'examboard').'%%';
     }
-    
-    
-    //print_object("Proecessing notifications");
-    //print_object($fromform);
-    //$tempdir = make_request_directory();
-    //print_object($tempdir);
+   
     $users = array();
     $attachname = '';
     $attachment =  '';
-    
     
     $notification = new stdClass();
     $notification->managerid = $USER->id; 
@@ -1862,6 +2069,7 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
         
         $replaces = array($replaceable['idnumber'] => $exam->idnumber,
                             $replaceable['sessionname'] => $exam->sessionname,
+                            $replaceable['accessurl'] => \html_writer::link( $exam->accessurl, get_string('accessurltext', 'examboard')),
                             $replaceable['examdatetime'] => userdate($exam->examdate),
                             $replaceable['examdate'] => userdate($exam->examdate, get_string('strftimedate', 'langconfig')),
                             $replaceable['examtime'] => userdate($exam->examdate, get_string('strftimetime24', 'langconfig')),
@@ -1917,9 +2125,6 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
         
         $subject = $course->shortname.': '.$fromform->messagesubject.'  ('.$exam->idnumber.')';
 
-        //print_object($users);
-        //print_object("users");
-        
         foreach($users as $user) {
             $role = $examboard->examinee;
             if($user->type == 'board') { 
@@ -2000,8 +2205,8 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
     $info->modname = $examboard->name;
     $info->usertype = examboard_usertype_string($fromform->usertype);
     $info->count = count($sent);
-    $subject = get_string('remindercontrolsubject', 'examboard', $info);
-    $messagehtml = get_string('remindercontrolbody', 'examboard',  $info);
+    $subject = get_string('controlemailsubject', 'examboard', $info);
+    $messagehtml = get_string('controlemailbody', 'examboard',  $info);
     $messagehtml .= '<br />'.html_writer::link($url, format_string($examboard->name)); 
     $messagehtml .= "<br />\n".implode("<br />\n", $sent);
     $messagetext = html_to_text($messagehtml);
@@ -2309,6 +2514,7 @@ function examboard_import_export_fields($examboard, $export = false) {
                         'name'          => get_string('boardname', 'examboard'),
                         'group'         => get_string('accessgroup', 'examboard'),
                         'venue'         => get_string('examvenue', 'examboard'),
+                        'accessurl'     => get_string('url', 'examboard'),
                         'sessionname'   => get_string('examsession', 'examboard'),
                         'examdate'      => get_string('examdate', 'examboard'),
                         'duration'      => get_string('examduration', 'examboard'),
@@ -2342,7 +2548,7 @@ function examboard_import_export_fields($examboard, $export = false) {
 function examboard_process_csv_record($record, $columns, $fieldnames, $examboard, $periods) {
     global $DB;
     
-    $texts = array('idnumber', 'examperiod', 'sessionname', 'title', 'name', 'venue', 'userlabel');
+    $texts = array('idnumber', 'examperiod', 'sessionname', 'title', 'name', 'venue', 'accessurl', 'userlabel');
     $users = array('member', 'examinee', 'tutor', 'othertutors');
     
     $data = (object)array_fill_keys(array_keys($fieldnames), '');
@@ -2361,12 +2567,14 @@ function examboard_process_csv_record($record, $columns, $fieldnames, $examboard
                     }
                 } elseif(in_array($key, $users)) {
                     if($key == 'othertutors') {
+                    $value = str_replace(array(';','|',' '), ',', $value);
                     $idnumbers = explode(',', $value); 
                     } else {
                         $idnumbers = array($value);
                     }
                     foreach($idnumbers as $i => $idnumber) {
-                        if($userid = $DB->get_field('user', 'id', array('idnumber' => trim($idnumber)))) {
+                        $idnumber = trim($idnumber);
+                        if($idnumber && $userid = $DB->get_field('user', 'id', array('idnumber' => $idnumber))) {
                             $idnumbers[$i] = $userid;
                         } else {
                             unset($idnumbers[$i]);
@@ -2481,7 +2689,6 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
         $examperiods[$key] = ltrim(strstr($conv, ':'), ':');
     }
  
-
     $csvreader->init();
     while ($record = $csvreader->next()) {
         // Fill data_content with the values imported from the CSV file:
@@ -2512,12 +2719,16 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
                                                     'examboard_board', array('title', 'name', 'groupid'));
         
         //check if this examination already exists, , and add/update add needed
-        $params = array('boardid' => $board->id, 'sessionname' => $record->sessionname, 'examboardid' => $examboard->id);
+        $params = array('boardid' => $board->id, 'examperiod' => $record->examperiod, 'examboardid' => $examboard->id);
+        if(isset($record->sessionname)) {
+            $params['sessionname'] = $record->sessionname;
+        }
         $exam = $DB->get_record('examboard_exam', $params);
         if(!$exam) {
             $exam = new stdClass();
             $exam->examboardid = $examboard->id;
             $exam->boardid = $board->id;
+            $exam->examperiod = $record->examperiod;
         } else {
             if($fromform->deleteprevious && !isset($deletedexams[$exam->id])) {
                 if($DB->delete_records('examboard_examinee', array('examid' => $exam->id))) {
@@ -2527,7 +2738,7 @@ function examboard_import_examinations($examboard, $returnurl, $csvreader,  $fro
         }
 
         $exam->id = examboard_insert_update_data($exam, $record, $now, $fromform->ignoremodified, 
-                                                    'examboard_exam', array('sessionname', 'venue', 'examdate', 'duration'));
+                                                    'examboard_exam', array('examperiod', 'sessionname', 'venue', 'accessurl', 'examdate', 'duration'));
        
         if($record->member) {
             $member = null;
@@ -2956,7 +3167,7 @@ function examboard_export_examinations($examboard, $fromform) {
             $rolestr[$idx] = $examboard->vocal.' '.($idx-1);
         }
         
-        $skipped = array('idnumber', 'sessionname', 'title', 'name', ' 	sessionname ', 'venue', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
+        $skipped = array('idnumber', 'sessionname', 'title', 'name', ' 	sessionname ', 'venue', 'accessurl', 'examdate', 'duration', 'group', 'boardactive', 'examactive');
         $examineefields = array('examinee', 'userlabel', 'tutor', 'othertutors', 'examineesortorder', 'grades', 'excluded', 'approved');
         $memberfields = array('member', 'role', 'deputy', 'exemption', 'confirmed', 'notifications');  
 
@@ -3076,11 +3287,10 @@ function examboard_synchronize_trackers($trackers, $exam) {
                 tracker_register_cc($tracker, $issue, $userid); 
             }
             
-            if(($tids[$issue->trackerid] == 'gradeable' ) && 
+            if(($tids[$issue->trackerid] == 'gradeable' OR $tids[$issue->trackerid] == 'defense') && 
                 ($issue->assignedto != $examinees[$issue->reportedby])){
-            
-                $DB->set_field('tracker_issue', 'assignedto', $examinees[$issue->reportedby], 
-                                    array('id' => $issue->id, 'trackerid' => $tracker->id, 'reportedby' => $issue->reportedby));
+                    $DB->set_field('tracker_issue', 'assignedto', $examinees[$issue->reportedby], 
+                                        array('id' => $issue->id, 'trackerid' => $tracker->id, 'reportedby' => $issue->reportedby));
 
             }
         }
@@ -3155,7 +3365,7 @@ function examboard_allocate_assign_graders($assigns, $tutors) {
 function examboard_process_allocateboard($examboard, $fromform) {
     global $CFG, $DB, $SESSION;
 
-    print_object("examboard_process_allocateboard");
+    //print_object("examboard_process_allocateboard");
     
     
     $context = context_module::instance($fromform->id);
@@ -3170,27 +3380,33 @@ function examboard_process_allocateboard($examboard, $fromform) {
         shuffle($potential[$sortorder]);
     }
     
-    $now = time();
-    $synchflag = false;
-    
-    $newmember = new stdClass();
-    $newmember->role = '';
-    $newmember->timecreated = $now;
-    $newmember->timemodified = $now;
-    
-    $examsllocated = 0;
-
     $allocatedexams =  $fromform->allocatedexams;//$allocatedexams =  explode(',',$fromform->allocatedexams);
     
-    if($fromform->delexisting && $allocatedexams) {
+    if($fromform->delexisting && $fromform->allocatedexams) {
         // delete
-        list($insql, $params) = $DB->get_in_or_equal($allocatedexams, SQL_PARAMS_NAMED, 'e');
+        list($insql, $params) = $DB->get_in_or_equal($fromform->allocatedexams, SQL_PARAMS_NAMED, 'e');
         $boards = array_unique($DB->get_records_select_menu('examboard_exam', "id $insql ", $params, '', 'id,boardid'));
         $DB->delete_records_list('examboard_member', 'boardid',  $boards);
     }
     
-    if(!$fromform->repeatable) {
-        if($boards = array_unique($DB->get_records_menu('examboard_exam', array('examboardid'=>$examboard->id), '', 'id,boardid'))) {
+    if($fromform->excludeexisting) {
+        $boards = array();
+        switch($fromform->excludeexisting) {
+            case 'any' : $boards = array_unique($DB->get_records_menu('examboard_exam', array('examboardid'=>$examboard->id, 'active'=>1), '', 'id,boardid'));
+                        break;
+
+            case 'exams' : list($insql, $params) = $DB->get_in_or_equal($fromform->allocatedexams, SQL_PARAMS_NAMED, 'e');
+                        $params['examboardid'] = $examboard->id;
+                        $select = " examboardid = :examboardid AND active = 1 AND id $insql ";
+                        $boards = array_unique($DB->get_records_select_menu('examboard_exam', $select, $params, '', 'id,boardid'));
+                        break;
+                        
+            default : $boards = array_unique($DB->get_records_menu('examboard_exam', array('examboardid'=>$examboard->id, 
+                                                            'examperiod' => $fromform->excludeexisting, 'active'=>1), '', 'id,boardid'));
+                        break;
+        }
+    
+        if($boards) {
             list($insql, $params) = $DB->get_in_or_equal($boards, SQL_PARAMS_NAMED, 'b');
             if($users = array_unique($DB->get_records_select_menu('examboard_member', "boardid $insql ", $params, '', 'id,userid'))) {
                 foreach($fromform->choosegroup as $sortorder => $groups) {
@@ -3200,88 +3416,99 @@ function examboard_process_allocateboard($examboard, $fromform) {
         }
     }
     
-    foreach($allocatedexams as $examid) {
-        // if there are no more potential users, stop allocation
-        foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
-            if(!$potential[$sortorder]) {
-                break 2;
-            }
-        }
+    $initial = $potential;
     
+    $boards = array();
+    // walk through exams to set all boards  with tutors & members
+    foreach($allocatedexams as $examid) {
         $exam = examboard_get_exam_with_board($examid);
-        // get existing tutors
-        $tutors = array();
+       
+        if(!isset($boards[$exam->boardid])) {
+            //this board is not set, add it 
+            $board = new \stdClass();
+            $board->id = $exam->boardid;
+            $board->idnumber = $exam->idnumber;
+            $board->members = array();
+            $board->excluded = array();
+            $board->exams = array();
+            
+            // load members is needed
+            if($fromform->delexisting) {
+                $DB->delete_records('examboard_member', array('boardid'=>$exam->boardid));
+            } else {
+                if($users = examboard_get_board_members($exam->boardid)) {
+                    foreach($users as $user) {
+                        $board->members[$user->sortorder][$user->deputy] = $user->userid;
+                        $board->excluded[] = $user->userid;
+                    }
+                }
+            }
+            $boards[$exam->boardid] = $board;
+        }
+        
+        // now $exam->boardid board exists in array
+        // if existing, board is set, only add tutors to excluded users
         if($examboard->usetutors) {
-            $tutors = $DB->get_records_menu('examboard_tutor', array('examid'=>$examid), '', 'id, tutorid') ;
-        }
-        $board = array();
-        $members = array();
-        if($fromform->delexisting) {
-            $DB->delete_records('examboard_member', array('boardid'=>$exam->boardid));
-        } else {
-            if($users = examboard_get_board_members($exam->boardid)) {
-                foreach($users as $user) {
-                    $board[$user->sortorder][$user->deputy] = $user->userid;
-                    $members[] = $user->userid;
-                }
+            // get all other tutor for any exam for this board for this board
+            $sql = "SELECT DISTINCT t.id, t.tutorid   
+                    FROM {examboard_tutor} t
+                    JOIN {examboard_exam} e ON t.examid = e.id 
+                    WHERE e.examboardid = :examboardid AND e.boardid = :boardid 
+                    GROUP BY t.tutorid ";
+            $params = array('examboardid' =>$examboard->id, 'boardid' => $exam->boardid);
+            if($tutors = $DB->get_records_sql_menu($sql, $params)) {
+                $boards[$exam->boardid]->excluded = array_unique(array_merge($boards[$exam->boardid]->excluded, array_unique($tutors)));
             }
-            $members = array_unique($members);
         }
         
-        $excluded = array_unique(array_merge($members, $tutors));
-        $added = array();        
-        
+        // we add this exam to the board's list
+        $boards[$exam->boardid]->exams[] = $examid;
+    }
+    
+    $now = time();
+    $synchflag = false;
+    $boardsllocated = 0;
+    $examsllocated = 0;
+    
+    $newmember = new \stdClass();
+    $newmember->role = '';
+    $newmember->timecreated = $now;
+    $newmember->timemodified = $now;
+    
+    $roles = array(0 => $examboard->chair, 1 => $examboard->secretary, 2 => $examboard->vocal);
+    if($examboard->maxboardsize > 3) {
+        foreach(range(2, $examboard->maxboardsize -1) as $idx) {
+          $roles[$idx] =  $examboard->vocal.' '.$idx;
+        }
+    }
+    $vacant = array();
+    
+    // now go through boards,  allocating members where needed
+    foreach($boards as $board) {
+        // if repeatable, we refill any array without users after all used
         foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
-            shuffle($potential[$sortorder]);
-            foreach(range(0, $fromform->deputy) as $deputy) {
-                if(!isset($board[$sortorder][$deputy])) {
-                    // not exists, allocate member now
-                    // get a potential user
-                    // only if there are potential users NOT excluded (avoid infinite loops)
-                    if($potential[$sortorder] && array_diff($potential[$sortorder], $excluded)) {
-                        $userid = 0;
-                        do {
-                            $key = array_rand($potential[$sortorder]);
-                            $userid = $potential[$sortorder][$key];
-                        } while (in_array($userid, $excluded));
-                        if($userid > 0) {
-                            //OK, this is a non-existing user, can be added
-                            $added[$sortorder][$deputy] = $userid;
-                            $excluded[] = $userid;
-                        }
-                    }
+            if(empty($potential[$sortorder])) {
+                if($fromform->repeatable) {
+                    $potential[$sortorder] = $initial[$sortorder];
+                     shuffle($potential[$sortorder]);
                 }
             }
         }
         
-        if($added) {
-            $newmember->boardid = $exam->boardid;
-            $examsllocated++;
-            foreach($added as $sortorder => $adds) {
-                foreach($adds as $deputy => $userid) {
-                    $newmember->userid = $userid;
-                    $newmember->sortorder = $sortorder;
-                    $newmember->deputy = $deputy;
-                    if($DB->insert_record('examboard_member', $newmember)) {
-                        $synchflag = true;
-                        if(!$fromform->repeatable) {
-                            // once added, remove from all potential
-                            foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
-                                if($key = array_search($userid, $potential[$sorder])) {
-                                    unset($potential[$sorder][$key]);
-                                    shuffle($potential[$sorder]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        // now we can test if really sold out
+        /*
+        $allempty = true; 
+        foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
+            // after loops end thsi is only true if all emptied 
+            $allempty = $allempty && empty($potential[$sorder]);
         }
-        
-        if($fromform->userorder) {
-            examboard_reorder_examinees($examid, $fromform->userorder);
+        if($allempty) {
+            // if one of the potential members arrays is empty we cannot continue allocating 
+            // notice
+            \core\notification::error(get_string('allocemptied', 'examboard'));
+            break;
         }
-        
+*/
         foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
             if(empty($potential[$sorder])) {
                 // if one of the potential members arrays is empty we cannot continue allocating 
@@ -3291,9 +3518,65 @@ function examboard_process_allocateboard($examboard, $fromform) {
             }
         }
         
-        
-        
-        
+        $added = array();
+    
+        foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
+            shuffle($potential[$sortorder]);
+            foreach(range(0, $fromform->deputy) as $deputy) {
+                if(!isset($board->member[$sortorder][$deputy])) {
+                    // not exists, allocate member now
+                    // get a potential user
+                    // only if there are potential users NOT excluded (avoid infinite loops)
+                    if($potential[$sortorder] && array_diff($potential[$sortorder], $board->excluded)) {
+                        $userid = 0;
+                        do {
+                            $key = array_rand($potential[$sortorder]);
+                            $userid = $potential[$sortorder][$key];
+                        } while (in_array($userid, $board->excluded));
+                        if($userid > 0) {
+                            //OK, this is a non-existing user, can be added
+                            $added[$sortorder][$deputy] = $userid;
+                            $board->excluded[] = $userid;
+                        }
+                    } else {
+                        $vacant[] = $board->idnumber;
+                    }
+                }
+            }
+        }
+    
+        if($added) {
+            $newmember->boardid = $board->id;
+            $boardsllocated++;
+            $examsllocated += count($board->exams); 
+            foreach($added as $sortorder => $adds) {
+                foreach($adds as $deputy => $userid) {
+                    $newmember->userid = $userid;
+                    $newmember->sortorder = $sortorder;
+                    $newmember->role = $roles[$sortorder];
+                    $newmember->deputy = $deputy;
+                    if($DB->insert_record('examboard_member', $newmember)) {
+                        $synchflag = true;
+                        // once added, remove from all potential, so no repeat unless all used up
+                        foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
+                            if($key = array_search($userid, $potential[$sorder])) {
+                                unset($potential[$sorder][$key]);
+                                shuffle($potential[$sorder]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // allocation for this boardid is done
+    
+        // time to reorder exam student users, if asked
+        if($fromform->userorder) {
+            foreach($board->exams as $examid) {
+                examboard_reorder_examinees($examid, $fromform->userorder);
+            }
+        }    
+    
     }
     
     // now call synchronizing as needed
@@ -3302,7 +3585,14 @@ function examboard_process_allocateboard($examboard, $fromform) {
         examboard_synchronize_gradeables($examboard, false, false);
     }
     
-    return get_string('allocnumexams', 'examboard', $examsllocated);
+    if($vacant) {
+        \core\notification::add(get_string('allocvacant', 'examboard', \html_writer::alist(array_unique($vacant))), \core\output\notification::NOTIFY_ERROR);
+    }
+    
+    $count = new \stdClass();
+    $count->boards = $boardsllocated;
+    $count->exams =  $examsllocated;
+    return get_string('allocnumexams', 'examboard', $count);
 }
 
 

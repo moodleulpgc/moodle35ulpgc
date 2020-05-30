@@ -108,9 +108,6 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         if ($data->grade < 0) {
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
-        if (empty($data->quizpracticebehaviour) || $data->quizpracticebehaviour == STUDENTQUIZ_BEHAVIOUR) {
-            $data->quizpracticebehaviour = STUDENTQUIZ_DEFAULT_QUIZ_BEHAVIOUR;
-        }
         if (empty($data->anonymrank)) {
             $data->anonymrank = true;
         }
@@ -144,8 +141,8 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         if (empty($data->forcecommenting)) {
             $data->forcecommenting = get_config('studentquiz', 'forcecommenting');
         }
-        if (empty($data->commentdeletionperiod)) {
-            $data->commentdeletionperiod = get_config('studentquiz', 'commentdeletionperiod');
+        if (!isset($data->commentdeletionperiod)) {
+            $data->commentdeletionperiod = get_config('studentquiz', 'commentediting_deletionperiod');
         }
         // Create the StudentQuiz instance.
         $newitemid = $DB->insert_record('studentquiz', $data);
@@ -186,6 +183,7 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         $data->questionid = $this->get_mappingid('question', $data->questionid);
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->deleteuserid = $this->get_mappingid_or_null('user', $data->deleteuserid);
+        $data->edituserid = $this->get_mappingid_or_null('user', $data->edituserid);
 
         // If is a reply (parentid != 0).
         if (!empty($data->parentid)) {
@@ -254,10 +252,6 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
     protected function after_restore() {
         parent::after_execute();
 
-        // Fix wrong parent in question categories if applicable.
-        mod_studentquiz_fix_wrong_parent_in_question_categories();
-        // Migrate old quiz usage if needed (the function does the checking).
-        mod_studentquiz_migrate_old_quiz_usage($this->get_courseid());
         // Migrate progress from quiz usage to internal table.
         mod_studentquiz_migrate_all_studentquiz_instances_to_aggregated_state($this->get_courseid());
         // Workaround setting default question state if no state data is available.

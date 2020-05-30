@@ -19,9 +19,7 @@ Feature: Step 12
       | Default for c1       | mtf            | MTF-Question-001 | question_one        |
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Actions menu" "link"
-    And I click on "More..." "link"
-    And I click on "Question bank" "link"
+    And I navigate to "Question bank" in current page administration
 
   @javascript
   Scenario: TESTCASE 12
@@ -29,22 +27,17 @@ Feature: Step 12
   # There should never be a state where neither true or
   # false are selected
 
-    And I output "[MTF - TESTCASE 12 - begin]"
-    When I click on "Edit" "link" in the "MTF-Question-001" "table_row"
+    When I choose "Edit question" action for "MTF-Question-001" in the question bank
     And I click on "id_weightbutton_1_1" "radio"
     And I press "id_updatebutton"
-    And element with css "#id_weightbutton_1_1[checked]" should exist
-    And element with css "#id_weightbutton_1_2:not([checked])" should exist
+    Then "#id_weightbutton_1_1[checked]" "css_element" should exist
+    And "#id_weightbutton_1_2:not([checked])" "css_element" should exist
     When I click on "id_weightbutton_1_2" "radio"
     And I press "id_updatebutton"
-    And element with css "#id_weightbutton_1_1:not([checked])" should exist
-    And element with css "#id_weightbutton_1_2[checked]" should exist
+    Then "#id_weightbutton_1_1:not([checked])" "css_element" should exist
+    And "#id_weightbutton_1_2[checked]" "css_element" should exist
     When I click on "id_weightbutton_1_1" "radio"
     And I click on "id_weightbutton_1_1" "radio"
     And I press "id_updatebutton"
-    And element with css "#id_weightbutton_1_1[checked]" should exist
-    And element with css "#id_weightbutton_1_2:not([checked])" should exist
-    And I output "[MTF - TESTCASE 12 - end]"
-
-  
-    
+    Then "#id_weightbutton_1_1[checked]" "css_element" should exist
+    And "#id_weightbutton_1_2:not([checked])" "css_element" should exist

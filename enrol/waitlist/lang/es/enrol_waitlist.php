@@ -123,3 +123,27 @@ $string['profiledescription5'] = 'Parámetro 5 para el campo';
 $string['defaultremindersubject'] = 'Recordatorio de Inscripción en curso';
 $string['enroladdusers'] = '{$a->waitlist} en {$a->instancename}';
 $string['noreplyname'] = 'Recordatorio automático de matriculación';
+$string['oranycohorts'] = 'Miembro de alguna de';
+$string['oranycohorts_help'] = '
+La sincronización afectara a los usuariso que sean miembros de al menos una, cualquiera, de las cohortes seleccionaads en esta caja.
+
+Este campo es obligatorio, se debe especificar al menos una cohorte aquí';
+$string['andallcohorts'] = 'Y en todas';
+$string['andallcohorts_help'] = 'Opcionalmente, los usarios seleccionados también deberán ser moembrso de <strong>todas</strong> las cohortes indicadas aquí.';
+$string['notcohorts'] = 'NO en ';
+$string['notcohorts_help'] = 'Opcionalmente, se pueden especificar algunas cohortes de las que el usuario NO debe ser miembro (todas o al menos una según el parámetro siguiente).';
+$string['noenrolgroups'] = 'Se puede enrolar y además asignar a un grupo.';
+$string['enrolgroup'] = 'Agregar al grupo';
+$string['enrolgroup_help'] = 'Si se habilita, permite agregar a los usuarios sincronizados como miembros de un grupo, además de matricularlos aquí.
+
+Indicar el grupo al que añadir a los usuarios. Puede ser un curso existente o uno nuevo creado automáticamente:
+
+La opción "Grupo de mentaenlace" creará un único grupo denominado como este método de matrícula e insertará en el mismo todos los usuarios.
+La opción "Grupos por cohorte" creará varios grupos denominados como las cohortes de origen en "Miembro de alguna de" e insertará a cad usuario en uno oo varios de esos grupos según su pertenecia a cada cohorte..
+';
+$string['creategroup'] = 'Grupo de metaenlace';
+$string['multiplegroup'] = 'Grupos por cohorte';
+$string['assigngroup'] = 'Asignación a grupos';
+$string['assigngroup_help'] = 'Si se activa, además de ser enrolado, 
+el usuario será asignado a un grupo ogrupso segun se especifica en la opción de debajo.';
+$string['headerallowedusers'] = 'Usuarios matriculables';

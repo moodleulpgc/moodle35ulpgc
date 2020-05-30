@@ -70,25 +70,23 @@ $PAGE->set_title( $course->shortname . ': ' . $groupselect->name );
 $PAGE->set_heading( $course->fullname );
 $PAGE->set_activity_record( $groupselect );
 
-$event = \mod_groupselect\event\course_module_viewed::create(array(
-    'objectid' => $groupselect->id,
-    'context' => $context,
-));
-$event->add_record_snapshot('course', $course);
-$event->add_record_snapshot('groupselect', $groupselect);
-$event->trigger();
-
 $mygroups = groups_get_all_groups( $course->id, $USER->id, $groupselect->targetgrouping, 'g.*' );
 $isopen = groupselect_is_open( $groupselect );
 $groupmode = groups_get_activity_groupmode( $cm, $course );
-$counts = groupselect_group_member_counts( $cm, $groupselect->targetgrouping );
-$groups = groups_get_all_groups( $course->id, 0, $groupselect->targetgrouping );
-$passwordgroups = groupselect_get_password_protected_groups( $groupselect );
+
+// Request group member counts without suspended students if enabled.
+$hidesuspendedstudents = $groupselect->hidesuspendedstudents;
+$counts = groupselect_group_member_counts($cm, $groupselect->targetgrouping, $hidesuspendedstudents);
+$susers = get_suspended_userids($context, true);
+$groups = groups_get_all_groups($course->id, 0, $groupselect->targetgrouping);
+$passwordgroups = groupselect_get_password_protected_groups($groupselect);
 $hidefullgroups = $groupselect->hidefullgroups;
 $exporturl = '';
 
+groupselect_view($groupselect, $course, $cm, $context);
 
 // Course specific supervision roles.
+$assignrole = 4;
 if (property_exists($groupselect, "supervisionrole") && $groupselect->supervisionrole > 0) {
     $assignrole = $groupselect->supervisionrole;
 } else {
@@ -97,7 +95,8 @@ if (property_exists($groupselect, "supervisionrole") && $groupselect->supervisio
     ), '*', IGNORE_MISSING);
     // Assign non-editing teachers.
     if (empty($teacherrole)) {
-        $assignrole = 4; // 4 is the moodle default value for the non-editing teachers.
+        // 4 is the moodle default value for the non-editing teachers.
+        $assignrole = 4;
     } else {
         $assignrole = $teacherrole->id;
     }
@@ -105,9 +104,10 @@ if (property_exists($groupselect, "supervisionrole") && $groupselect->supervisio
 
 // Permissions.
 $accessall = has_capability( 'moodle/site:accessallgroups', $context );
+$canmanagegroups = has_capability('moodle/course:managegroups', $context);
 $viewfullnames = has_capability( 'moodle/site:viewfullnames', $context );
 
-// multi group selection prerequisite
+// Multi group selection prerequisite.
 
 $alreadyassigned = count ( $DB->get_records( 'groupselect_groups_teachers', array (
                             'instance_id' => $groupselect->id
@@ -124,8 +124,14 @@ $canassign = (has_capability( 'mod/groupselect:assign', $context ) and $groupsel
             and (count(groupselect_get_context_members_by_role( context_course::instance( $course->id )->id, $assignrole )) > 0));
 $canunassign = (has_capability( 'mod/groupselect:assign', $context ) and $alreadyassigned);
 $canedit = ($groupselect->studentcansetdesc and $isopen);
-$canmanagegroups = has_capability('moodle/course:managegroups', $context);
+// Do not hide groups if the user can manage group or has access to all groups.
+if ($canmanagegroups or $accessall) {
+    $hidegroupmembers = false;
+} else {
+    $hidegroupmembers = $groupselect->hidegroupmembers;
+}
 $cansetgroupname = ($groupselect->studentcansetgroupname);
+$viewothers = null;
 
 if ($course->id == SITEID) {
     $viewothers = has_capability( 'moodle/site:viewparticipants', $context );
@@ -334,19 +340,18 @@ if ($export and $canexport) {
           ORDER BY g.id ASC";
     $grouplist = $DB->get_records_sql( $sql, $params );
 
-    // Fetch students & groups.
+    // Fetch students and groups.
     $sql = "SELECT m.id, u.username, u.idnumber, u.firstname, u.lastname, u.email, g.id AS groupid
             FROM   {groups} g
             $groupingsql
             JOIN {groups_members} m ON g.id = m.groupid
             JOIN {user} u ON u.id = m.userid
-            WHERE  g.courseid = :courseid
+            WHERE g.courseid = :courseid
             ORDER BY groupid ASC";
 
     $students = $DB->get_records_sql( $sql, $params );
 
     // Fetch max number of students in a group (may differ from setting, because teacher may add members w/o limits).
-
     $sql = "SELECT MAX(t.memberscount) AS max
             FROM (
                 SELECT g.id, COUNT(m.userid) AS memberscount
@@ -416,8 +421,8 @@ if ($export and $canexport) {
     }
     $content = implode( (','), $header ) . "\n";
 
-    // TODO: add better export options
-    // Quick workaround for Excel
+    // TODO: add better export options.
+    // Quick workaround for Excel.
     $content = 'sep=,' . "\n" . $content;
 
     foreach ($grouplist as $r) {
@@ -433,7 +438,7 @@ if ($export and $canexport) {
         $groupsize = 0;
         for ($i = 1; $i < $maxgroupsize + 1; $i++) {
             if (isset($r->$i)) {
-                // First element contains group-member relation id which is not needed, so skip it
+                // First element contains group-member relation id which is not needed, so skip it.
                 $first = true;
                 foreach ($r->$i as $memberfield) {
                     if ($first) {
@@ -450,7 +455,7 @@ if ($export and $canexport) {
         $content = $content . implode( (','), $row ) . "\n";
     }
 
-    // File info
+    // File info.
     $separator = '_';
     $filename = get_string( 'modulename', 'mod_groupselect' ) . $separator .
             clean_param(format_string($course->shortname), PARAM_FILE) . $separator .
@@ -466,27 +471,27 @@ if ($export and $canexport) {
             'filename' => $filename
     ); // any filename
 
-    // See if same file exists
+    // See if same file exists.
     $file = $fs->get_file( $fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'] );
 
-    // Delete already existing file
+    // Delete already existing file.
     if ($file) {
         $file->delete();
     }
 
     $file = $fs->create_file_from_string( $fileinfo, $content );
-    // Store file url to show later
+    // Store file url to show later.
     $exporturl = moodle_url::make_pluginfile_url( $file->get_contextid(), $file->get_component(), $file->get_filearea(),
                                                   $file->get_itemid(), $file->get_filepath(), $file->get_filename());
 
-    // event logging
+    // event logging.
     $event = \mod_groupselect\event\export_link_created::create(array(
             'context' => $context,
     ));
     $event->trigger();
 }
 
-// User wants to assign supervisors via supervisionrole
+// User wants to assign supervisors via supervisionrole.
 if ($assign and $canassign) {
 
     $coursecontext = context_course::instance( $course->id )->id;
@@ -623,6 +628,13 @@ if ($canunassign) {
     echo $OUTPUT->render($button);
 }
 
+// Manage groups.
+if ($canmanagegroups) {
+    echo $OUTPUT->single_button( new moodle_url( '/group/index.php', array (
+                'id' => $course->id
+    ) ), get_string( 'managegroups', 'mod_groupselect' ) );
+}
+
 if (empty ( $groups )) {
     echo $OUTPUT->notification( get_string( 'nogroups', 'mod_groupselect' ) );
 } else {
@@ -660,6 +672,7 @@ if (empty ( $groups )) {
 
     // Group list.
     foreach ($groups as $group) {
+        $canseemembers = $viewothers;
         $ismember = isset( $mygroups[$group->id] );
         $usercount = isset( $counts[$group->id] ) ? $counts[$group->id]->usercount : 0;
         $grpname = format_string( $group->name, true, array (
@@ -677,12 +690,13 @@ if (empty ( $groups )) {
             $group->password = false;
         }
 
-        // Groupname.
         $line = array ();
+
+        // Groupname.
         if ($ismember) {
-            $line[0] = '<div class="mygroup">' . $grpname . '</div>';
+            $line[0] = '<div id="grouppicture" class="mygroup">' . print_group_picture($group, $course->id, false, true, true) . "  " . $grpname . '</div>';
         } else {
-            $line[0] = $grpname;
+            $line[0] = '<div id="grouppicture">' . print_group_picture($group, $course->id, false, true, $canseemembers) . "  " . $grpname . '</div>';
         }
 
         // Group description.
@@ -716,14 +730,29 @@ if (empty ( $groups )) {
             if ($members = groups_get_members( $group->id )) {
                 $membernames = array ();
                 foreach ($members as $member) {
+                    // Hide suspended students from the member list if enabled.
+                    if ($hidesuspendedstudents and (isset($susers[$member->id]) or !empty($member->suspended)) ) {
+                        continue;
+                    }
                     $pic = $OUTPUT->user_picture( $member, array (
                             'courseid' => $course->id
                     ) );
                     if ($member->id == $USER->id) {
                         $membernames[] = '<span class="me">' . $pic . '&nbsp;' . fullname( $member, $viewfullnames ) . '</span>';
+                        if ($hidegroupmembers) {
+                            $membernames[] = '<span class="membershidden">' . get_string( 'membershidden', 'mod_groupselect' ) . '</span>';
+                            break;
+                        }
                     } else {
-                        $membernames[] = $pic . '&nbsp;<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $member->id .
-                                          '&amp;course=' . $course->id . '">' . fullname( $member, $viewfullnames ) . '</a>';
+                        if ($hidegroupmembers) {
+                            if (!$ismember) {
+                                $membernames[] = '<span class="membershidden">' . get_string( 'membershidden', 'mod_groupselect' ) . '</span>';
+                                break;
+                            }
+                        } else {
+                            $membernames[] = $pic . '&nbsp;<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $member->id .
+                                             '&amp;course=' . $course->id . '">' . fullname( $member, $viewfullnames ) . '</a>';
+                        }
                     }
                 }
                 // Show assigned teacher, if exists, when enabled or when user is non-assigned teacher
@@ -756,12 +785,13 @@ if (empty ( $groups )) {
                         }
                     }
                 }
+
                 $line[3] = implode( ', ', $membernames );
             } else {
                 $line[3] = '';
             }
         } else {
-            $line[3] = '<div class="membershidden">' . get_string( 'membershidden', 'mod_groupselect' ) . '</div>';
+            $line[3] = '<span class="membershidden">' . get_string( 'membershidden', 'mod_groupselect' ) . '</span>';
         }
 
         // Icons.
@@ -790,7 +820,8 @@ if (empty ( $groups )) {
         // Action buttons.
         if ($isopen) {
             if (! $ismember and $canselect and $groupselect->maxmembers and $groupselect->maxmembers <= $usercount) {
-                $line[5] = '<div class="maxlimitreached">' . get_string( 'maxlimitreached', 'mod_groupselect' ) . '</div>'; // full - no more members
+                // full - no more members.
+                $line[5] = '<div class="maxlimitreached">' . get_string( 'maxlimitreached', 'mod_groupselect' ) . '</div>';
                 $actionpresent = true;
             } else if ($ismember and $canunselect) {
                 $line[5] = $OUTPUT->single_button( new moodle_url( '/mod/groupselect/view.php', array (

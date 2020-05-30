@@ -218,6 +218,7 @@ $string['orderkeepchosen'] = 'Keep as shown';
 $string['orderrandomize'] = 'Randomize';
 $string['orderalphabetic'] = 'Alphabetic';
 $string['orderalphatutor'] = 'Alphabetic by tutor';
+$string['orderalphalabel'] = 'Alphabetic by label';
 $string['codename'] = 'Label';
 $string['session'] = 'Exam session';
 $string['examinees'] = 'Examinees';
@@ -263,7 +264,7 @@ $string['allocmodemember'] = 'Allocate board members given students';
 $string['allocmodeuser'] = 'Allocate students given board members';
 $string['allocmodetutor'] = 'Allocate students given board members';
 $string['allocnumusers'] = 'Allocated {$a} examinees';
-$string['allocnumexams'] = 'Assigned Board members in {$a} exams';
+$string['allocnumexams'] = 'Assigned Board members in {$a->boards} Boards for {$a->exams} exams';
 $string['allocemptied'] = 'No more users to allocate';
 $string['allocprevious'] = 'Erase previous';
 $string['allocprevious_help'] = 'If enabled, existing assignations will be deleted previously to random allocation.';
@@ -277,8 +278,23 @@ You may repeat a group for several positions, if desired.';
 $string['allocateusers'] = 'Allocate examinees';
 $string['allocateusers_help'] = 'Users from the selected groups will be randomly assigned as examinees in the target exams.';
 $string['allocationsettings'] = 'Allocation settings';
+$string['allocatedboards'] = 'Target Boards';
+$string['allocatedboards_help'] = 'The available users will be distributed randomly into the selected exam boards.';
 $string['allocatedexams'] = 'Target Exams';
 $string['allocatedexams_help'] = 'The available users will be distributed randomly into the selected exams.';
+$string['allocexcludeexisting'] = 'Exclude other Board\'s members';
+$string['allocexcludeexisting_help'] = 'Defines if existing board members (not to be deleted, below) 
+will be included in this allocation or excluded from allocation, that is, they will not we assigned additional new exams here. 
+The options are: 
+
+ * None: no exclusion, even if a Teacher already have any exam allocated, will be considered here for new allocation.
+ * Any : excluded if a teacher has any assignation in any other exam in this module instance.
+ * Exams: excluded teachers that already have an assignation as Board Members in any of the exams to be allocated here. 
+ * Period items: excluded any teachers having already an asignation in any exam belonging to that Period.
+ 
+';
+$string['allocvacant'] = 'Insufficient teachers. Some vacant places in: <br />
+{$a}';
 $string['examsallocated'] = 'Exams allocated ';
 $string['choosegroup'] = 'Groups for position {$a}';
 $string['allocatewarningboard'] = 'Students may have tutors. 
@@ -467,6 +483,7 @@ The case must be maintained.
  
  * <strong>%%DURATION%%</strong>: The specified duration of the examination.
  * <strong>%%VENUE%%</strong>: The venue, classroom or other place where the examination will take place.
+ * <strong>%%URL%%</strong>: The web site or videocnference address where the Web examination will take place.
  * <strong>%%TODAY%%</strong>: Todays date. 
   
  * <strong>%%STUDENTS%%</strong>: The list of students to be assessed in this Examination. 
@@ -483,6 +500,7 @@ $string['replace_examdate'] = 'DATE';
 $string['replace_examtime'] = 'TIME';
 $string['replace_examdatetime'] = 'DATETIME';
 $string['replace_venue'] = 'VENUE';
+$string['replace_accessurl'] = 'URL';
 $string['replace_duration'] = 'DURATION';
 $string['replace_students'] = 'STUDENTS';
 $string['replace_committee'] = 'COMMITTEE';
@@ -591,6 +609,7 @@ For instance  02/01/2018 10:00 is Feb 01.
 Duration must be specified in hours, optionally with minutes ansd seconds, e.g. 2:30:05.
 ';
 $string['importedrecords'] = 'Processed {$a} records for import/update.';
+$string['cannotreadtmpfile'] = 'File invalid or not readable as CSV columns.';
 $string['export'] = 'Export';
 $string['export_help'] = 'Allows to export all or some data about examinations stored in Examboard modeule.';
 $string['fixedfields'] = 'Mandatory items';
@@ -697,6 +716,7 @@ You may check the details in the activity {$a->link}.
 ';
 $string['remindercontrolsubject'] = '[{$a->shortname}]: Reminders summary for {$a->modname}';
 $string['remindercontrolbody'] = 'Have been issued {$a->count} reminders to {$a->usertype} in {$a->modname}';
+$string['synchtask'] = 'Synchronize gradeables in Exam board examinations';
 $string['bulkaddexam'] = 'Add Exam series';
 $string['bulkaddnum'] = 'Number exams to add';
 $string['bulkaddnum_help'] = 'This tool will add a series of numbered exams with correlative numbers. 
@@ -709,6 +729,8 @@ $string['submitbulkaddexam'] = 'Add series';
 $string['submissionstatus'] = 'Submission & complementary items';
 $string['viewgraded'] = 'Grading details';
 $string['viewgrading'] = 'Grading';
+$string['gradeoutof'] = 'Grade out of {$a}';
+$string['gradesaved'] = 'Grade saved';
 $string['visibility_explain'] = 'Hidden items are inactive, visible only for managers.';
 $string['viewgradingdetails'] = 'Click to view grading details by criteria.';
 $string['usergrades'] = 'User grades';
@@ -748,13 +770,26 @@ $string['event_member_confirmed'] = 'Board member confirmed';
 $string['event_member_confirmed_desc'] = 'The user with id \'{$a->userid}\' confirmed participation on Exam with 
 id \'{$a->objectid}\'  in activity with cm id \'{$a->cmid}\'.';
 
+$string['editchangetext'] = 'Change this text';
+$string['editchangenewvalue'] = 'New value for {$a}';
+$string['moveusers'] = 'Change users Exam session';
+$string['moveusers_help'] = 'This form allow to move the selected users to a different exam session. 
 
-
-
-
-
-
-
-
-
-
+Transfer will only apply if there is no conflict between existing Board members in the target exam session and the students tutors, if any.
+';
+$string['moveto'] = 'Transfer users';
+$string['movetoexam'] = 'Destination Exam session';
+$string['movetoexam_help'] = 'You must select a target Exam session to transfer the above students to';
+$string['movetoreturn'] = 'Return exam';
+$string['movetoreturn_help'] = 'The Exam page to view after the Students are transfererd to a the new Exam session';
+$string['movetokeep'] = 'Original exam page';
+$string['movetonew'] = 'Destination exam page';
+$string['movetoconflicts'] = 'Some students not transfererd due to  conflicts: <br /> ';
+$string['movetoerror'] = 'Invalid or missing data to transfer students between exam sessions';
+$string['movetomoved'] = 'Transferred {$a} studenst to new exam session';
+$string['newexamsession'] = 'New exam session for Board';
+$string['url'] = 'URL';
+$string['accessurl'] = 'Url for web access';
+$string['accessurl_help'] = 'Write here a complete, with hhtp:// part, and valid url for a site where the examination will take place via web/videoconference. ';
+$string['accessurltext'] = 'Web access';
+$string['accessurllabel'] = 'URL for access: {$a}';

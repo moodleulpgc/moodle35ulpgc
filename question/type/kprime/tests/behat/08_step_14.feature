@@ -31,9 +31,7 @@ Feature: Step 14
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Quiz 1"
-    And I click on "Actions menu" "link"
-    And I click on "Edit quiz" "link"
-
+    And I navigate to "Edit quiz" in current page administration
 
   @javascript
   Scenario: TESTCASE 14
@@ -42,7 +40,6 @@ Feature: Step 14
   # All should work like standard questions.
 
   # Repaginate
-    And I output "[Kprime - TESTCASE 14 - begin]"
     When I press "Repaginate"
     Then I should see "Repaginate with"
     And I set the field "menuquestionsperpage" to "2"
@@ -52,8 +49,8 @@ Feature: Step 14
     And I should see "KPrime-Question-3" on quiz page "2"
 
   # Add a new question to the quiz
-    And I click on css "li:contains('Page 2') .add-menu-outer"
-    And I click on css ".menu-action-text:contains('a new question')"
+    And I click on "li:contains('Page 2') .add-menu-outer" "css_element"
+    And I click on ".menu-action-text:contains('a new question')" "css_element"
     And I set the field "item_qtype_kprime" to "1"
     And I press "submitbutton"
     Then I should see "Adding a Kprime question"
@@ -79,17 +76,14 @@ Feature: Step 14
     And I should see "KPrime-Question-4"
 
   # Add a question from the question bank to the quiz
-    And I click on css "li:contains('Page 2') .add-menu-outer"
-    And I click on css ".menu-action-text:contains('from question bank')"
+    And I click on "li:contains('Page 2') .add-menu-outer" "css_element"
+    And I click on ".menu-action-text:contains('from question bank')" "css_element"
     And I click on "Add to quiz" "link" in the "KPrime-Question-5" "table_row"
     Then I should see "Editing quiz: Quiz 1"
     And I should see "KPrime-Question-5"
 
   # Delete a question from a quiz
     When I click on "Delete" "link" in the "KPrime-Question-4" "list_item"
-    And I click on "Yes" "button" in the ".moodle-dialogue-wrap" "css_element" 
+    And I click on "Yes" "button" in the ".moodle-dialogue-wrap" "css_element"
     Then I should see "Editing quiz: Quiz 1"
     And I should not see "KPrime-Question-4"
-    And I output "[Kprime - TESTCASE 14 - end]"
- 
-

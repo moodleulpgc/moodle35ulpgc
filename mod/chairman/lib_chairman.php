@@ -34,7 +34,7 @@ function chairman_header($cmid, $pagename, $pagelink) {
 
     $course_mod = $DB->get_record('course_modules', array('id' => $cmid));
     $chairman = $DB->get_record('chairman', array('id' => $course_mod->instance));
-    $context = get_context_instance(CONTEXT_MODULE, $course_mod->id);
+    $context = context_module::instance($course_mod->id);
 
     require_course_login($course_mod->course, true, $course_mod);
 
@@ -43,7 +43,7 @@ function chairman_header($cmid, $pagename, $pagelink) {
     $navlinks = array(
         array('name' => get_string($pagename, 'chairman'), 'link' => $CFG->wwwroot . '/mod/chairman/' . $pagelink, 'type' => 'misc')
     );
-    build_navigation($navlinks);
+    //build_navigation($navlinks); // ecastro deprecated
 
     $page = get_string($pagename, 'chairman');
     $title = $chairman_name . ': ' . $page;
@@ -60,7 +60,10 @@ function chairman_header($cmid, $pagename, $pagelink) {
     $PAGE->set_title($chairman_name);
     $PAGE->set_heading($title);
     $PAGE->set_context($context);
-
+    $PAGE->set_activity_record($chairman);
+    $PAGE->navbar->add($chairman_name);
+    
+    
     echo $OUTPUT->header();
 
 
@@ -418,9 +421,9 @@ function chairman_check($id, $silent = false, $redirect = true) {
     require_course_login($course, true, $cm, !$redirect);
 
     //context needed for access rights
-    $context = get_context_instance(CONTEXT_USER, $USER->id);
+    //$context = get_context_instance(CONTEXT_USER, $USER->id); // ecastro 
 
-    global $cm;
+    // global $cm; ecastro
 
     //If not a member, get out
     if ($chairman->secured == 1) {
@@ -432,12 +435,13 @@ function chairman_check($id, $silent = false, $redirect = true) {
         }
             
     }
+    return array($cm, $course, $chairman); // ecastro ULPGC
 }
 
 function chairman_isadmin($id) {
     global $DB, $USER, $PAGE;
     $instance = $PAGE->course->id;
-    $context = get_context_instance(CONTEXT_COURSE, $instance);
+    $context = context_course::instance($instance);
     if ($DB->get_record('chairman_members', array('chairman_id' => $id, 'role_id' => 2, 'user_id' => $USER->id)) || $DB->get_record('chairman_members', array('chairman_id' => $id, 'role_id' => 1, 'user_id' => $USER->id)) || $DB->get_record('chairman_members', array('chairman_id' => $id, 'role_id' => 4, 'user_id' => $USER->id)) || has_capability('moodle/course:update', $context) || is_siteadmin()) {
         return true;
     } else {

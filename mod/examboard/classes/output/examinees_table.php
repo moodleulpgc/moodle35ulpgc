@@ -27,6 +27,7 @@ namespace mod_examboard\output;
 use renderable;                                                                                                                     
  
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/tablelib.php');
 
 /**
  * The Examinees_table class holds data to display, manipulate and grade the users that ara been examined
@@ -53,6 +54,9 @@ class examinees_table extends \flexible_table implements renderable {
 
     /** @var bool the capabilities in this viewer. */
     public $canmanage = false;
+
+    /** @var bool the capabilities in this viewer. */
+    public $canedit = false;
     
     /** @var bool if this instance use any advanced grading method. */
     public $advancedgrading = false;

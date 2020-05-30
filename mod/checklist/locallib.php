@@ -1514,13 +1514,14 @@ class checklist_class {
                 $linkcourseid = optional_param('linkcourseid', null, PARAM_INT);
                 $linkurl = optional_param('linkurl', null, PARAM_URL);
                 $groupingid = optional_param('groupingid', 0, PARAM_INT);
+                $openlinkinnewwindow = optional_param('openlinkinnewwindow', false, PARAM_BOOL);
                 if (optional_param('duetimedisable', false, PARAM_BOOL)) {
                     $duetime = false;
                 } else {
                     $duetime = optional_param_array('duetime', false, PARAM_INT);
                 }
                 $this->additem($displaytext, 0, $indent, $position, $duetime, 0, CHECKLIST_OPTIONAL_NO, CHECKLIST_HIDDEN_NO,
-                               $linkcourseid, $linkurl, $groupingid);
+                               $linkcourseid, $linkurl, $groupingid, $openlinkinnewwindow);
                 if ($position) {
                     $additemafter = false;
                 }
@@ -1544,7 +1545,8 @@ class checklist_class {
                 } else {
                     $duetime = optional_param_array('duetime', false, PARAM_INT);
                 }
-                $this->updateitem($itemid, $displaytext, $duetime, $linkcourseid, $linkurl, $groupingid);
+                $openlinkinnewwindow = optional_param('openlinkinnewwindow', false, PARAM_BOOL);
+                $this->updateitem($itemid, $displaytext, $duetime, $linkcourseid, $linkurl, $groupingid, $openlinkinnewwindow);
                 break;
             case 'deleteitem':
                 if (($this->checklist->autopopulate) && (isset($this->items[$itemid])) && ($this->items[$itemid]->moduleid)) {
@@ -1711,7 +1713,7 @@ class checklist_class {
 
     public function additem($displaytext, $userid = 0, $indent = 0, $position = false, $duetime = false, $moduleid = 0,
                             $optional = CHECKLIST_OPTIONAL_NO, $hidden = CHECKLIST_HIDDEN_NO, $linkcourseid = null,
-                            $linkurl = null, $groupingid = 0) {
+                            $linkurl = null, $groupingid = 0, $openlinkinnewwindow = false) {
         $displaytext = trim($displaytext);
         if ($displaytext == '') {
             return false;
@@ -1752,6 +1754,7 @@ class checklist_class {
         $item->linkcourseid = $linkcourseid;
         $item->linkurl = $linkurl;
         $item->groupingid = $groupingid;
+        $item->openlinkinnewwindow = $openlinkinnewwindow;
 
         $item->insert();
         if ($item->id) {
@@ -1860,7 +1863,7 @@ class checklist_class {
     }
 
     protected function updateitem($itemid, $displaytext, $duetime = false, $linkcourseid = null, $linkurl = null,
-                                  $groupingid = null) {
+                                  $groupingid = null, $openlinkinnewwindow = false) {
         $displaytext = trim($displaytext);
         if ($displaytext == '') {
             return;
@@ -1879,6 +1882,7 @@ class checklist_class {
                         $item->duetime = make_timestamp($duetime['year'], $duetime['month'], $duetime['day']);
                     }
                 }
+                $item->openlinkinnewwindow = $openlinkinnewwindow;
                 $item->linkcourseid = $linkcourseid;
                 $item->linkurl = $linkurl;
                 if ($groupingid !== null) {

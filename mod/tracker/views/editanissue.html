@@ -153,9 +153,12 @@ if (tracker_can_edit($tracker, $context, $issue)){
                     echo '<input type="hidden" name="assignedto" value="0" />';
                 }
             } else {
-                $issue->owner = $DB->get_record('user', array('id' => $issue->assignedto));
-                echo $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
-                echo '&nbsp;'.fullname($issue->owner);
+                if($issue->owner = $DB->get_record('user', array('id' => $issue->assignedto))) {
+                    echo $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+                    echo '&nbsp;'.fullname($issue->owner);
+                } else {
+                    echo '&nbsp;'.get_string('unassigned', 'tracker');
+                }
             }
             ?>
         </td>

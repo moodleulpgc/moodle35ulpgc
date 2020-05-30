@@ -92,6 +92,7 @@ class create_comment_api extends external_api {
         ]);
 
         list($question, $cm, $context, $studentquiz) = utils::get_data_for_comment_area($params['questionid'], $params['cmid']);
+        self::validate_context($context);
         $commentarea = new container($studentquiz, $question, $cm, $context);
 
         if ($params['replyto'] != container::PARENTID) {

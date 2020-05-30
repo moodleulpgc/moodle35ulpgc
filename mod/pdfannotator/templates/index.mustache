@@ -9,11 +9,13 @@
             <div id="toolbarContent"> 
                 <button id="pdfannotator_cursor" class="cursor" type="button" title="Cursor" data-tooltype="cursor"><i class="fa fa-hand-pointer-o" aria-hidden="true"></i></button>
                 <div class="spacer"></div>
+                {{#useannotationscomments}}  <!-- ecastro ULPGC:-->
                 <button class="comment" type="button" title="{{# str }} point, pdfannotator {{/ str }}" data-tooltype="point">{{# pix }}pinbild,pdfannotator, {{# str }} point, pdfannotator {{/ str }} {{/ pix}}</button>           
                 <button class="pdfannotator_rectangle" type="button" title="{{# str }} rectangle, pdfannotator {{/ str }}" data-tooltype="area">{{# pix }}i/completion-manual-n,core, {{# str }} rectangle, pdfannotator {{/ str }} {{/ pix}}</button>
                 <button class="pdfannotator_highlight" type="button" title="{{# str }} highlight, pdfannotator {{/ str }}" data-tooltype="highlight">{{# pix }}text_highlight_picker,pdfannotator, {{# str }} highlight, pdfannotator {{/ str }} {{/ pix}}</button>
                 <button class="pdfannotator_strikeout" type="button" title="{{# str }} strikeout, pdfannotator {{/ str }}" data-tooltype="strikeout">{{# pix }}strikethrough,pdfannotator, {{# str }} strikeout, pdfannotator {{/ str }} {{/ pix}}</button>
                 <div class="spacer"></div>
+                {{/useannotationscomments}}
 
                 {{#usestudenttextbox}}
                     <span class="toolbaritem">
@@ -103,11 +105,14 @@
 
   
     <div class="row-fluid row" id="body-wrapper">
-        <div class="span8 col-lg-8" id="content-wrapper">
-            <div id="viewer" class="pdfViewer"></div>
+        <div class="span8 {{viewersize}}"  id="content-wrapper">  <!-- ecastro ULPGC:-->
+            <div id="viewer" class="pdfViewer  {{{viewerstyle}}}"  {{{viewerdisabled}}}></div>
         </div>
-        <div class="span4 col-lg-4" id="comment-wrapper">
+        
+        <div class="span4 {{questionsize}}" {{{questionview}}}  id="comment-wrapper"> <!-- ecastro ULPGC:-->
+            {{#usequestions}}  <!-- ecastro ULPGC:-->
                 <h4>{{# str }} questionstitle, pdfannotator {{/ str }}</h4>
+            {{/usequestions}}  <!-- ecastro ULPGC:-->                
                 <div id="comment-nav">
                     <button id="allQuestions" class="btn-link" title="{{#str}}allquestionsimgtitle, pdfannotator{{/str}}">
                         <i title="{{#str}}allquestionsimgtitle, pdfannotator{{/str}}" class="icon fa fa-book fa-fw"></i>
@@ -115,16 +120,21 @@
                     <button id="questionsOnThisPage" class="btn-link" title="{{#str}}questionsimgtitle, pdfannotator{{/str}}">
                         <i title="{{#str}}questionsimgtitle, pdfannotator{{/str}}" class="icon fa fa-comments fa-fw"></i>
                     </button>
+                    {{#usequestions}}  <!-- ecastro ULPGC:-->
                     <button id="searchButton" class="btn-link" title="{{# str }} search, pdfannotator {{/ str }}" alt="{{# str }} search, pdfannotator {{/ str }}">
                         <i class="icon fa fa-search fa-fw" title="{{# str }} search, pdfannotator {{/ str }}" alt="{{# str }} search, pdfannotator {{/ str }}"></i>
                     </button>
+                    {{/usequestions}}  <!-- ecastro ULPGC:-->                
                     <form id="searchForm">
+                        {{#usequestions}}  <!-- ecastro ULPGC:-->
                         <input type="search" id="searchPattern" class="form-control" name="pattern" placeholder="{{#str}}search, pdfannotator{{/str}}">      
                         <button type="submit" id="searchClear">
                             <i class="icon fa fa-times fa-fw"></i>
                         </button>
+                        {{/usequestions}}  <!-- ecastro ULPGC:-->                
                     </form>                    
                 </div>
+
             <div class="comment-list">
                 <div class="comment-list-container">
 
@@ -141,8 +151,13 @@
                     <input id="commentCancel" class="owner btn btn-secondary" type="reset" value="{{# str }} cancelButton, pdfannotator {{/ str }}" >
                 </form>
             </div>
-
+        {{^usequestions}}  <!-- ecastro ULPGC          $(document).on('contextmenu', function () {return false;});                  :-->    
+        {{#js}}
+           document.oncontextmenu = new Function("return false;");
+        {{/js}}
+        {{/usequestions}}
         </div>
+        
     </div>
 
 </div>

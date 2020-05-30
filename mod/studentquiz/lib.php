@@ -29,6 +29,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_studentquiz\commentarea\container;
+use mod_studentquiz\utils;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/lib/questionlib.php');
@@ -114,14 +117,6 @@ function studentquiz_add_instance(stdClass $studentquiz, mod_studentquiz_mod_for
     // New StudentQuiz instances use the aggregated mode.
     $studentquiz->aggregated = 1;
 
-    // Set default value for comment deletion period.
-    if (!empty($mform->commentdeletionperiod)) {
-        $studentquiz->commentdeletionperiod = $mform->commentdeletionperiod;
-    }
-    if (empty($studentquiz->commentdeletionperiod)) {
-        $studentquiz->commentdeletionperiod = get_config('studentquiz', 'commentdeletionperiod');
-    }
-
     // You may have to add extra stuff in here.
     $studentquiz->id = $DB->insert_record('studentquiz', $studentquiz);
     $context = context_module::instance($studentquiz->coursemodule);
@@ -180,7 +175,7 @@ function studentquiz_update_instance(stdClass $studentquiz, mod_studentquiz_mod_
     }
 
     if (!isset($studentquiz->commentdeletionperiod)) {
-        $studentquiz->commentdeletionperiod = get_config('studentquiz', 'commentdeletionperiod');
+        $studentquiz->commentdeletionperiod = get_config('studentquiz', 'commentediting_deletionperiod');
     }
 
     $result = $DB->update_record('studentquiz', $studentquiz);
@@ -211,25 +206,6 @@ function studentquiz_delete_instance($id) {
 
     $DB->delete_records('studentquiz', array('id' => $studentquiz->id));
 
-    return true;
-}
-
-/**
- * Clean up studentquiz question categories when deleting studentquiz
- * @Warning: This callback is only triggered in Moodle Version >=3.1!
- * @param cm_info|stdClass $mod The course module info object or record
- * @return true|false
- */
-function studentquiz_pre_course_module_delete($cm) {
-    global $DB;
-
-    // Skip if $cm is not a studentquiz module.
-    if (! $studentquiz = $DB->get_record('studentquiz', array('id' => $cm->instance))) {
-        return false;
-    }
-    $context = context_module::instance($studentquiz->coursemodule);
-
-    $DB->delete_records('question_categories', array('contextid' => $context->id));
     return true;
 }
 
@@ -500,5 +476,38 @@ function mod_studentquiz_output_fragment_commentform($params) {
             'forcecommenting' => $params['forcecommenting'],
             'cancelbutton' => $cancelbutton
     ]);
+    return $mform->get_html();
+}
+
+/**
+ * Edit comment form fragment.
+ *
+ * @param array $params - Params used to load comment form.
+ * @return string
+ */
+function mod_studentquiz_output_fragment_commenteditform($params) {
+    if (!isset($params['commentid'])) {
+        throw new moodle_exception('missingparam', 'studentquiz');
+    }
+    $cancelbutton = isset($params['cancelbutton']) ? $params['cancelbutton'] : false;
+
+    list($question, $cm, $context, $studentquiz) = utils::get_data_for_comment_area($params['questionid'], $params['cmid']);
+    $commentarea = new container($studentquiz, $question, $cm, $context);
+    $comment = $commentarea->query_comment_by_id($params['commentid']);
+    if (!$comment) {
+        throw new moodle_exception('invalidcomment', 'studentquiz');
+    }
+
+    $formdata = ['text' => $comment->get_comment_data()->comment];
+    $mform = new \mod_studentquiz\commentarea\form\comment_form([
+            'questionid' => $params['questionid'],
+            'cmid' => $params['cmid'],
+            'commentid' => $params['commentid'],
+            'forcecommenting' => $params['forcecommenting'],
+            'cancelbutton' => $cancelbutton,
+            'editmode' => true,
+            'formdata' => $formdata
+    ]);
+
     return $mform->get_html();
 }

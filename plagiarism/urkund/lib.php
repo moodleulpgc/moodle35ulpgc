@@ -93,11 +93,11 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
         if (!empty($plagiarismsettings) || $plagiarismsettings === false) {
             return $plagiarismsettings;
         }
-        $plagiarismsettings = (array)get_config('plagiarism');
+        $plagiarismsettings = (array)get_config('plagiarism_urkund');
         // Check if enabled.
-        if (isset($plagiarismsettings['urkund_use']) && $plagiarismsettings['urkund_use']) {
+        if (isset($plagiarismsettings['enabled']) && $plagiarismsettings['enabled']) {
             // Now check to make sure required settings are set!
-            if (empty($plagiarismsettings['urkund_api'])) {
+            if (empty($plagiarismsettings['api'])) {
                 debugging("URKUND API URL not set!");
                 return false;
             }
@@ -248,10 +248,17 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
             if (has_capability('plagiarism/urkund:resetfile', $modulecontext) &&
                 !empty($results['error'])) { // This is a teacher viewing the responses.
 
-                $xml = simplexml_load_string($results['error']);
+                $json = json_decode($results['error']);
+                if (json_last_error() == JSON_ERROR_NONE) {
+                    // XML.
+                    $xml = simplexml_load_string($results['error']);
+                    $errorcode = (int) $xml->SubmissionData->Status->ErrorCode;
+                } else {
+                    // JSON.
+                    $errorcode = (int) $json->Status->ErrorCode;
+                }
 
-                if (!empty($xml->SubmissionData->Status->ErrorCode)) {
-                    $errorcode = $xml->SubmissionData->Status->ErrorCode;
+                if (!empty($errorcode)) {
                     if ($errorcode == 3 OR $errorcode == 4 OR $errorcode == 5001 OR $errorcode == 7001) {
                         // We have custom error messages for these response codes.
                         $errormessage = get_string('errorcode_' . $errorcode, 'plagiarism_urkund');
@@ -435,205 +442,12 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
             if ($viewreport) {
                 $results['reporturl'] = $plagiarismfile->reporturl;
             }
-            if (!empty($plagiarismsettings['urkund_optout']) && !empty($plagiarismfile->optout) && $selfreport) {
+            if (!empty($plagiarismsettings['optout']) && !empty($plagiarismfile->optout) && $selfreport) {
                 $results['optoutlink'] = $plagiarismfile->optout;
             }
             $results['renamed'] = $previouslysubmitted;
         }
         return $results;
-    }
-    /**
-     * Hook to save plagiarism specific settings on a module settings page.
-     * @param object $data - data from an mform submission.
-     */
-    public function save_form_elements($data) {
-        global $DB;
-        if (!$this->get_settings()) {
-            return;
-        }
-        if (isset($data->use_urkund)) {
-            if (empty($data->submissiondrafts)) {
-                // Make sure draft_submit is not set if submissiondrafts not used.
-                $data->urkund_draft_submit = 0;
-            }
-            // Array of possible plagiarism config options.
-            $plagiarismelements = $this->config_options();
-            $contextmodule = context_module::instance($data->coursemodule);
-
-            foreach ($plagiarismelements as $key => $elements) {
-                if (!has_capability('plagiarism/urkund:resubmitonclose', $contextmodule) &&
-                    $elements == 'urkund_resubmit_on_close') {
-
-                    unset($plagiarismelements[$key]);
-                }
-            }
-
-            // First get existing values.
-            if (empty($data->coursemodule)) {
-                debugging("URKUND settings failure - no coursemodule set in form data, URKUND could not be enabled.");
-                return;
-            }
-            $existingelements = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => $data->coursemodule),
-                                                      '', 'name, id');
-            foreach ($plagiarismelements as $element) {
-                // Don't allow changes to receiver address if urkund is disabled.
-                if (empty($data->use_urkund) && $element == 'urkund_receiver') {
-                    continue;
-                }
-                $newelement = new stdClass();
-                $newelement->cm = $data->coursemodule;
-                $newelement->name = $element;
-                if (isset($data->$element) && is_array($data->$element)) {
-                    $newelement->value = implode(',', $data->$element);
-                } else {
-                    $newelement->value = (isset($data->$element) ? $data->$element : 0);
-                }
-                if (isset($existingelements[$element])) {
-                    $newelement->id = $existingelements[$element];
-                    $DB->update_record('plagiarism_urkund_config', $newelement);
-                } else {
-                    $DB->insert_record('plagiarism_urkund_config', $newelement);
-                }
-
-            }
-            // Don't save user preference if this assignment doesn't use Urkund.
-            if (!empty($data->urkund_receiver) && !empty($data->use_urkund)) {
-                set_user_preference('urkund_receiver', trim($data->urkund_receiver));
-            }
-        }
-    }
-
-    /**
-     * Hook to add plagiarism specific settings to a module settings page
-     * @param stdClass $mform  - Moodle form
-     * @param stdClass $context - current context
-     * @param string $modulename - name of module.
-     */
-    public function get_form_elements_module($mform, $context, $modulename = "") {
-        global $DB, $PAGE, $CFG;
-        $plagiarismsettings = $this->get_settings();
-        if (!$plagiarismsettings) {
-            return;
-        }
-        $cmid = optional_param('update', 0, PARAM_INT); // Get cm as $this->_cm is not available here.
-        if (!empty($modulename)) {
-            $modname = 'urkund_enable_' . $modulename;
-            if (empty($plagiarismsettings[$modname])) {
-                return;             // Return if urkund is not enabled for the module.
-            }
-        }
-        if (!empty($cmid)) {
-            $plagiarismvalues = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => $cmid), '', 'name, value');
-            // If this is an older assignment, it may not have a resubmit_on_close setting in place.
-            // If the site default is to turn this on, we don't want to turn it on for "old" assignments
-            // without being specified.
-            if (!empty($plagiarismvalues) && !isset($plagiarismvalues['urkund_resubmit_on_close'])) {
-                $plagiarismvalues['urkund_resubmit_on_close'] = 0;
-            }
-        }
-        // Get Defaults - cmid(0) is the default list.
-        $plagiarismdefaults = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => 0), '', 'name, value');
-        $plagiarismelements = $this->config_options();
-        foreach ($plagiarismelements as $key => $elements) {
-            if (!has_capability('plagiarism/urkund:resubmitonclose', $context) && $elements == 'urkund_resubmit_on_close') {
-                unset($plagiarismelements[$key]);
-            }
-        }
-
-        if (has_capability('plagiarism/urkund:enable', $context)) {
-            urkund_get_form_elements($mform);
-            if ($mform->elementExists('urkund_draft_submit') && $mform->elementExists('submissiondrafts')) {
-                $mform->hideif('urkund_draft_submit', 'submissiondrafts', 'eq', 0);
-            }
-
-            if (!has_capability('plagiarism/urkund:resubmitonclose', $context)) {
-                $mform->removeElement('urkund_resubmit_on_close');
-            }
-            // Disable all plagiarism elements if use_plagiarism eg 0.
-            foreach ($plagiarismelements as $element) {
-                if ($element <> 'use_urkund') { // Ignore this var.
-                    $mform->hideif($element, 'use_urkund', 'eq', 0);
-                }
-            }
-            // Check if files have been submitted and we need to disable the receiver address.
-            if ($DB->record_exists('plagiarism_urkund_files', array('cm' => $cmid, 'statuscode' => URKUND_STATUSCODE_ACCEPTED))) {
-                $mform->disabledIf('urkund_receiver', 'use_urkund');
-            }
-            $mform->hideif('urkund_selectfiletypes', 'urkund_allowallfile', 'eq', 1);
-        } else { // Add plagiarism settings as hidden vars.
-            foreach ($plagiarismelements as $element) {
-                $mform->addElement('hidden', $element);
-            }
-        }
-        $mform->setType('use_urkund', PARAM_INT);
-        $mform->setType('urkund_show_student_score', PARAM_INT);
-        $mform->setType('urkund_show_student_report', PARAM_INT);
-        $mform->setType('urkund_draft_submit', PARAM_INT);
-        $mform->setType('urkund_receiver', PARAM_TEXT);
-        $mform->setType('urkund_studentemail', PARAM_INT);
-
-        // Now set defaults.
-        foreach ($plagiarismelements as $element) {
-            $defaultelement = $element.'_'.str_replace('mod_', '', $modulename);
-            if (isset($plagiarismvalues[$element])) {
-                $mform->setDefault($element, $plagiarismvalues[$element]);
-            } else if ($element == 'urkund_receiver' && !empty($plagiarismsettings['urkund_userpref'])) {
-                // If this is the reciever address, and user preference handling is enabled.
-                $def = get_user_preferences($element);
-                if (!empty($def)) {
-                    $mform->setDefault($element, $def);
-                } else if (isset($plagiarismdefaults[$defaultelement])) {
-                    $mform->setDefault($element, $plagiarismdefaults[$defaultelement]);
-                }
-            } else if (isset($plagiarismdefaults[$defaultelement])) {
-                $mform->setDefault($element, $plagiarismdefaults[$defaultelement]);
-            }
-        }
-        $mform->registerRule('urkundvalidatereceiver', null, 'plagiarism_urkund_validatereceiver',
-                             $CFG->dirroot.'/plagiarism/urkund/classes/validatereceiver.php');
-        $mform->addRule('urkund_receiver', get_string('receivernotvalid', 'plagiarism_urkund'), 'urkundvalidatereceiver');
-
-        // Now add JS to validate receiver indicator using Ajax.
-        if (has_capability('plagiarism/urkund:enable', $context)) {
-            $jsmodule = array(
-                'name' => 'plagiarism_urkund',
-                'fullpath' => '/plagiarism/urkund/checkreceiver.js',
-                'requires' => array('json'),
-            );
-            $PAGE->requires->js_init_call('M.plagiarism_urkund.init', array($context->instanceid), true, $jsmodule);
-        }
-
-        // Show advanced elements only if allowed.
-        $defaultelementadvanced = 'urkund_advanceditems_'.str_replace('mod_', '', $modulename);
-        if (!empty($plagiarismdefaults[$defaultelementadvanced])) {
-            $advancedsettings = explode(',', $plagiarismdefaults[$defaultelementadvanced]);
-            if (has_capability('plagiarism/urkund:advancedsettings', $context)) {
-                foreach ($advancedsettings as $name) {
-                    if ($mform->elementExists($name)) {
-                        $mform->setAdvanced($name, true);
-                    }
-                }
-            } else {
-                // Otherwise, put them as hidden elements.
-                foreach ($advancedsettings as $name) {
-                    if ($mform->elementExists($name)) {
-                        $element = $mform->removeElement($name);
-                        $mform->addElement('hidden', $name, $element->getValue());
-                    }
-                }
-            }
-        }
-
-        // Now handle content restriction settings.
-        if ($modulename == 'mod_assign' && $mform->elementExists("submissionplugins")) { // This should be mod_assign
-            // I can't see a way to check if a particular checkbox exists
-            // elementExists on the checkbox name doesn't work.
-            $mform->hideif('urkund_restrictcontent', 'assignsubmission_onlinetext_enabled');
-        } else if ($modulename != 'mod_forum' && $modulename != 'mod_hsuforum') {
-            // Forum doesn't need any changes but all other modules should disable this.
-            $mform->setDefault('urkund_restrictcontent', 0);
-            $mform->hardFreeze('urkund_restrictcontent');
-        }
     }
 
     /**
@@ -648,12 +462,12 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
 
         $urkunduse = urkund_cm_use($cmid);
         $plagiarismsettings = $this->get_settings();
-        if (!empty($plagiarismsettings['urkund_student_disclosure']) &&
+        if (!empty($plagiarismsettings['student_disclosure']) &&
             !empty($urkunduse)) {
                 $outputhtml .= $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 $formatoptions = new stdClass;
                 $formatoptions->noclean = true;
-                $outputhtml .= format_text($plagiarismsettings['urkund_student_disclosure'], FORMAT_MOODLE, $formatoptions);
+                $outputhtml .= format_text($plagiarismsettings['student_disclosure'], FORMAT_MOODLE, $formatoptions);
                 $outputhtml .= $OUTPUT->box_end();
         }
         return $outputhtml;
@@ -702,8 +516,8 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
             }
         }
 
-        if (!empty($plagiarismsettings['urkund_charcount'])) {
-            $charcount = $plagiarismsettings['urkund_charcount'];
+        if (!empty($plagiarismsettings['charcount'])) {
+            $charcount = $plagiarismsettings['charcount'];
         } else {
             // Set a sensible default if we can't find one.
             $charcount = 450;
@@ -803,7 +617,7 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
         $a->modulelink = $CFG->wwwroot.'/mod/'.$cm->modname.'/view.php?id='.$cm->id;
         $a->coursename = format_string($DB->get_field('course', 'fullname', array('id' => $cm->course)));
         $plagiarismsettings = $this->get_settings();
-        if (!empty($plagiarismsettings['urkund_optout'])) {
+        if (!empty($plagiarismsettings['optout'])) {
             $a->optoutlink = $plagiarismfile->optout;
             $emailcontent = get_string('studentemailcontent', 'plagiarism_urkund', $a);
         } else {
@@ -824,7 +638,7 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
         $plagiarismsettings = $this->get_settings();
         $url = URKUND_INTEGRATION_SERVICE .'/receivers'.'/'. trim($receiver);;
 
-        $headers = array('Accept-Language: '.$plagiarismsettings['urkund_lang']);
+        $headers = array('Accept-Language: '.$plagiarismsettings['lang']);
 
         $allowedstatus = array(URKUND_STATUSCODE_PROCESSED,
                                URKUND_STATUSCODE_NOT_FOUND,
@@ -837,7 +651,7 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
         $c->setopt(array('CURLOPT_RETURNTRANSFER' => 1,
                          'CURLOPT_TIMEOUT' => 60, // Set to 60seconds just in case.
                          'CURLOPT_HTTPAUTH' => CURLAUTH_BASIC,
-                         'CURLOPT_USERPWD' => $plagiarismsettings['urkund_username'].":".$plagiarismsettings['urkund_password']));
+                         'CURLOPT_USERPWD' => $plagiarismsettings['username'].":".$plagiarismsettings['password']));
 
         $c->setHeader($headers);
         $response = $c->get($url);
@@ -879,6 +693,58 @@ class plagiarism_plugin_urkund extends plagiarism_plugin {
                     ."</div>";
             }
         }
+    }
+
+    /**
+     * Executes a call to URKUND's API to see if a receiver address exists for the logged in user.
+     * If so we store that receiver address in the user preferences.
+     * Otherwise we attempt to create a receiver address.
+     */
+    public function load_receiver() {
+        global $USER;
+        $plagiarismsettings = self::get_settings();
+        $headers = array('Accept: application/json', 'Content-Type: application/json');
+
+        $c = new curl(array('proxy' => true));
+        $c->setopt(array());
+        $c->setopt(array('CURLOPT_RETURNTRANSFER' => 1,
+            'CURLOPT_TIMEOUT' => 60, // Set to 60seconds just in case.
+            'CURLOPT_HTTPAUTH' => CURLAUTH_BASIC,
+            'CURLOPT_USERPWD' => $plagiarismsettings['username'].":".$plagiarismsettings['password']));
+
+        $c->setHeader($headers);
+
+        $email = $USER->email;
+        $name = $USER->firstname . " " . $USER->lastname;
+        $response = $c->get("https://secure.urkund.com/api/receivers?emailAddress=$email");
+        $status = $c->info['http_code'];
+        if (!empty($status)) {
+            $json = json_decode($response);
+            if (count($json) > 0) {
+                set_user_preference('urkund_receiver', trim($json[0]->AnalysisAddress));
+                return array('receiver' => trim($json[0]->AnalysisAddress));
+            } else {
+                if (get_config('plagiarism_urkund', 'unitid') != 0) {
+                    $data = array(
+                        'UnitId' => get_config('plagiarism_urkund', 'unitid'),
+                        'Fullname' => $name,
+                        'EmailAddress' => $email,
+                    );
+                    $response = $c->post("http://secure.urkund.com/api/receivers", json_encode($data));
+                    $status = $c->info['http_code'];
+                    if (!empty($status)) {
+                        $json = json_decode($response);
+                        if (count($json) > 0) {
+                            if (!empty($json[0]->AnalysisAddress)) {
+                                set_user_preference('urkund_receiver', trim($json[0]->AnalysisAddress));
+                                return array('receiver' => trim($json[0]->AnalysisAddress));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return array('error' => true, 'msg' => "You must manually enter an analysis address.");
     }
 }
 
@@ -931,6 +797,236 @@ function plagiarism_urkund_format_temp_content($content, $strippretag = false) {
            $content .
            '</body></html>';
 
+}
+
+/**
+ * Hook to save plagiarism specific settings on a module settings page.
+ *
+ * @param stdClass $data
+ * @param stdClass $course
+ */
+function plagiarism_urkund_coursemodule_edit_post_actions($data, $course) {
+    global $DB;
+
+    $plugin = new plagiarism_plugin_urkund();
+    if (!$plugin->get_settings()) {
+        return;
+    }
+
+    if (isset($data->use_urkund)) {
+        if (empty($data->submissiondrafts)) {
+            // Make sure draft_submit is not set if submissiondrafts not used.
+            $data->urkund_draft_submit = 0;
+        }
+        // Array of possible plagiarism config options.
+        $plagiarismelements = $plugin->config_options();
+        $contextmodule = context_module::instance($data->coursemodule);
+
+        foreach ($plagiarismelements as $key => $elements) {
+            if (!has_capability('plagiarism/urkund:resubmitonclose', $contextmodule) &&
+                $elements == 'urkund_resubmit_on_close') {
+
+                unset($plagiarismelements[$key]);
+            }
+        }
+
+        // First get existing values.
+        if (empty($data->coursemodule)) {
+            debugging("URKUND settings failure - no coursemodule set in form data, URKUND could not be enabled.");
+            return;
+        }
+        $existingelements = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => $data->coursemodule),
+            '', 'name, id');
+        foreach ($plagiarismelements as $element) {
+            // Don't allow changes to receiver address if urkund is disabled.
+            if (empty($data->use_urkund) && $element == 'urkund_receiver') {
+                continue;
+            }
+            $newelement = new stdClass();
+            $newelement->cm = $data->coursemodule;
+            $newelement->name = $element;
+            if (isset($data->$element) && is_array($data->$element)) {
+                $newelement->value = implode(',', $data->$element);
+            } else {
+                $newelement->value = (isset($data->$element) ? $data->$element : 0);
+            }
+            if (isset($existingelements[$element])) {
+                $newelement->id = $existingelements[$element];
+                $DB->update_record('plagiarism_urkund_config', $newelement);
+            } else {
+                $DB->insert_record('plagiarism_urkund_config', $newelement);
+            }
+
+        }
+        // Don't save user preference if this assignment doesn't use Urkund.
+        if (!empty($data->urkund_receiver) && !empty($data->use_urkund)) {
+            set_user_preference('urkund_receiver', trim($data->urkund_receiver));
+        }
+    }
+}
+
+/**
+ * Validate receiver address
+ *
+ * @param stdClass $data
+ * @return array $errors
+ */
+function plagiarism_urkund_coursemodule_validation($data) {
+    $data = $data->get_submitted_data();
+    if (array_key_exists('use_urkund', $data)) {
+        if ($data->use_urkund) {
+            $plugin = new plagiarism_plugin_urkund();
+            $result = $plugin->validate_receiver($data->urkund_receiver);
+            if ($result === 404) {
+                return array('urkund_receiver' => get_string('receivernotvalid', 'plagiarism_urkund'));
+            }
+        }
+    }
+    return array();
+}
+
+/**
+ * Hook to add plagiarism specific settings to a module settings page
+ *
+ * @param moodleform $formwrapper
+ * @param MoodleQuickForm $mform
+ */
+function plagiarism_urkund_coursemodule_standard_elements($formwrapper, $mform) {
+    global $DB, $PAGE, $CFG;
+
+    $plugin = new plagiarism_plugin_urkund();
+    $plagiarismsettings = $plugin->get_settings();
+    if (!$plagiarismsettings) {
+        return;
+    }
+
+    $cmid = null;
+    if ($cm = $formwrapper->get_coursemodule()) {
+        $cmid = $cm->id;
+    }
+    $matches = array();
+    if (!preg_match('/^mod_([^_]+)_mod_form$/', get_class($formwrapper), $matches)) {
+        return;
+    }
+    $modulename = "mod_" . $matches[1];
+    $modname = 'enable_' . $modulename;
+    if (empty($plagiarismsettings[$modname])) {
+        return;
+    }
+    $context = context_course::instance($formwrapper->get_course()->id);
+    if (!empty($cmid)) {
+        $plagiarismvalues = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => $cmid), '', 'name, value');
+        // If this is an older assignment, it may not have a resubmit_on_close setting in place.
+        // If the site default is to turn this on, we don't want to turn it on for "old" assignments
+        // without being specified.
+        if (!empty($plagiarismvalues) && !isset($plagiarismvalues['urkund_resubmit_on_close'])) {
+            $plagiarismvalues['urkund_resubmit_on_close'] = 0;
+        }
+    }
+    // Get Defaults - cmid(0) is the default list.
+    $plagiarismdefaults = $DB->get_records_menu('plagiarism_urkund_config', array('cm' => 0), '', 'name, value');
+    $plagiarismelements = $plugin->config_options();
+    foreach ($plagiarismelements as $key => $elements) {
+        if (!has_capability('plagiarism/urkund:resubmitonclose', $context) && $elements == 'urkund_resubmit_on_close') {
+            unset($plagiarismelements[$key]);
+        }
+    }
+
+    if (has_capability('plagiarism/urkund:enable', $context)) {
+        urkund_get_form_elements($mform);
+        if ($mform->elementExists('urkund_draft_submit') && $mform->elementExists('submissiondrafts')) {
+            $mform->hideif('urkund_draft_submit', 'submissiondrafts', 'eq', 0);
+        }
+
+        if (!has_capability('plagiarism/urkund:resubmitonclose', $context) &&
+            $mform->elementExists('urkund_resubmit_on_close')) {
+            $mform->removeElement('urkund_resubmit_on_close');
+        }
+        // Disable all plagiarism elements if use_plagiarism eg 0.
+        foreach ($plagiarismelements as $element) {
+            if ($element <> 'use_urkund') { // Ignore this var.
+                $mform->hideif($element, 'use_urkund', 'eq', 0);
+            }
+        }
+        // Check if files have been submitted and we need to disable the receiver address.
+        if ($DB->record_exists('plagiarism_urkund_files', array('cm' => $cmid, 'statuscode' => URKUND_STATUSCODE_ACCEPTED))) {
+            $mform->disabledIf('urkund_receiver', 'use_urkund');
+        }
+        $mform->hideif('urkund_selectfiletypes', 'urkund_allowallfile', 'eq', 1);
+    } else { // Add plagiarism settings as hidden vars.
+        foreach ($plagiarismelements as $element) {
+            $mform->addElement('hidden', $element);
+        }
+    }
+    $mform->setType('use_urkund', PARAM_INT);
+    $mform->setType('urkund_show_student_score', PARAM_INT);
+    $mform->setType('urkund_show_student_report', PARAM_INT);
+    $mform->setType('urkund_draft_submit', PARAM_INT);
+    $mform->setType('urkund_receiver', PARAM_TEXT);
+    $mform->setType('urkund_studentemail', PARAM_INT);
+
+    // Now set defaults.
+    foreach ($plagiarismelements as $element) {
+        $defaultelement = $element.'_'.str_replace('mod_', '', $modulename);
+        if (isset($plagiarismvalues[$element])) {
+            $mform->setDefault($element, $plagiarismvalues[$element]);
+        } else if ($element == 'urkund_receiver' && !empty($plagiarismsettings['userpref'])) {
+            // If this is the reciever address, and user preference handling is enabled.
+            $def = get_user_preferences($element);
+            if (!empty($def)) {
+                $mform->setDefault($element, $def);
+            } else if (isset($plagiarismdefaults[$defaultelement])) {
+                $mform->setDefault($element, $plagiarismdefaults[$defaultelement]);
+            }
+        } else if (isset($plagiarismdefaults[$defaultelement])) {
+            $mform->setDefault($element, $plagiarismdefaults[$defaultelement]);
+        }
+    }
+    $mform->registerRule('urkundvalidatereceiver', null, 'plagiarism_urkund_validatereceiver',
+        $CFG->dirroot.'/plagiarism/urkund/classes/validatereceiver.php');
+    $mform->addRule('urkund_receiver', get_string('receivernotvalid', 'plagiarism_urkund'), 'urkundvalidatereceiver');
+
+    // Now add JS to validate receiver indicator using Ajax.
+    if (has_capability('plagiarism/urkund:enable', $context)) {
+        $jsmodule = array(
+            'name' => 'plagiarism_urkund',
+            'fullpath' => '/plagiarism/urkund/checkreceiver.js',
+            'requires' => array('json'),
+        );
+        $PAGE->requires->js_init_call('M.plagiarism_urkund.init', array($formwrapper->get_course()->id), true, $jsmodule);
+    }
+
+    // Show advanced elements only if allowed.
+    $defaultelementadvanced = 'urkund_advanceditems_'.str_replace('mod_', '', $modulename);
+    if (!empty($plagiarismdefaults[$defaultelementadvanced])) {
+        $advancedsettings = explode(',', $plagiarismdefaults[$defaultelementadvanced]);
+        if (has_capability('plagiarism/urkund:advancedsettings', $context)) {
+            foreach ($advancedsettings as $name) {
+                if ($mform->elementExists($name)) {
+                    $mform->setAdvanced($name, true);
+                }
+            }
+        } else {
+            // Otherwise, put them as hidden elements.
+            foreach ($advancedsettings as $name) {
+                if ($mform->elementExists($name)) {
+                    $element = $mform->removeElement($name);
+                    $mform->addElement('hidden', $name, $element->getValue());
+                }
+            }
+        }
+    }
+
+    // Now handle content restriction settings.
+    if ($modulename == 'mod_assign' && $mform->elementExists("submissionplugins")) { // This should be mod_assign
+        // I can't see a way to check if a particular checkbox exists
+        // elementExists on the checkbox name doesn't work.
+        $mform->hideif('urkund_restrictcontent', 'assignsubmission_onlinetext_enabled');
+    } else if ($modulename != 'mod_forum' && $modulename != 'mod_hsuforum') {
+        // Forum doesn't need any changes but all other modules should disable this.
+        $mform->setDefault('urkund_restrictcontent', 0);
+        $mform->hardFreeze('urkund_restrictcontent');
+    }
 }
 
 /**
@@ -1204,7 +1300,7 @@ function urkund_send_file_to_urkund($plagiarismfile, $plagiarismsettings, $file)
     }
 
     // Get url of api.
-    $url = urkund_get_url($plagiarismsettings['urkund_api'], $plagiarismfile);
+    $url = urkund_get_url($plagiarismsettings['api'], $plagiarismfile);
     if (empty($url)) {
         mtrace('ERROR: no receiver address found for this cm: '.$plagiarismfile->cm. ' Skipping file');
         $plagiarismfile->statuscode = URKUND_STATUSCODE_NORECEIVER;
@@ -1212,7 +1308,7 @@ function urkund_send_file_to_urkund($plagiarismfile, $plagiarismsettings, $file)
         $DB->update_record('plagiarism_urkund_files', $plagiarismfile);
         return true;
     }
-    if (!empty(get_config('plagiarism', 'urkund_hidefilename'))) {
+    if (!empty(get_config('plagiarism_urkund', 'hidefilename'))) {
         $pathinfo = pathinfo($filename);
         $filenametopass = base64_encode("submission.".$pathinfo['extension']);
     } else {
@@ -1220,7 +1316,7 @@ function urkund_send_file_to_urkund($plagiarismfile, $plagiarismsettings, $file)
     }
 
     $headers = array('x-urkund-submitter: '.$useremail,
-                    'Accept-Language: '.$plagiarismsettings['urkund_lang'],
+                    'Accept-Language: '.$plagiarismsettings['lang'],
                     'x-urkund-filename: '.$filenametopass,
                     'Content-Type: '.$mimetype);
 
@@ -1230,7 +1326,7 @@ function urkund_send_file_to_urkund($plagiarismfile, $plagiarismsettings, $file)
     $c->setopt(array('CURLOPT_RETURNTRANSFER' => 1,
                      'CURLOPT_TIMEOUT' => 1800, // Set to 30min just in case.
                      'CURLOPT_HTTPAUTH' => CURLAUTH_BASIC,
-                     'CURLOPT_USERPWD' => $plagiarismsettings['urkund_username'].":".$plagiarismsettings['urkund_password']));
+                     'CURLOPT_USERPWD' => $plagiarismsettings['username'].":".$plagiarismsettings['password']));
 
     $c->setHeader($headers);
     $filecontents = (!empty($file->filepath)) ? file_get_contents($file->filepath) : $file->get_content();
@@ -1369,9 +1465,9 @@ function urkund_get_score($plagiarismsettings, $plagiarismfile, $force = false) 
                            URKUND_STATUSCODE_BAD_REQUEST);
     $successfulstates = array('Analyzed', 'Rejected', 'Error');
     if ($plagiarismfile->statuscode == URKUND_STATUSCODE_ACCEPTED_OLD) {
-        $url = old_urkund_get_url($plagiarismsettings['urkund_api'], $plagiarismfile);
+        $url = old_urkund_get_url($plagiarismsettings['api'], $plagiarismfile);
     } else {
-        $url = urkund_get_url($plagiarismsettings['urkund_api'], $plagiarismfile);
+        $url = urkund_get_url($plagiarismsettings['api'], $plagiarismfile);
     }
 
     if (empty($url)) {
@@ -1381,7 +1477,7 @@ function urkund_get_score($plagiarismsettings, $plagiarismfile, $force = false) 
         $DB->update_record('plagiarism_urkund_files', $plagiarismfile);
         return '';
     }
-    $headers = array('Accept-Language: '.$plagiarismsettings['urkund_lang']);
+    $headers = array('Accept: application/json', 'Accept-Language: '.$plagiarismsettings['lang']);
 
     // Use Moodle curl wrapper to send file.
     $c = new curl(array('proxy' => true));
@@ -1389,7 +1485,7 @@ function urkund_get_score($plagiarismsettings, $plagiarismfile, $force = false) 
     $c->setopt(array('CURLOPT_RETURNTRANSFER' => 1,
         'CURLOPT_TIMEOUT' => 300, // Set to 5min just in case.
         'CURLOPT_HTTPAUTH' => CURLAUTH_BASIC,
-        'CURLOPT_USERPWD' => $plagiarismsettings['urkund_username'].":".$plagiarismsettings['urkund_password']));
+        'CURLOPT_USERPWD' => $plagiarismsettings['username'].":".$plagiarismsettings['password']));
 
     $c->setHeader($headers);
     $response = $c->get($url);
@@ -1397,18 +1493,18 @@ function urkund_get_score($plagiarismsettings, $plagiarismfile, $force = false) 
     if (!empty($httpstatus)) {
         if (in_array($httpstatus, $allowedstatus)) {
             if ($httpstatus == URKUND_STATUSCODE_PROCESSED) {
-                // Get similarity score from xml.
-                $xml = new SimpleXMLElement($response);
+                // Get similarity score from JSON.
                 // When multiple results returned, the last one is the important one.
-                $last = count($xml->SubmissionData) - 1;
-                $status = (string)$xml->SubmissionData[$last]->Status[0]->State[0];
+                $json = json_decode($response);
+                $last = end($json);
+                $status = (string) $last->Status->State;
                 if (!empty($status) && in_array($status, $successfulstates)) {
                     $plagiarismfile->statuscode = $status;
                 }
                 if (!empty($status) && $status == 'Analyzed') {
-                    $plagiarismfile->reporturl = (string)$xml->SubmissionData[$last]->Report[0]->ReportUrl[0];
-                    $plagiarismfile->similarityscore = (int)$xml->SubmissionData[$last]->Report[0]->Significance[0];
-                    $plagiarismfile->optout = (string)$xml->SubmissionData[$last]->Document[0]->OptOutInfo[0]->Url[0];
+                    $plagiarismfile->reporturl = (string) $last->Report->ReportUrl;
+                    $plagiarismfile->similarityscore = (int) $last->Report->Significance;
+                    $plagiarismfile->optout = (string) $last->Document->OptOutInfo->Url;
                     // Now send e-mail to user.
                     $emailstudents = $DB->get_field('plagiarism_urkund_config', 'value',
                                                     array('cm' => $plagiarismfile->cm, 'name' => 'urkund_studentemail'));

@@ -42,6 +42,7 @@ function tab_supports($feature)
         case FEATURE_GRADE_OUTCOMES: return false;
         case FEATURE_MOD_ARCHETYPE: return MOD_ARCHETYPE_RESOURCE;
         case FEATURE_BACKUP_MOODLE2: return true;
+        case FEATURE_SHOW_DESCRIPTION: return true;        
 
         default: return null;
     }
@@ -413,6 +414,18 @@ function tab_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload
     send_stored_file($file, 0, 0, $forcedownload);
 }
 
+
+/**
+ * Return a list of page types
+ * @param string $pagetype current page type
+ * @param stdClass $parentcontext Block's parent context
+ * @param stdClass $currentcontext Current context of block
+ */
+function tab_page_type_list($pagetype, $parentcontext, $currentcontext) {
+    $modulepagetype = array('mod-tab-*' => get_string('page-mod-tab-x', 'tab'));
+    return $modulepagetype;
+}
+
 /**
  * Return a small object with summary information about what a 
  * user has done with a given particular instance of this module
@@ -430,7 +443,7 @@ function tab_user_outline($course, $user, $mod, $tab)
 
     if ($logs = $DB->get_records('log', array('userid' => $user->id, 'module' => 'tab',
         'action' => 'view', 'info' => $tab->id. ' - '.$tab->name), 'time ASC'))
-    {
+    { 
 
         $numviews = count($logs);
         $lastlog = array_pop($logs);
@@ -507,13 +520,64 @@ function tab_get_coursemodule_info($coursemodule)
     global $CFG, $DB;
     require_once("$CFG->libdir/resourcelib.php");
 
-    if (!$tab = $DB->get_record('tab', array('id' => $coursemodule->instance), 'id, name'))
+    if (!$tab = $DB->get_record('tab', array('id' => $coursemodule->instance), 'id, name, intro, introformat'))
     {
         return NULL;
     }
 
-    $info = new stdClass();
+    $info = new cached_cm_info(); // ecastro ULPGC
     $info->name = $tab->name;
-
+    
+    // ecastro ULPGC
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $info->content = format_module_intro('tab', $tab, $coursemodule->id, false);
+    }
+    
     return $info;
+}
+
+/**
+ * This will provide summary info about the user's grade in the subcourse below the link on
+ * the course/view.php page
+ *
+ * @param cm_info $cm
+ * @return void
+ */
+function mod_xxx_cmxx_info_view(cm_info $cm) {
+    global $CFG, $USER, $DB;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    $html = '';
+
+    $sql = "SELECT r.*
+              FROM {course} r
+              JOIN {subcourse} s ON s.refcourse = r.id
+             WHERE s.id = :subcourseid";
+
+    $refcourse = $DB->get_record_sql($sql, ['subcourseid' => $cm->instance], IGNORE_MISSING);
+
+    if ($refcourse) {
+        $percentage = \core_completion\progress::get_course_progress_percentage($refcourse);
+        if ($percentage !== null) {
+            $percentage = floor($percentage);
+            $html .= html_writer::tag('div', get_string('currentprogress', 'subcourse', $percentage),
+                ['class' => 'contentafterlink']);
+        }
+    }
+
+    $currentgrade = grade_get_grades($cm->course, 'mod', 'subcourse', $cm->instance, $USER->id);
+
+    if (!empty($currentgrade->items[0]->grades)) {
+        $currentgrade = reset($currentgrade->items[0]->grades);
+        if (isset($currentgrade->grade) and !($currentgrade->hidden)) {
+            $strgrade = $currentgrade->str_grade;
+            $html .= html_writer::tag('div', get_string('currentgrade', 'subcourse', $strgrade),
+                ['class' => 'contentafterlink']);
+        }
+    }
+
+    if ($html !== '') {
+        $cm->set_after_link($html);
+    }
 }

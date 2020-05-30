@@ -220,5 +220,56 @@ function xmldb_plagiarism_urkund_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2020020700) {
+        // Conversion of old config_plugin settings.
+        $oldsettings = get_config('plagiarism');
+        foreach ($oldsettings as $setting => $value) {
+            if (strpos($setting, 'urkund_') !== false) {
+                if ($setting == 'urkund_use') { // Not deprecated yet - see MDL-67872.
+                    // Not deprecated yet, so don't delete.
+                    // Internal plugin code now checks plugin->enabled setting so we need to set both.
+                    set_config('enabled', $value, 'plagiarism_urkund');
+                } else {
+                    $newsetting = substr($setting, 7); // Strip urkund from the start of this setting.
+                    // Set new setting.
+                    set_config($newsetting, $value, 'plagiarism_urkund');
+
+                    // Remove old settings.
+                    set_config($setting, null, 'plagiarism');
+                }
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2020020700, 'plagiarism', 'urkund');
+    }
+
+    if ($oldversion < 2020021300) {
+        $DB->delete_records('user_preferences', array('name' => 'urkund_receiver'));
+
+        upgrade_plugin_savepoint(true, 2020021300, 'plagiarism', 'urkund');
+    }
+
+    if ($oldversion < 2020031900) {
+        if (get_config('plagiarism_urkund', 'unitid') != 0) {
+            $plagiarismdefaults = $DB->get_records_menu('plagiarism_urkund_config',
+                array('cm' => 0), '', 'name, value'); // The cmid(0) is the default list.
+            $supportedmodules = urkund_supported_modules();
+            foreach ($supportedmodules as $sm) {
+                $element = 'urkund_receiver';
+                $element .= "_" . $sm;
+                $newelement = new Stdclass();
+                $newelement->cm = 0;
+                $newelement->name = $element;
+                $newelement->value = '';
+                if (isset($plagiarismdefaults[$element])) {
+                    $newelement->id = $DB->get_field('plagiarism_urkund_config', 'id', (array('cm' => 0, 'name' => $element)));
+                    $DB->update_record('plagiarism_urkund_config', $newelement);
+                }
+            }
+
+            upgrade_plugin_savepoint(true, 2020031900, 'plagiarism', 'urkund');
+        }
+    }
+
     return true;
 }

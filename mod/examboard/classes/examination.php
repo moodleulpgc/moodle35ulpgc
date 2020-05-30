@@ -74,6 +74,9 @@ class examination {
     /** @var string the classroom name in which this examination will take place. */
     public $venue;
 
+    /** @var string the classroom name in which this examination will take place. */
+    public $accessurl;
+    
     /** @var int the date when this thsi examinatioc wll happen. */
     public $examdate;
 
@@ -119,8 +122,13 @@ class examination {
             $this->examperiod = get_string('none');
         }
         
+        $this->examperiod = $examrec->examperiod;
+        
+        
+        
         $this->sessionname = $examrec->sessionname;
         $this->venue = $examrec->venue;
+        $this->accessurl  = $examrec->accessurl;
         $this->examdate = $examrec->examdate;
         $this->duration = $examrec->duration;
         $this->active = $examrec->examactive;
@@ -315,5 +323,20 @@ class examination {
         
         return $DB->record_exists('examboard_member', $params);
     }
+    
+    public function is_active_member($userid = 0) {
+        global $DB, $USER;
+        
+        if(!$userid) {
+            $userid = $USER->id;
+        }
+        
+        $params = array('boardid' => $this->boardid, 'userid'=>$userid, 'deputy' => 0 );
+        $select = ' boardid = :boardid AND userid = :userid AND deputy = :deputy 
+                    AND sortorder <= 1 AND sortorder >= 0 ';
+                    
+        return $DB->record_exists_select('examboard_member', $select, $params);
+    }
+    
     
 }

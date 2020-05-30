@@ -47,7 +47,7 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
 
         // Define the root element describing the StudentQuiz instance.
         $studentquiz = new backup_nested_element('studentquiz', array('id'), array(
-                'coursemodule', 'name', 'intro', 'introformat', 'grade', 'anonymrank', 'quizpracticebehaviour',
+                'coursemodule', 'name', 'intro', 'introformat', 'grade', 'anonymrank',
                 'questionquantifier', 'approvedquantifier', 'ratequantifier',
                 'correctanswerquantifier', 'incorrectanswerquantifier',
                 'allowedqtypes', 'aggregated', 'excluderoles', 'forcerating', 'forcecommenting',
@@ -87,7 +87,7 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
         // Comment -> Question, User.
         $comments = new backup_nested_element('comments');
         $comment = new backup_nested_element('comment', array('questionid', 'userid', 'id'), [
-                'comment', 'created', 'parentid', 'deleted', 'deleteuserid'
+                'comment', 'created', 'parentid', 'deleted', 'deleteuserid', 'edited', 'edituserid'
         ]);
         $comments->add_child($comment);
         $studentquiz->add_child($comments);
@@ -146,6 +146,7 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
         $rate->annotate_ids('user', 'userid');
         $comment->annotate_ids('user', 'userid');
         $comment->annotate_ids('user', 'deleteuserid');
+        $comment->annotate_ids('user', 'edituserid');
 
         // Define file annotations (we do not use itemid in this example).
         $studentquiz->annotate_files('mod_studentquiz', 'intro', null);

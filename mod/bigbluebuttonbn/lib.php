@@ -28,17 +28,6 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-require_once($CFG->dirroot.'/calendar/lib.php');
-require_once($CFG->dirroot.'/message/lib.php');
-require_once($CFG->dirroot.'/mod/lti/OAuth.php');
-require_once($CFG->dirroot.'/tag/lib.php');
-require_once($CFG->libdir.'/accesslib.php');
-require_once($CFG->libdir.'/completionlib.php');
-require_once($CFG->libdir.'/datalib.php');
-require_once($CFG->libdir.'/enrollib.php');
-require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/formslib.php');
-
 // JWT is included in Moodle 3.7 core, but a local package is still needed for backward compatibility.
 if (!class_exists('\Firebase\JWT\JWT')) {
     if (file_exists($CFG->libdir.'/php-jwt/src/JWT.php')) {
@@ -64,7 +53,7 @@ $CFG->bigbluebuttonbn['scheduled_duration_enabled'] = 0;
  * Remove this block when restored
  */
 
- /** @var BIGBLUEBUTTONBN_DEFAULT_SERVER_URL string of default bigbluebutton server url */
+/** @var BIGBLUEBUTTONBN_DEFAULT_SERVER_URL string of default bigbluebutton server url */
 const BIGBLUEBUTTONBN_DEFAULT_SERVER_URL = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
 /** @var BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET string of default bigbluebutton server shared secret */
 const BIGBLUEBUTTONBN_DEFAULT_SHARED_SECRET = '8cd8ef52e8e101574e400365b55e11a6';
@@ -454,6 +443,7 @@ function bigbluebuttonbn_reset_userdata($data) {
         unset($items['tags']);
         $status[] = bigbluebuttonbn_reset_getstatus('tags');
     }
+    // TODO : seems to be duplicated code unless we just want to force reset tags.
     foreach ($items as $item => $default) {
         // Remove instances or elements linked to this course, others than recordings or tags.
         if (!empty($data->{"reset_bigbluebuttonbn_{$item}"})) {
@@ -572,7 +562,8 @@ function bigbluebuttonbn_print_overview($courses, &$htmlarray) {
             if (empty($htmlarray[$bn->course]['bigbluebuttonbn'])) {
                 $htmlarray[$bn->course]['bigbluebuttonbn'] = '';
             }
-            $htmlarray[$bn->course]['bigbluebuttonbn'] = bigbluebuttonbn_print_overview_element($bn, $now);
+            // Make sure we print all bigbluebutton instances.
+            $htmlarray[$bn->course]['bigbluebuttonbn'] .= bigbluebuttonbn_print_overview_element($bn, $now);
         }
     }
 }
@@ -739,6 +730,9 @@ function bigbluebuttonbn_process_pre_save_checkboxes(&$bigbluebuttonbn) {
     if (!isset($bigbluebuttonbn->muteonstart)) {
         $bigbluebuttonbn->muteonstart = 0;
     }
+    if (!isset($bigbluebuttonbn->recordings_validate_url)) {
+        $bigbluebuttonbn->recordings_validate_url = 1;
+    }
 }
 
 /**
@@ -794,7 +788,8 @@ function bigbluebuttonbn_process_post_save_notification(&$bigbluebuttonbn) {
  * @return void
  **/
 function bigbluebuttonbn_process_post_save_event(&$bigbluebuttonbn) {
-    global $DB;
+    global $CFG, $DB;
+    require_once($CFG->dirroot.'/calendar/lib.php');
     $eventid = $DB->get_field('event', 'id', array('modulename' => 'bigbluebuttonbn',
         'instance' => $bigbluebuttonbn->id));
     // Delete the event from calendar when/if openingtime is NOT set.
@@ -1079,7 +1074,7 @@ function bigbluebuttonbn_view($bigbluebuttonbn, $course, $cm, $context) {
         'objectid' => $bigbluebuttonbn->id
     );
 
-    $event = \mod_bigbluebuttonbn\event\bigbluebuttonbn_activity_viewed::create($params);
+    $event = \mod_bigbluebuttonbn\event\activity_viewed::create($params); // Fix event name.
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('bigbluebuttonbn', $bigbluebuttonbn);
@@ -1206,15 +1201,6 @@ function bigbluebuttonbn_log($bigbluebuttonbn, $event, array $overrides = [], $m
  * @param navigation_node $nodenav The node to add module settings to
  */
 function bigbluebuttonbn_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $nodenav) {
-/*
-
-    global $PAGE, $CFG;
-
-    $params = $PAGE->url->params();
-    if (!empty($params['id']) || !empty($params['update'])) {
-        $params['id'] = !empty($params['id']) ? $params['id'] : $params['update']; // ecastro ULPGC
-        $cm = get_coursemodule_from_id('bigbluebuttonbn', $params['id'], 0, false, MUST_EXIST);
-*/
     global $PAGE, $USER;
     // Don't add validate completion if the callback for meetingevents is NOT enabled.
     if (!(boolean)\mod_bigbluebuttonbn\locallib\config::get('meetingevents_enabled')) {

@@ -313,7 +313,8 @@ function xmldb_studentquiz_upgrade($oldversion) {
     // Migrate old quiz activity data into new data structure.
     if ($oldversion < 2017112406) {
         // This is also used in import, so it had to be extracted.
-        mod_studentquiz_migrate_old_quiz_usage();
+        // Removed as this migration step is now out of support range, just here for historical purposes because this is the upgrade file with savepoints
+        // mod_studentquiz_migrate_old_quiz_usage();
 
         upgrade_mod_savepoint(true, 2017112406, 'studentquiz');
     }
@@ -388,7 +389,8 @@ function xmldb_studentquiz_upgrade($oldversion) {
 
     if ($oldversion < 2018051300) {
         // Fix wrong parent in question categories if applicable.
-        mod_studentquiz_fix_wrong_parent_in_question_categories();
+        // Removed afterwards because of #173, just here for historical purposes because this is the upgrade file with savepoints
+        // mod_studentquiz_fix_wrong_parent_in_question_categories();
 
         upgrade_mod_savepoint(true, 2018051300, 'studentquiz');
     }
@@ -589,6 +591,39 @@ function xmldb_studentquiz_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2020011602, 'studentquiz');
+    }
+
+    if ($oldversion < 2020021300) {
+
+        $table = new xmldb_table('studentquiz_comment');
+        $field = new xmldb_field('edited', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'deleteuserid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('edituserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'edited');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020021300, 'studentquiz');
+    }
+
+    // remove unused practice database tables and old quiz practice columns
+    if ($oldversion < 2020043000) {
+
+        $table = new xmldb_table('studentquiz_practice');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('studentquiz');
+        $field = new xmldb_field('quizpracticebehaviour');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020043000, 'studentquiz');
     }
 
     return true;

@@ -60,8 +60,9 @@ class entry extends \core_search\base_mod {
         $sql = "SELECT de.*, dl.course
                 FROM {datalynx_entries} de
                 JOIN {datalynx} dl ON dl.id = de.dataid $contextjoin
-                WHERE de.timemodified >= ? ORDER BY de.timemodified ASC";
-        return $DB->get_recordset_sql($sql, array_merge($contextparams, [$modifiedfrom]));
+                WHERE de.timemodified >= :timemodified ORDER BY de.timemodified ASC";
+
+        return $DB->get_recordset_sql($sql, array_merge($contextparams, ['timemodified' => $modifiedfrom]));
     }
 
     /**
@@ -200,7 +201,7 @@ class entry extends \core_search\base_mod {
         global $DB;
 
         $indexfields = array();
-        $validfieldtypes = array('text', 'textarea', 'url', 'number', 'editor');
+        $validfieldtypes = array('text', 'textarea', 'url', 'number', 'editor', 'file');
 
         $sql = "SELECT dc.*, df.name AS fieldname, df.type AS fieldtype
                 FROM {datalynx_contents} dc, {datalynx_fields} df
@@ -227,5 +228,54 @@ class entry extends \core_search\base_mod {
         }
 
         return $indexfields;
+    }
+
+    /**
+     * Returns true if this area uses file indexing.
+     *
+     * @return bool
+     */
+    public function uses_file_indexing() {
+        return true;
+    }
+
+    /**
+     * Return the context info required to index files for
+     * this search area.
+     *
+     * @return array
+     */
+    public function get_search_fileareas() {
+        return array('content');
+    }
+
+    /**
+     * Add the database entries attachments.
+     *
+     * @param \core_search\document $doc
+     * @return void
+     */
+    public function attach_files($doc) {
+        global $DB;
+
+        $entryid = $doc->get('itemid');
+
+        try {
+            $entry = $this->get_entry($entryid);
+        } catch (\dml_missing_record_exception $e) {
+            debugging('Could not get record to attach files to '.$doc->get('id'), DEBUG_DEVELOPER);
+            return;
+        }
+
+        $cm = $this->get_cm('datalynx', $entry->dataid, $doc->get('courseid'));
+        $context = \context_module::instance($cm->id);
+
+        // Get the files and attach them.
+        $fs = get_file_storage();
+
+        $files = $fs->get_area_files($context->id, 'mod_datalynx', 'content', $entryid);
+        foreach ($files as $file) {
+            $doc->add_stored_file($file);
+        }
     }
 }

@@ -128,3 +128,27 @@ $string['messageprovider:reminder'] = 'Waitlist enrolment reminders';
 $string['enroladdusers'] = '{$a->waitlist} in {$a->instancename}';
 $string['addusers_onwaitlist'] = 'Add users to the waiting list';
 $string['noreplyname'] = 'Automatic reminder message system';
+$string['oranycohorts'] = 'Member of any of';
+$string['oranycohorts_help'] = '
+The synchronization will affect to users that are memberes of any one of the cohorts selected in this group.
+This field is mandatory, you must select at leat one cohort here';
+$string['andallcohorts'] = 'And all in';
+$string['andallcohorts_help'] = 'Optionally, selected users must be members of ALL cohorts in this group, must be assigned to each one of these.';
+$string['notcohorts'] = 'And not in';
+$string['notcohorts_help'] = 'Optionally, you may indicated a group of cohorts the user must be NOT a member of. 
+The user should NOT be a member of any or all of these cohorts, controlled by the next option.
+';
+$string['noenrolgroups'] = 'In addition to enrolment, a group can be assigned.';
+$string['enrolgroup'] = 'Add to group';
+$string['enrolgroup_help'] = 'Select a group to add users to. It may be an existing group or a new one.
+
+Option "Create new group" will create a new group named after this enrol method.
+
+Option "Create new group for cohort" will create a new group for each of the separate cohorts in the "Any cohorts" group.
+';
+$string['creategroup'] = 'Create new group';
+$string['multiplegroup'] = 'Create new group for each cohort';
+$string['assigngroup'] = 'Group enrolment';
+$string['assigngroup_help'] = 'When activated, the newly enrolled user additionally will be added to a group or groups, 
+according to the setting below';
+$string['headerallowedusers'] = 'User selection';

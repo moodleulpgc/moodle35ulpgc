@@ -116,7 +116,6 @@ function bigbluebuttonbn_view_render(&$bbbsession, $activity) {
     $output .= bigbluebuttonbn_view_warning_general($bbbsession);
 
     // Renders the rest of the page.
-    $output .= $OUTPUT->heading($bbbsession['meetingname'], 3);
     // Renders the completed description.
     $desc = file_rewrite_pluginfile_urls($bbbsession['meetingdescription'], 'pluginfile.php',
         $bbbsession['context']->id, 'mod_bigbluebuttonbn', 'intro', null);
@@ -248,28 +247,8 @@ function bigbluebuttonbn_view_render_room(&$bbbsession, $activity, &$jsvars) {
  * @return string
  */
 function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, &$jsvars) {
-    $bigbluebuttonbnid = null;
-    if ($enabledfeatures['showroom']) {
-        $bigbluebuttonbnid = $bbbsession['bigbluebuttonbn']->id;
-    }
-    // Get recordings.
-    $recordings = bigbluebuttonbn_get_recordings(
-        $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom'],
-        $bbbsession['bigbluebuttonbn']->recordings_deleted
-    );
-    if ($enabledfeatures['importrecordings']) {
-        // Get recording links.
-        $recordingsimported = bigbluebuttonbn_get_recordings_imported_array(
-            $bbbsession['course']->id, $bigbluebuttonbnid, $enabledfeatures['showroom']
-        );
-        /* Perform aritmetic addition instead of merge so the imported recordings corresponding to existent
-         * recordings are not included. */
-        if ($bbbsession['bigbluebuttonbn']->recordings_imported) {
-            $recordings = $recordingsimported;
-        } else {
-            $recordings += $recordingsimported;
-        }
-    }
+    $recordings = bigbluebutton_get_recordings_for_table_view($bbbsession, $enabledfeatures);
+
     if (empty($recordings) || array_key_exists('messageKey', $recordings)) {
         // There are no recordings to be shown.
         return html_writer::div(get_string('view_message_norecordings', 'bigbluebuttonbn'), '',
@@ -287,8 +266,7 @@ function bigbluebuttonbn_view_render_recordings(&$bbbsession, $enabledfeatures, 
     }
     // JavaScript variables for recordings with YUI.
     $jsvars += array(
-        'columns' => bigbluebuttonbn_get_recording_columns($bbbsession),
-        'data' => bigbluebuttonbn_get_recording_data($bbbsession, $recordings),
+        'bbbid' => $bbbsession['bigbluebuttonbn']->id,
     );
     // Render a YUI table.
     $reset = get_string('reset');

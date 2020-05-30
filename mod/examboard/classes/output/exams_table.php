@@ -28,6 +28,8 @@ use renderable;
 use flexible_table;
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/tablelib.php');
+
 
 /**
  * The Exams_table class holds data to get and manipulate an exam instance. 

@@ -47,6 +47,11 @@ class index implements renderable, templatable { // Class should be placed elsew
         $this->useprint = ($pdfannotator->useprint || $capabilities->useprint);
         $this->useprintcomments = ($pdfannotator->useprintcomments || $capabilities->useprintcomments);
 
+        // ecastro ULPGC
+        $this->useannotationscomments = $capabilities->createannotations;
+        $this->usequestions = $capabilities->usequestions;
+        // ecastro ULPGC
+
         $contextid = $file->get_contextid();
         $component = $file->get_component();
         $filearea = $file->get_filearea();
@@ -71,6 +76,22 @@ class index implements renderable, templatable { // Class should be placed elsew
         $data->printlink = $this->printurl;
         $data->pixprintdoc = $OUTPUT->image_url('download', 'mod_pdfannotator');
         $data->pixprintcomments = $OUTPUT->image_url('print_comments', 'mod_pdfannotator');
+
+        // ecastro ULPGC
+        $data->useannotationscomments = $this->useannotationscomments; 
+        $data->usequestions = $this->usequestions; 
+        $data->viewerstyle = $this->useannotationscomments ?  '' : 'disabledpdfcontent'; 
+        $data->viewerdisabled = $this->useannotationscomments ?  '' : 'oncontextmenu="function(){return false;}"';
+        //$data->viewerdisabled = '';
+        $data->viewersize = 'col-lg-8';
+        $data->questionsize = 'col-lg-4';
+        $data->questionview = '';
+        if(!$this->usequestions) {
+            $data->viewersize = 'col-lg-12';
+            $data->questionsize = 'col-lg-auto';
+            $data->questionview = 'style="display:none;"';
+        }
+        // ecastro ULPGC
 
         return $data;
     }

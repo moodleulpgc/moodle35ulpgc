@@ -267,7 +267,7 @@ class datalynx_filter {
         }
         if ($simplesearch) {
             $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
-            $searchtables .= " JOIN {datalynx_fields} f ON cs.fieldid = f.id ";
+            $searchtables .= " JOIN {datalynx_fields} fsimple ON cs.fieldid = fsimple.id ";
             $searchlike = array('search1' => $DB->sql_like('cs.content', ':search1', false, false),
                 'search2' => $DB->sql_like('u.firstname', ':search2', false, false),
                 'search3' => $DB->sql_like('u.lastname', ':search3', false, false),
@@ -286,7 +286,7 @@ class datalynx_filter {
                             $paramid = "fieldid$i";
                             $searchlike[$paramlike] = "(" .
                                     $DB->sql_like("cs.content", ":$paramlike", false, false) .
-                                    " AND f.id = :$paramid)";
+                                    " AND fsimple.id = :$paramid)";
                             $searchparams[$paramlike] = "%#{$id}%#";
                             $searchparams[$paramid] = $field->id();
                             $i++;
@@ -298,7 +298,7 @@ class datalynx_filter {
                             if (stripos($option, $simplesearch) !== false) {
                                 $paramlike = "fieldquicksearch$i";
                                 $paramid = "fieldid$i";
-                                $searchlike[$paramlike] = "(cs.content = :$paramlike AND f.id = :$paramid)";
+                                $searchlike[$paramlike] = "(cs.content = :$paramlike AND fsimple.id = :$paramid)";
                                 $searchparams[$paramlike] = "$id";
                                 $searchparams[$paramid] = $field->id();
                                 $i++;
@@ -338,7 +338,7 @@ class datalynx_filter {
             $searchwhere[] = ' (' . implode(' OR ', $searchlike) . ') ';
         }
 
-        $wheresearch = $searchwhere ? ' AND (' . implode(' OR ', $searchwhere) .')' : '';
+        $wheresearch = $searchwhere ? ' AND (' . implode(' AND ', $searchwhere) .')' : '';
 
         // Register referred tables.
         $this->_filteredtables = $searchfrom;
@@ -673,7 +673,7 @@ class datalynx_filter_manager {
         global $DB;
         if (!$this->_filters or $forceget) {
             $this->_filters = array();
-            if ($filters = $DB->get_records('datalynx_filters', array('dataid' => $this->_df->id()))) {
+            if ($filters = $DB->get_records('datalynx_filters', array('dataid' => $this->_df->id()), 'name')) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->_filters[$filterid] = new datalynx_filter($filterdata);
                 }
@@ -919,12 +919,20 @@ class datalynx_filter_manager {
     public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
-        $filter->perpage = !empty($formdata->uperpage) ? $formdata->uperpage : 0;
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
         $filter->groupby = !empty($formdata->groupby) ? $formdata->groupby : 0;
         $filter->search = isset($formdata->search) ? $formdata->search : '';
         $filter->customsort = $this->get_sort_options_from_form($formdata);
         $filter->customsearch = $this->get_search_options_from_form($formdata, $finalize);
+
+        // Userpreferences for perpage overwrites filterpreferences.
+        $filter->perpage = 0;
+        if (isset($formdata->perpage)) {
+            $filter->perpage = $formdata->perpage;
+        }
+        if (isset($formdata->uperpage)) {
+            $filter->perpage = $formdata->uperpage;
+        }
 
         if ($filter->customsearch) {
             $filter->search = '';
@@ -989,6 +997,12 @@ class datalynx_filter_manager {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
                                 }
+                            } else if ($type == "multiselect" OR $type == "checkbox") {
+                                // If andor is checked we set operator to ALL_OF.
+                                if ($value['andor']) {
+                                    $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
+                                }
+                                unset($value['andor']);
                             } else if ($type == "file") {
                                 if ($value == '0') {
                                     $searchfields[$fieldname]['AND'][] = array('', '', false);

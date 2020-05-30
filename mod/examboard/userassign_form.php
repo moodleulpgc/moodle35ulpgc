@@ -68,6 +68,8 @@ class examboard_userassign_form extends moodleform {
         $options = array(EXAMBOARD_ORDER_KEEP   => get_string('orderkeepchosen', 'examboard'),
                          EXAMBOARD_ORDER_RANDOM => get_string('orderrandomize', 'examboard'),
                          EXAMBOARD_ORDER_ALPHA  => get_string('orderalphabetic', 'examboard'),
+                         EXAMBOARD_ORDER_TUTOR => get_string('orderalphatutor', 'examboard'),
+                         EXAMBOARD_ORDER_LABEL => get_string('orderalphalabel', 'examboard'),
                          );
         $mform->addElement('select', 'userorder', get_string('allocmemberorder', 'examboard'), $options);
         $mform->setDefault('userorder', EXAMBOARD_ORDER_ALPHA);

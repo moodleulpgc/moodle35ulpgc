@@ -192,7 +192,7 @@ class restore_examboard_activity_structure_step extends restore_activity_structu
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->grader = $this->get_mappingid('user', $data->grader);
         
-        $newitemid = $DB->insert_record('examboard_grade', $data);
+        $newitemid = $DB->insert_record('examboard_grades', $data);
     }
 
     

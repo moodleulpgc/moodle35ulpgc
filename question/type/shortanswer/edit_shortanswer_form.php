@@ -49,7 +49,7 @@ class qtype_shortanswer_edit_form extends question_edit_form {
         $mform->closeHeaderBefore('answersinstruct');
 
         $this->add_per_answer_fields($mform, get_string('answerno', 'qtype_shortanswer', '{no}'),
-                question_bank::fraction_options());
+                question_bank::fraction_options_full()); // question_bank::fraction_options()); // ecastro ULPGC
 
         $this->add_interactive_settings();
     }

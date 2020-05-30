@@ -97,10 +97,8 @@
             $(this).attr('title', settings.tooltip);
         }
 
-        
         settings.autowidth  = 'auto' == settings.width;
         settings.autoheight = 'auto' == settings.height;
-        
 
         return this.each(function() {
 
@@ -109,9 +107,9 @@
 
             /* Inlined block elements lose their width and height after first edit. */
             /* Save them for later use as workaround. */
-            
-            var savedwidth  = $(self).width();
-            var savedheight = $(self).height();            
+
+            /* var savedwidth  = $(self).width(); */  
+            /* var savedheight = $(self).height(); */
 
             /* Save so it can be later used by $.editable('destroy') */
             $(this).data('event.editable', settings.event);
@@ -274,25 +272,25 @@
                 /* Do nothing is usable when navigating with tab. */
                 var t;
                 if ('cancel' == settings.onblur) {
-                    input.blur(function(e) {
+                    input.blur(function() {
                         /* Prevent canceling if submit was clicked. */
                         t = setTimeout(function() {
                             reset.apply(form, [settings, self]);
                         }, 500);
                     });
                 } else if ('submit' == settings.onblur) {
-                    input.blur(function(e) {
+                    input.blur(function() {
                         /* Prevent double submit if submit was clicked. */
                         t = setTimeout(function() {
                             form.submit();
                         }, 200);
                     });
                 } else if ($.isFunction(settings.onblur)) {
-                    input.blur(function(e) {
+                    input.blur(function() {
                         settings.onblur.apply(self, [input.val(), settings]);
                     });
                 } else {
-                    input.blur(function(e) {
+                    input.blur(function() {
                       /* TODO: maybe something here */
                     });
                 }
@@ -516,7 +514,7 @@
                     }
                     /* Loop option again to set selected. IE needed this... */
                     $('select', this).children().each(function() {
-                        if ($(this).val() == json['selected'] || 
+                        if ($(this).val() == json['selected'] ||
                             $(this).text() == $.trim(original.revert)) {
                                 $(this).prop('selected', true);
                         }

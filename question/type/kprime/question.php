@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      qtype_kprime
-* @author       Amr Hourani (amr.hourani@id.ethz.ch)
- *@author       Martin Hanusch (martin.hanusch@let.ethz.ch)
-* @author       Jürgen Zimmer (juergen.zimmer@edaktik.at)
-* @author       Andreas Hruska (andreas.hruska@edaktik.at)
-* @copyright    2016 ETHZ {@link http://ethz.ch/}
-* @copyright    2014 eDaktik GmbH {@link http://www.edaktik.at}
-* @license      http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     qtype_kprime
+ * @author      Amr Hourani (amr.hourani@id.ethz.ch)
+ * @author      Martin Hanusch (martin.hanusch@let.ethz.ch)
+ * @author      Jürgen Zimmer (juergen.zimmer@edaktik.at)
+ * @author      Andreas Hruska (andreas.hruska@edaktik.at)
+ * @copyright   2016 ETHZ {@link http://ethz.ch/}
+ * @copyright   2014 eDaktik GmbH {@link http://www.edaktik.at}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -72,7 +72,7 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
 
         // Add any missing answers. Sometimes people edit questions after they
         // have been attempted which breaks things.
-        // Retrieve the question rows (mtf options).
+        // Retrieve the question rows (kprime options).
         for ($i = 0; $i < count($this->order); $i++) {
             if (isset($this->rows[$this->order[$i]])) {
                 continue;
@@ -81,7 +81,7 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
             $a->id = 0;
             $a->questionid = $this->id;
             $a->number = -1;
-            $a->optiontext = html_writer::span(get_string('deletedchoice', 'qtype_sc'), 'notifyproblem');
+            $a->optiontext = html_writer::span(get_string('deletedchoice', 'qtype_kprime'), 'notifyproblem');
             $a->optiontextformat = FORMAT_HTML;
             $a->optionfeedback = "";
             $a->optionfeedbackformat = FORMAT_HTML;
@@ -213,10 +213,15 @@ class qtype_kprime_question extends question_graded_automatically_with_countback
      * @see question_graded_automatically::is_gradable_response()
      */
     public function is_gradable_response(array $response) {
-        if (count($response) == 0) {
-            return false;
+        unset($response['_order']);
+        if ($this->scoringmethod == 'subpoints' || $this->scoringmethod == 'kprime') {
+            if (count($response) > 0) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return true;
+            return $this->is_complete_response($response);
         }
     }
 

@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class definition for the backup activity
+ *
  * @package   mod_groupselect
  * @copyright 2018 HTW Chur Roger Barras
  * @copyright  2011 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
@@ -50,8 +52,10 @@ class backup_groupselect_activity_task extends backup_activity_task {
     }
 
     /**
-     * Code the transformations to perform in the activity in
-     * order to get transportable (encoded) links
+     * Code the transformations to perform in the activity in order to get transportable (encoded) links
+     *
+     * @param $content Code to be encoded
+     * @return string endoced Code
      */
     static public function encode_content_links($content) {
         global $CFG;

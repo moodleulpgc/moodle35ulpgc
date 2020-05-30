@@ -137,6 +137,10 @@ $string['ungradedactivity'] = '{$a} items need grading';
 $string['usersexportcsv'] = 'Export as CSV';
 $string['exportusers'] = 'Export users';
 
+$string['allowedcoursecats'] = 'Allowed course categories';
+$string['explainallowedcoursecats'] = 'List of category idnumber strings of course categories available in this server.  
+Either comma separated or one string per line';
+
 //backup
 $string['rootsettinggroups'] = 'Include Groups';
 $string['rootsettinggroupings'] = 'Include Groupings';

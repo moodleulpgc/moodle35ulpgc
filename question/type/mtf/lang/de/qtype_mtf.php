@@ -15,11 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @package qtype_mtf
- * @author Amr Hourani amr.hourani@id.ethz.ch
- * @copyright ETHz 2016 amr.hourani@id.ethz.ch
+ * @package     qtype_mtf
+ * @author      Amr Hourani (amr.hourani@id.ethz.ch)
+ * @author      Martin Hanusch (martin.hanusch@let.ethz.ch)
+ * @copyright   2016 ETHZ {@link http://ethz.ch/}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['answernumbering'] = 'Wahlantworten nummerieren?';
 $string['answernumbering123'] = '1., 2., 3., ...';
 $string['answernumberingabc'] = 'a., b., c., ...';
@@ -45,6 +47,7 @@ $string['maxpoints'] = 'Max. Punkte';
 $string['mustsupplyresponses'] = 'Sie müssen für alle Texte einen Wert eingeben.';
 $string['mustsupplyvalue'] = 'Sie müssen hier einen Wert eingeben.';
 $string['optionno'] = 'Wahlantwort {$a}';
+$string['oneanswerperrow'] = 'Bitte beantworten Sie alle Teile der Frage.';
 $string['pluginname'] = 'Multiple True False (ETH)';
 $string['pluginname_help'] = 'Teilnehmer/innen bewerten zur Beantwortung einer Fragestellung Wahlantworten als „wahr“ oder „falsch“. Es können statt „wahr“/„falsch“ auch eigene Kriterien gesetzt werden.';
 $string['pluginname_link'] = 'question/type/mtf';

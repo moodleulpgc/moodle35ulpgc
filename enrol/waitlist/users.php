@@ -158,5 +158,4 @@ echo $renderer->render_course_enrolment_users_table($table, $filterform);
 $url = new moodle_url($CFG->wwwroot.'/enrol/waitlist/enroluser.php', array('enrolid'=>$instance, 'wait'=>1));
 echo $OUTPUT->heading(html_writer::link($url, get_string('addusers_onwaitlist', 'enrol_waitlist')), 5);
 
-http://localhost/moodle35ulpgc/enrol/waitlist/enroluser.php?enrolid=112
 echo $OUTPUT->footer();

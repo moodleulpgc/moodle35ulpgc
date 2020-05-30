@@ -34,5 +34,15 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*'
-    )
+    ),
+    
+    array(
+        'classname' => 'mod_examboard\task\synch_groups_gradeables_task',
+        'blocking' => 0,
+        'minute' => '05',
+        'hour' => '3',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    ),
 );

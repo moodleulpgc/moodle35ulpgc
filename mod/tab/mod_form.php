@@ -50,10 +50,10 @@ class mod_tab_mod_form extends moodleform_mod
         $mform->addRule('name', null, 'required', null, 'client');
 
         //Add Intro
-        $this->standard_intro_elements(false);
+        $this->standard_intro_elements();
 
-        $mform->setDefault('printintro', 0);
-        $mform->setAdvanced('printintro', false);
+        $mform->setDefault('printintro', 1);
+        //$mform->setAdvanced('printintro', false);
 
         //Have to use this option for postgresqgl to work
         $instance = $this->current->instance;

@@ -18,6 +18,10 @@ $string['term03'] = 'Third semester';
 $string['term04'] = 'Fourth semester';
 
 $string['newactivity'] = 'New activity detected in the course';
+$string['useallowedcats'] = 'Only allowed categories';
+$string['configuseallowedcats'] = 'When enabled, only courses in the ULPGC allowed caregories are listed';
+$string['onlyactiveenrol'] = 'Only active enrol';
+$string['configonlyactiveenrol'] = 'When enabled, only active enrolments are considerdd to construct the course list';
 $string['nocourses'] = 'You are not enroled in any course';
 $string['course_termlist:myaddinstance'] = 'Add a new course term list block to My home';
 $string['course_termlist:addinstance'] = 'Add a new course term list block';
