@@ -2094,8 +2094,6 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
             $fromform->usertype == EXAMBOARD_USERTYPE_ALL ) { 
             $deputy = $fromform->includedeputy ? '' : ' AND m.deputy = 0 ';
             $members = $exam->load_board_members(" (c.exemption = 0 OR c.exemption IS NULL) $deputy ");
-            //print_object($members);
-            //print_object("members");
             foreach($members as $key => $user) {
                 $user->type = 'board';
                 $users[$key] = $user;
@@ -2105,8 +2103,6 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
             $fromform->usertype == EXAMBOARD_USERTYPE_STAFF ||
             $fromform->usertype == EXAMBOARD_USERTYPE_ALL ) { 
             $tutors = $exam->load_tutors();
-            //print_object($tutors);
-            //print_object("tutors");
             foreach($tutors as $key => $usertutors) {
                 foreach($usertutors as $user) {
                     $user->type = 'tutor';
@@ -2117,8 +2113,6 @@ function  examboard_process_notifications($examboard, $course, $cm, $context, $f
         if($fromform->usertype == EXAMBOARD_USERTYPE_USER ||
             $fromform->usertype == EXAMBOARD_USERTYPE_ALL ) { 
             $examinees = $exam->load_examinees(' e.excluded = 0 ');
-            //print_object($examinees);
-            //print_object("examinees");
             
             $users += $examinees;
         }
@@ -3365,9 +3359,6 @@ function examboard_allocate_assign_graders($assigns, $tutors) {
 function examboard_process_allocateboard($examboard, $fromform) {
     global $CFG, $DB, $SESSION;
 
-    //print_object("examboard_process_allocateboard");
-    
-    
     $context = context_module::instance($fromform->id);
     // form arrays of potential members (those that can grade)
     foreach($fromform->choosegroup as $sortorder => $groups) {
@@ -3417,7 +3408,16 @@ function examboard_process_allocateboard($examboard, $fromform) {
     }
     
     $initial = $potential;
-    
+    /*
+    // change for deep copy
+    $initial = array();
+    foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
+        $initial[$sortorder] = array();
+        foreach($potential[$sortorder] as $i => $userid) {
+            $initial[$sortorder][$i] = $userid;
+        }
+    }
+    */
     $boards = array();
     // walk through exams to set all boards  with tutors & members
     foreach($allocatedexams as $examid) {
@@ -3465,6 +3465,39 @@ function examboard_process_allocateboard($examboard, $fromform) {
         $boards[$exam->boardid]->exams[] = $examid;
     }
     
+    $maxallocations = array();
+    $allocations = array();
+    $total = array();
+    $totaloccupied = 0;
+    foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
+        foreach(range(0, $fromform->deputy) as $deputy) {
+            $occupied[$sortorder][$deputy] = 0;
+            foreach($boards as $board) {
+                $set = false; 
+                if(isset($board->members[$sortorder][$deputy])){ 
+                    $occupied[$sortorder][$deputy] += 1;
+                    $set = true;
+                }
+                foreach($potential[$sortorder] as $i => $userid) {
+                    $allocations[$userid][$sortorder][$deputy] = 0;
+                    if($set && $userid == $board->members[$sortorder][$deputy]) { 
+                        $allocations[$userid][$sortorder][$deputy] += 1; 
+                    }
+                }
+            }
+        }
+        $maxallocations[$sortorder] = $potential[$sortorder] ? ceil( (count($boards) - $occupied[$sortorder][0]) / count($potential[$sortorder])) : 1;
+        $total = array_merge($total, $potential[$sortorder]);
+        $totaloccupied += $occupied[$sortorder][0];
+    }
+    //print_object($fromform);
+    //print_object($maxallocations);
+
+    
+    $totalmaxallocations = ceil((count($boards) * $examboard->maxboardsize - $totaloccupied) / count(array_unique($total)));
+    $totalmaxallocations = $fromform->deputy ? 2 * $totalmaxallocations : $totalmaxallocations;
+    //print_object("totalmaxallocations = $totalmaxallocations             from boards:".count($boards)."  - occupied=$totaloccupied   users =".count(array_unique($total)));
+    
     $now = time();
     $synchflag = false;
     $boardsllocated = 0;
@@ -3482,7 +3515,8 @@ function examboard_process_allocateboard($examboard, $fromform) {
         }
     }
     $vacant = array();
-    
+    $added = array();
+
     // now go through boards,  allocating members where needed
     foreach($boards as $board) {
         // if repeatable, we refill any array without users after all used
@@ -3490,13 +3524,32 @@ function examboard_process_allocateboard($examboard, $fromform) {
             if(empty($potential[$sortorder])) {
                 if($fromform->repeatable) {
                     $potential[$sortorder] = $initial[$sortorder];
-                     shuffle($potential[$sortorder]);
+                    // eliminate those with max allowable allocations; 
+                    foreach($potential[$sortorder] as $i => $userid) {
+                        $allocs = 0;
+                        foreach(range(0, $fromform->deputy) as $deputy) {
+                            if($allocations[$userid][$sortorder][$deputy] >= $maxallocations[$sortorder]) { 
+                                unset($potential[$sortorder][$i]);
+                                //print_object("eliminado por max  $sortorder  $userid has {$allocations[$userid][$sortorder][$deputy]} allocations");
+                            }
+                        }
+                        foreach($allocations[$userid] as $s => $darr) {
+                            foreach($darr as $d => $num) {
+                               $allocs += $allocations[$userid][$s][$d];
+                            }
+                        }
+                        if($allocs >= $totalmaxallocations) {
+                            unset($potential[$sortorder][$i]);
+                            //print_object("eliminado  por maxglobal $userid ");
+                        }
+                    }
+                    shuffle($potential[$sortorder]);
+                    //print_object("Al procesar {$board->idnumber}   Deben quedar en $sortorder unos".count($potential[$sortorder]));
                 }
             }
         }
         
         // now we can test if really sold out
-        /*
         $allempty = true; 
         foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
             // after loops end thsi is only true if all emptied 
@@ -3508,31 +3561,19 @@ function examboard_process_allocateboard($examboard, $fromform) {
             \core\notification::error(get_string('allocemptied', 'examboard'));
             break;
         }
-*/
-        foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
-            if(empty($potential[$sorder])) {
-                // if one of the potential members arrays is empty we cannot continue allocating 
-                // notice
-                \core\notification::error(get_string('allocemptied', 'examboard'));
-                break 2;
-            }
-        }
-        
+
         $added = array();
-    
         foreach(range(0, $examboard->maxboardsize -1) as $sortorder) {
             shuffle($potential[$sortorder]);
             foreach(range(0, $fromform->deputy) as $deputy) {
-                if(!isset($board->member[$sortorder][$deputy])) {
+                if(!isset($board->members[$sortorder][$deputy]) || !$board->members[$sortorder][$deputy]) {
                     // not exists, allocate member now
                     // get a potential user
                     // only if there are potential users NOT excluded (avoid infinite loops)
-                    if($potential[$sortorder] && array_diff($potential[$sortorder], $board->excluded)) {
-                        $userid = 0;
-                        do {
-                            $key = array_rand($potential[$sortorder]);
-                            $userid = $potential[$sortorder][$key];
-                        } while (in_array($userid, $board->excluded));
+                    $userid = 0;
+                    if($available = array_diff($potential[$sortorder], $board->excluded)) {
+                        $key = array_rand($available);
+                        $userid = $available[$key];                    
                         if($userid > 0) {
                             //OK, this is a non-existing user, can be added
                             $added[$sortorder][$deputy] = $userid;
@@ -3540,12 +3581,12 @@ function examboard_process_allocateboard($examboard, $fromform) {
                         }
                     } else {
                         $vacant[] = $board->idnumber;
-                    }
+                    } 
                 }
             }
         }
     
-        if($added) {
+        if(!empty($added)) {
             $newmember->boardid = $board->id;
             $boardsllocated++;
             $examsllocated += count($board->exams); 
@@ -3557,9 +3598,11 @@ function examboard_process_allocateboard($examboard, $fromform) {
                     $newmember->deputy = $deputy;
                     if($DB->insert_record('examboard_member', $newmember)) {
                         $synchflag = true;
+                        $allocations[$userid][$sortorder][$deputy] += 1; 
                         // once added, remove from all potential, so no repeat unless all used up
                         foreach(range(0, $examboard->maxboardsize -1) as $sorder) {
-                            if($key = array_search($userid, $potential[$sorder])) {
+                            $key = array_search($userid, $potential[$sorder]);
+                            if($key !== false) {
                                 unset($potential[$sorder][$key]);
                                 shuffle($potential[$sorder]);
                             }
@@ -3568,6 +3611,8 @@ function examboard_process_allocateboard($examboard, $fromform) {
                 }
             }
         }
+        $userid = 0;
+        $newmember->userid = null;
         // allocation for this boardid is done
     
         // time to reorder exam student users, if asked
