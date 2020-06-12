@@ -310,10 +310,6 @@ class batchmanage_managejob_gcatconfig extends batchmanage_managejob_plugin {
         $extramsg = '';
         
         if($data && $gcat) {
-        
-            print_object($gcat);
-            print_object($data);
-            
             if (!$grade_category = grade_category::fetch(array('id'=>$gcat->id, 'courseid'=>$gcat->courseid))) {
                 return array(false, $gcat->fullname, ' Category not existing');
             }
